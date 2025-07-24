@@ -1,0 +1,2304 @@
+LABORATORIOS PRÁCTICOS - SESIÓN 1: INTRODUCCIÓN A ANGULAR v18
+PROVIAS DESCENTRALIZADO
+________________________________________
+INFORMACIÓN GENERAL
+Curso: Angular v18 - 30 horas académicas
+Modalidad: 100% Online Live
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Sesión: 1 - Introducción a Angular v18
+Duración Total Laboratorios: 90 minutos (Lab 0: 20 min + Lab 1: 25 min + Lab 2: 25 min + Lab 3: 20 min)
+________________________________________
+REQUISITOS PREVIOS
+Requisitos Técnicos
+•	✅ Sistema Operativo: Windows 10/11, macOS 10.15+, o Ubuntu 18.04+
+•	✅ RAM: Mínimo 8GB (recomendado 16GB)
+•	✅ Espacio en disco: Mínimo 5GB libres
+•	✅ Conexión a internet: Mínimo 10 Mbps para descargas
+•	✅ Permisos de administrador: Para instalación de software
+Software a Verificar/Instalar
+•	✅ Node.js v18.19.0 o superior
+•	✅ npm (incluido con Node.js)
+•	✅ Visual Studio Code
+•	✅ Git
+•	✅ Navegador moderno (Chrome, Firefox, Safari, Edge)
+Conocimientos Previos
+•	Conocimientos básicos de JavaScript
+•	Experiencia con HTML y CSS
+•	Familiaridad con línea de comandos
+•	Conceptos básicos de desarrollo web
+________________________________________
+LAB 0: CONFIGURACIÓN DEL ENTORNO DE DESARROLLO
+Duración: 20 minutos
+Objetivo: Configurar completamente el entorno de desarrollo Angular v18
+PASO 1: VERIFICACIÓN E INSTALACIÓN DE NODE.JS (7 minutos)
+1.1 Verificar Instalación Existente
+1.	Abrir terminal/command prompt:
+o	Windows: Win + R → cmd → Enter
+o	macOS: Cmd + Space → Terminal → Enter
+o	Linux: Ctrl + Alt + T
+2.	Verificar Node.js:
+3.	node --version
+Resultado esperado: v18.19.0 o superior
+4.	Verificar npm:
+5.	npm --version
+Resultado esperado: 9.0.0 o superior
+1.2 Instalación de Node.js (si es necesario)
+Si no tienen Node.js instalado o versión inferior a v18:
+1.	Descargar Node.js:
+o	Ir a: https://nodejs.org/en/download/
+o	Seleccionar: LTS (Long Term Support)
+o	Descargar para su sistema operativo
+2.	Instalar Node.js:
+o	Windows: Ejecutar archivo .msi descargado
+o	macOS: Ejecutar archivo .pkg descargado
+o	Linux: Usar package manager o descargar binarios
+3.	Verificar instalación:
+4.	node --version
+5.	npm --version
+1.3 Configuración Básica de npm
+1.	Configurar npm registry (opcional pero recomendado):
+2.	npm config set registry https://registry.npmjs.org/
+3.	Verificar configuración:
+4.	npm config list
+5.	Actualizar npm a la última versión:
+6.	npm install -g npm@latest
+PASO 2: INSTALACIÓN DE VISUAL STUDIO CODE (5 minutos)
+2.1 Descargar e Instalar VS Code
+1.	Descargar VS Code:
+o	Ir a: https://code.visualstudio.com/download
+o	Seleccionar versión para su sistema operativo
+2.	Instalar VS Code:
+o	Seguir asistente de instalación
+o	Importante: Marcar opciones: 
+	✅ Add "Open with Code" action to Windows Explorer file context menu
+	✅ Add "Open with Code" action to Windows Explorer directory context menu
+	✅ Add to PATH (requires shell restart)
+2.2 Instalación de Extensiones Esenciales
+1.	Abrir VS Code
+2.	Ir a Extensions: Ctrl + Shift + X (Windows/Linux) o Cmd + Shift + X (macOS)
+3.	Instalar extensiones una por una:
+Angular Language Service:
+o	Buscar: "Angular Language Service"
+o	Publisher: Angular
+o	Click "Install"
+Angular Snippets:
+o	Buscar: "Angular Snippets (Version 16)"
+o	Publisher: John Papa
+o	Click "Install"
+Prettier - Code formatter:
+o	Buscar: "Prettier - Code formatter"
+o	Publisher: Prettier
+o	Click "Install"
+Auto Rename Tag:
+o	Buscar: "Auto Rename Tag"
+o	Publisher: Jun Han
+o	Click "Install"
+GitLens:
+o	Buscar: "GitLens — Git supercharged"
+o	Publisher: GitKraken
+o	Click "Install"
+Material Icon Theme:
+o	Buscar: "Material Icon Theme"
+o	Publisher: Philipp Kief
+o	Click "Install"
+4.	Reiniciar VS Code después de instalar todas las extensiones
+PASO 3: INSTALACIÓN DE GIT (4 minutos)
+3.1 Verificar Instalación de Git
+1.	Verificar Git en terminal: 
+2.	git --version
+3.2 Instalar Git (si es necesario)
+Windows:
+•	Descargar de: https://git-scm.com/download/win
+•	Ejecutar instalador con configuraciones por defecto
+macOS:
+•	Instalar Xcode Command Line Tools: 
+•	xcode-select --install
+•	O descargar de: https://git-scm.com/download/mac
+Linux (Ubuntu/Debian):
+sudo apt update
+sudo apt install git
+3.3 Configuración Inicial de Git
+1.	Configurar nombre de usuario:
+2.	git config --global user.name "Tu Nombre Completo"
+3.	Configurar email:
+4.	git config --global user.email "tu.email@empresa.com"
+5.	Verificar configuración:
+6.	git config --list
+PASO 4: INSTALACIÓN DE ANGULAR CLI (4 minutos)
+4.1 Instalar Angular CLI Globalmente
+1.	Instalar Angular CLI v18:
+2.	npm install -g @angular/cli@18
+3.	Verificar instalación:
+4.	ng version
+Resultado esperado:
+Angular CLI: 18.x.x
+Node: 18.x.x
+Package Manager: npm 9.x.x
+OS: [tu sistema operativo]
+4.2 Configuración de Angular CLI
+1.	Habilitar analytics (opcional):
+2.	ng analytics on
+3.	Verificar comandos disponibles:
+4.	ng help
+RESULTADO ESPERADO LAB 0:
+•	✅ Node.js v18+ instalado y funcionando
+•	✅ npm actualizado y configurado
+•	✅ Visual Studio Code con todas las extensiones esenciales
+•	✅ Git instalado y configurado
+•	✅ Angular CLI v18 instalado globalmente
+•	✅ Entorno listo para desarrollo Angular
+TROUBLESHOOTING LAB 0
+Problemas Comunes y Soluciones:
+Error: "node is not recognized as internal command"
+•	Causa: Node.js no agregado al PATH
+•	Solución: 
+1.	Reinstalar Node.js marcando "Add to PATH"
+2.	O agregar manualmente: C:\Program Files\nodejs al PATH
+3.	Reiniciar terminal
+Error: "ng is not recognized as internal command"
+•	Causa: Angular CLI no instalado globalmente o PATH issue
+•	Solución: 
+•	npm install -g @angular/cli@18# Si persiste el error:npm config get prefix# Agregar la ruta mostrada al PATH del sistema
+Error de permisos en npm (Linux/macOS):
+•	Solución: 
+•	sudo npm install -g @angular/cli@18# O configurar npm para no usar sudo:mkdir ~/.npm-globalnpm config set prefix '~/.npm-global'# Agregar ~/.npm-global/bin al PATH
+Extensions no funcionan en VS Code:
+•	Solución: 
+1.	Verificar que VS Code esté actualizado
+2.	Recargar window: Ctrl+Shift+P → "Developer: Reload Window"
+3.	Reinstalar extensiones si es necesario
+________________________________________
+LAB 1: CREACIÓN DEL PRIMER PROYECTO ANGULAR
+Duración: 25 minutos
+Objetivo: Crear, configurar y ejecutar el primer proyecto Angular v18
+PASO 1: CREACIÓN DEL PROYECTO (8 minutos)
+1.1 Crear Directorio de Trabajo
+1.	Crear carpeta para proyectos:
+# Windows
+mkdir C:\Angular-Projects
+cd C:\Angular-Projects
+
+# macOS/Linux
+mkdir ~/Angular-Projects
+cd ~/Angular-Projects
+2.	Verificar ubicación:
+pwd  # macOS/Linux
+cd   # Windows
+1.2 Crear Nuevo Proyecto Angular
+1.	Ejecutar comando de creación:
+2.	ng new mi-primera-app-angular --routing --style=scss --skip-git=false --package-manager=npm
+3.	Durante la creación, responder a prompts:
+o	¿Would you like to add Angular routing? → Yes (Y)
+o	¿Which stylesheet format would you like to use? → SCSS
+4.	Esperar a que termine la instalación (3-5 minutos)
+1.3 Verificar Estructura del Proyecto
+1.	Navegar al proyecto:
+cd mi-primera-app-angular
+2.	Listar archivos del proyecto:
+# Windows
+dir
+
+# macOS/Linux
+ls -la
+3.	Verificar estructura en VS Code:
+code .
+PASO 2: EXPLORACIÓN DE ARCHIVOS PRINCIPALES (10 minutos)
+2.1 Archivos de Configuración
+1.	Abrir y revisar package.json:
+o	Verificar dependencies de Angular v18
+o	Revisar scripts disponibles
+o	Confirmar devDependencies
+2.	Explorar angular.json:
+o	Configuración del workspace
+o	Build configurations
+o	Test configurations
+3.	Revisar tsconfig.json:
+o	Configuración TypeScript
+o	Compiler options
+o	Path mappings
+2.2 Estructura del Código Fuente
+1.	Explorar carpeta src/:
+src/
+├── app/
+│   ├── app.component.ts      # Componente principal
+│   ├── app.component.html    # Template principal
+│   ├── app.component.scss    # Estilos del componente
+│   ├── app.routes.ts         # Configuración de rutas
+│   └── app.config.ts         # Configuración de la app
+├── assets/                   # Recursos estáticos
+├── environments/             # Configuraciones de entorno
+├── index.html               # HTML principal
+├── main.ts                  # Bootstrap de la aplicación
+└── styles.scss              # Estilos globales
+2.	Analizar app.component.ts:
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent {
+  title = 'mi-primera-app-angular';
+}
+3.	Revisar main.ts:
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));
+2.3 Personalización Inicial
+1.	Modificar app.component.html:
+<div class="main-container">
+  <h1>¡Bienvenidos a Angular 18!</h1>
+  <h2>{{ title }}</h2>
+  <p>Mi primera aplicación Angular está funcionando perfectamente.</p>
+  
+  <div class="info-cards">
+    <div class="card">
+      <h3>🚀 Versión</h3>
+      <p>Angular 18.x</p>
+    </div>
+    <div class="card">
+      <h3>💻 TypeScript</h3>
+      <p>Tipado estático</p>
+    </div>
+    <div class="card">
+      <h3>🎨 SCSS</h3>
+      <p>Estilos avanzados</p>
+    </div>
+  </div>
+</div>
+
+<router-outlet></router-outlet>
+2.	Agregar estilos en app.component.scss:
+.main-container {
+  padding: 2rem;
+  text-align: center;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+
+  h1 {
+    color: #dd0031;
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    color: #333;
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+
+  p {
+    color: #666;
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+  }
+}
+
+.info-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+
+  .card {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+
+    h3 {
+      margin: 0 0 0.5rem 0;
+      font-size: 1.3rem;
+    }
+
+    p {
+      margin: 0;
+      color: rgba(255, 255, 255, 0.9);
+    }
+  }
+}
+3.	Actualizar propiedad en app.component.ts:
+export class AppComponent {
+  title = 'Proyecto Angular - PROVIAS DESCENTRALIZADO';
+}
+PASO 3: EJECUCIÓN Y PRUEBAS (7 minutos)
+3.1 Iniciar Servidor de Desarrollo
+1.	Ejecutar servidor de desarrollo:
+ng serve
+2.	Verificar output en terminal:
+✔ Browser application bundle generation complete.
+
+Initial Chunk Files | Names         |  Raw Size
+vendor.js           | vendor        |   2.05 MB | 
+main.js             | main          | 207.95 kB | 
+polyfills.js        | polyfills     |  90.20 kB | 
+styles.css          | styles        |  95.33 kB | 
+runtime.js          | runtime       |   6.15 kB | 
+
+                    | Initial Total |   2.44 MB
+
+Build at: 2025-07-24T19:45:23.456Z - Hash: a1b2c3d4e5f6g7h8 - Time: 8234ms
+
+** Angular Live Development Server is listening on localhost:4200 **
+3.	Abrir navegador automáticamente:
+o	Si no se abre automáticamente: http://localhost:4200
+3.2 Verificar Funcionalidad
+1.	Verificar en navegador:
+o	✅ Página carga correctamente
+o	✅ Título personalizado visible
+o	✅ Cards con información mostradas
+o	✅ Estilos SCSS aplicados correctamente
+2.	Probar Hot Reload:
+o	Cambiar texto en app.component.html
+o	Guardar archivo (Ctrl+S)
+o	Verificar que cambios aparecen automáticamente en navegador
+3.3 Explorar Herramientas de Desarrollo
+1.	Abrir DevTools: F12 o Ctrl+Shift+I
+2.	Verificar en Console:
+o	No debe haber errores
+o	Verificar mensajes de Angular
+3.	Inspeccionar Elements:
+o	Verificar estructura DOM generada
+o	Confirmar que componentes Angular están renderizados
+4.	Network Tab:
+o	Recargar página (F5)
+o	Verificar que archivos se cargan correctamente
+RESULTADO ESPERADO LAB 1:
+•	✅ Proyecto Angular v18 creado exitosamente
+•	✅ Estructura de archivos comprendida
+•	✅ Personalización básica aplicada
+•	✅ Servidor de desarrollo funcionando
+•	✅ Hot reload operativo
+•	✅ Aplicación visible en navegador
+________________________________________
+LAB 2: CREACIÓN DE COMPONENTES Y ESTRUCTURA
+Duración: 25 minutos
+Objetivo: Crear componentes personalizados y entender la arquitectura de Angular
+PASO 1: CREACIÓN DE COMPONENTES (10 minutos)
+1.1 Crear Componente Header
+1.	Generar componente header:
+ng generate component components/header --standalone
+2.	Verificar archivos creados:
+src/app/components/header/
+├── header.component.ts
+├── header.component.html
+├── header.component.scss
+└── header.component.spec.ts
+3.	Modificar header.component.html:
+<header class="app-header">
+  <div class="header-container">
+    <div class="logo-section">
+      <h1>🏗️ PROVIAS</h1>
+      <span class="subtitle">Angular Learning</span>
+    </div>
+    <nav class="navigation">
+      <a href="#" class="nav-link">Inicio</a>
+      <a href="#" class="nav-link">Proyectos</a>
+      <a href="#" class="nav-link">Contacto</a>
+    </nav>
+  </div>
+</header>
+4.	Agregar estilos en header.component.scss:
+.app-header {
+  background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+  color: white;
+  padding: 1rem 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+  .header-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 2rem;
+
+    .logo-section {
+      h1 {
+        margin: 0;
+        font-size: 1.8rem;
+        font-weight: bold;
+      }
+
+      .subtitle {
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+    }
+
+    .navigation {
+      display: flex;
+      gap: 2rem;
+
+      .nav-link {
+        color: white;
+        text-decoration: none;
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        transition: background-color 0.3s ease;
+
+        &:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+      }
+    }
+  }
+}
+1.2 Crear Componente Footer
+1.	Generar componente footer:
+ng generate component components/footer --standalone
+2.	Modificar footer.component.html:
+<footer class="app-footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="company-info">
+        <h3>PROVIAS DESCENTRALIZADO</h3>
+        <p>Construyendo el futuro con Angular 18</p>
+      </div>
+      <div class="tech-info">
+        <h4>Tecnologías</h4>
+        <ul>
+          <li>Angular {{ angularVersion }}</li>
+          <li>TypeScript</li>
+          <li>SCSS</li>
+        </ul>
+      </div>
+      <div class="contact-info">
+        <h4>Contacto</h4>
+        <p>📧 info@provias.gob.pe</p>
+        <p>📱 +51 999 999 999</p>
+      </div>
+    </div>
+    <div class="copyright">
+      <p>&copy; {{ currentYear }} PROVIAS DESCENTRALIZADO - Todos los derechos reservados</p>
+    </div>
+  </div>
+</footer>
+3.	Actualizar footer.component.ts:
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-footer',
+  standalone: true,
+  imports: [],
+  templateUrl: './footer.component.html',
+  styleUrl: './footer.component.scss'
+})
+export class FooterComponent {
+  angularVersion = '18.x';
+  currentYear = new Date().getFullYear();
+}
+4.	Agregar estilos en footer.component.scss:
+.app-footer {
+  background-color: #2c3e50;
+  color: white;
+  margin-top: 2rem;
+
+  .footer-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+
+    .footer-content {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 1rem;
+
+      h3, h4 {
+        margin-bottom: 0.5rem;
+        color: #3498db;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+
+        li {
+          margin-bottom: 0.3rem;
+          padding-left: 1rem;
+          position: relative;
+
+          &:before {
+            content: '▶';
+            position: absolute;
+            left: 0;
+            color: #3498db;
+          }
+        }
+      }
+
+      p {
+        margin: 0.3rem 0;
+        opacity: 0.9;
+      }
+    }
+
+    .copyright {
+      border-top: 1px solid #34495e;
+      padding-top: 1rem;
+      text-align: center;
+
+      p {
+        margin: 0;
+        opacity: 0.8;
+        font-size: 0.9rem;
+      }
+    }
+  }
+}
+1.3 Crear Componente Home
+1.	Generar componente home:
+ng generate component pages/home --standalone
+2.	Modificar home.component.html:
+<div class="home-container">
+  <section class="hero-section">
+    <h1>🎉 ¡Bienvenidos al Curso Angular 18!</h1>
+    <p class="hero-subtitle">
+      Aprende a desarrollar aplicaciones web modernas con la última versión de Angular
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>{{ studentsCount }}</h3>
+        <p>Estudiantes</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ sessionsCount }}</h3>
+        <p>Sesiones</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ hoursCount }}</h3>
+        <p>Horas</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <h2>¿Qué aprenderás?</h2>
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let feature of features">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </div>
+    </div>
+  </section>
+</div>
+3.	Actualizar home.component.ts:
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
+})
+export class HomeComponent {
+  studentsCount = 25;
+  sessionsCount = 10;
+  hoursCount = 30;
+
+  features = [
+    {
+      icon: '🧩',
+      title: 'Componentes',
+      description: 'Aprende a crear componentes reutilizables y modulares'
+    },
+    {
+      icon: '🚀',
+      title: 'Signals',
+      description: 'Domina la nueva API de Signals para manejo de estado'
+    },
+    {
+      icon: '🛣️',
+      title: 'Routing',
+      description: 'Implementa navegación avanzada entre páginas'
+    },
+    {
+      icon: '🔗',
+      title: 'HTTP Client',
+      description: 'Conecta con APIs REST de forma eficiente'
+    },
+    {
+      icon: '🎨',
+      title: 'Angular Material',
+      description: 'Diseña interfaces modernas con Material Design'
+    },
+    {
+      icon: '✅',
+      title: 'Testing',
+      description: 'Implementa pruebas unitarias y de integración'
+    }
+  ];
+}
+Agregar estilos en home.component.scss:
+.home-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  .hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+
+      .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        h3 {
+          font-size: 2rem;
+          margin: 0 0 0.5rem 0;
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+  .features-section {
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+
+      .feature-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-5px);
+        }
+
+        .feature-icon {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+
+        h3 {
+          color: #3498db;
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          color: #7f8c8d;
+          line-height: 1.6;
+        }
+      }
+    }
+  }
+}
+PASO 2: INTEGRACIÓN DE COMPONENTES (8 minutos)
+2.1 Integrar Componentes en App Principal
+1.	Actualizar app.component.ts para importar componentes: 
+typescript
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { HomeComponent } from './pages/home/home.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, HomeComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent {
+  title = 'Mi Primera App Angular - PROVIAS DESCENTRALIZADO';
+}
+2.	Actualizar app.component.html: 
+html
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <main class="main-content">
+    <app-home></app-home>
+    <router-outlet></router-outlet>
+  </main>
+  
+  <app-footer></app-footer>
+</div>
+3.	Actualizar app.component.scss: 
+scss
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .main-content {
+    flex: 1;
+    background-color: #f8f9fa;
+  }
+}
+4.	Actualizar src/styles.scss (estilos globales): 
+scss
+/* Reset básico */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* Fuentes y colores globales */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #ffffff;
+}
+
+/* Utilidades */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+}
+2.2 Verificar Funcionamiento
+1.	Verificar que el servidor sigue ejecutándose: 
+bash
+# Si no está ejecutándose:
+ng serve
+2.	Revisar en navegador (http://localhost:4200): 
+o	✅ Header con navegación visible
+o	✅ Contenido principal de Home component
+o	✅ Footer con información de la empresa
+o	✅ Diseño responsive
+3.	Verificar en DevTools: 
+o	Inspeccionar elementos para ver estructura de componentes
+o	Verificar que no hay errores en console
+PASO 3: CREACIÓN DE SERVICIO DE DATOS (7 minutos)
+3.1 Generar Servicio
+1.	Crear servicio de datos: 
+bash
+ng generate service services/data
+2.	Verificar archivos creados: 
+3.	src/app/services/
+4.	├── data.service.ts
+└── data.service.spec.ts
+3.2 Implementar Lógica del Servicio
+1.	Actualizar data.service.ts: 
+typescript
+import { Injectable } from '@angular/core';
+
+export interface Course {
+  id: number;
+  title: string;
+  description: string;
+  duration: string;
+  level: string;
+  technologies: string[];
+}
+
+export interface Student {
+  id: number;
+  name: string;
+  email: string;
+  course: string;
+  progress: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+
+  private courses: Course[] = [
+    {
+      id: 1,
+      title: 'Angular Fundamentals',
+      description: 'Aprende los conceptos básicos de Angular 18',
+      duration: '30 horas',
+      level: 'Beginner',
+      technologies: ['Angular', 'TypeScript', 'RxJS']
+    },
+    {
+      id: 2,
+      title: 'Advanced Angular',
+      description: 'Técnicas avanzadas y mejores prácticas',
+      duration: '40 horas',
+      level: 'Advanced',
+      technologies: ['Angular', 'NgRx', 'Testing', 'Performance']
+    },
+    {
+      id: 3,
+      title: 'Angular with .NET',
+      description: 'Integración completa con backend .NET',
+      duration: '50 horas',
+      level: 'Intermediate',
+      technologies: ['Angular', '.NET Core', 'Entity Framework', 'SignalR']
+    }
+  ];
+
+  private students: Student[] = [
+    {
+      id: 1,
+      name: 'Ana García',
+      email: 'ana.garcia@provias.gob.pe',
+      course: 'Angular Fundamentals',
+      progress: 75
+    },
+    {
+      id: 2,
+      name: 'Carlos López',
+      email: 'carlos.lopez@provias.gob.pe',
+      course: 'Advanced Angular',
+      progress: 45
+    },
+    {
+      id: 3,
+      name: 'María Rodriguez',
+      email: 'maria.rodriguez@provias.gob.pe',
+      course: 'Angular with .NET',
+      progress: 90
+    }
+  ];
+
+  constructor() { }
+
+  // Métodos para obtener datos
+  getCourses(): Course[] {
+    return this.courses;
+  }
+
+  getStudents(): Student[] {
+    return this.students;
+  }
+
+  getCourseById(id: number): Course | undefined {
+    return this.courses.find(course => course.id === id);
+  }
+
+  getStudentById(id: number): Student | undefined {
+    return this.students.find(student => student.id === id);
+  }
+
+  // Métodos para agregar datos
+  addCourse(course: Omit<Course, 'id'>): Course {
+    const newCourse = {
+      ...course,
+      id: Math.max(...this.courses.map(c => c.id)) + 1
+    };
+    this.courses.push(newCourse);
+    return newCourse;
+  }
+
+  addStudent(student: Omit<Student, 'id'>): Student {
+    const newStudent = {
+      ...student,
+      id: Math.max(...this.students.map(s => s.id)) + 1
+    };
+    this.students.push(newStudent);
+    return newStudent;
+  }
+
+  // Métodos para actualizar datos
+  updateStudentProgress(studentId: number, progress: number): boolean {
+    const student = this.getStudentById(studentId);
+    if (student) {
+      student.progress = Math.min(100, Math.max(0, progress));
+      return true;
+    }
+    return false;
+  }
+
+  // Método para obtener estadísticas
+  getStatistics() {
+    return {
+      totalCourses: this.courses.length,
+      totalStudents: this.students.length,
+      averageProgress: Math.round(
+        this.students.reduce((sum, student) => sum + student.progress, 0) / 
+        this.students.length
+      ),
+      completedStudents: this.students.filter(s => s.progress >= 100).length
+    };
+  }
+}
+3.3 Integrar Servicio en Home Component
+1.	Actualizar home.component.ts: 
+typescript
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DataService, Course, Student } from '../../services/data.service';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
+})
+export class HomeComponent implements OnInit {
+  // Propiedades existentes
+  studentsCount = 0;
+  sessionsCount = 10;
+  hoursCount = 30;
+
+  // Nuevas propiedades
+  courses: Course[] = [];
+  students: Student[] = [];
+  statistics: any = {};
+
+  features = [
+    {
+      icon: '🧩',
+      title: 'Componentes',
+      description: 'Aprende a crear componentes reutilizables y modulares'
+    },
+    {
+      icon: '🚀',
+      title: 'Signals',
+      description: 'Domina la nueva API de Signals para manejo de estado'
+    },
+    {
+      icon: '🛣️',
+      title: 'Routing',
+      description: 'Implementa navegación avanzada entre páginas'
+    },
+    {
+      icon: '🔗',
+      title: 'HTTP Client',
+      description: 'Conecta con APIs REST de forma eficiente'
+    },
+    {
+      icon: '🎨',
+      title: 'Angular Material',
+      description: 'Diseña interfaces modernas con Material Design'
+    },
+    {
+      icon: '✅',
+      title: 'Testing',
+      description: 'Implementa pruebas unitarias y de integración'
+    }
+  ];
+
+  constructor(private dataService: DataService) {}
+
+  ngOnInit(): void {
+    this.loadData();
+  }
+
+  private loadData(): void {
+    this.courses = this.dataService.getCourses();
+    this.students = this.dataService.getStudents();
+    this.statistics = this.dataService.getStatistics();
+    
+    // Actualizar contadores con datos reales
+    this.studentsCount = this.statistics.totalStudents;
+  }
+}
+2.	Actualizar home.component.html para mostrar datos del servicio: 
+html
+<div class="home-container">
+  <section class="hero-section">
+    <h1>🎉 ¡Bienvenidos al Curso Angular 18!</h1>
+    <p class="hero-subtitle">
+      Aprende a desarrollar aplicaciones web modernas con la última versión de Angular
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>{{ statistics.totalStudents }}</h3>
+        <p>Estudiantes</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ statistics.totalCourses }}</h3>
+        <p>Cursos</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ statistics.averageProgress }}%</h3>
+        <p>Progreso Promedio</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <h2>¿Qué aprenderás?</h2>
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let feature of features">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nueva sección de cursos -->
+  <section class="courses-section">
+    <h2>Cursos Disponibles</h2>
+    <div class="courses-grid">
+      <div class="course-card" *ngFor="let course of courses">
+        <div class="course-header">
+          <h3>{{ course.title }}</h3>
+          <span class="course-level" [class]="'level-' + course.level.toLowerCase()">
+            {{ course.level }}
+          </span>
+        </div>
+        <p class="course-description">{{ course.description }}</p>
+        <div class="course-info">
+          <span class="duration">⏱️ {{ course.duration }}</span>
+          <div class="technologies">
+            <span class="tech-tag" *ngFor="let tech of course.technologies">
+              {{ tech }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nueva sección de estudiantes -->
+  <section class="students-section">
+    <h2>Estudiantes Activos</h2>
+    <div class="students-grid">
+      <div class="student-card" *ngFor="let student of students">
+        <div class="student-info">
+          <h4>{{ student.name }}</h4>
+          <p>{{ student.email }}</p>
+          <small>{{ student.course }}</small>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="student.progress"></div>
+          </div>
+          <span class="progress-text">{{ student.progress }}%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+3.	Actualizar estilos en home.component.scss: 
+scss
+.home-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  // Estilos existentes...
+  .hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 2.5rem;
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .hero-subtitle {
+      font-size: 1.2rem;
+      color: #7f8c8d;
+      margin-bottom: 2rem;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      max-width: 600px;
+      margin: 0 auto;
+
+      .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+        h3 {
+          font-size: 2rem;
+          margin: 0 0 0.5rem 0;
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.9;
+        }
+      }
+    }
+  }
+
+  .features-section, .courses-section, .students-section {
+    margin-bottom: 3rem;
+
+    h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: #2c3e50;
+      margin-bottom: 2rem;
+    }
+  }
+
+  .features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .feature-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .feature-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+      }
+
+      h3 {
+        color: #3498db;
+        margin-bottom: 0.5rem;
+      }
+
+      p {
+        color: #7f8c8d;
+        line-height: 1.6;
+      }
+    }
+  }
+
+  // Nuevos estilos para cursos
+  .courses-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 1.5rem;
+
+    .course-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .course-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        h3 {
+          color: #2c3e50;
+          margin: 0;
+        }
+
+        .course-level {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: bold;
+          text-transform: uppercase;
+
+          &.level-beginner {
+            background-color: #d4edda;
+            color: #155724;
+          }
+
+          &.level-intermediate {
+            background-color: #fff3cd;
+            color: #856404;
+          }
+
+          &.level-advanced {
+            background-color: #f8d7da;
+            color: #721c24;
+          }
+        }
+      }
+
+      .course-description {
+        color: #7f8c8d;
+        margin-bottom: 1rem;
+        line-height: 1.6;
+      }
+
+      .course-info {
+        .duration {
+          display: block;
+          color: #3498db;
+          margin-bottom: 0.5rem;
+          font-weight: 500;
+        }
+
+        .technologies {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+
+          .tech-tag {
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Nuevos estilos para estudiantes
+  .students-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+
+    .student-card {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: translateY(-5px);
+      }
+
+      .student-info {
+        margin-bottom: 1rem;
+
+        h4 {
+          color: #2c3e50;
+          margin: 0 0 0.25rem 0;
+        }
+
+        p {
+          color: #7f8c8d;
+          margin: 0 0 0.25rem 0;
+          font-size: 0.9rem;
+        }
+
+        small {
+          color: #3498db;
+          font-weight: 500;
+        }
+      }
+
+      .progress-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+
+        .progress-bar {
+          flex: 1;
+          height: 8px;
+          background-color: #e9ecef;
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #28a745 0%, #20c997 100%);
+            transition: width 0.3s ease;
+          }
+        }
+
+        .progress-text {
+          font-weight: bold;
+          color: #28a745;
+          min-width: 40px;
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: 1fr;
+      max-width: 300px;
+    }
+
+    .features-grid,
+    .courses-grid,
+    .students-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+RESULTADO ESPERADO LAB 2:
+•	✅ Tres componentes personalizados creados (Header, Footer, Home)
+•	✅ Componentes integrados en aplicación principal
+•	✅ Servicio de datos implementado con TypeScript interfaces
+•	✅ Inyección de dependencias funcionando correctamente
+•	✅ Data binding dinámico mostrando información del servicio
+•	✅ Aplicación con diseño profesional y responsive
+•	✅ Uso de directivas estructurales (*ngFor)
+________________________________________
+LAB 3: COMANDOS CLI Y HERRAMIENTAS DE DESARROLLO
+Duración: 20 minutos
+Objetivo: Dominar Angular CLI y configurar herramientas de desarrollo avanzadas
+PASO 1: EXPLORACIÓN AVANZADA DE ANGULAR CLI (8 minutos)
+1.1 Comandos de Generación Avanzados
+1.	Generar una directiva personalizada: 
+bash
+ng generate directive directives/highlight
+2.	Revisar código generado en highlight.directive.ts: 
+typescript
+import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+
+@Directive({
+  selector: '[appHighlight]',
+  standalone: true
+})
+export class HighlightDirective {
+  @Input() appHighlight = '#ffeb3b';
+
+  constructor(private el: ElementRef) {}
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.highlight(this.appHighlight);
+  }
+
+  @HostListener('mouseleave') onMouseLeave() {
+    this.highlight('');
+  }
+
+  private highlight(color: string) {
+    this.el.nativeElement.style.backgroundColor = color;
+  }
+}
+3.	Generar un pipe personalizado: 
+bash
+ng generate pipe pipes/truncate
+4.	Implementar lógica del pipe en truncate.pipe.ts: 
+typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'truncate',
+  standalone: true
+})
+export class TruncatePipe implements PipeTransform {
+
+  transform(value: string, limit: number = 50, trail: string = '...'): string {
+    if (!value) return '';
+    
+    return value.length > limit 
+      ? value.substring(0, limit) + trail 
+      : value;
+  }
+}
+5.	Generar un guard de ruta: 
+bash
+ng generate guard guards/auth
+6.	Configurar guard básico en auth.guard.ts: 
+typescript
+import { CanActivateFn } from '@angular/router';
+import { inject } from '@angular/core';
+
+export const authGuard: CanActivateFn = (route, state) => {
+  // Lógica de autenticación básica
+  const isAuthenticated = localStorage.getItem('user') !== null;
+  
+  if (!isAuthenticated) {
+    console.warn('Acceso denegado: Usuario no autenticado');
+    return false;
+  }
+  
+  return true;
+};
+7.	Generar una interface: 
+bash
+ng generate interface models/user
+8.	Definir estructura en user.ts: 
+typescript
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  isActive: boolean;
+  createdAt: Date;
+  lastLogin?: Date;
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  INSTRUCTOR = 'instructor',
+  STUDENT = 'student'
+}
+
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  role: UserRole;
+}
+1.2 Uso de Pipes y Directivas en Componente
+1.	Actualizar home.component.ts para usar nuevas funcionalidades: 
+typescript
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { DataService, Course, Student } from '../../services/data.service';
+import { TruncatePipe } from '../../pipes/truncate.pipe';
+import { HighlightDirective } from '../../directives/highlight.directive';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule, TruncatePipe, HighlightDirective],
+  templateUrl: './home.component.html',
+  styleUrl: './home.component.scss'
+})
+export class HomeComponent implements OnInit {
+  // ... código existente ...
+}
+2.	Actualizar template para usar pipe y directiva: 
+html
+<!-- En la sección de cursos, actualizar la descripción -->
+<p class="course-description" appHighlight="#e3f2fd">
+  {{ course.description | truncate:80:'...' }}
+</p>
+
+<!-- En la sección de estudiantes, agregar highlight -->
+<h4 appHighlight="#f0f8ff">{{ student.name }}</h4>
+PASO 2: CONFIGURACIÓN AVANZADA DE VS CODE (6 minutos)
+2.1 Configuración de Workspace
+1.	Crear carpeta .vscode en la raíz del proyecto: 
+bash
+mkdir .vscode
+2.	Crear settings.json para configuración específica del proyecto: 
+json
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "files.associations": {
+    "*.html": "html"
+  },
+  "emmet.includeLanguages": {
+    "typescript": "html"
+  },
+  "angular.enable-strict-mode-prompt": false,
+  "typescript.suggest.autoImports": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 100
+}
+3.	Crear launch.json para debugging: 
+json
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Launch Chrome against localhost",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
+4.	Crear tasks.json para automatización: 
+json
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "start",
+      "group": "build",
+      "label": "npm: start",
+      "detail": "ng serve"
+    },
+    {
+      "type": "npm",
+      "script": "build",
+      "group": "build",
+      "label": "npm: build",
+      "detail": "ng build"
+    },
+    {
+      "type": "npm",
+      "script": "test",
+      "group": "test",
+      "label": "npm: test",
+      "detail": "ng test"
+    }
+  ]
+}
+2.2 Configuración de Prettier
+1.	Crear .prettierrc en la raíz del proyecto: 
+json
+{
+  "semi": true,
+  "trailingComma": "es5",
+  "singleQuote": true,
+  "printWidth": 80,
+  "tabWidth": 2,
+  "useTabs": false,
+  "bracketSpacing": true,
+  "arrowParens": "avoid"
+}
+2.	Crear .prettierignore: 
+node_modules
+dist
+coverage
+*.md
+package-lock.json
+PASO 3: BUILD Y OPTIMIZACIÓN (6 minutos)
+3.1 Build de Desarrollo vs Producción
+1.	Build de desarrollo: 
+bash
+ng build
+2.	Build de producción: 
+bash
+ng build --configuration production
+3.	Comparar archivos generados: 
+bash
+# Ver archivos de build
+ls -la dist/mi-primera-app-angular/
+4.	Verificar optimizaciones en producción: 
+o	Minificación de archivos
+o	Tree-shaking (eliminación de código no usado)
+o	Bundling optimizado
+o	Source maps para debugging
+3.2 Análisis de Bundle
+1.	Instalar webpack-bundle-analyzer: 
+bash
+npm install --save-dev webpack-bundle-analyzer
+2.	Generar build con estadísticas: 
+bash
+ng build --stats-json
+3.	Analizar bundle: 
+bash
+npx webpack-bundle-analyzer dist/mi-primera-app-angular/stats.json
+3.3 Configuración de Proxy para APIs
+1.	Crear proxy.conf.json: 
+json
+{
+  "/api/*": {
+    "target": "http://localhost:3000",
+    "secure": true,
+    "changeOrigin": true,
+    "logLevel": "debug"
+  }
+}
+2.	Actualizar angular.json para usar proxy: 
+json
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "configurations": {
+    "production": {
+      "buildTarget": "mi-primera-app-angular:build:production"
+    },
+    "development": {
+      "buildTarget": "mi-primera-app-angular:build:development",
+      "proxyConfig": "proxy.conf.json"
+    }
+  },
+  "defaultConfiguration": "development"
+}
+3. Ejecutar servidor con proxy:
+bash
+ng serve --configuration development
+4. Verificar configuración de proxy:
+1.	Crear servicio de prueba para simular llamadas API: 
+bash
+ng generate service services/api-test
+2.	Implementar api-test.service.ts: 
+typescript
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface ApiResponse {
+  message: string;
+  data: any;
+  timestamp: Date;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ApiTestService {
+
+  private baseUrl = '/api'; // Será proxificado a localhost:3000
+
+  constructor(private http: HttpClient) { }
+
+  // Simulación de llamadas que irían a través del proxy
+  testConnection(): Observable<ApiResponse> {
+    return this.http.get<ApiResponse>(`${this.baseUrl}/test`);
+  }
+
+  getUsers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.baseUrl}/users`);
+  }
+
+  createUser(userData: any): Observable<any> {
+    return this.http.post<any>(`${this.baseUrl}/users`, userData);
+  }
+}
+3.	Agregar HttpClient al proyecto: Actualizar app.config.ts: 
+typescript
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient } from '@angular/common/http';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient()
+  ]
+};
+4.	Crear componente para probar conexiones API: 
+bash
+ng generate component components/api-test --standalone
+5.	Implementar api-test.component.ts: 
+typescript
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ApiTestService } from '../../services/api-test.service';
+
+@Component({
+  selector: 'app-api-test',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+  <div class="api-test-container">
+    <h3>🔌 Prueba de Configuración Proxy</h3>
+    <div class="test-section">
+      <p><strong>Estado del Proxy:</strong> 
+        <span [class]="proxyStatus.class">{{ proxyStatus.message }}</span>
+      </p>
+      <button (click)="testProxy()" class="test-button">
+        Probar Conexión API
+      </button>
+    </div>
+    
+    <div class="info-section">
+      <h4>📋 Información de Configuración:</h4>
+      <ul>
+        <li><strong>URL Base:</strong> /api/*</li>
+        <li><strong>Target:</strong> http://localhost:3000</li>
+        <li><strong>Status:</strong> {{ proxyConfigured ? 'Configurado' : 'No configurado' }}</li>
+      </ul>
+    </div>
+
+    <div class="note-section">
+      <p><em>Nota: Para probar completamente el proxy, necesitarías un servidor backend ejecutándose en puerto 3000.</em></p>
+    </div>
+  </div>
+  `,
+  styles: [`
+    .api-test-container {
+      background: #f8f9fa;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin: 1rem 0;
+
+      h3 {
+        color: #495057;
+        margin-bottom: 1rem;
+      }
+
+      .test-section {
+        margin-bottom: 1rem;
+
+        .test-button {
+          background: #007bff;
+          color: white;
+          border: none;
+          padding: 0.5rem 1rem;
+          border-radius: 4px;
+          cursor: pointer;
+          margin-left: 1rem;
+
+          &:hover {
+            background: #0056b3;
+          }
+        }
+      }
+
+      .info-section {
+        background: white;
+        padding: 1rem;
+        border-radius: 4px;
+        margin-bottom: 1rem;
+
+        ul {
+          margin: 0.5rem 0;
+          padding-left: 1.5rem;
+        }
+      }
+
+      .note-section {
+        font-style: italic;
+        color: #6c757d;
+        font-size: 0.9rem;
+      }
+
+      .status-ok { color: #28a745; }
+      .status-error { color: #dc3545; }
+      .status-pending { color: #ffc107; }
+    }
+  `]
+})
+export class ApiTestComponent {
+  proxyConfigured = true;
+  proxyStatus = {
+    message: 'Listo para pruebas',
+    class: 'status-pending'
+  };
+
+  constructor(private apiTestService: ApiTestService) {}
+
+  testProxy() {
+    this.proxyStatus = {
+      message: 'Probando conexión...',
+      class: 'status-pending'
+    };
+
+    // Simulamos prueba de conexión
+    setTimeout(() => {
+      // Como no tenemos servidor real, simulamos respuesta
+      this.proxyStatus = {
+        message: 'Proxy configurado correctamente (simulado)',
+        class: 'status-ok'
+      };
+    }, 1500);
+
+    // Código real para cuando tengas servidor:
+    /*
+    this.apiTestService.testConnection().subscribe({
+      next: (response) => {
+        this.proxyStatus = {
+          message: 'Conexión exitosa',
+          class: 'status-ok'
+        };
+      },
+      error: (error) => {
+        this.proxyStatus = {
+          message: 'Error de conexión - verifica servidor backend',
+          class: 'status-error'
+        };
+      }
+    });
+    */
+  }
+}
+6.	Integrar componente de prueba en Home: Actualizar home.component.ts: 
+typescript
+import { ApiTestComponent } from '../../components/api-test/api-test.component';
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule, TruncatePipe, HighlightDirective, ApiTestComponent],
+  // ... resto del código
+})
+Agregar al template de home.component.html: 
+html
+<!-- Agregar después de la sección de estudiantes -->
+<section class="tools-section">
+  <h2>🛠️ Herramientas de Desarrollo</h2>
+  <app-api-test></app-api-test>
+</section>
+________________________________________
+PASO 4: TESTING Y CALIDAD DE CÓDIGO (8 minutos)
+4.1 Configuración de Testing
+1.	Ejecutar tests existentes: 
+bash
+ng test
+Resultado esperado: 
+o	Karma se ejecuta en navegador
+o	Tests pasan exitosamente
+o	Coverage report disponible
+2.	Ejecutar tests en modo CI: 
+bash
+ng test --watch=false --browsers=ChromeHeadless
+3.	Generar coverage report: 
+bash
+ng test --code-coverage --watch=false --browsers=ChromeHeadless
+4.	Verificar coverage report: 
+bash
+# Navegar a coverage/mi-primera-app-angular/index.html
+open coverage/mi-primera-app-angular/index.html  # macOS
+# o simplemente abrir el archivo en navegador
+4.2 Linting y Calidad de Código
+1.	Instalar ESLint para Angular: 
+bash
+ng add @angular-eslint/schematics
+2.	Ejecutar linting: 
+bash
+ng lint
+3.	Configurar reglas personalizadas en .eslintrc.json: 
+json
+{
+  "root": true,
+  "ignorePatterns": [
+    "projects/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts"
+      ],
+      "extends": [
+        "eslint:recommended",
+        "@typescript-eslint/recommended",
+        "@angular-eslint/recommended",
+        "@angular-eslint/template/process-inline-templates"
+      ],
+      "rules": {
+        "@angular-eslint/directive-selector": [
+          "error",
+          {
+            "type": "attribute",
+            "prefix": "app",
+            "style": "camelCase"
+          }
+        ],
+        "@angular-eslint/component-selector": [
+          "error",
+          {
+            "type": "element",
+            "prefix": "app",
+            "style": "kebab-case"
+          }
+        ],
+        "@typescript-eslint/no-unused-vars": "error",
+        "@typescript-eslint/no-explicit-any": "warn"
+      }
+    },
+    {
+      "files": [
+        "*.html"
+      ],
+      "extends": [
+        "@angular-eslint/template/recommended"
+      ],
+      "rules": {}
+    }
+  ]
+}
+4.	Agregar scripts al package.json: 
+json
+{
+  "scripts": {
+    "lint": "ng lint",
+    "lint:fix": "ng lint --fix",
+    "test:coverage": "ng test --code-coverage --watch=false --browsers=ChromeHeadless",
+    "build:analyze": "ng build --stats-json && npx webpack-bundle-analyzer dist/mi-primera-app-angular/stats.json"
+  }
+}
+4.3 Pruebas de Componente Personalizadas
+1.	Crear test para DataService: Actualizar data.service.spec.ts: 
+typescript
+import { TestBed } from '@angular/core/testing';
+import { DataService, Course, Student } from './data.service';
+
+describe('DataService', () => {
+  let service: DataService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(DataService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should return courses', () => {
+    const courses = service.getCourses();
+    expect(courses.length).toBeGreaterThan(0);
+    expect(courses[0]).toHaveProperty('title');
+    expect(courses[0]).toHaveProperty('description');
+  });
+
+  it('should return students', () => {
+    const students = service.getStudents();
+    expect(students.length).toBeGreaterThan(0);
+    expect(students[0]).toHaveProperty('name');
+    expect(students[0]).toHaveProperty('email');
+  });
+
+  it('should find course by id', () => {
+    const course = service.getCourseById(1);
+    expect(course).toBeTruthy();
+    expect(course?.id).toBe(1);
+  });
+
+  it('should return undefined for non-existent course', () => {
+    const course = service.getCourseById(999);
+    expect(course).toBeUndefined();
+  });
+
+  it('should add new course', () => {
+    const initialCount = service.getCourses().length;
+    const newCourse = {
+      title: 'Test Course',
+      description: 'Test Description',
+      duration: '10 hours',
+      level: 'Beginner',
+      technologies: ['Test Tech']
+    };
+    
+    const addedCourse = service.addCourse(newCourse);
+    expect(addedCourse.id).toBeTruthy();
+    expect(service.getCourses().length).toBe(initialCount + 1);
+  });
+
+  it('should update student progress', () => {
+    const updated = service.updateStudentProgress(1, 85);
+    expect(updated).toBeTruthy();
+    
+    const student = service.getStudentById(1);
+    expect(student?.progress).toBe(85);
+  });
+
+  it('should return correct statistics', () => {
+    const stats = service.getStatistics();
+    expect(stats.totalCourses).toBeGreaterThan(0);
+    expect(stats.totalStudents).toBeGreaterThan(0);
+    expect(stats.averageProgress).toBeGreaterThanOrEqual(0);
+    expect(stats.averageProgress).toBeLessThanOrEqual(100);
+  });
+});
+2.	Crear test para TruncatePipe: Actualizar truncate.pipe.spec.ts: 
+typescript
+import { TruncatePipe } from './truncate.pipe';
+
+describe('TruncatePipe', () => {
+  let pipe: TruncatePipe;
+
+  beforeEach(() => {
+    pipe = new TruncatePipe();
+  });
+
+  it('create an instance', () => {
+    expect(pipe).toBeTruthy();
+  });
+
+  it('should return original string if shorter than limit', () => {
+    const result = pipe.transform('Short text', 50);
+    expect(result).toBe('Short text');
+  });
+
+  it('should truncate long string with default trail', () => {
+    const longText = 'This is a very long text that should be truncated';
+    const result = pipe.transform(longText, 20);
+    expect(result).toBe('This is a very long...');
+  });
+
+  it('should use custom trail', () => {
+    const longText = 'This is a very long text that should be truncated';
+    const result = pipe.transform(longText, 20, ' [más]');
+    expect(result).toBe('This is a very long [más]');
+  });
+
+  it('should handle empty string', () => {
+    const result = pipe.transform('', 10);
+    expect(result).toBe('');
+  });
+
+  it('should handle null/undefined input', () => {
+    const result1 = pipe.transform(null as any, 10);
+    const result2 = pipe.transform(undefined as any, 10);
+    expect(result1).toBe('');
+    expect(result2).toBe('');
+  });
+});
+3.	Ejecutar todos los tests: 
+bash
+ng test --watch=false --browsers=ChromeHeadless
+________________________________________
+PASO 5: OPTIMIZACIÓN Y DEPLOYMENT PREPARATION (6 minutos)
+5.1 Optimización de Assets
+1.	Optimizar imágenes y assets: Crear scripts/optimize-assets.js: 
+javascript
+const fs = require('fs');
+const path = require('path');
+
+// Script para optimización de assets
+console.log('🔧 Optimizando assets...');
+
+// Verificar tamaño de archivos en src/assets
+const assetsPath = path.join(__dirname, '../src/assets');
+
+function getFileSizeInKB(filepath) {
+  const stats = fs.statSync(filepath);
+  return (stats.size / 1024).toFixed(2);
+}
+
+if (fs.existsSync(assetsPath)) {
+  const files = fs.readdirSync(assetsPath);
+  console.log('\n📁 Assets encontrados:');
+  
+  files.forEach(file => {
+    const filePath = path.join(assetsPath, file);
+    if (fs.statSync(filePath).isFile()) {
+      const size = getFileSizeInKB(filePath);
+      console.log(`  - ${file}: ${size} KB`);
+    }
+  });
+}
+
+console.log('\n✅ Análisis de assets completado');
+2.	Agregar script al package.json: 
+json
+{
+  "scripts": {
+    "optimize:assets": "node scripts/optimize-assets.js"
+  }
+}
+3.	Ejecutar optimización: 
+bash
+npm run optimize:assets
+5.2 Configuración de Environment Variables
+1.	Actualizar environment.development.ts: 
+typescript
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  appName: 'Mi Primera App Angular - DEV',
+  version: '1.0.0',
+  features: {
+    enableLogging: true,
+    enableDebugMode: true,
+    enableMockData: true
+  }
+};
+2.	Actualizar environment.ts (producción): 
+typescript
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.miapp.com/api',
+  appName: 'Mi Primera App Angular',
+  version: '1.0.0',
+  features: {
+    enableLogging: false,
+    enableDebugMode: false,
+    enableMockData: false
+  }
+};
+3.	Usar environment en DataService: Actualizar data.service.ts: 
+typescript
+import { environment } from '../../environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
+  private apiUrl = environment.apiUrl;
+  private enableMockData = environment.features.enableMockData;
+
+  // ... resto del código
+
+  getStatistics() {
+    const stats = {
+      totalCourses: this.courses.length,
+      totalStudents: this.students.length,
+      averageProgress: Math.round(
+        this.students.reduce((sum, student) => sum + student.progress, 0) / 
+        this.students.length
+      ),
+      completedStudents: this.students.filter(s => s.progress >= 100).length,
+      environment: environment.production ? 'production' : 'development',
+      version: environment.version
+    };
+
+    if (environment.features.enableLogging) {
+      console.log('📊 Statistics generated:', stats);
+    }
+
+    return stats;
+  }
+}
+5.3 Build Final y Verificación
+1.	Build de producción con análisis: 
+bash
+npm run build:analyze
+2.	Verificar archivos generados: 
+bash
+ls -la dist/mi-primera-app-angular/
+3.	Verificar compresión y optimización: 
+bash
+# Ver tamaños de archivos principales
+du -h dist/mi-primera-app-angular/*.js
+du -h dist/mi-primera-app-angular/*.css
+4.	Simular servidor de producción: 
+bash
+# Instalar servidor estático
+npm install -g http-server
+
+# Servir archivos de producción
+cd dist/mi-primera-app-angular
+http-server -p 8080
+
+# Abrir http://localhost:8080 en navegador
+________________________________________
+RESULTADO FINAL LAB 3 COMPLETO:
+•	✅ Proxy configurado para APIs futuras
+•	✅ HttpClient integrado en proyecto
+•	✅ Testing completo con coverage reports
+•	✅ ESLint configurado para calidad de código
+•	✅ Tests personalizados para servicios y pipes
+•	✅ Assets optimizados y analizados
+•	✅ Environment variables configuradas
+•	✅ Build de producción optimizado y verificado
+•	✅ Servidor de producción simulado y funcionando
+________________________________________
+VALIDACIÓN FINAL COMPLETA
+Checklist Lab 3 Completado:
+Funcionalidades Básicas:
+•	Directiva highlight funciona en hover
+•	Pipe truncate corta texto correctamente
+•	Guard auth configurado y listo
+•	Interfaces TypeScript definidas y usadas
+Herramientas de Desarrollo:
+•	VS Code configurado con settings específicos
+•	Prettier formatea código automáticamente
+•	ESLint detecta problemas de calidad
+•	Debugging configurado en VS Code
+Testing y Calidad:
+•	Tests unitarios pasan exitosamente
+•	Coverage report genera correctamente
+•	Linting pasa sin errores
+•	Tests personalizados funcionan
+Build y Optimización:
+•	Build de desarrollo funciona
+•	Build de producción optimiza archivos
+•	Bundle analyzer muestra estadísticas
+•	Servidor de producción sirve app correctamente
+Configuración Avanzada:
+•	Proxy para APIs configurado
+•	Environment variables funcionando
+•	HttpClient listo para uso
+•	Assets optimizados y verificados
+Comando Final de Verificación:
+bash
+# Ejecutar suite completa de verificación
+npm run lint && npm run test:coverage && npm run build:analyze
+Si todos los comandos pasan exitosamente, el Lab 3 está completo! ✅
+________________________________________
+PREPARACIÓN AVANZADA PARA SESIÓN 2
+Código Base Listo:
+El proyecto ahora tiene una base sólida con:
+•	Arquitectura component-based bien estructurada
+•	Servicios con inyección de dependencias
+•	Herramientas de desarrollo profesionales
+•	Testing y calidad de código configurados
+•	Build pipeline optimizado
+Próximos Pasos en Sesión 2:
+1.	Router avanzado con guards implementados
+2.	Comunicación entre componentes con @Input/@Output
+3.	Ciclo de vida de componentes en profundidad
+4.	Reactive forms con validaciones
+5.	HTTP client conectado a APIs reales
+Tareas Opcionales Avanzadas:
+1.	Implementar routing completo: 
+bash
+ng generate component pages/dashboard --standalone
+ng generate component pages/profile --standalone
+2.	Configurar interceptors HTTP: 
+bash
+ng generate interceptor interceptors/auth
+ng generate interceptor interceptors/loading
+3.	Agregar state management básico: 
+bash
+ng generate service services/state
+4.	Implementar PWA features: 
+bash
+ng add @angular/pwa
+________________________________________
+CONTACTO Y NEXT STEPS
+¡Felicitaciones! 🎉
+Has completado exitosamente todos los laboratorios de la Sesión 1. Tu aplicación Angular v18 está:
+•	✅ Completamente funcional con componentes modulares
+•	✅ Profesionalmente configurada con herramientas de desarrollo
+•	✅ Lista para escalabilidad con arquitectura sólida
+•	✅ Optimizada para producción con builds eficientes
+Estás preparado para la Sesión 2: Componentes y Enrutamiento Avanzado
+Nos vemos el jueves 31 de julio a las 19:00! 🚀
+________________________________________
+Happy Coding! 💻✨
+

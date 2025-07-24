@@ -1,0 +1,267 @@
+GUIÓN DETALLADO - SESIÓN 1: INTRODUCCIÓN A ANGULAR v18
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Portada del Curso (2 minutos)
+Bienvenidos todos a esta primera sesión de nuestro curso de Angular versión 18.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y seré su instructor durante estas 10 sesiones que nos esperan. Hoy es jueves 24 de julio de 2025 y vamos a embarcarnos en un viaje fascinante por el mundo de Angular.
+Para aquellos que me acompañan por primera vez, Angular no es solo un framework más del montón. Es una plataforma robusta que utilizan gigantes tecnológicos como Google, Microsoft, Samsung y miles de empresas alrededor del mundo para construir aplicaciones web que manejan millones de usuarios diariamente.
+La versión 18 que vamos a estudiar incorpora características revolucionarias como los Signals, que prometen cambiar la forma en que manejamos el estado reactivo en nuestras aplicaciones. También incluye mejoras significativas en rendimiento y nuevas formas de estructurar el código que harán que nuestras aplicaciones sean más mantenibles y escalables.
+Durante las próximas 3 horas, vamos a establecer las bases sólidas que necesitan para convertirse en desarrolladores Angular competentes. No se preocupen si algunos conceptos les parecen complejos al principio; al final de esta sesión tendrán su primer proyecto Angular funcionando y un entendimiento claro de hacia dónde nos dirigimos.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Permítanme ser muy específico sobre lo que vamos a lograr hoy.
+Al finalizar esta sesión, no solo van a comprender qué es Angular, sino que van a experimentar esa sensación satisfactoria de ver su código funcionando en el navegador. Imaginen por un momento la diferencia entre leer sobre cómo manejar un automóvil versus realmente sentarse al volante y conducir. Eso es exactamente lo que haremos hoy con Angular.
+Primero, vamos a desmitificar qué es Angular y por qué ha evolucionado tanto desde sus inicios como AngularJS. Es importante que entiendan esta evolución porque les ayudará a comprender las decisiones de diseño que veremos más adelante.
+La arquitectura de Angular versión 18 es elegante y poderosa. Aprenderán cómo esta arquitectura les permite construir desde aplicaciones simples hasta sistemas empresariales complejos utilizando los mismos principios fundamentales.
+TypeScript será nuestro compañero constante. Si vienen del mundo JavaScript puro, van a descubrir que TypeScript no es una barrera, sino un superpoder que les evitará incontables horas de debugging y les dará una confianza increíble al escribir código.
+Y por supuesto, terminaremos con las manos en la masa, creando nuestro primer proyecto Angular completamente funcional. Al final de la sesión, tendrán un entorno de desarrollo profesional configurado y listo para los desafíos que vienen.
+________________________________________
+Diapositiva 3: Agenda de la Sesión (1 minuto)
+Veamos cómo vamos a distribuir nuestro tiempo para maximizar el aprendizaje.
+He diseñado esta agenda pensando en que necesitan tanto la teoría sólida como la práctica inmediata. Los primeros 15 minutos los dedicaremos a contextualizar Angular en el ecosistema actual de desarrollo web. Es crucial que entiendan dónde se posiciona Angular frente a otras opciones.
+Luego exploraremos la fascinante historia de Angular. Esto no es solo cultura general; entender de dónde viene Angular les ayudará a comprender por qué ciertas características están diseñadas de la forma en que están.
+La arquitectura es el corazón de nuestra sesión. Dedicaremos 20 minutos completos a esto porque una vez que comprendan la arquitectura, todo lo demás encajará naturalmente.
+TypeScript merece su propio espacio porque es fundamental para trabajar efectivamente con Angular. No se preocupen si nunca lo han usado; les mostraré que es más amigable de lo que parece.
+A las 20:10 tendremos nuestro merecido descanso de 15 minutos. Aprovechen para estirar las piernas, hidratarse y preparar sus máquinas para la segunda parte.
+La segunda mitad será intensamente práctica. Angular CLI será su nueva herramienta favorita, y terminaremos construyendo y entendiendo la estructura de un proyecto real.
+________________________________________
+Diapositiva 4: ¿Qué es Angular? (3 minutos)
+Angular es mucho más que un simple framework de JavaScript.
+Permítanme hacer una analogía que les va a quedar clara. Si piensan en el desarrollo web como la construcción de un rascacielos, HTML sería los cimientos, CSS la decoración, y JavaScript tradicional sería como construir piso por piso con herramientas básicas. Angular, en cambio, es como tener una grúa torre, un equipo de ingenieros, planos arquitectónicos detallados y un sistema de construcción modular que les permite levantar ese rascacielos de manera ordenada, eficiente y mantenible.
+La definición técnica dice que Angular es una "plataforma de desarrollo para construir aplicaciones web escalables usando TypeScript", pero eso no captura la verdadera esencia. Angular es un ecosistema completo que incluye no solo el framework central, sino también herramientas de desarrollo, librerías de componentes, sistemas de testing, y una comunidad global de desarrolladores.
+Cuando hablamos de "component-based", estamos hablando de construcción modular. Imaginen que cada componente es como un LEGO especializado. Pueden tener un componente para un botón, otro para una tabla de datos, otro para un formulario. Estos componentes se pueden combinar, reutilizar y mantener independientemente.
+El "two-way data binding" es la magia que hace que cuando el usuario escribe en un campo de texto, automáticamente se actualice el modelo de datos en su aplicación, y viceversa. Es como tener un asistente invisible que mantiene todo sincronizado.
+Los números que ven en pantalla no son casuales. 87 millones de descargas semanales significan que en este preciso momento, mientras estamos aquí aprendiendo, hay equipos de desarrollo en todo el mundo eligiendo Angular para sus proyectos más críticos.
+________________________________________
+Diapositiva 5: Angular vs Otros Frameworks (4 minutos)
+Seamos honestos: el mundo del desarrollo frontend está lleno de opciones, y es natural preguntarse por qué elegir Angular sobre React o Vue.
+Esta comparación no se trata de declarar un ganador absoluto. Es como comparar un SUV con un automóvil deportivo y una camioneta de carga. Cada uno tiene su propósito y su momento ideal.
+React es como el automóvil deportivo del desarrollo frontend. Es increíblemente flexible, rápido de aprender para casos simples, y te da mucha libertad para elegir cómo estructurar tu aplicación. Pero cuando tu proyecto crece, esa flexibilidad puede convertirse en caos si no tienes un equipo muy disciplinado. Es perfecto para startups que necesitan moverse rápido y experimentar.
+Vue es como el automóvil familiar confiable. Tiene una curva de aprendizaje muy suave, es predecible, y funciona bien para la mayoría de casos de uso. Es excelente para equipos que no quieren gastar tiempo debatiendo arquitectura y prefieren seguir convenciones establecidas.
+Angular es el SUV robusto del desarrollo frontend. Puede parecer intimidante al principio, especialmente si vienen de vanilla JavaScript, pero una vez que lo dominan, pueden manejar cualquier terreno. Es la elección natural cuando están construyendo aplicaciones empresariales que van a vivir por años, que van a ser mantenidas por múltiples equipos, y que necesitan escalabilidad real.
+La clave está en la palabra "opinionated". Angular toma decisiones por ustedes sobre cómo estructurar el código, cómo manejar las dependencias, cómo organizar los tests. Esto puede sentirse restrictivo al principio, pero en proyectos grandes, estas opiniones se convierten en su salvavidas.
+Cuando veo equipos trabajando con Angular en proyectos empresariales complejos, veo desarrolladores que pueden entrar a cualquier parte del código y entender inmediatamente qué está pasando, porque Angular impone patrones consistentes.
+________________________________________
+Diapositiva 6: Historia de Angular (3 minutos)
+La historia de Angular es realmente la historia de cómo el desarrollo web evolucionó en la última década.
+Imaginen el desarrollo web en 2010. Las aplicaciones web eran principalmente páginas que se recargaban completamente cada vez que hacían click en un enlace. JavaScript se usaba principalmente para validaciones simples y efectos visuales básicos. En ese contexto, AngularJS fue revolucionario.
+AngularJS introdujo conceptos que hoy damos por sentado, pero que en 2010 eran casi mágicos. El two-way data binding significaba que podías escribir en un campo de texto y ver cómo se actualizaba automáticamente en otra parte de la página sin escribir código adicional. La inyección de dependencias permitía escribir código más modular y testeable.
+Pero aquí viene la parte interesante de la historia. En 2016, el equipo de Google tomó una decisión valiente pero controversial: reescribir completamente AngularJS desde cero. Imaginen el valor que requirió decirle a millones de desarrolladores: "Lo que han estado usando ya no es el futuro, pero creemos tanto en esta nueva visión que vale la pena empezar de nuevo."
+Esta reescritura no fue caprichosa. El mundo había cambiado. Los móviles se habían vuelto predominantes, las aplicaciones web se habían vuelto tan complejas como las aplicaciones de escritorio, y JavaScript había evolucionado enormemente.
+Angular 2 introdujo TypeScript como lenguaje principal, una arquitectura completamente nueva basada en componentes, y herramientas de desarrollo que profesionalizaron todo el proceso.
+El ciclo de 6 meses para nuevas versiones que establecieron desde entonces es brillante. Significa que obtienen mejoras constantes pero predecibles. No hay sorpresas masivas que rompan todo su código, pero tampoco se quedan estancados esperando años por nuevas características.
+________________________________________
+Diapositiva 7: Novedades Angular v18 (4 minutos)
+Angular 18 representa un salto cualitativo en la madurez del framework, y las características que vamos a ver cambiarán fundamentalmente cómo escriben aplicaciones Angular.
+Los Signals son probablemente la característica más emocionante que Angular ha introducido en años. Para entender por qué son importantes, piensen en cómo tradicionalmente manejamos el estado en una aplicación. Tenemos variables que cambian, y queremos que la interfaz se actualice cuando estas variables cambian. Tradicionalmente, Angular tenía que "revisar" constantemente si algo había cambiado, lo cual es ineficiente.
+Los Signals son como un sistema de notificaciones inteligente. En lugar de revisar constantemente si algo cambió, los Signals "avisan" automáticamente cuando su valor cambia. Es como la diferencia entre llamar constantemente a alguien para preguntar si tiene noticias, versus que esa persona te llame cuando realmente tenga algo importante que decir.
+Veamos el código que está en pantalla. signal(0) crea un signal con valor inicial 0. computed(() => count() * 2) crea un valor calculado que se actualiza automáticamente cuando count cambia. La belleza está en que no tienen que escribir código adicional para manejar estas actualizaciones; simplemente ocurren.
+El nuevo control flow es igualmente revolucionario. Antes teníamos directivas como *ngIf y *ngFor. Funcionaban bien, pero la sintaxis podía ser confusa, especialmente para desarrolladores nuevos. La nueva sintaxis @if y @for es más clara, más potente, y más fácil de debuggear.
+Cuando ven @if (condition), inmediatamente entienden que es una condición. No hay asteriscos confusos ni directivas que recordar. Es JavaScript con esteroides para templates.
+Material 3 representa la última evolución del sistema de diseño de Google. Incluye tokens de diseño que permiten temas dinámicos, mejor accesibilidad por defecto, y componentes que se adaptan automáticamente a las preferencias del usuario.
+Las mejoras de rendimiento con Vite y Esbuild significan builds más rápidos, hot reloading más eficiente, y una experiencia de desarrollo más fluida.
+________________________________________
+Diapositiva 8: Arquitectura Angular - Overview (4 minutos)
+La arquitectura de Angular es elegante en su simplicidad y poderosa en su escalabilidad.
+Imaginen la arquitectura como las capas de una aplicación moderna. En la parte superior tenemos la aplicación Angular que los usuarios ven e interactúan. Esta capa incluye componentes que manejan la interfaz y la lógica, templates que definen cómo se ve todo, servicios que manejan la lógica de negocio, y la estructura modular que mantiene todo organizado.
+Los componentes son los actores principales. Cada componente es responsable de una parte específica de la interfaz. Piensen en el dashboard de una aplicación bancaria: tendrían un componente para el header con la información del usuario, otro para el resumen de cuentas, otro para las transacciones recientes, y así sucesivamente.
+Los templates son la cara visible de sus componentes. Incluyen HTML tradicional pero potenciado con directivas Angular que les permiten mostrar datos dinámicamente, responder a eventos del usuario, y controlar qué se muestra bajo qué condiciones.
+Los servicios son donde vive la lógica de negocio. Si los componentes son los actores en una obra de teatro, los servicios son el equipo técnico detrás del escenario que hace que todo funcione. Manejan llamadas a APIs, procesan datos, gestionan el estado de la aplicación, y proporcionan funcionalidad reutilizable.
+La capa del framework Angular incluye todo el motor que hace que la magia ocurra. El sistema de detección de cambios que mantiene la interfaz sincronizada con los datos, el router que maneja la navegación, el sistema de inyección de dependencias que conecta todo elegantemente.
+Angular CLI es su compañero de desarrollo. No es solo una herramienta para crear proyectos; es un asistente que les ayuda a generar código, ejecutar tests, optimizar builds, y mantener las mejores prácticas automáticamente.
+Finalmente, todo esto corre sobre la plataforma del navegador, pero Angular abstrae muchas de las complejidades, permitiéndoles enfocarse en resolver problemas de negocio en lugar de luchar con APIs del navegador.
+________________________________________
+Diapositiva 9: Componentes - Corazón de Angular (4 minutos)
+Los componentes son la unidad fundamental de construcción en Angular, y entender su estructura es crucial para todo lo que haremos después.
+Veamos el código en pantalla paso a paso. El decorador @Component es como el DNI del componente. Le dice a Angular: "esto es un componente", y le proporciona información esencial sobre cómo debe comportarse.
+El selector: 'app-hello' define cómo van a usar este componente en otros templates. Es como darle un nombre único. Una vez definido, pueden usar <app-hello></app-hello> en cualquier template y Angular sabrá que debe renderizar este componente específico.
+El template es donde definen la estructura visual. Pueden notar que estamos usando template literals de JavaScript (las comillas invertidas) que nos permiten escribir HTML multilínea directamente en el código TypeScript. Esto es útil para componentes simples, aunque para componentes más complejos preferiremos archivos separados.
+Dentro del template vemos {{ title }}, que es interpolación. Angular automáticamente reemplaza esto con el valor de la propiedad title de la clase del componente. Es reactivo, lo que significa que si el valor de title cambia, la interfaz se actualiza automáticamente.
+(click)="sayHello()" es event binding. Cuando el usuario hace click en el botón, Angular ejecuta el método sayHello() de la clase del componente. Es la forma limpia y declarativa de manejar eventos en Angular.
+La clase del componente es donde vive la lógica. title = 'Hello Angular 18!' define una propiedad que está disponible en el template. sayHello() es un método que responde a eventos del usuario.
+Esta separación es brillante: el template se enfoca en la estructura y presentación, la clase se enfoca en la lógica y el estado, y Angular se encarga de mantener todo sincronizado.
+________________________________________
+Diapositiva 10: Data Binding Overview (3 minutos)
+El data binding es lo que hace que Angular se sienta mágico, especialmente cuando vienen de manipular el DOM manualmente con JavaScript vanilla.
+Imaginen que están desarrollando una aplicación de e-commerce. Sin data binding, cada vez que el usuario agrega un producto al carrito, tendrían que escribir código para encontrar el elemento HTML del contador, actualizarlo manualmente, encontrar el elemento del total, actualizarlo también, y así sucesivamente. Con Angular, simplemente actualizan el modelo de datos y la interfaz se actualiza automáticamente.
+La interpolación {{ title }} es la forma más básica. Es unidireccional: fluye desde el componente hacia la vista. Úsenla para mostrar valores dinámicos como nombres de usuario, totales de carrito, fechas, cualquier cosa que quieran mostrar pero que no necesite ser editada directamente.
+Property binding [src]="imageUrl" les permite vincular propiedades HTML a propiedades de su componente. Es especialmente útil para atributos dinámicos. Por ejemplo, si tienen una galería de imágenes, imageUrl puede cambiar basado en la imagen seleccionada, y el src del elemento img se actualiza automáticamente.
+Event binding (click)="onClick()" maneja la interacción del usuario. En lugar de usar addEventListener y manejar referencias del DOM, simplemente declaran qué método debe ejecutarse cuando ocurre el evento. Angular se encarga de todos los detalles técnicos.
+Two-way binding [(ngModel)]="name" es donde la magia realmente brilla. Es bidireccional: si el usuario escribe en el input, la propiedad name se actualiza automáticamente. Si su código cambia name programáticamente, el input se actualiza para reflejar el nuevo valor.
+El sistema de detección de cambios de Angular revisa automáticamente cuando estos valores pueden haber cambiado y actualiza la vista según sea necesario. Es eficiente y transparente.
+________________________________________
+Diapositiva 11: Services e Inyección de Dependencias (4 minutos)
+Los servicios son donde Angular realmente demuestra su madurez como plataforma de desarrollo empresarial.
+Piensen en los servicios como especialistas en su equipo de desarrollo. Si los componentes son los gerentes que coordinan la interfaz de usuario, los servicios son los expertos técnicos que realmente saben cómo hacer el trabajo pesado.
+El decorador @Injectable con providedIn: 'root' es una característica brillante. Le dice a Angular: "este servicio debe estar disponible en toda la aplicación, y debe haber solo una instancia del mismo". Es el patrón singleton implementado de forma elegante.
+En el código de ejemplo, DataService encapsula toda la lógica relacionada con el manejo de usuarios. No importa cuántos componentes necesiten trabajar con usuarios; todos pueden usar el mismo servicio y compartir los mismos datos.
+La inyección de dependencias es lo que hace esto posible sin complicaciones. En lugar de que cada componente tenga que crear su propia instancia del servicio (lo cual sería un desastre para compartir datos), Angular se encarga de crear una instancia y proporcionársela a cualquier componente que la necesite.
+Veamos la inyección en el componente. El constructor constructor(private dataService: DataService) le dice a Angular: "este componente necesita el DataService, por favor proporciónalo". Angular automáticamente encuentra la instancia correcta y la inyecta.
+La palabra clave private es una convención de TypeScript que automáticamente crea una propiedad de la clase. Es equivalente a escribir this.dataService = dataService en el constructor, pero más conciso.
+Esto facilita enormemente el testing. Cuando escriban tests unitarios, pueden fácilmente inyectar una versión mock del servicio en lugar del real, lo que hace que sus tests sean rápidos y confiables.
+Los servicios también promueven la reutilización de código. En lugar de duplicar lógica de negocio en múltiples componentes, la centralizan en servicios que pueden ser utilizados donde sea necesario.
+________________________________________
+Diapositiva 12: TypeScript Fundamentals (4 minutos)
+TypeScript puede parecer intimidante al principio, pero créanme, una vez que lo prueben, no van a querer volver a JavaScript puro.
+Permítanme contarles por qué TypeScript es un superpoder. Imaginen que están construyendo una aplicación y tienen una función que espera recibir un objeto usuario con propiedades específicas. En JavaScript tradicional, si alguien pasa un objeto sin la propiedad correcta, o con el tipo incorrecto, no se darán cuenta hasta que la aplicación explote en producción, posiblemente en las manos de sus usuarios.
+Con TypeScript, estos errores se detectan mientras están escribiendo el código. Su editor les mostrará una línea roja ondulada y les dirá exactamente qué está mal antes de que puedan siquiera ejecutar el código.
+Los tipos primitivos en el código son autoexplicativos. string, number, boolean funcionan exactamente como esperarían. Lo interesante viene con los arrays y objetos.
+let items: string[] declara un array que solo puede contener strings. Si intentan agregar un número, TypeScript les gritará. Array<number> es la sintaxis genérica alternativa, que pueden usar para tipos más complejos.
+Las interfaces son donde TypeScript realmente brilla para el desarrollo de aplicaciones. La interfaz User define un contrato: cualquier objeto que se declare como tipo User debe tener las propiedades id y name, y opcionalmente puede tener email.
+El signo de interrogación en email? indica que es opcional. Esto es increíblemente útil para APIs que pueden devolver datos parciales o para formularios donde algunos campos no son obligatorios.
+Cuando declaran const user: User, TypeScript verifica que el objeto cumple con el contrato. Su editor les dará autocompletado inteligente, mostrándoles qué propiedades están disponibles mientras escriben.
+La detección temprana de errores no solo previene bugs; hace que escribir código sea más rápido y confiante. El refactoring se vuelve seguro porque TypeScript les dice inmediatamente si han roto algo.
+________________________________________
+Diapositiva 13: TypeScript Classes e Interfaces (3 minutos)
+Las clases e interfaces son los building blocks que les permitirán estructurar código complejo de manera mantenible.
+Las interfaces en TypeScript son como contratos o planos arquitectónicos. Definen la forma que debe tener un objeto sin especificar cómo se implementa. La interfaz Product dice: "cualquier producto debe tener estas propiedades con estos tipos".
+Esto es especialmente valioso cuando trabajan con APIs. Pueden definir interfaces que representen la estructura de datos que esperan recibir del backend, y TypeScript se asegurará de que estén manejando esos datos correctamente en todo su código.
+Las clases, por otro lado, son implementaciones concretas. ProductService es una clase que realmente hace trabajo. Tiene propiedades (como el array products) y métodos que operan sobre esos datos.
+La palabra clave private en private products: Product[] significa que esta propiedad solo es accesible desde dentro de la clase. Es una forma de encapsulación que evita que otras partes del código manipulen directamente los datos internos del servicio.
+El método addProduct toma un parámetro de tipo Product. TypeScript verifica que cualquier objeto que pasen realmente tenga la estructura correcta según la interfaz Product.
+getProduct retorna Product | undefined. El operador | significa "o", así que este método puede retornar un producto o undefined si no encuentra ninguno. Esto fuerza a quien use el método a manejar ambos casos, previniendo errores de null reference.
+El método find es una función nativa de arrays en JavaScript que busca el primer elemento que cumple una condición. La arrow function p => p.id === id dice "busca un producto cuyo id sea igual al id que estamos buscando".
+En Angular, van a usar interfaces constantemente para modelar datos, y clases para servicios y componentes. Esta combinación les dará un código robusto y fácil de mantener.
+________________________________________
+Diapositiva 14: BREAK (15 minutos)
+Perfecto, es momento de hacer una pausa estratégica.
+Hemos cubierto mucho terreno conceptual en estos primeros 45 minutos. Han absorbido los fundamentos de Angular, entendido su arquitectura, y visto cómo TypeScript potencia todo el ecosistema.
+Durante este break de 15 minutos, les recomiendo que aprovechen para:
+Primero, levántense y estiren las piernas. Sabemos que estar sentados frente a la computadora por períodos largos no es ideal, así que muevan el cuerpo un poco.
+Segundo, verifiquen que tienen Node.js instalado en sus máquinas. Abran una terminal o command prompt y ejecuten node --version. Deberían ver algo como v18.19.0 o superior. Si no lo tienen instalado, es el momento perfecto para descargarlo desde nodejs.org.
+Tercero, asegúrense de que Visual Studio Code esté listo. Durante la segunda parte vamos a usar el editor intensivamente, y quiero que tengan las extensiones recomendadas instaladas.
+Si tienen dudas sobre algún concepto que hemos visto hasta ahora, anótenlas. Cuando regresemos, antes de continuar con la parte práctica, dedicaré unos minutos a aclarar cualquier punto que no haya quedado claro.
+La segunda parte va a ser mucho más hands-on. Vamos a instalar Angular CLI, crear nuestro primer proyecto, y van a ver cómo todos estos conceptos que hemos discutido se materializan en código real funcionando.
+Recuerden que en programación, la teoría es importante, pero la comprensión real viene de la práctica. Así que prepárense para ensuciarse las manos con código.
+Nos vemos en 15 minutos, exactamente a las 20:25. ¡Que tengan un buen descanso!
+________________________________________
+Diapositiva 15: Angular CLI - Herramienta Principal (3 minutos)
+Bienvenidos de vuelta. Espero que hayan aprovechado el descanso para recargar energías porque ahora viene la parte emocionante.
+Angular CLI es probablemente una de las herramientas de desarrollo más elegantes que van a usar en su carrera. CLI significa Command Line Interface, pero no se dejen intimidar si no están acostumbrados a la línea de comandos. Angular CLI es sorprendentemente amigable y potente.
+Piensen en Angular CLI como su asistente personal de desarrollo. En lugar de tener que recordar cómo configurar webpack, cómo estructurar archivos, cómo configurar TypeScript, cómo optimizar el código para producción, Angular CLI hace todo eso por ustedes siguiendo las mejores prácticas establecidas por el equipo de Angular y la comunidad.
+La instalación es straightforward: npm install -g @angular/cli@18. El flag -g significa global, así que una vez instalado, tendrán acceso al comando ng desde cualquier directorio en su sistema.
+ng version no solo les muestra la versión de Angular CLI instalada, sino toda la información del entorno: versión de Node.js, versión del sistema operativo, versiones de las librerías Angular instaladas. Es muy útil para debugging cuando algo no funciona como esperado.
+Los comandos que ven en pantalla cubren todo el ciclo de vida de desarrollo. ng new para empezar, ng serve para desarrollar con hot reload, ng build para preparar código para producción, ng test para ejecutar sus tests, ng generate para crear código siguiendo convenciones, ng add para integrar librerías de terceros de forma inteligente.
+Lo que hace especial a Angular CLI es que no solo ejecuta comandos; entiende la estructura de proyectos Angular y genera código que sigue las mejores prácticas. Nunca más van a tener que discutir con su equipo sobre cómo nombrar archivos o dónde ubicar ciertos tipos de código.
+El scaffolding automático, el hot reload que preserva el estado de la aplicación, y la optimización automática para builds de producción los van a hacer más productivos desde el día uno.
+________________________________________
+Diapositiva 16: Creando tu Primer Proyecto (4 minutos)
+Ahora sí, manos a la obra. Vamos a crear nuestro primer proyecto Angular y entender cada decisión que tomemos.
+El comando ng new es su punto de entrada al ecosistema Angular. Pero no es solo un comando que crea archivos; es un asistente inteligente que les hace preguntas importantes sobre cómo quieren configurar su proyecto.
+mi-proyecto-angular es el nombre de nuestro proyecto. Angular CLI automáticamente creará un directorio con este nombre y configurará todo dentro. Usen nombres descriptivos para sus proyectos reales; su yo futuro se los agradecerá.
+--routing=true le dice a Angular que queremos configurar el sistema de rutas desde el principio. Aunque pueden agregarlo después, es mejor empezar con esto habilitado porque prácticamente toda aplicación Angular no trivial necesita navegación.
+--style=scss especifica que queremos usar Sass en lugar de CSS vanilla. Sass les da variables, anidamiento, mixins y otras características que hacen que escribir estilos sea más mantenible. Si prefieren CSS puro, pueden omitir esta opción.
+--skip-git=false significa que queremos inicializar un repositorio Git. En el mundo profesional, version control no es opcional, así que es mejor empezar con esta práctica desde el primer proyecto.
+--package-manager=npm especifica que queremos usar npm para manejar dependencias. También podrían usar yarn o pnpm, pero npm viene incluido con Node.js y es perfectamente adecuado para empezar.
+El proceso de creación toma unos minutos porque Angular CLI está descargando todas las dependencias necesarias, configurando herramientas de desarrollo, creando la estructura de archivos, y inicializando el repositorio Git.
+Cuando termine, tendrán un proyecto Angular completamente funcional. Pueden navegar al directorio con cd mi-proyecto-angular y ejecutar ng serve para ver su aplicación funcionando en el navegador.
+________________________________________
+Diapositiva 17: Estructura de Proyecto Angular (5 minutos)
+La estructura de archivos que Angular CLI genera no es arbitraria; cada archivo y directorio tiene un propósito específico y sigue convenciones establecidas que facilitan el trabajo en equipo.
+Empecemos por la carpeta src, que es donde van a pasar el 95% de su tiempo de desarrollo. Es como el corazón de su aplicación, donde vive todo el código que realmente importa.
+Dentro de src, la carpeta app es su espacio de trabajo principal. Aquí es donde construirán todos los componentes, servicios, y funcionalidad de su aplicación. Piensen en app como el lienzo donde pintarán su aplicación.
+app.component.ts es el componente raíz, el punto de entrada de su aplicación Angular. Es como el CEO de una empresa: no hace todo el trabajo, pero coordina todo lo que sucede. Desde aquí se renderizan todos los demás componentes.
+app.component.html es el template principal. Tradicionalmente aquí encontrarían el router-outlet, que es como un marco donde se cargan diferentes componentes según la ruta actual. Es el esqueleto principal sobre el cual se construye el resto de la interfaz.
+app.routes.ts define todas las rutas de su aplicación. Es como el mapa de navegación que le dice a Angular: "cuando el usuario vaya a /productos, muestra el componente de productos; cuando vaya a /perfil, muestra el componente de perfil".
+app.config.ts es nuevo en las versiones recientes de Angular. Aquí configuran todos los servicios y funcionalidades que necesita su aplicación. Es como el archivo de configuración maestro.
+La carpeta assets es para recursos estáticos: imágenes, iconos, archivos JSON con datos mock, documentos PDF, cualquier cosa que no sea código pero que su aplicación necesite servir.
+environments contiene archivos de configuración para diferentes entornos. environment.development.ts para desarrollo local, environment.production.ts para producción. Aquí definen URLs de APIs, configuraciones de debugging, feature flags.
+index.html es el único archivo HTML real de su aplicación. Angular es una SPA (Single Page Application), así que toda su aplicación se inyecta dinámicamente en este archivo base.
+main.ts es el punto de arranque. Es el primer archivo TypeScript que se ejecuta y el responsable de inicializar Angular y cargar el componente principal.
+Los archivos de configuración en la raíz (angular.json, package.json, tsconfig.json) controlan cómo se comportan las herramientas de desarrollo, qué dependencias usa el proyecto, y cómo TypeScript compila el código.
+________________________________________
+Diapositiva 18: app.component.ts - Componente Raíz (4 minutos)
+El archivo app.component.ts es fascinante porque representa la evolución más reciente de Angular hacia un paradigma más moderno y simplificado.
+Empecemos con los imports. Component viene del core de Angular y es el decorador que convierte una clase TypeScript normal en un componente Angular. RouterOutlet es la funcionalidad que permite que el sistema de rutas funcione dentro de este componente.
+El decorador @Component es como el DNA del componente. Cada propiedad aquí le dice a Angular algo específico sobre cómo debe comportarse este componente.
+selector: 'app-root' define el nombre del elemento HTML personalizado que representa este componente. En index.html encontrarán <app-root></app-root>, y es exactamente ahí donde Angular renderiza este componente.
+standalone: true es una característica relativamente nueva que representa un cambio fundamental en Angular. Tradicionalmente, los componentes tenían que declararse en módulos (NgModules), pero los componentes standalone pueden existir independientemente. Es como pasar de departamentos corporativos rígidos a equipos ágiles autocontenidos.
+imports: [RouterOutlet] especifica qué otros componentes, directivas o pipes necesita este componente. En el paradigma standalone, cada componente declara explícitamente sus dependencias, lo que hace el código más claro y facilita el tree-shaking (eliminación de código no usado).
+templateUrl apunta al archivo HTML separado en lugar de incluir el template inline. Para componentes simples pueden usar template con template literals, pero para componentes más complejos, archivos separados mantienen mejor organización.
+styleUrl es la nueva sintaxis para archivos de estilo individuales. Reemplaza a styleUrls que aceptaba un array, porque en la práctica, la mayoría de componentes tienen solo un archivo de estilo asociado.
+La clase AppComponent es sorprendentemente simple. Solo tiene una propiedad title que se puede usar en el template. El constructor vacío muestra que este componente no tiene dependencias complejas - su único trabajo es servir como contenedor para otros componentes.
+Esta simplicidad es intencional. El componente raíz debe ser estable y minimalista, ya que es la base sobre la cual se construye toda la aplicación.
+________________________________________
+Diapositiva 19: main.ts - Bootstrap de la Aplicación (3 minutos)
+El archivo main.ts es pequeño pero fundamental: es responsable de arrancar toda su aplicación Angular.
+bootstrapApplication es la función moderna para inicializar aplicaciones Angular. Reemplaza al método tradicional basado en NgModules con algo más directo y fácil de entender.
+Piensen en bootstrapApplication como el encendido de un automóvil. Toma el componente principal (AppComponent) y toda la configuración necesaria (appConfig), y los combina para crear una aplicación Angular funcionando.
+El primer parámetro, AppComponent, le dice a Angular cuál es el componente raíz. Es como decirle "este es el jefe, todo lo demás se organiza a partir de aquí".
+El segundo parámetro, appConfig, contiene toda la configuración de la aplicación. En lugar de distribuir configuración en múltiples NgModules, ahora centralizan todo en un solo lugar.
+El .catch((err) => console.error(err)) es manejo básico de errores. Si algo sale mal durante el bootstrap - falta una dependencia, hay un error de configuración, etc. - el error se loggea en la consola en lugar de fallar silenciosamente.
+Veamos ahora appConfig en el archivo separado. ApplicationConfig es el tipo TypeScript que define la estructura de configuración que Angular espera.
+provideRouter(routes) configura el sistema de rutas de la aplicación. Es el equivalente moderno a RouterModule.forRoot() del paradigma tradicional basado en módulos.
+La propiedad providers es un array donde registran todos los servicios, configuraciones, y funcionalidades que su aplicación necesita. Es como la lista de ingredientes de una receta: todo lo que necesitan para que la aplicación funcione debe estar listado aquí.
+Esta aproximación es más explicit y predecible que el sistema anterior. En lugar de imports mágicos y configuración distribuida, todo está visible y centralizado.
+________________________________________
+Diapositiva 20: Comandos ng generate (4 minutos)
+Los comandos ng generate son donde Angular CLI realmente demuestra su valor como herramienta de productividad.
+Cuando ejecutan ng generate component header, Angular CLI no solo crea archivos; crea una estructura completa siguiendo convenciones establecidas, configura imports necesarios, y actualiza archivos de configuración cuando es apropiado.
+ng g c es el shorthand para ng generate component. En el día a día, van a usar estos shortcuts para ser más eficientes. Angular CLI está diseñado para desarrolladores que escriben estos comandos docenas de veces al día.
+La opción --standalone crea componentes que no dependen de NgModules. Este es el futuro de Angular, y para proyectos nuevos es la aproximación recomendada. Los componentes standalone son más fáciles de entender, testear, y reutilizar.
+--skip-tests omite la creación de archivos de test. En desarrollo rápido o prototipado puede ser útil, pero en proyectos serios siempre quieren tener tests desde el principio.
+Para servicios, ng generate service services/data crea un servicio en la carpeta services. La convención de carpetas no es obligatoria, pero ayuda enormemente a mantener el código organizado en proyectos grandes.
+Los pipes personalizados con ng g pipe pipes/capitalize son perfectos para transformaciones de datos que van a reutilizar en múltiples lugares. Por ejemplo, un pipe que formatea números como moneda o que trunca texto largo.
+Las directivas con ng g directive directives/highlight les permiten crear funcionalidad reutilizable que se puede aplicar a elementos HTML. Imaginen una directiva que resalta texto cuando pasan el mouse por encima, o que valida campos de formulario.
+Los guards con ng g guard guards/auth son esenciales para controlar acceso a rutas. Un guard de autenticación puede verificar si el usuario está logueado antes de permitir acceso a páginas protegidas.
+La estructura resultante muestra cómo Angular CLI mantiene consistencia. Cada componente tiene su propio directorio con archivos TypeScript, HTML, y SCSS separados. Esto facilita encontrar código relacionado y hace que el proyecto sea navegable intuitivamente.
+________________________________________
+Diapositiva 21: Servidor de Desarrollo (3 minutos)
+El servidor de desarrollo de Angular es una pieza de ingeniería impresionante que hace que el desarrollo web moderno sea fluido y eficiente.
+ng serve arranca un servidor de desarrollo local que no solo sirve archivos; está constantemente observando su código, recompilando cuando detecta cambios, y actualizando el navegador automáticamente. Es como tener un asistente que está pendiente de todo lo que hacen.
+Las opciones que ven en pantalla transforman la experiencia de desarrollo. --open automáticamente abre su navegador predeterminado y navega a la aplicación. Es un detalle pequeño, pero cuando están desarrollando activamente, cada segundo cuenta.
+--port 3000 les permite cambiar el puerto si 4200 está ocupado por otra aplicación, o si simplemente prefieren trabajar en un puerto específico. En equipos grandes, es común que cada desarrollador use un puerto diferente para evitar conflictos.
+--host 0.0.0.0 es especialmente útil si están desarrollando en una máquina virtual o si quieren probar su aplicación desde dispositivos móviles en la misma red. Por defecto, el servidor solo acepta conexiones desde localhost.
+--ssl habilita HTTPS local, que es necesario para probar ciertas características como service workers, geolocation, o notificaciones push. El navegador generará advertencias de certificado, pero pueden ignorarlas en desarrollo.
+--proxy-config resuelve uno de los problemas más comunes en desarrollo frontend: el CORS. Pueden configurar un proxy que redirija llamadas a APIs externas, evitando problemas de cross-origin requests.
+El hot reload que menciono es pura magia para la productividad. Imaginen que están trabajando en un formulario complejo, han llenado todos los campos, y necesitan ajustar un estilo CSS. Sin hot reload, tendrían que recargar la página y llenar el formulario de nuevo. Con hot reload, el cambio se aplica instantáneamente preservando el estado de la aplicación.
+La URL por defecto http://localhost:4200 se convertirá en muy familiar. Es su portal de entrada para ver el progreso de su trabajo en tiempo real.
+________________________________________
+Diapositiva 22: package.json y Scripts (3 minutos)
+El archivo package.json es el corazón administrativo de cualquier proyecto Node.js, y en proyectos Angular contiene información crucial sobre dependencias, scripts, y configuración.
+La sección scripts define comandos personalizados que pueden ejecutar con npm. Estos scripts son shortcuts para comandos más largos o complejos, y establecen un lenguaje común para el equipo.
+npm start es la convención universal para arrancar una aplicación en modo desarrollo. Ejecuta ng serve, pero usar npm start es más intuitivo para desarrolladores que vienen de otros ecosistemas.
+npm run build ejecuta ng build, que compila la aplicación para producción. El resultado son archivos HTML, CSS, y JavaScript optimizados listos para deployar en un servidor web.
+npm run watch con ng build --watch es útil para casos donde quieren ver los archivos compilados pero no necesitan el servidor de desarrollo. Por ejemplo, si están integrando con un backend que sirve los archivos estáticos.
+Las dependencias en package.json se dividen en dos categorías. dependencies son librerías que necesita la aplicación para funcionar en producción: el framework Angular, RxJS para programación reactiva, el router, etc.
+devDependencies (no mostradas en este ejemplo, pero presentes en el archivo real) incluyen herramientas que solo necesitan durante desarrollo: TypeScript compiler, Karma para testing, Webpack para bundling, etc.
+Los números de versión siguen semantic versioning. ^18.0.0 significa "18.0.0 o cualquier versión compatible". El caret ^ permite actualizaciones menores que no deberían romper compatibilidad.
+RxJS merece mención especial. Es la librería de programación reactiva que Angular usa internamente para manejar eventos, HTTP requests, y cualquier operación asíncrona. Van a interactuar con RxJS constantemente, aunque Angular abstrae mucha de su complejidad.
+TypeScript ~5.4.0 usa la tilde, que es más conservadora que el caret. Permite solo actualizaciones de patch (5.4.1, 5.4.2) pero no minor versions (5.5.0).
+________________________________________
+Diapositiva 23: Entorno de Desarrollo (4 minutos)
+Un entorno de desarrollo bien configurado es la diferencia entre frustración constante y productividad fluida.
+Visual Studio Code se ha convertido en el editor estándar para desarrollo Angular, y las extensiones que menciono no son opcionales si quieren ser productivos.
+Angular Language Service es absolutamente esencial. Proporciona autocompletado inteligente en templates HTML, detección de errores en tiempo real, navegación entre componentes y templates, y refactoring seguro. Sin esta extensión, estarían programando a ciegas.
+Angular Snippets acelera la escritura de código común. En lugar de escribir todo el boilerplate de un componente desde cero, pueden escribir a-component y la extensión genera toda la estructura automáticamente.
+Prettier - Code formatter mantiene consistencia en el estilo de código del equipo. Se configura una vez y automáticamente formatea código según reglas establecidas. Nunca más discusiones sobre espacios vs tabs o dónde poner las llaves.
+Auto Rename Tag es especialmente útil en templates Angular. Cuando cambian el tag de apertura de un elemento HTML, automáticamente actualiza el tag de cierre. Parece trivial, pero elimina una fuente común de errores.
+GitLens transforma VS Code en una herramienta Git poderosa. Pueden ver quién escribió cada línea de código, cuándo se modificó, revisar el historial de cambios inline, todo sin salir del editor.
+La configuración .vscode/settings.json que muestro establece comportamientos específicos para el proyecto. importModuleSpecifier: 'relative' hace que los imports usen rutas relativas en lugar de rutas absolutas, lo cual es más portable.
+editor.formatOnSave: true automáticamente formatea archivos cuando los guardan. source.organizeImports automáticamente ordena y limpia imports no utilizados.
+Para debugging en el navegador, Angular DevTools es indispensable. Les permite inspeccionar la jerarquía de componentes, ver el estado en tiempo real, profiling de performance, y debug de change detection.
+Redux DevTools es útil si planean usar NgRx para state management en aplicaciones complejas. Les permite hacer "time travel debugging" - ver cómo el estado de la aplicación cambió a través del tiempo.
+________________________________________
+Diapositiva 24: Próximos Pasos - Sesión 2 (3 minutos)
+Antes de cerrar esta sesión, quiero que tomen un momento para apreciar lo que han logrado en estas últimas dos horas.
+Empezamos con conceptos fundamentales, y ahora tienen un entendimiento sólido de qué es Angular, cómo funciona su arquitectura, y por qué TypeScript potencia todo el ecosistema. Más importante aún, tienen un proyecto Angular real funcionando en sus máquinas.
+Esto no es trivial. Han configurado un entorno de desarrollo profesional, entendido la estructura de archivos que usan equipos de desarrollo en todo el mundo, y visto cómo las herramientas modernas pueden hacer que el desarrollo sea productivo y placentero.
+El conocimiento que han adquirido hoy es la base sobre la cual construiremos todo lo que viene. Los componentes, el data binding, los servicios, la inyección de dependencias - todos estos conceptos van a cobrar vida en las próximas sesiones a medida que los implementemos en proyectos cada vez más complejos.
+Para la próxima sesión, "Componentes y Enrutamiento", vamos a profundizar en temas que transformarán su forma de pensar sobre desarrollo frontend. El ciclo de vida de componentes les dará control granular sobre cuándo y cómo se comportan sus componentes. La comunicación entre componentes les permitirá construir aplicaciones modulares y mantenibles.
+Angular Router es especialmente emocionante porque es donde van a ver cómo Angular realmente brilla para SPAs complejas. Aprenderán a crear navegación fluida, proteger rutas con guards, y manejar parámetros dinámicos.
+Les recomiendo que entre hoy y la próxima sesión exploren el proyecto que creamos. Cambien el contenido del template, modifiquen estilos, jueguen con el código. La mejor forma de aprender programación es experimentando.
+Si encuentran algo que no entienden, anótenlo. En la próxima sesión dedicaremos tiempo a aclarar dudas antes de avanzar con material nuevo.
+________________________________________
+Diapositiva 25: Q&A y Cierre (3 minutos)
+Llegamos al final de nuestra primera sesión, y estoy seguro de que tienen preguntas.
+Las preguntas que veo más frecuentemente en este punto del curso suelen girar alrededor de temas prácticos que los preocupan para el mundo real.
+"¿Cuándo usar Angular versus AngularJS?" es una pregunta importante para quienes trabajar en empresas con código legacy. La respuesta corta es: AngularJS es tecnología del pasado, Angular es el presente y futuro. Si tienen que mantener aplicaciones AngularJS existentes, está bien, pero para todo desarrollo nuevo, Angular moderno es la opción correcta.
+"¿Cuándo usar standalone versus NgModules?" El futuro es standalone. Para proyectos nuevos, siempre empiecen con standalone. Para proyectos existentes, pueden migrar gradualmente. Los NgModules no van a desaparecer de un día para otro, pero standalone es más simple y poderoso.
+"¿Cómo migrar proyectos antiguos?" Angular tiene herramientas de migración excelentes. ng update puede actualizar versiones automáticamente, y hay schematics para migrar de NgModules a standalone. Es un proceso gradual, no tienen que reescribir todo de una vez.
+"¿Mejores prácticas para estructura de folders?" Organicen por features, no por tipo de archivo. En lugar de tener carpetas separadas para todos los componentes, todos los servicios, etc., agrupen archivos relacionados por funcionalidad. Un feature "usuarios" tendría su propio directorio con componentes, servicios, y todo lo relacionado.
+Para seguir aprendiendo entre sesiones, la documentación oficial en angular.dev es excelente. Está bien escrita, tiene ejemplos prácticos, y se mantiene actualizada.
+Recuerden mantener Node.js y Angular CLI actualizados. Las herramientas de desarrollo evolucionan rápidamente, y quieren aprovechar las últimas mejoras.
+Practiquen comandos de CLI hasta que se vuelvan segunda naturaleza. La fluidez con las herramientas les permitirá enfocarse en resolver problemas de negocio en lugar de luchar con configuración.
+Nos vemos el próximo jueves 31 de julio a las 19:00 para nuestra sesión sobre componentes y enrutamiento. Va a ser emocionante ver cómo todo lo que aprendieron hoy se convierte en aplicaciones interactivas y dinámicas.
+¡Gracias por su atención y participación! Que tengan una excelente semana practicando lo que aprendimos hoy.
+
