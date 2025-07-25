@@ -1,0 +1,69 @@
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+
+  .app-header {
+    background: linear-gradient(90deg, #1e3c72 0%, #2a5298 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+
+    p {
+      margin: 0;
+      opacity: 0.9;
+      font-size: 1.1rem;
+    }
+  }
+
+  .main-content {
+    padding: 2rem;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    .demo-section {
+      background: white;
+      margin-bottom: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+
+      h2 {
+        background: #3498db;
+        color: white;
+        margin: 0;
+        padding: 1rem 2rem;
+        font-size: 1.3rem;
+      }
+
+      .highlight-demo, .pipe-demo {
+        padding: 2rem;
+
+        p {
+          margin: 1rem 0;
+          padding: 1rem;
+          border-radius: 6px;
+          background: #f8f9fa;
+          border-left: 4px solid #3498db;
+        }
+      }
+    }
+  }
+
+  .app-footer {
+    background: #2c3e50;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    margin-top: 2rem;
+
+    p {
+      margin: 0;
+      opacity: 0.8;
+    }
+  }
+}

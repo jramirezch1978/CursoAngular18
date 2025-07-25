@@ -1,0 +1,65 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>🔐 Iniciar Sesión - PROVIAS</h2>
+    
+    <form (ngSubmit)="onSubmit()" #loginForm="ngForm">
+      <div class="form-group">
+        <label for="email">Email:</label>
+        <input 
+          type="email" 
+          id="email" 
+          name="email"
+          [(ngModel)]="credentials.email"
+          required
+          placeholder="admin@provias.gob.pe"
+          class="form-control"
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Contraseña:</label>
+        <input 
+          type="password" 
+          id="password" 
+          name="password"
+          [(ngModel)]="credentials.password"
+          required
+          placeholder="admin123"
+          class="form-control"
+        >
+      </div>
+
+      <button 
+        type="submit" 
+        [disabled]="isLoading || !loginForm.valid"
+        class="btn btn-primary"
+      >
+        <span *ngIf="isLoading">⏳ Cargando...</span>
+        <span *ngIf="!isLoading">🚀 Iniciar Sesión</span>
+      </button>
+    </form>
+
+    <div class="messages">
+      <div *ngIf="errorMessage" class="alert alert-danger">
+        ❌ {{ errorMessage }}
+      </div>
+      <div *ngIf="successMessage" class="alert alert-success">
+        ✅ {{ successMessage }}
+      </div>
+    </div>
+
+    <div class="demo-info">
+      <h4>💡 Información de Demo:</h4>
+      <p><strong>Email:</strong> admin@provias.gob.pe</p>
+      <p><strong>Contraseña:</strong> admin123</p>
+    </div>
+
+    <button 
+      (click)="logout()" 
+      class="btn btn-secondary"
+      style="margin-top: 1rem;"
+    >
+      🚪 Cerrar Sesión
+    </button>
+  </div>
+</div> 

@@ -2,6 +2,30 @@
 
 Bienvenido al repositorio de laboratorios prácticos del curso **Angular v18**. Aquí encontrarás la guía paso a paso para configurar tu entorno, crear tu primer proyecto, dominar la arquitectura de Angular y aplicar buenas prácticas de desarrollo profesional.
 
+## Comandos para crear los proyectos de ejemplo de cada laboratorio
+
+Ejecuta estos comandos dentro de la carpeta de cada laboratorio (laboratorio-1, laboratorio-2, laboratorio-3, laboratorio-4):
+
+```bash
+# Laboratorio 1 (si necesitas regenerarlo)
+cd laboratorio-1
+npx @angular/cli@18 new . --skip-git --routing --style=scss --package-manager=npm
+
+# Laboratorio 2
+cd laboratorio-2
+npx @angular/cli@18 new . --skip-git --routing --style=scss --package-manager=npm
+
+# Laboratorio 3
+cd laboratorio-3
+npx @angular/cli@18 new . --skip-git --routing --style=scss --package-manager=npm
+
+# Laboratorio 4 (si aplica)
+cd laboratorio-4
+npx @angular/cli@18 new . --skip-git --routing --style=scss --package-manager=npm
+```
+
+---
+
 ## Estructura del Curso
 
 - **Laboratorio 0:** Configuración de herramientas y entorno

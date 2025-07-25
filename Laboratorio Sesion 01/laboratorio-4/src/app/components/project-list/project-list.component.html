@@ -1,0 +1,81 @@
+<div class="project-list-container">
+  <header class="list-header">
+    <h2>🏗️ Gestión de Proyectos - PROVIAS</h2>
+    <button class="btn btn-primary" (click)="loadProjects()" [disabled]="loading">
+      <span *ngIf="loading">⏳ Cargando...</span>
+      <span *ngIf="!loading">🔄 Actualizar</span>
+    </button>
+  </header>
+
+  <div class="loading-container" *ngIf="loading">
+    <div class="spinner"></div>
+    <p>Cargando proyectos...</p>
+  </div>
+
+  <div class="error-container" *ngIf="error && !loading">
+    <div class="alert alert-danger">
+      ❌ {{ error }}
+    </div>
+  </div>
+
+  <div class="projects-grid" *ngIf="!loading && !error">
+    <div 
+      class="project-card" 
+      *ngFor="let project of projects"
+      [class.selected]="selectedProject?.id === project.id"
+      (click)="selectProject(project)"
+    >
+      <div class="project-header">
+        <h3>{{ project.name }}</h3>
+        <span class="status-badge" [class]="getStatusClass(project.status)">
+          {{ getStatusIcon(project.status) }} {{ project.status }}
+        </span>
+      </div>
+
+      <p class="project-description">{{ project.description }}</p>
+
+      <div class="project-details">
+        <div class="detail-item">
+          <span class="label">💰 Presupuesto:</span>
+          <span class="value">{{ formatCurrency(project.budget) }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">📅 Inicio:</span>
+          <span class="value">{{ formatDate(project.startDate) }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">📅 Fin:</span>
+          <span class="value">{{ formatDate(project.endDate) }}</span>
+        </div>
+
+        <div class="detail-item">
+          <span class="label">👥 Equipo:</span>
+          <span class="value">{{ project.team.length }} miembros</span>
+        </div>
+      </div>
+
+      <div class="project-team" *ngIf="project.team.length > 0">
+        <h4>Equipo del Proyecto:</h4>
+        <ul>
+          <li *ngFor="let member of project.team">{{ member }}</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="no-projects" *ngIf="!loading && !error && projects.length === 0">
+    <p>📭 No hay proyectos disponibles</p>
+  </div>
+
+  <div class="project-summary" *ngIf="selectedProject">
+    <h3>📋 Resumen del Proyecto Seleccionado</h3>
+    <div class="summary-content">
+      <p><strong>Nombre:</strong> {{ selectedProject.name }}</p>
+      <p><strong>Estado:</strong> {{ selectedProject.status }}</p>
+      <p><strong>Presupuesto:</strong> {{ formatCurrency(selectedProject.budget) }}</p>
+      <p><strong>Duración:</strong> {{ formatDate(selectedProject.startDate) }} - {{ formatDate(selectedProject.endDate) }}</p>
+    </div>
+  </div>
+</div> 
