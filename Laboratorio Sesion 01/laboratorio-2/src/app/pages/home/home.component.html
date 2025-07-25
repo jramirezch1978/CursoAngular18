@@ -1,0 +1,75 @@
+<div class="home-container">
+  <section class="hero-section">
+    <h1>🎉 ¡Bienvenidos al Curso Angular 18!</h1>
+    <p class="hero-subtitle">
+      Aprende a desarrollar aplicaciones web modernas con la última versión de Angular
+    </p>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <h3>{{ studentsCount }}</h3>
+        <p>Estudiantes</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ sessionsCount }}</h3>
+        <p>Sesiones</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ hoursCount }}</h3>
+        <p>Horas</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="features-section">
+    <h2>¿Qué aprenderás?</h2>
+    <div class="features-grid">
+      <div class="feature-card" *ngFor="let feature of features">
+        <div class="feature-icon">{{ feature.icon }}</div>
+        <h3>{{ feature.title }}</h3>
+        <p>{{ feature.description }}</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="courses-section">
+    <h2>Cursos Disponibles</h2>
+    <div class="courses-grid">
+      <div class="course-card" *ngFor="let course of courses">
+        <div class="course-header">
+          <h3>{{ course.title }}</h3>
+          <span class="course-level" [class]="'level-' + course.level.toLowerCase()">
+            {{ course.level }}
+          </span>
+        </div>
+        <p class="course-description">{{ course.description }}</p>
+        <div class="course-info">
+          <span class="duration">⏱️ {{ course.duration }}</span>
+          <div class="technologies">
+            <span class="tech-tag" *ngFor="let tech of course.technologies">
+              {{ tech }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="students-section">
+    <h2>Estudiantes Activos</h2>
+    <div class="students-grid">
+      <div class="student-card" *ngFor="let student of students">
+        <div class="student-info">
+          <h4>{{ student.name }}</h4>
+          <p>{{ student.email }}</p>
+          <small>{{ student.course }}</small>
+        </div>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="student.progress"></div>
+          </div>
+          <span class="progress-text">{{ student.progress }}%</span>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
