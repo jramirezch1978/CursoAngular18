@@ -1,64 +1,27 @@
-# Laboratorio 3: CLI Avanzado, Herramientas, Testing y Optimización
+# Laboratorio3
 
-## Propósito
-Dominar Angular CLI, configurar herramientas de desarrollo, implementar testing, optimizar el proyecto y preparar la aplicación para producción.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
 
-## Pasos Detallados
+## Development server
 
-### 1. Comandos Avanzados de Angular CLI
-```bash
-ng generate directive directives/highlight
-ng generate pipe pipes/truncate
-ng generate guard guards/auth
-ng generate interface models/user
-```
-- Implementa lógica personalizada en cada archivo generado.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-### 2. Uso de Pipes y Directivas
-- Usa el pipe `truncate` y la directiva `highlight` en el componente Home.
+## Code scaffolding
 
-### 3. Configuración de Herramientas de Desarrollo
-- Crea la carpeta `.vscode` y configura `settings.json`, `launch.json` y `tasks.json`.
-- Configura Prettier y ESLint para formateo y calidad de código.
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-### 4. Testing y Calidad de Código
-```bash
-ng test
-ng lint
-ng test --code-coverage --watch=false --browsers=ChromeHeadless
-```
-- Implementa tests personalizados para servicios y pipes.
+## Build
 
-### 5. Build y Optimización
-```bash
-ng build --configuration production
-npm run build:analyze
-npm run optimize:assets
-```
-- Analiza el bundle y optimiza assets.
-- Configura variables de entorno y proxy para APIs.
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Ejemplo de Código: Directiva Highlight
-```typescript
-@Directive({ selector: '[appHighlight]', standalone: true })
-export class HighlightDirective {
-  @Input() appHighlight = '#ffeb3b';
-  constructor(private el: ElementRef) {}
-  @HostListener('mouseenter') onMouseEnter() { this.highlight(this.appHighlight); }
-  @HostListener('mouseleave') onMouseLeave() { this.highlight(''); }
-  private highlight(color: string) { this.el.nativeElement.style.backgroundColor = color; }
-}
-```
+## Running unit tests
 
-## Checklist de Validación
-- [ ] Directiva y pipe personalizados funcionando
-- [ ] Guard e interfaces implementados
-- [ ] Herramientas de desarrollo configuradas
-- [ ] Tests unitarios y coverage report generados
-- [ ] Linting sin errores
-- [ ] Build de producción optimizado
-- [ ] Proxy y environment variables funcionando
-- [ ] Aplicación lista para producción y validada en Angular v18
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
 
----
-¡Has completado todos los laboratorios de la Sesión 1! Tu aplicación Angular v18 está lista para el siguiente nivel. 
+## Running end-to-end tests
+
+Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.

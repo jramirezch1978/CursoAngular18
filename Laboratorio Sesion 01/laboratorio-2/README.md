@@ -1,50 +1,27 @@
-# Laboratorio 2: Componentes, Servicios y Arquitectura
+# Laboratorio2
 
-## Propósito
-Crear componentes personalizados, entender la arquitectura de Angular, implementar servicios e inyección de dependencias, y aplicar data binding.
+This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 18.2.20.
 
-## Pasos Detallados
+## Development server
 
-### 1. Crear Componentes Standalone
-```bash
-ng generate component components/header --standalone
-ng generate component components/footer --standalone
-ng generate component pages/home --standalone
-```
-- Personaliza los archivos `.html` y `.scss` de cada componente según el diseño propuesto.
+Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
 
-### 2. Integrar Componentes en la App Principal
-- Importa los componentes en `app.component.ts` y actualiza el template para incluir `<app-header>`, `<app-home>`, y `<app-footer>`.
+## Code scaffolding
 
-### 3. Crear Servicio de Datos
-```bash
-ng generate service services/data
-```
-- Implementa interfaces y lógica de ejemplo en `data.service.ts` para cursos y estudiantes.
-- Inyecta el servicio en el componente Home y muestra datos usando data binding y directivas (`*ngFor`).
+Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
 
-### 4. Diseño Responsive y Buenas Prácticas
-- Aplica estilos SCSS para lograr un diseño profesional y adaptable.
-- Usa directivas estructurales y property binding.
+## Build
 
-## Ejemplo de Código: Servicio de Datos
-```typescript
-@Injectable({ providedIn: 'root' })
-export class DataService {
-  private courses = [/* ... */];
-  private students = [/* ... */];
-  getCourses() { return this.courses; }
-  getStudents() { return this.students; }
-}
-```
+Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
-## Checklist de Validación
-- [ ] Componentes personalizados creados e integrados
-- [ ] Servicio de datos implementado y funcionando
-- [ ] Data binding dinámico en Home
-- [ ] Diseño responsive aplicado
-- [ ] Uso de directivas y property binding
-- [ ] Aplicación compila y funciona correctamente
+## Running unit tests
 
----
-¡Componentes y servicios listos! Continúa con el Laboratorio 3 para dominar CLI avanzado y herramientas de desarrollo. 
+Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+
+## Running end-to-end tests
+
+Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+
+## Further help
+
+To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
