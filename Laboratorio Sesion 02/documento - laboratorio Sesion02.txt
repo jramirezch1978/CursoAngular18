@@ -1,0 +1,3204 @@
+LABORATORIOS PRÁCTICOS - SESIÓN 2: COMPONENTES Y ENRUTAMIENTO
+PROVIAS DESCENTRALIZADO
+________________________________________
+INFORMACIÓN GENERAL
+Curso: Angular v18 - 30 horas académicas
+Modalidad: 100% Online Live - Formato Laboratorio Intensivo
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Sesión: 2 - Componentes y Enrutamiento
+Duración Total Laboratorios: 180 minutos (5 laboratorios de 30-35 min c/u)
+________________________________________
+HERRAMIENTAS Y SOFTWARE NECESARIO
+✅ Verificación Previa (de Sesión 1)
+•	Node.js v18.19.0+ - Para ejecutar Angular CLI
+•	Angular CLI v18 - Herramienta principal de desarrollo
+•	Visual Studio Code - Editor con extensiones Angular
+•	Git - Control de versiones
+•	Navegador moderno - Chrome/Firefox con DevTools
+🔧 Extensiones VS Code Esenciales
+•	Angular Language Service - Intellisense para templates
+•	Angular Snippets - Generación rápida de código
+•	Prettier - Formateo automático
+•	Auto Rename Tag - Sincronización de tags HTML
+•	GitLens - Integración Git avanzada
+🌐 Herramientas Browser
+•	Angular DevTools Extension - Debug de componentes
+•	Developer Tools - Inspección y debug
+•	Network Tab - Monitoreo de requests
+________________________________________
+LAB 0: CONFIGURACIÓN AVANZADA Y VERIFICACIÓN
+Duración: 10 minutos
+Objetivo: Asegurar entorno óptimo para laboratorios de componentes
+PASO 1: Verificación del Proyecto Base (3 minutos)
+1.1 Verificar proyecto de Sesión 1
+# Verificar que existe el proyecto de la sesión anterior
+cd mi-primera-app-angular
+# o el nombre que usaron en sesión 1
+
+# Verificar estado del proyecto
+ng version
+npm list --depth=0
+1.2 Actualizar dependencias si es necesario
+# Solo si hay problemas de versiones
+npm update
+ng update @angular/core @angular/cli
+1.3 Verificar servidor de desarrollo
+# Iniciar servidor
+ng serve
+
+# Verificar en navegador: http://localhost:4200
+# Debe mostrar la aplicación de la sesión anterior funcionando
+PASO 2: Configuración de Herramientas de Debug (4 minutos)
+2.1 Configurar Angular DevTools
+1.	Instalar Angular DevTools (si no está instalado):
+o	Chrome: https://chrome.google.com/webstore/detail/angular-devtools/ienfalfjdbdpebioblfackkekamfmbnh
+o	Firefox: https://addons.mozilla.org/en-US/firefox/addon/angular-devtools/
+2.	Verificar funcionamiento:
+o	Abrir DevTools (F12)
+o	Buscar tab "Angular"
+o	Debe mostrar el árbol de componentes
+2.2 Configurar VS Code para debugging
+1.	Crear .vscode/launch.json:
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "chrome",
+      "request": "launch",
+      "name": "Angular Debug",
+      "url": "http://localhost:4200",
+      "webRoot": "${workspaceFolder}"
+    }
+  ]
+}
+2.	Actualizar .vscode/settings.json:
+{
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+  "angular.enable-strict-mode-prompt": false,
+  "typescript.suggest.autoImports": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true
+}
+PASO 3: Preparación del Workspace (3 minutos)
+3.1 Limpiar proyecto base
+# Detener servidor si está ejecutándose (Ctrl+C)
+
+# Limpiar caché
+npm run build -- --delete-output-path
+rm -rf node_modules/.cache (Linux/Mac)
+rmdir /s node_modules\.cache (Windows)
+3.2 Crear estructura de carpetas para laboratorios
+# Dentro de src/app/
+mkdir components
+mkdir pages  
+mkdir services
+mkdir guards
+mkdir models
+mkdir shared
+3.3 Verificar herramientas están funcionando
+# Test Angular CLI
+ng generate component test-component --dry-run
+
+# Test Git
+git status
+
+# Reiniciar servidor
+ng serve
+✅ RESULTADO ESPERADO LAB 0
+•	✅ Proyecto base funcionando correctamente
+•	✅ Angular DevTools operativo
+•	✅ VS Code configurado para debugging
+•	✅ Estructura de carpetas organizada
+•	✅ Todas las herramientas verificadas
+________________________________________
+LAB 1: CICLO DE VIDA DE COMPONENTES
+Duración: 30 minutos
+Objetivo: Dominar lifecycle hooks y implementar logging system
+PASO 1: Crear Componente con Lifecycle Hooks (12 minutos)
+1.1 Generar componente de demostración
+ng generate component components/lifecycle-demo --standalone
+1.2 Implementar todos los lifecycle hooks
+Actualizar lifecycle-demo.component.ts:
+import { Component, OnInit, OnDestroy, OnChanges, AfterViewInit, 
+         AfterContentInit, Input, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-lifecycle-demo',
+  standalone: true,
+  imports: [],
+  templateUrl: './lifecycle-demo.component.html',
+  styleUrl: './lifecycle-demo.component.scss'
+})
+export class LifecycleDemoComponent implements OnInit, OnDestroy, 
+  OnChanges, AfterViewInit, AfterContentInit {
+  
+  @Input() inputData: string = '';
+  
+  private intervalId?: number;
+  private startTime: number;
+  
+  constructor() {
+    this.startTime = Date.now();
+    this.logLifecycle('Constructor llamado - Solo inyección de dependencias');
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    this.logLifecycle('ngOnChanges - Input properties cambiaron', changes);
+  }
+  
+  ngOnInit(): void {
+    this.logLifecycle('ngOnInit - Componente inicializado, perfecto para HTTP calls');
+    this.startTimer();
+  }
+  
+  ngAfterContentInit(): void {
+    this.logLifecycle('ngAfterContentInit - Contenido proyectado inicializado');
+  }
+  
+  ngAfterViewInit(): void {
+    this.logLifecycle('ngAfterViewInit - Vista completamente inicializada');
+  }
+  
+  ngOnDestroy(): void {
+    this.logLifecycle('ngOnDestroy - Limpiando recursos antes de destruir');
+    this.clearTimer();
+  }
+  
+  private startTimer(): void {
+    this.intervalId = window.setInterval(() => {
+      const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+      console.log(`⏱️ Componente activo por ${elapsed} segundos`);
+    }, 2000);
+  }
+  
+  private clearTimer(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.logLifecycle('✅ Timer limpiado correctamente');
+    }
+  }
+  
+  private logLifecycle(message: string, data?: any): void {
+    const timestamp = new Date().toLocaleTimeString();
+    console.log(`🔄 [${timestamp}] ${message}`, data || '');
+  }
+  
+  // Método para simular cambio de input
+  simulateInputChange(): void {
+    this.inputData = `Datos actualizados: ${new Date().toLocaleTimeString()}`;
+  }
+}
+1.3 Crear template interactivo
+Actualizar lifecycle-demo.component.html:
+<div class="lifecycle-container">
+  <h2>🔄 Demostración Lifecycle Hooks</h2>
+  
+  <div class="info-panel">
+    <h3>Estado del Componente</h3>
+    <p><strong>Input Data:</strong> {{ inputData || 'Sin datos' }}</p>
+    <p><strong>Tiempo activo:</strong> Revisar consola cada 2 segundos</p>
+  </div>
+  
+  <div class="controls">
+    <button 
+      (click)="simulateInputChange()" 
+      class="btn btn-primary">
+      🔄 Simular Cambio de Input
+    </button>
+  </div>
+  
+  <div class="instructions">
+    <h4>📋 Instrucciones:</h4>
+    <ol>
+      <li>Abre las DevTools (F12)</li>
+      <li>Ve a la pestaña Console</li>
+      <li>Observa los mensajes de lifecycle hooks</li>
+      <li>Haz click en "Simular Cambio de Input"</li>
+      <li>Navega a otra página para ver ngOnDestroy</li>
+    </ol>
+  </div>
+  
+  <div class="lifecycle-info">
+    <h4>🎯 Hooks Implementados:</h4>
+    <ul>
+      <li><code>constructor()</code> - Inyección de dependencias</li>
+      <li><code>ngOnChanges()</code> - Cambios en @Input</li>
+      <li><code>ngOnInit()</code> - Inicialización del componente</li>
+      <li><code>ngAfterContentInit()</code> - Contenido inicializado</li>
+      <li><code>ngAfterViewInit()</code> - Vista inicializada</li>
+      <li><code>ngOnDestroy()</code> - Limpieza de recursos</li>
+    </ul>
+  </div>
+</div>
+1.4 Agregar estilos profesionales
+Actualizar lifecycle-demo.component.scss:
+.lifecycle-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+  }
+  
+  .info-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .controls {
+    text-align: center;
+    margin: 2rem 0;
+    
+    .btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+    }
+  }
+  
+  .instructions {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #17a2b8;
+    margin-bottom: 1.5rem;
+    
+    h4 {
+      color: #17a2b8;
+      margin-top: 0;
+    }
+    
+    ol {
+      margin: 0;
+      padding-left: 1.5rem;
+      
+      li {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+      }
+    }
+  }
+  
+  .lifecycle-info {
+    background: #e8f5e8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+    
+    h4 {
+      color: #28a745;
+      margin-top: 0;
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 1.5rem;
+      
+      li {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+        
+        code {
+          background: #f1f1f1;
+          padding: 0.2rem 0.4rem;
+          border-radius: 3px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          color: #d63384;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .lifecycle-container {
+    margin: 1rem;
+    padding: 1rem;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+}
+PASO 2: Crear Logger Service (8 minutos)
+2.1 Generar service para logging
+ng generate service services/logger
+2.2 Implementar logger service avanzado
+Actualizar logger.service.ts:
+import { Injectable } from '@angular/core';
+
+export enum LogLevel {
+  DEBUG = 0,
+  INFO = 1,
+  WARN = 2,
+  ERROR = 3
+}
+
+export interface LogEntry {
+  timestamp: Date;
+  level: LogLevel;
+  component: string;
+  message: string;
+  data?: any;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoggerService {
+  private logs: LogEntry[] = [];
+  private currentLogLevel: LogLevel = LogLevel.DEBUG;
+  
+  constructor() {
+    this.info('LoggerService', 'Logger service inicializado');
+  }
+  
+  debug(component: string, message: string, data?: any): void {
+    this.log(LogLevel.DEBUG, component, message, data);
+  }
+  
+  info(component: string, message: string, data?: any): void {
+    this.log(LogLevel.INFO, component, message, data);
+  }
+  
+  warn(component: string, message: string, data?: any): void {
+    this.log(LogLevel.WARN, component, message, data);
+  }
+  
+  error(component: string, message: string, data?: any): void {
+    this.log(LogLevel.ERROR, component, message, data);
+  }
+  
+  private log(level: LogLevel, component: string, message: string, data?: any): void {
+    if (level >= this.currentLogLevel) {
+      const logEntry: LogEntry = {
+        timestamp: new Date(),
+        level,
+        component,
+        message,
+        data
+      };
+      
+      this.logs.push(logEntry);
+      this.consoleLog(logEntry);
+      
+      // Mantener solo los últimos 100 logs
+      if (this.logs.length > 100) {
+        this.logs = this.logs.slice(-100);
+      }
+    }
+  }
+  
+  private consoleLog(entry: LogEntry): void {
+    const timestamp = entry.timestamp.toLocaleTimeString();
+    const levelEmoji = this.getLevelEmoji(entry.level);
+    const message = `${levelEmoji} [${timestamp}] [${entry.component}] ${entry.message}`;
+    
+    switch (entry.level) {
+      case LogLevel.DEBUG:
+        console.debug(message, entry.data || '');
+        break;
+      case LogLevel.INFO:
+        console.info(message, entry.data || '');
+        break;
+      case LogLevel.WARN:
+        console.warn(message, entry.data || '');
+        break;
+      case LogLevel.ERROR:
+        console.error(message, entry.data || '');
+        break;
+    }
+  }
+  
+  private getLevelEmoji(level: LogLevel): string {
+    switch (level) {
+      case LogLevel.DEBUG: return '🐛';
+      case LogLevel.INFO: return 'ℹ️';
+      case LogLevel.WARN: return '⚠️';
+      case LogLevel.ERROR: return '❌';
+      default: return '📝';
+    }
+  }
+  
+  getLogs(): LogEntry[] {
+    return [...this.logs];
+  }
+  
+  clearLogs(): void {
+    this.logs = [];
+    this.info('LoggerService', 'Logs limpiados');
+  }
+  
+  setLogLevel(level: LogLevel): void {
+    this.currentLogLevel = level;
+    this.info('LoggerService', `Log level cambiado a ${LogLevel[level]}`);
+  }
+}
+PASO 3: Integrar Logger en Componente (5 minutos)
+3.1 Actualizar lifecycle component para usar logger
+Modificar lifecycle-demo.component.ts:
+import { Component, OnInit, OnDestroy, OnChanges, AfterViewInit, 
+         AfterContentInit, Input, SimpleChanges } from '@angular/core';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-lifecycle-demo',
+  standalone: true,
+  imports: [],
+  templateUrl: './lifecycle-demo.component.html',
+  styleUrl: './lifecycle-demo.component.scss'
+})
+export class LifecycleDemoComponent implements OnInit, OnDestroy, 
+  OnChanges, AfterViewInit, AfterContentInit {
+  
+  @Input() inputData: string = '';
+  
+  private intervalId?: number;
+  private startTime: number;
+  
+  constructor(private logger: LoggerService) {
+    this.startTime = Date.now();
+    this.logger.debug('LifecycleDemoComponent', 'Constructor - Componente creado');
+  }
+  
+  ngOnChanges(changes: SimpleChanges): void {
+    this.logger.info('LifecycleDemoComponent', 'ngOnChanges ejecutado', changes);
+  }
+  
+  ngOnInit(): void {
+    this.logger.info('LifecycleDemoComponent', 'ngOnInit - Inicializando componente');
+    this.startTimer();
+  }
+  
+  ngAfterContentInit(): void {
+    this.logger.debug('LifecycleDemoComponent', 'ngAfterContentInit ejecutado');
+  }
+  
+  ngAfterViewInit(): void {
+    this.logger.debug('LifecycleDemoComponent', 'ngAfterViewInit - Vista lista');
+  }
+  
+  ngOnDestroy(): void {
+    this.logger.warn('LifecycleDemoComponent', 'ngOnDestroy - Limpiando recursos');
+    this.clearTimer();
+  }
+  
+  private startTimer(): void {
+    this.intervalId = window.setInterval(() => {
+      const elapsed = Math.floor((Date.now() - this.startTime) / 1000);
+      this.logger.debug('LifecycleDemoComponent', `Timer tick: ${elapsed} segundos activo`);
+    }, 3000);
+  }
+  
+  private clearTimer(): void {
+    if (this.intervalId) {
+      clearInterval(this.intervalId);
+      this.logger.info('LifecycleDemoComponent', 'Timer limpiado exitosamente');
+    }
+  }
+  
+  simulateInputChange(): void {
+    const newData = `Actualizado: ${new Date().toLocaleTimeString()}`;
+    this.inputData = newData;
+    this.logger.info('LifecycleDemoComponent', 'Input simulado cambiado', { newData });
+  }
+  
+  clearLogs(): void {
+    this.logger.clearLogs();
+  }
+}
+PASO 4: Integrar en Aplicación Principal (5 minutos)
+4.1 Agregar componente a app.component.ts
+Actualizar app.component.ts:
+import { Component } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { LifecycleDemoComponent } from './components/lifecycle-demo/lifecycle-demo.component';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, HeaderComponent, FooterComponent, LifecycleDemoComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent {
+  title = 'Sesión 2 - Componentes y Enrutamiento';
+  showLifecycleDemo = true;
+  
+  toggleLifecycleDemo(): void {
+    this.showLifecycleDemo = !this.showLifecycleDemo;
+  }
+}
+4.2 Actualizar app.component.html
+Modificar app.component.html:
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <main class="main-content">
+    <div class="container">
+      <section class="lab-section">
+        <h1>🧪 LAB 1: Ciclo de Vida de Componentes</h1>
+        
+        <div class="controls">
+          <button 
+            (click)="toggleLifecycleDemo()" 
+            class="btn"
+            [class.btn-danger]="showLifecycleDemo"
+            [class.btn-success]="!showLifecycleDemo">
+            {{ showLifecycleDemo ? '🗑️ Destruir Componente' : '🔄 Crear Componente' }}
+          </button>
+        </div>
+        
+        @if (showLifecycleDemo) {
+          <app-lifecycle-demo 
+            [inputData]="'Datos desde componente padre'">
+          </app-lifecycle-demo>
+        } @else {
+          <div class="component-destroyed">
+            <h3>💀 Componente Destruido</h3>
+            <p>Revisa la consola para ver el log de ngOnDestroy</p>
+          </div>
+        }
+      </section>
+    </div>
+    
+    <router-outlet></router-outlet>
+  </main>
+  
+  <app-footer></app-footer>
+</div>
+✅ RESULTADO ESPERADO LAB 1
+•	✅ Componente con todos los lifecycle hooks implementados
+•	✅ Logger service funcionando y registrando eventos
+•	✅ Capacidad de crear/destruir componente dinámicamente
+•	✅ Console mostrando secuencia completa de lifecycle hooks
+•	✅ Timer implementado y limpiado correctamente
+•	✅ Comprensión práctica de cuándo usar cada hook
+________________________________________
+LAB 2: COMUNICACIÓN ENTRE COMPONENTES
+Duración: 30 minutos
+Objetivo: Implementar @Input/@Output y comunicación via services
+PASO 1: Crear Modelos de Datos (3 minutos)
+1.1 Generar interfaces para el proyecto
+ng generate interface models/user
+ng generate interface models/project
+1.2 Definir modelo User
+Actualizar user.ts:
+export interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: UserRole;
+  avatar?: string;
+  isActive: boolean;
+  lastLogin?: Date;
+  projects: number[]; // IDs de proyectos asignados
+}
+
+export enum UserRole {
+  ADMIN = 'admin',
+  PROJECT_MANAGER = 'project_manager',
+  ENGINEER = 'engineer',
+  TECHNICIAN = 'technician'
+}
+
+export interface CreateUserRequest {
+  name: string;
+  email: string;
+  role: UserRole;
+}
+
+export interface UserStats {
+  totalUsers: number;
+  activeUsers: number;
+  byRole: { [key in UserRole]: number };
+}
+1.3 Definir modelo Project
+Actualizar project.ts:
+export interface Project {
+  id: number;
+  name: string;
+  description: string;
+  status: ProjectStatus;
+  startDate: Date;
+  endDate?: Date;
+  budget: number;
+  assignedUserIds: number[];
+  location: string;
+  priority: ProjectPriority;
+}
+
+export enum ProjectStatus {
+  PLANNING = 'planning',
+  IN_PROGRESS = 'in_progress',
+  ON_HOLD = 'on_hold',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled'
+}
+
+export enum ProjectPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  CRITICAL = 'critical'
+}
+PASO 2: Crear Service de Comunicación (7 minutos)
+2.1 Generar service para manejo de estado
+ng generate service services/user-management
+2.2 Implementar UserManagementService
+Actualizar user-management.service.ts:
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { User, UserRole, CreateUserRequest, UserStats } from '../models/user';
+import { LoggerService } from './logger.service';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserManagementService {
+  private users: User[] = [
+    {
+      id: 1,
+      name: 'Ana García López',
+      email: 'ana.garcia@provias.gob.pe',
+      role: UserRole.PROJECT_MANAGER,
+      avatar: '👩‍💼',
+      isActive: true,
+      lastLogin: new Date('2025-07-30T14:30:00'),
+      projects: [1, 3]
+    },
+    {
+      id: 2,
+      name: 'Carlos Mendoza Silva',
+      email: 'carlos.mendoza@provias.gob.pe',
+      role: UserRole.ENGINEER,
+      avatar: '👨‍🔧',
+      isActive: true,
+      lastLogin: new Date('2025-07-31T09:15:00'),
+      projects: [1, 2]
+    },
+    {
+      id: 3,
+      name: 'María Rodriguez Vargas',
+      email: 'maria.rodriguez@provias.gob.pe',
+      role: UserRole.ADMIN,
+      avatar: '👩‍💻',
+      isActive: true,
+      lastLogin: new Date('2025-07-31T16:45:00'),
+      projects: []
+    },
+    {
+      id: 4,
+      name: 'José Pérez Huamán',
+      email: 'jose.perez@provias.gob.pe',
+      role: UserRole.TECHNICIAN,
+      avatar: '👨‍🔧',
+      isActive: false,
+      lastLogin: new Date('2025-07-25T11:20:00'),
+      projects: [2]
+    }
+  ];
+
+  private selectedUserSubject = new BehaviorSubject<User | null>(null);
+  private usersSubject = new BehaviorSubject<User[]>(this.users);
+
+  constructor(private logger: LoggerService) {
+    this.logger.info('UserManagementService', 'Servicio inicializado con datos mock');
+  }
+
+  // Observables públicos
+  getUsers(): Observable<User[]> {
+    return this.usersSubject.asObservable();
+  }
+
+  getSelectedUser(): Observable<User | null> {
+    return this.selectedUserSubject.asObservable();
+  }
+
+  // Métodos de gestión
+  selectUser(user: User): void {
+    this.selectedUserSubject.next(user);
+    this.logger.info('UserManagementService', `Usuario seleccionado: ${user.name}`, user);
+  }
+
+  addUser(userRequest: CreateUserRequest): User {
+    const newUser: User = {
+      id: Math.max(...this.users.map(u => u.id)) + 1,
+      ...userRequest,
+      avatar: this.getRandomAvatar(),
+      isActive: true,
+      lastLogin: new Date(),
+      projects: []
+    };
+
+    this.users.push(newUser);
+    this.usersSubject.next([...this.users]);
+    this.logger.info('UserManagementService', `Usuario creado: ${newUser.name}`, newUser);
+    
+    return newUser;
+  }
+
+  updateUser(updatedUser: User): void {
+    const index = this.users.findIndex(u => u.id === updatedUser.id);
+    if (index !== -1) {
+      this.users[index] = { ...updatedUser };
+      this.usersSubject.next([...this.users]);
+      
+      // Actualizar usuario seleccionado si es el mismo
+      if (this.selectedUserSubject.value?.id === updatedUser.id) {
+        this.selectedUserSubject.next(updatedUser);
+      }
+      
+      this.logger.info('UserManagementService', `Usuario actualizado: ${updatedUser.name}`, updatedUser);
+    }
+  }
+
+  deleteUser(userId: number): void {
+    this.users = this.users.filter(u => u.id !== userId);
+    this.usersSubject.next([...this.users]);
+    
+    // Limpiar selección si se eliminó el usuario seleccionado
+    if (this.selectedUserSubject.value?.id === userId) {
+      this.selectedUserSubject.next(null);
+    }
+    
+    this.logger.warn('UserManagementService', `Usuario eliminado con ID: ${userId}`);
+  }
+
+  toggleUserStatus(userId: number): void {
+    const user = this.users.find(u => u.id === userId);
+    if (user) {
+      user.isActive = !user.isActive;
+      this.updateUser(user);
+    }
+  }
+  getUserStats(): UserStats {
+    const stats: UserStats = {
+      totalUsers: this.users.length,
+      activeUsers: this.users.filter(u => u.isActive).length,
+      byRole: {
+        [UserRole.ADMIN]: this.users.filter(u => u.role === UserRole.ADMIN).length,
+        [UserRole.PROJECT_MANAGER]: this.users.filter(u => u.role === UserRole.PROJECT_MANAGER).length,
+        [UserRole.ENGINEER]: this.users.filter(u => u.role === UserRole.ENGINEER).length,
+        [UserRole.TECHNICIAN]: this.users.filter(u => u.role === UserRole.TECHNICIAN).length
+      }
+    };
+    
+    this.logger.debug('UserManagementService', 'Estadísticas calculadas', stats);
+    return stats;
+  }
+
+  private getRandomAvatar(): string {
+    const avatars = ['👤', '👨‍💼', '👩‍💼', '👨‍🔧', '👩‍🔧', '👨‍💻', '👩‍💻', '🧑‍⚕️'];
+    return avatars[Math.floor(Math.random() * avatars.length)];
+  }
+
+  clearSelection(): void {
+    this.selectedUserSubject.next(null);
+    this.logger.debug('UserManagementService', 'Selección de usuario limpiada');
+  }
+}
+PASO 3: Crear Componente Parent (User List) (8 minutos)
+3.1 Generar componente padre
+ng generate component components/user-list --standalone
+3.2 Implementar user-list.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subscription } from 'rxjs';
+import { User, UserRole, CreateUserRequest } from '../../models/user';
+import { UserManagementService } from '../../services/user-management.service';
+import { LoggerService } from '../../services/logger.service';
+import { UserCardComponent } from '../user-card/user-card.component';
+
+@Component({
+  selector: 'app-user-list',
+  standalone: true,
+  imports: [CommonModule, UserCardComponent],
+  templateUrl: './user-list.component.html',
+  styleUrl: './user-list.component.scss'
+})
+export class UserListComponent implements OnInit, OnDestroy {
+  users: User[] = [];
+  selectedUser: User | null = null;
+  isLoading = false;
+  
+  private subscriptions = new Subscription();
+
+  constructor(
+    private userService: UserManagementService,
+    private logger: LoggerService
+  ) {
+    this.logger.debug('UserListComponent', 'Constructor ejecutado');
+  }
+
+  ngOnInit(): void {
+    this.logger.info('UserListComponent', 'Inicializando componente');
+    this.loadUsers();
+    this.subscribeToSelectedUser();
+  }
+
+  ngOnDestroy(): void {
+    this.logger.info('UserListComponent', 'Destruyendo componente y limpiando subscripciones');
+    this.subscriptions.unsubscribe();
+  }
+
+  private loadUsers(): void {
+    this.isLoading = true;
+    
+    const usersSub = this.userService.getUsers().subscribe({
+      next: (users) => {
+        this.users = users;
+        this.isLoading = false;
+        this.logger.info('UserListComponent', `Cargados ${users.length} usuarios`);
+      },
+      error: (error) => {
+        this.isLoading = false;
+        this.logger.error('UserListComponent', 'Error cargando usuarios', error);
+      }
+    });
+    
+    this.subscriptions.add(usersSub);
+  }
+
+  private subscribeToSelectedUser(): void {
+    const selectedSub = this.userService.getSelectedUser().subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+        this.logger.debug('UserListComponent', 'Usuario seleccionado actualizado', user?.name || 'ninguno');
+      }
+    });
+    
+    this.subscriptions.add(selectedSub);
+  }
+
+  // Event handlers para comunicación con child components
+  onUserSelected(user: User): void {
+    this.logger.info('UserListComponent', 'Evento recibido: usuario seleccionado', user.name);
+    this.userService.selectUser(user);
+  }
+
+  onUserToggleStatus(user: User): void {
+    this.logger.info('UserListComponent', 'Evento recibido: toggle status', user.name);
+    this.userService.toggleUserStatus(user.id);
+  }
+
+  onUserDelete(user: User): void {
+    if (confirm(`¿Está seguro de eliminar a ${user.name}?`)) {
+      this.logger.warn('UserListComponent', 'Evento recibido: eliminar usuario', user.name);
+      this.userService.deleteUser(user.id);
+    }
+  }
+
+  addNewUser(): void {
+    const newUserRequest: CreateUserRequest = {
+      name: `Usuario ${Date.now()}`,
+      email: `user${Date.now()}@provias.gob.pe`,
+      role: UserRole.TECHNICIAN
+    };
+    
+    this.userService.addUser(newUserRequest);
+    this.logger.info('UserListComponent', 'Usuario agregado desde parent', newUserRequest);
+  }
+
+  clearSelection(): void {
+    this.userService.clearSelection();
+  }
+
+  getActiveUsersCount(): number {
+    return this.users.filter(u => u.isActive).length;
+  }
+
+  getRoleDisplayName(role: UserRole): string {
+    const roleNames = {
+      [UserRole.ADMIN]: 'Administrador',
+      [UserRole.PROJECT_MANAGER]: 'Jefe de Proyecto',
+      [UserRole.ENGINEER]: 'Ingeniero',
+      [UserRole.TECHNICIAN]: 'Técnico'
+    };
+    return roleNames[role];
+  }
+}
+3.3 Crear template para user-list.component.html
+<div class="user-list-container">
+  <header class="list-header">
+    <h2>👥 Gestión de Usuarios PROVIAS</h2>
+    <div class="header-stats">
+      <span class="stat">
+        👤 Total: {{ users.length }}
+      </span>
+      <span class="stat">
+        ✅ Activos: {{ getActiveUsersCount() }}
+      </span>
+      @if (selectedUser) {
+        <span class="stat selected">
+          🎯 Seleccionado: {{ selectedUser.name }}
+        </span>
+      }
+    </div>
+  </header>
+
+  <div class="controls">
+    <button 
+      (click)="addNewUser()" 
+      class="btn btn-primary">
+      ➕ Agregar Usuario
+    </button>
+    
+    <button 
+      (click)="clearSelection()" 
+      class="btn btn-secondary"
+      [disabled]="!selectedUser">
+      🗑️ Limpiar Selección
+    </button>
+  </div>
+
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  } @else {
+    <div class="users-grid">
+      @for (user of users; track user.id) {
+        <app-user-card
+          [user]="user"
+          [isSelected]="selectedUser?.id === user.id"
+          (userSelected)="onUserSelected($event)"
+          (userToggleStatus)="onUserToggleStatus($event)"
+          (userDelete)="onUserDelete($event)">
+        </app-user-card>
+      } @empty {
+        <div class="no-users">
+          <h3>📭 No hay usuarios</h3>
+          <p>Haz click en "Agregar Usuario" para comenzar</p>
+        </div>
+      }
+    </div>
+  }
+
+  <div class="communication-demo">
+    <h3>🔄 Demo de Comunicación</h3>
+    <ul>
+      <li><strong>Parent → Child:</strong> Datos del usuario via @Input</li>
+      <li><strong>Child → Parent:</strong> Eventos via @Output</li>
+      <li><strong>Service:</strong> Estado compartido entre componentes</li>
+    </ul>
+  </div>
+</div>
+PASO 4: Crear Componente Child (User Card) (8 minutos)
+4.1 Generar componente hijo
+ng generate component components/user-card --standalone
+4.2 Implementar user-card.component.ts
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { User, UserRole } from '../../models/user';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-user-card',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './user-card.component.html',
+  styleUrl: './user-card.component.scss'
+})
+export class UserCardComponent implements OnChanges {
+  // Props de entrada desde el parent
+  @Input({ required: true }) user!: User;
+  @Input() isSelected = false;
+  
+  // Eventos hacia el parent
+  @Output() userSelected = new EventEmitter<User>();
+  @Output() userToggleStatus = new EventEmitter<User>();
+  @Output() userDelete = new EventEmitter<User>();
+
+  constructor(private logger: LoggerService) {
+    this.logger.debug('UserCardComponent', 'Constructor ejecutado');
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['user']) {
+      this.logger.debug('UserCardComponent', 'Usuario actualizado en card', this.user?.name);
+    }
+    
+    if (changes['isSelected']) {
+      this.logger.debug('UserCardComponent', `Estado selección: ${this.isSelected}`);
+    }
+  }
+
+  onCardClick(): void {
+    this.logger.info('UserCardComponent', 'Card clickeada, emitiendo evento userSelected');
+    this.userSelected.emit(this.user);
+  }
+
+  onToggleStatus(event: Event): void {
+    event.stopPropagation(); // Evitar que se propague al click de la card
+    this.logger.info('UserCardComponent', 'Toggle status clickeado');
+    this.userToggleStatus.emit(this.user);
+  }
+
+  onDelete(event: Event): void {
+    event.stopPropagation(); // Evitar que se propague al click de la card
+    this.logger.warn('UserCardComponent', 'Delete clickeado');
+    this.userDelete.emit(this.user);
+  }
+
+  getRoleClass(): string {
+    const roleClasses = {
+      [UserRole.ADMIN]: 'role-admin',
+      [UserRole.PROJECT_MANAGER]: 'role-manager',
+      [UserRole.ENGINEER]: 'role-engineer',
+      [UserRole.TECHNICIAN]: 'role-technician'
+    };
+    return roleClasses[this.user.role];
+  }
+
+  getRoleDisplayName(): string {
+    const roleNames = {
+      [UserRole.ADMIN]: 'Administrador',
+      [UserRole.PROJECT_MANAGER]: 'Jefe de Proyecto',
+      [UserRole.ENGINEER]: 'Ingeniero',
+      [UserRole.TECHNICIAN]: 'Técnico'
+    };
+    return roleNames[this.user.role];
+  }
+
+  getLastLoginFormatted(): string {
+    if (!this.user.lastLogin) return 'Nunca';
+    
+    const now = new Date();
+    const loginDate = new Date(this.user.lastLogin);
+    const diffMs = now.getTime() - loginDate.getTime();
+    const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+    
+    if (diffDays === 0) return 'Hoy';
+    if (diffDays === 1) return 'Ayer';
+    if (diffDays < 7) return `Hace ${diffDays} días`;
+    return loginDate.toLocaleDateString('es-PE');
+  }
+}
+4.3 Crear template para user-card.component.html
+<div 
+  class="user-card"
+  [class.selected]="isSelected"
+  [class.inactive]="!user.isActive"
+  (click)="onCardClick()">
+  
+  <div class="card-header">
+    <div class="avatar">{{ user.avatar || '👤' }}</div>
+    <div class="status-badge" [class]="user.isActive ? 'active' : 'inactive'">
+      {{ user.isActive ? 'Activo' : 'Inactivo' }}
+    </div>
+  </div>
+  
+  <div class="card-body">
+    <h3 class="user-name">{{ user.name }}</h3>
+    <p class="user-email">📧 {{ user.email }}</p>
+    
+    <div class="user-role" [class]="getRoleClass()">
+      <span class="role-label">{{ getRoleDisplayName() }}</span>
+    </div>
+    
+    <div class="user-info">
+      <small class="last-login">
+        🕒 Último acceso: {{ getLastLoginFormatted() }}
+      </small>
+      
+      @if (user.projects.length > 0) {
+        <small class="projects-count">
+          📋 {{ user.projects.length }} proyecto(s)
+        </small>
+      }
+    </div>
+  </div>
+  
+  <div class="card-actions">
+    <button 
+      class="btn-action"
+      [class]="user.isActive ? 'btn-warning' : 'btn-success'"
+      (click)="onToggleStatus($event)"
+      [title]="user.isActive ? 'Desactivar usuario' : 'Activar usuario'">
+      {{ user.isActive ? '⏸️' : '▶️' }}
+    </button>
+    
+    <button 
+      class="btn-action btn-danger"
+      (click)="onDelete($event)"
+      title="Eliminar usuario">
+      🗑️
+    </button>
+  </div>
+  
+  @if (isSelected) {
+    <div class="selection-indicator">
+      ✨ Seleccionado
+    </div>
+  }
+</div>
+PASO 5: Crear Componente Sibling (User Details) (8 minutos)
+5.1 Generar componente de detalles
+ng generate component components/user-details --standalone
+5.2 Implementar user-details.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { User, UserRole } from '../../models/user';
+import { UserManagementService } from '../../services/user-management.service';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-user-details',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './user-details.component.html',
+  styleUrl: './user-details.component.scss'
+})
+export class UserDetailsComponent implements OnInit, OnDestroy {
+  selectedUser: User | null = null;
+  editMode = false;
+  editForm: Partial<User> = {};
+  
+  // Enum para el template
+  UserRole = UserRole;
+  
+  private subscription = new Subscription();
+
+  constructor(
+    private userService: UserManagementService,
+    private logger: LoggerService
+  ) {
+    this.logger.debug('UserDetailsComponent', 'Constructor ejecutado');
+  }
+
+  ngOnInit(): void {
+    this.logger.info('UserDetailsComponent', 'Inicializando componente');
+    this.subscribeToSelectedUser();
+  }
+
+  ngOnDestroy(): void {
+    this.logger.info('UserDetailsComponent', 'Destruyendo componente');
+    this.subscription.unsubscribe();
+  }
+
+  private subscribeToSelectedUser(): void {
+    const sub = this.userService.getSelectedUser().subscribe({
+      next: (user) => {
+        this.selectedUser = user;
+        this.editMode = false;
+        this.initEditForm();
+        this.logger.debug('UserDetailsComponent', 'Usuario seleccionado recibido', user?.name || 'ninguno');
+      }
+    });
+    
+    this.subscription.add(sub);
+  }
+
+  private initEditForm(): void {
+    if (this.selectedUser) {
+      this.editForm = {
+        name: this.selectedUser.name,
+        email: this.selectedUser.email,
+        role: this.selectedUser.role
+      };
+    } else {
+      this.editForm = {};
+    }
+  }
+
+  startEdit(): void {
+    this.editMode = true;
+    this.initEditForm();
+    this.logger.info('UserDetailsComponent', 'Modo edición activado');
+  }
+
+  cancelEdit(): void {
+    this.editMode = false;
+    this.initEditForm();
+    this.logger.info('UserDetailsComponent', 'Edición cancelada');
+  }
+
+  saveChanges(): void {
+    if (this.selectedUser && this.editForm.name && this.editForm.email && this.editForm.role) {
+      const updatedUser: User = {
+        ...this.selectedUser,
+        name: this.editForm.name,
+        email: this.editForm.email,
+        role: this.editForm.role
+      };
+      
+      this.userService.updateUser(updatedUser);
+      this.editMode = false;
+      this.logger.info('UserDetailsComponent', 'Usuario actualizado', updatedUser);
+    }
+  }
+
+  toggleUserStatus(): void {
+    if (this.selectedUser) {
+      this.userService.toggleUserStatus(this.selectedUser.id);
+      this.logger.info('UserDetailsComponent', 'Estado de usuario cambiado');
+    }
+  }
+
+  getRoleDisplayName(role: UserRole): string {
+    const roleNames = {
+      [UserRole.ADMIN]: 'Administrador',
+      [UserRole.PROJECT_MANAGER]: 'Jefe de Proyecto',
+      [UserRole.ENGINEER]: 'Ingeniero',
+      [UserRole.TECHNICIAN]: 'Técnico'
+    };
+    return roleNames[role];
+  }
+
+  getStatusClass(): string {
+    return this.selectedUser?.isActive ? 'status-active' : 'status-inactive';
+  }
+
+  isFormValid(): boolean {
+    return !!(this.editForm.name?.trim() && 
+              this.editForm.email?.trim() && 
+              this.editForm.role);
+  }
+}
+5.3 Crear template para user-details.component.html
+<div class="user-details-container">
+  <div class="details-header">
+    <h3>👤 Detalles del Usuario</h3>
+    @if (selectedUser && !editMode) {
+      <button class="btn btn-primary" (click)="startEdit()">
+        ✏️ Editar
+      </button>
+    }
+  </div>
+
+  @if (!selectedUser) {
+    <div class="no-selection">
+      <div class="empty-state">
+        <h4>🎯 Selecciona un usuario</h4>
+        <p>Haz click en cualquier tarjeta de usuario para ver sus detalles aquí</p>
+        <div class="demo-info">
+          <small>
+            💡 <strong>Demo de comunicación:</strong> Este componente recibe datos 
+            del UserManagementService cuando otro componente selecciona un usuario
+          </small>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <div class="user-details">
+      @if (!editMode) {
+        <!-- Modo visualización -->
+        <div class="details-view">
+          <div class="user-header">
+            <div class="user-avatar">{{ selectedUser.avatar || '👤' }}</div>
+            <div class="user-basic-info">
+              <h4>{{ selectedUser.name }}</h4>
+              <p class="user-email">{{ selectedUser.email }}</p>
+              <span class="user-status" [class]="getStatusClass()">
+                {{ selectedUser.isActive ? '✅ Activo' : '❌ Inactivo' }}
+              </span>
+            </div>
+          </div>
+
+          <div class="details-grid">
+            <div class="detail-item">
+              <label>👔 Rol:</label>
+              <span>{{ getRoleDisplayName(selectedUser.role) }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>🆔 ID:</label>
+              <span>{{ selectedUser.id }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>🕒 Último acceso:</label>
+              <span>{{ selectedUser.lastLogin | date:'dd/MM/yyyy HH:mm' || 'Nunca' }}</span>
+            </div>
+
+            <div class="detail-item">
+              <label>📋 Proyectos asignados:</label>
+              <span>{{ selectedUser.projects.length }} proyecto(s)</span>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button 
+              class="btn"
+              [class]="selectedUser.isActive ? 'btn-warning' : 'btn-success'"
+              (click)="toggleUserStatus()">
+              {{ selectedUser.isActive ? '⏸️ Desactivar' : '▶️ Activar' }}
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- Modo edición -->
+        <div class="details-edit">
+          <h4>✏️ Editando: {{ selectedUser.name }}</h4>
+          
+          <form class="edit-form" (ngSubmit)="saveChanges()">
+            <div class="form-group">
+              <label for="name">👤 Nombre completo:</label>
+              <input 
+                type="text" 
+                id="name"
+                [(ngModel)]="editForm.name"
+                name="name"
+                class="form-control"
+                placeholder="Nombre completo"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="email">📧 Email:</label>
+              <input 
+                type="email" 
+                id="email"
+                [(ngModel)]="editForm.email"
+                name="email"
+                class="form-control"
+                placeholder="correo@provias.gob.pe"
+                required>
+            </div>
+
+            <div class="form-group">
+              <label for="role">👔 Rol:</label>
+              <select 
+                id="role"
+                [(ngModel)]="editForm.role"
+                name="role"
+                class="form-control"
+                required>
+                <option value="">Seleccionar rol...</option>
+                <option [value]="UserRole.ADMIN">Administrador</option>
+                <option [value]="UserRole.PROJECT_MANAGER">Jefe de Proyecto</option>
+                <option [value]="UserRole.ENGINEER">Ingeniero</option>
+                <option [value]="UserRole.TECHNICIAN">Técnico</option>
+              </select>
+            </div>
+
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn btn-success"
+                [disabled]="!isFormValid()">
+                💾 Guardar Cambios
+              </button>
+              
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancelEdit()">
+                ❌ Cancelar
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  }
+</div>
+✅ RESULTADO ESPERADO LAB 2
+•	✅ Comunicación Parent → Child via @Input funcionando
+•	✅ Comunicación Child → Parent via @Output implementada
+•	✅ Service compartido coordinando estado entre siblings
+•	✅ Componente UserList mostrando lista de usuarios
+•	✅ Componente UserCard con eventos hacia parent
+•	✅ Componente UserDetails mostrando datos del usuario seleccionado
+•	✅ CRUD básico funcionando a través de comunicación
+•	✅ Logging de todos los eventos de comunicación
+________________________________________
+LAB 3: ANGULAR ROUTER - CONFIGURACIÓN BÁSICA
+Duración: 30 minutos
+Objetivo: Implementar navegación SPA con rutas básicas y parametrizadas
+PASO 1: Configurar Rutas Principales (8 minutos)
+1.1 Crear componentes de páginas
+ng generate component pages/dashboard --standalone
+ng generate component pages/users --standalone  
+ng generate component pages/projects --standalone
+ng generate component pages/not-found --standalone
+1.2 Configurar app.routes.ts
+import { Routes } from '@angular/router';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { UsersComponent } from './pages/users/users.component';
+import { ProjectsComponent } from './pages/projects/projects.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+
+export const routes: Routes = [
+  { 
+    path: '', 
+    redirectTo: '/dashboard', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent,
+    title: 'Dashboard - PROVIAS'
+  },
+  { 
+    path: 'users', 
+    component: UsersComponent,
+    title: 'Gestión de Usuarios - PROVIAS'
+  },
+  { 
+    path: 'users/:id', 
+    component: UsersComponent,
+    title: 'Detalle de Usuario - PROVIAS'
+  },
+  { 
+    path: 'projects', 
+    component: ProjectsComponent,
+    title: 'Proyectos - PROVIAS'
+  },
+  { 
+    path: 'projects/:id', 
+    component: ProjectsComponent,
+    title: 'Detalle de Proyecto - PROVIAS'
+  },
+  { 
+    path: '404', 
+    component: NotFoundComponent,
+    title: 'Página no encontrada - PROVIAS'
+  },
+  { 
+    path: '**', 
+    redirectTo: '/404' 
+  }
+];
+PASO 2: Crear Navigation Component (10 minutos)
+2.1 Generar componente de navegación
+ng generate component shared/navigation --standalone
+2.2 Implementar navigation.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { LoggerService } from '../../services/logger.service';
+
+interface NavItem {
+  path: string;
+  label: string;
+  icon: string;
+  exactMatch?: boolean;
+}
+
+@Component({
+  selector: 'app-navigation',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
+  templateUrl: './navigation.component.html',
+  styleUrl: './navigation.component.scss'
+})
+export class NavigationComponent implements OnInit {
+  navItems: NavItem[] = [
+    { path: '/dashboard', label: 'Dashboard', icon: '📊', exactMatch: true },
+    { path: '/users', label: 'Usuarios', icon: '👥' },
+    { path: '/projects', label: 'Proyectos', icon: '🏗️' },
+  ];
+
+  currentRoute = '';
+
+  constructor(
+    private router: Router,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    // Suscribirse a cambios de ruta
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentRoute = event.urlAfterRedirects;
+        this.logger.info('NavigationComponent', `Navegación a: ${this.currentRoute}`);
+      });
+  }
+
+  navigate(path: string): void {
+    this.logger.info('NavigationComponent', `Navegando programáticamente a: ${path}`);
+    this.router.navigate([path]);
+  }
+
+  isActive(path: string): boolean {
+    if (path === '/dashboard') {
+      return this.currentRoute === '/' || this.currentRoute === '/dashboard';
+    }
+    return this.currentRoute.startsWith(path);
+  }
+}
+2.3 Crear template navigation.component.html
+<nav class="main-navigation">
+  <div class="nav-brand">
+    <h2>🏗️ PROVIAS</h2>
+    <span class="nav-subtitle">Sistema de Gestión</span>
+  </div>
+
+  <ul class="nav-menu">
+    @for (item of navItems; track item.path) {
+      <li class="nav-item">
+        <a 
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: item.exactMatch || false }"
+          class="nav-link">
+          <span class="nav-icon">{{ item.icon }}</span>
+          <span class="nav-label">{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <div class="nav-info">
+    <p class="current-route">
+      📍 Ruta actual: <code>{{ currentRoute || '/' }}</code>
+    </p>
+    <small class="demo-note">
+      💡 Navegación SPA con Angular Router
+    </small>
+  </div>
+</nav>
+PASO 3: Implementar Páginas Básicas (12 minutos)
+3.1 Implementar DashboardComponent
+// dashboard.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import {
+
+LABORATORIOS SESIÓN 02 - PARTE 3: ANGULAR ROUTER Y GUARDS
+LAB 3: ANGULAR ROUTER - CONFIGURACIÓN BÁSICA (Continuación)
+PASO 3: Implementar Páginas Básicas (Continuación) (12 minutos)
+3.1 Implementar DashboardComponent
+// dashboard.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { UserManagementService } from '../../services/user-management.service';
+import { LoggerService } from '../../services/logger.service';
+import { UserStats } from '../../models/user';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './dashboard.component.html',
+  styleUrl: './dashboard.component.scss'
+})
+export class DashboardComponent implements OnInit {
+  userStats: UserStats | null = null;
+  quickActions = [
+    { label: 'Ver Usuarios', icon: '👥', route: '/users', color: 'blue' },
+    { label: 'Ver Proyectos', icon: '🏗️', route: '/projects', color: 'green' },
+    { label: 'Configuración', icon: '⚙️', route: '/config', color: 'orange' }
+  ];
+
+  constructor(
+    private userService: UserManagementService,
+    private router: Router,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.logger.info('DashboardComponent', 'Dashboard inicializado');
+    this.loadStats();
+  }
+
+  loadStats(): void {
+    this.userStats = this.userService.getUserStats();
+    this.logger.debug('DashboardComponent', 'Estadísticas cargadas', this.userStats);
+  }
+
+  navigateTo(route: string): void {
+    this.logger.info('DashboardComponent', `Navegando a ${route} desde dashboard`);
+    this.router.navigate([route]);
+  }
+
+  navigateToUserDetails(userId: number): void {
+    this.logger.info('DashboardComponent', `Navegando a detalles de usuario ${userId}`);
+    this.router.navigate(['/users', userId]);
+  }
+}
+dashboard.component.html:
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <h1>📊 Dashboard PROVIAS</h1>
+    <p class="welcome-message">Bienvenido al sistema de gestión de infraestructura</p>
+  </header>
+
+  @if (userStats) {
+    <section class="stats-section">
+      <h2>📈 Estadísticas del Sistema</h2>
+      <div class="stats-grid">
+        <div class="stat-card total">
+          <div class="stat-icon">👥</div>
+          <div class="stat-content">
+            <h3>{{ userStats.totalUsers }}</h3>
+            <p>Usuarios Totales</p>
+          </div>
+        </div>
+
+        <div class="stat-card active">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <h3>{{ userStats.activeUsers }}</h3>
+            <p>Usuarios Activos</p>
+          </div>
+        </div>
+
+        <div class="stat-card admins">
+          <div class="stat-icon">👑</div>
+          <div class="stat-content">
+            <h3>{{ userStats.byRole.admin }}</h3>
+            <p>Administradores</p>
+          </div>
+        </div>
+
+        <div class="stat-card engineers">
+          <div class="stat-icon">🔧</div>
+          <div class="stat-content">
+            <h3>{{ userStats.byRole.engineer }}</h3>
+            <p>Ingenieros</p>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <section class="quick-actions">
+    <h2>⚡ Acciones Rápidas</h2>
+    <div class="actions-grid">
+      @for (action of quickActions; track action.route) {
+        <button 
+          class="action-card"
+          [class]="'card-' + action.color"
+          (click)="navigateTo(action.route)">
+          <div class="action-icon">{{ action.icon }}</div>
+          <span class="action-label">{{ action.label }}</span>
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="router-demo">
+    <h2>🛣️ Demo de Routing</h2>
+    <div class="demo-content">
+      <p>Este dashboard demuestra:</p>
+      <ul>
+        <li>✅ Navegación programática con Router.navigate()</li>
+        <li>✅ Rutas parametrizadas (ej: /users/:id)</li>
+        <li>✅ RouterLink vs programmatic navigation</li>
+        <li>✅ Títulos dinámicos de página</li>
+      </ul>
+      
+      <div class="demo-buttons">
+        <button 
+          class="btn btn-primary"
+          (click)="navigateToUserDetails(1)">
+          🎯 Ver Usuario #1 (Ruta parametrizada)
+        </button>
+        
+        <button 
+          class="btn btn-secondary"
+          (click)="navigateTo('/users')">
+          👥 Lista de Usuarios
+        </button>
+      </div>
+    </div>
+  </section>
+</div>
+3.2 Implementar UsersComponent
+// users.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { UserListComponent } from '../../components/user-list/user-list.component';
+import { UserDetailsComponent } from '../../components/user-details/user-details.component';
+import { UserManagementService } from '../../services/user-management.service';
+import { LoggerService } from '../../services/logger.service';
+import { User } from '../../models/user';
+
+@Component({
+  selector: 'app-users',
+  standalone: true,
+  imports: [CommonModule, UserListComponent, UserDetailsComponent],
+  templateUrl: './users.component.html',
+  styleUrl: './users.component.scss'
+})
+export class UsersComponent implements OnInit, OnDestroy {
+  selectedUserId: number | null = null;
+  showDetails = false;
+  
+  private routeSubscription = new Subscription();
+
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private userService: UserManagementService,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.logger.info('UsersComponent', 'Componente de usuarios inicializado');
+    this.subscribeToRouteParams();
+  }
+
+  ngOnDestroy(): void {
+    this.routeSubscription.unsubscribe();
+  }
+
+  private subscribeToRouteParams(): void {
+    this.routeSubscription = this.route.params.subscribe(params => {
+      const userId = params['id'];
+      
+      if (userId) {
+        this.selectedUserId = +userId;
+        this.showDetails = true;
+        this.loadUserFromRoute(this.selectedUserId);
+        this.logger.info('UsersComponent', `Cargando usuario desde ruta: ${userId}`);
+      } else {
+        this.selectedUserId = null;
+        this.showDetails = false;
+        this.userService.clearSelection();
+        this.logger.info('UsersComponent', 'Mostrando lista general de usuarios');
+      }
+    });
+  }
+
+  private loadUserFromRoute(userId: number): void {
+    // Simular carga de usuario específico
+    this.userService.getUsers().subscribe(users => {
+      const user = users.find(u => u.id === userId);
+      if (user) {
+        this.userService.selectUser(user);
+        this.logger.info('UsersComponent', `Usuario cargado desde ruta: ${user.name}`);
+      } else {
+        this.logger.warn('UsersComponent', `Usuario no encontrado: ${userId}`);
+        this.router.navigate(['/404']);
+      }
+    });
+  }
+
+  navigateToUserList(): void {
+    this.router.navigate(['/users']);
+  }
+
+  navigateToUser(userId: number): void {
+    this.router.navigate(['/users', userId]);
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+}
+users.component.html:
+<div class="users-page">
+  <header class="page-header">
+    <nav class="breadcrumb">
+      <button class="breadcrumb-item" (click)="navigateToDashboard()">
+        🏠 Dashboard
+      </button>
+      <span class="breadcrumb-separator">></span>
+      
+      @if (selectedUserId) {
+        <button class="breadcrumb-item" (click)="navigateToUserList()">
+          👥 Usuarios
+        </button>
+        <span class="breadcrumb-separator">></span>
+        <span class="breadcrumb-current">Usuario #{{ selectedUserId }}</span>
+      } @else {
+        <span class="breadcrumb-current">👥 Usuarios</span>
+      }
+    </nav>
+
+    <h1>
+      @if (selectedUserId) {
+        👤 Detalle de Usuario
+      } @else {
+        👥 Gestión de Usuarios
+      }
+    </h1>
+  </header>
+
+  <div class="page-content">
+    @if (!showDetails) {
+      <!-- Vista lista completa -->
+      <div class="list-view">
+        <app-user-list></app-user-list>
+      </div>
+    } @else {
+      <!-- Vista de detalle con navegación -->
+      <div class="detail-view">
+        <div class="back-navigation">
+          <button class="btn btn-secondary" (click)="navigateToUserList()">
+            ← Volver a la lista
+          </button>
+        </div>
+        
+        <div class="detail-content">
+          <div class="detail-sidebar">
+            <app-user-details></app-user-details>
+          </div>
+          
+          <div class="detail-main">
+            <div class="route-info">
+              <h3>🛣️ Información de Ruta</h3>
+              <p><strong>Parámetro ID:</strong> {{ selectedUserId }}</p>
+              <p><strong>Ruta actual:</strong> <code>/users/{{ selectedUserId }}</code></p>
+              
+              <div class="route-demo">
+                <h4>Demo de Navegación Parametrizada:</h4>
+                <div class="demo-buttons">
+                  <button class="btn btn-sm" (click)="navigateToUser(1)">Usuario #1</button>
+                  <button class="btn btn-sm" (click)="navigateToUser(2)">Usuario #2</button>
+                  <button class="btn btn-sm" (click)="navigateToUser(3)">Usuario #3</button>
+                  <button class="btn btn-sm" (click)="navigateToUser(999)">Usuario #999 (Error)</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    }
+  </div>
+</div>
+3.3 Crear NotFoundComponent
+// not-found.component.ts
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-not-found',
+  standalone: true,
+  imports: [],
+  templateUrl: './not-found.component.html',
+  styleUrl: './not-found.component.scss'
+})
+export class NotFoundComponent {
+  constructor(
+    private router: Router,
+    private logger: LoggerService
+  ) {
+    this.logger.warn('NotFoundComponent', 'Usuario llegó a página 404');
+  }
+
+  goHome(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
+  goBack(): void {
+    window.history.back();
+  }
+}
+not-found.component.html:
+<div class="not-found-container">
+  <div class="error-content">
+    <div class="error-icon">🚧</div>
+    <h1>404 - Página No Encontrada</h1>
+    <p class="error-message">
+      Lo sentimos, la página que buscas no existe o ha sido movida.
+    </p>
+    
+    <div class="error-actions">
+      <button class="btn btn-primary" (click)="goHome()">
+        🏠 Ir al Dashboard
+      </button>
+      <button class="btn btn-secondary" (click)="goBack()">
+        ← Volver Atrás
+      </button>
+    </div>
+
+    <div class="help-info">
+      <h3>¿Qué puedes hacer?</h3>
+      <ul>
+        <li>Verificar que la URL esté escrita correctamente</li>
+        <li>Regresar a la página anterior</li>
+        <li>Ir al dashboard principal</li>
+        <li>Contactar al administrador del sistema</li>
+      </ul>
+    </div>
+  </div>
+</div>
+✅ RESULTADO ESPERADO LAB 3
+•	✅ Navegación SPA funcionando completamente
+•	✅ Rutas parametrizadas (/users/:id) implementadas
+•	✅ Breadcrumb navigation dinámico
+•	✅ Página 404 para rutas no encontradas
+•	✅ Navegación programática vs RouterLink
+•	✅ Títulos dinámicos de página configurados
+•	✅ Router events siendo monitoreados
+________________________________________
+LAB 4: RUTAS AVANZADAS Y GUARDS
+Duración: 30 minutos
+Objetivo: Implementar guards de autenticación, lazy loading y resolvers
+PASO 1: Crear Authentication Service (8 minutos)
+1.1 Generar service de autenticación
+ng generate service services/auth
+1.2 Implementar auth.service.ts
+import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable, of, delay } from 'rxjs';
+import { LoggerService } from './logger.service';
+
+export interface AuthUser {
+  id: number;
+  username: string;
+  email: string;
+  role: 'admin' | 'user';
+  permissions: string[];
+}
+
+export interface LoginCredentials {
+  username: string;
+  password: string;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
+  private isAuthenticatedSubject = new BehaviorSubject<boolean>(false);
+
+  // Usuarios mock para demo
+  private mockUsers: AuthUser[] = [
+    {
+      id: 1,
+      username: 'admin',
+      email: 'admin@provias.gob.pe',
+      role: 'admin',
+      permissions: ['read', 'write', 'delete', 'admin']
+    },
+    {
+      id: 2,
+      username: 'user',
+      email: 'user@provias.gob.pe',
+      role: 'user',
+      permissions: ['read', 'write']
+    }
+  ];
+
+  constructor(private logger: LoggerService) {
+    this.checkStoredAuth();
+  }
+
+  // Observables públicos
+  get currentUser$(): Observable<AuthUser | null> {
+    return this.currentUserSubject.asObservable();
+  }
+
+  get isAuthenticated$(): Observable<boolean> {
+    return this.isAuthenticatedSubject.asObservable();
+  }
+
+  // Getters síncronos
+  get currentUser(): AuthUser | null {
+    return this.currentUserSubject.value;
+  }
+
+  get isAuthenticated(): boolean {
+    return this.isAuthenticatedSubject.value;
+  }
+
+  // Métodos de autenticación
+  login(credentials: LoginCredentials): Observable<{ success: boolean; user?: AuthUser; error?: string }> {
+    this.logger.info('AuthService', `Intento de login para: ${credentials.username}`);
+    
+    // Simular llamada HTTP con delay
+    return of(null).pipe(
+      delay(1000) // Simular latencia de red
+    ).pipe(
+      delay(0),
+      // Simular lógica de validación
+      (() => {
+        const user = this.mockUsers.find(u => 
+          u.username === credentials.username && 
+          credentials.password === 'password123' // Password fijo para demo
+        );
+
+        if (user) {
+          this.setAuthenticatedUser(user);
+          return of({ success: true, user });
+        } else {
+          this.logger.warn('AuthService', 'Credenciales inválidas');
+          return of({ success: false, error: 'Credenciales inválidas' });
+        }
+      })()
+    );
+  }
+
+  logout(): void {
+    this.logger.info('AuthService', 'Usuario deslogueado');
+    this.clearAuth();
+  }
+
+  // Simular login rápido para demo
+  quickLogin(role: 'admin' | 'user' = 'user'): void {
+    const user = this.mockUsers.find(u => u.role === role);
+    if (user) {
+      this.setAuthenticatedUser(user);
+      this.logger.info('AuthService', `Quick login como ${role}`);
+    }
+  }
+
+  // Verificar permisos
+  hasPermission(permission: string): boolean {
+    const user = this.currentUser;
+    return user ? user.permissions.includes(permission) : false;
+  }
+
+  hasRole(role: string): boolean {
+    const user = this.currentUser;
+    return user ? user.role === role : false;
+  }
+
+  // Métodos privados
+  private setAuthenticatedUser(user: AuthUser): void {
+    this.currentUserSubject.next(user);
+    this.isAuthenticatedSubject.next(true);
+    
+    // Guardar en localStorage para persistencia
+    localStorage.setItem('authUser', JSON.stringify(user));
+    localStorage.setItem('isAuthenticated', 'true');
+    
+    this.logger.info('AuthService', `Usuario autenticado: ${user.username}`, user);
+  }
+
+  private clearAuth(): void {
+    this.currentUserSubject.next(null);
+    this.isAuthenticatedSubject.next(false);
+    
+    // Limpiar localStorage
+    localStorage.removeItem('authUser');
+    localStorage.removeItem('isAuthenticated');
+  }
+
+  private checkStoredAuth(): void {
+    const storedUser = localStorage.getItem('authUser');
+    const storedAuth = localStorage.getItem('isAuthenticated');
+    
+    if (storedUser && storedAuth === 'true') {
+      try {
+        const user: AuthUser = JSON.parse(storedUser);
+        this.currentUserSubject.next(user);
+        this.isAuthenticatedSubject.next(true);
+        this.logger.info('AuthService', 'Sesión restaurada desde localStorage', user.username);
+      } catch (error) {
+        this.logger.error('AuthService', 'Error restaurando sesión', error);
+        this.clearAuth();
+      }
+    }
+  }
+}
+PASO 2: Crear Route Guards (10 minutos)
+2.1 Generar guards
+ng generate guard guards/auth
+ng generate guard guards/admin
+ng generate guard guards/unsaved-changes
+2.2 Implementar auth.guard.ts
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
+import { LoggerService } from '../services/logger.service';
+
+export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const logger = inject(LoggerService);
+
+  logger.info('AuthGuard', `Verificando acceso a: ${state.url}`);
+
+  return authService.isAuthenticated$.pipe(
+    map(isAuthenticated => {
+      if (isAuthenticated) {
+        logger.info('AuthGuard', 'Acceso permitido - Usuario autenticado');
+        return true;
+      } else {
+        logger.warn('AuthGuard', 'Acceso denegado - Usuario no autenticado');
+        // Redirigir a página de login (simularemos con una alerta)
+        alert('Debes estar autenticado para acceder a esta página.\nUsa el botón "Quick Login" en el header.');
+        router.navigate(['/dashboard']);
+        return false;
+      }
+    })
+  );
+};
+2.3 Implementar admin.guard.ts
+import { CanActivateFn, Router } from '@angular/router';
+import { inject } from '@angular/core';
+import { map } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
+import { LoggerService } from '../services/logger.service';
+
+export const adminGuard: CanActivateFn = (route, state) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const logger = inject(LoggerService);
+
+  logger.info('AdminGuard', `Verificando permisos de admin para: ${state.url}`);
+
+  return authService.currentUser$.pipe(
+    map(user => {
+      if (user && user.role === 'admin') {
+        logger.info('AdminGuard', 'Acceso permitido - Usuario es administrador');
+        return true;
+      } else {
+        logger.warn('AdminGuard', 'Acceso denegado - Usuario no es administrador');
+        alert('Necesitas permisos de administrador para acceder a esta página.');
+        router.navigate(['/dashboard']);
+        return false;
+      }
+    })
+  );
+};
+2.4 Implementar unsaved-changes.guard.ts
+import { CanDeactivateFn } from '@angular/router';
+import { inject } from '@angular/core';
+import { LoggerService } from '../services/logger.service';
+
+// Interface que deben implementar los componentes que usen este guard
+export interface ComponentCanDeactivate {
+  canDeactivate(): boolean;
+  hasUnsavedChanges?(): boolean;
+}
+
+export const unsavedChangesGuard: CanDeactivateFn<ComponentCanDeactivate> = (component, currentRoute, currentState, nextState) => {
+  const logger = inject(LoggerService);
+
+  logger.info('UnsavedChangesGuard', `Verificando cambios no guardados al salir de: ${currentState?.url}`);
+
+  // Si el componente no implementa el método, permitir salida
+  if (!component.canDeactivate) {
+    return true;
+  }
+
+  const canDeactivate = component.canDeactivate();
+  
+  if (!canDeactivate) {
+    logger.warn('UnsavedChangesGuard', 'Usuario intentó salir con cambios no guardados');
+    const confirmExit = confirm(
+      '¿Estás seguro de que quieres salir?\nTienes cambios no guardados que se perderán.'
+    );
+    
+    if (confirmExit) {
+      logger.info('UnsavedChangesGuard', 'Usuario confirmó salida con pérdida de datos');
+    } else {
+      logger.info('UnsavedChangesGuard', 'Usuario canceló salida');
+    }
+    
+    return confirmExit;
+  }
+
+  return true;
+};
+PASO 3: Crear Componentes con Lazy Loading (7 minutos)
+3.1 Generar componente admin
+ng generate component pages/admin --standalone
+3.2 Implementar admin.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AuthService } from '../../services/auth.service';
+import { LoggerService } from '../../services/logger.service';
+import { ComponentCanDeactivate } from '../../guards/unsaved-changes.guard';
+
+@Component({
+  selector: 'app-admin',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './admin.component.html',
+  styleUrl: './admin.component.scss'
+})
+export class AdminComponent implements OnInit, ComponentCanDeactivate {
+  hasUnsavedData = false;
+  formData = {
+    systemName: 'PROVIAS System',
+    version: '1.0.0',
+    maintainanceMode: false
+  };
+
+  constructor(
+    private authService: AuthService,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.logger.info('AdminComponent', 'Panel de administración cargado');
+  }
+
+  // Implementación del guard
+  canDeactivate(): boolean {
+    return !this.hasUnsavedData;
+  }
+
+  hasUnsavedChanges(): boolean {
+    return this.hasUnsavedData;
+  }
+
+  onDataChange(): void {
+    this.hasUnsavedData = true;
+    this.logger.debug('AdminComponent', 'Datos modificados - cambios no guardados');
+  }
+
+  saveChanges(): void {
+    // Simular guardado
+    setTimeout(() => {
+      this.hasUnsavedData = false;
+      this.logger.info('AdminComponent', 'Cambios guardados exitosamente');
+      alert('Configuración guardada exitosamente');
+    }, 1000);
+  }
+
+  discardChanges(): void {
+    this.hasUnsavedData = false;
+    this.logger.info('AdminComponent', 'Cambios descartados');
+    // Resetear formulario
+    this.formData = {
+      systemName: 'PROVIAS System',
+      version: '1.0.0',
+      maintainanceMode: false
+    };
+  }
+
+  get currentUser() {
+    return this.authService.currentUser;
+  }
+}
+3.3 Crear admin.component.html
+<div class="admin-container">
+  <header class="admin-header">
+    <h1>⚙️ Panel de Administración</h1>
+    <div class="admin-info">
+      <p>👤 Logueado como: <strong>{{ currentUser?.username }}</strong></p>
+      <p>🛡️ Rol: <strong>{{ currentUser?.role }}</strong></p>
+    </div>
+  </header>
+
+  <div class="admin-content">
+    <div class="guard-demo">
+      <h2>🛡️ Demo de Guards</h2>
+      <div class="demo-info">
+        <p>Esta página está protegida por:</p>
+        <ul>
+          <li>✅ <strong>AuthGuard:</strong> Requiere autenticación</li>
+          <li>✅ <strong>AdminGuard:</strong> Requiere rol de administrador</li>
+          <li>✅ <strong>UnsavedChangesGuard:</strong> Previene salida con cambios no guardados</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="config-form">
+      <h3>⚙️ Configuración del Sistema</h3>
+      
+      <div class="form-group">
+        <label>Nombre del Sistema:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formData.systemName"
+          (input)="onDataChange()"
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>Versión:</label>
+        <input 
+          type="text" 
+          [(ngModel)]="formData.version"
+          (input)="onDataChange()"
+          class="form-control">
+      </div>
+
+      <div class="form-group">
+        <label>
+          <input 
+            type="checkbox" 
+            [(ngModel)]="formData.maintainanceMode"
+            (change)="onDataChange()">
+          Modo de mantenimiento
+        </label>
+      </div>
+
+      @if (hasUnsavedData) {
+        <div class="unsaved-warning">
+          ⚠️ Tienes cambios no guardados
+        </div>
+      }
+
+      <div class="form-actions">
+        <button 
+          class="btn btn-primary"
+          (click)="saveChanges()"
+          [disabled]="!hasUnsavedData">
+          💾 Guardar Cambios
+        </button>
+        
+        <button 
+          class="btn btn-secondary"
+          (click)="discardChanges()"
+          [disabled]="!hasUnsavedData">
+          🗑️ Descartar Cambios
+        </button>
+      </div>
+    </div>
+
+    <div class="unsaved-changes-demo">
+      <h3>🚪 Demo UnsavedChangesGuard</h3>
+      <p>
+        Modifica cualquier campo del formulario arriba y luego intenta 
+        navegar a otra página. El guard te preguntará si quieres salir 
+        sin guardar los cambios.
+      </p>
+    </div>
+  </div>
+</div>
+PASO 4: Actualizar Rutas con Guards (5 minutos)
+4.1 Completar app.routes.ts con guards y lazy loading
+import { Routes } from '@angular/router';
+import { DashboardComponent } from './pages/dashboard/dashboard.component';
+import { UsersComponent } from './pages/users/users.component';
+import { ProjectsComponent } from './pages/projects/projects.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { authGuard } from './guards/auth.guard';
+import { adminGuard } from './guards/admin.guard';
+import { unsavedChangesGuard } from './guards/unsaved-changes.guard';
+
+export const routes: Routes = [
+  { 
+    path: '', 
+    redirectTo: '/dashboard', 
+    pathMatch: 'full' 
+  },
+  { 
+    path: 'dashboard', 
+    component: DashboardComponent,
+    title: 'Dashboard - PROVIAS'
+  },
+  { 
+    path: 'users', 
+    component: UsersComponent,
+    title: 'Gestión de Usuarios - PROVIAS',
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'users/:id', 
+    component: UsersComponent,
+    title: 'Detalle de Usuario - PROVIAS',
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'projects', 
+    component: ProjectsComponent,
+    title: 'Proyectos - PROVIAS',
+    canActivate: [authGuard]
+  },
+  { 
+    path: 'projects/:id', 
+    component: ProjectsComponent,
+    title: 'Detalle de Proyecto - PROVIAS',
+    canActivate: [authGuard]
+  },
+  {
+    path: 'admin',
+    loadComponent: () => import('./pages/admin/admin.component').then(m => m.AdminComponent),
+    title: 'Administración - PROVIAS',
+    canActivate: [authGuard, adminGuard],
+    canDeactivate: [unsavedChangesGuard]
+  },
+  { 
+    path: '404', 
+    component: NotFoundComponent,
+    title: 'Página no encontrada - PROVIAS'
+  },
+  { 
+    path: '**', 
+    redirectTo: '/404' 
+  }
+];
+✅ RESULTADO ESPERADO LAB 4
+•	✅ AuthService implementado con persistencia localStorage
+•	✅ Guards de autenticación y autorización funcionando
+•	✅ Guard de cambios no guardados implementado
+•	✅ Lazy loading en ruta admin
+•	✅ Navegación protegida por roles
+•	✅ Demo completo de guards en funcionamiento
+________________________________________
+LAB 5: SPA COMPLETA CON NAVEGACIÓN
+Duración: 35 minutos
+Objetivo: Integrar todos los componentes en una SPA profesional completa
+PASO 1: Actualizar Header con Autenticación (8 minutos)
+1.1 Actualizar header.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router, RouterLink, RouterLinkActive } from '@angular/router';
+import { Subscription } from 'rxjs';
+import { AuthService, AuthUser } from '../../services/auth.service';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-header',
+  standalone: true,
+  imports: [CommonModule, RouterLink, RouterLinkActive],
+  templateUrl: './header.component.html',
+  styleUrl: './header.component.scss'
+})
+export class HeaderComponent implements OnInit, OnDestroy {
+  currentUser: AuthUser | null = null;
+  isAuthenticated = false;
+  showUserMenu = false;
+  
+  private authSubscription = new Subscription();
+
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscribeToAuth();
+  }
+
+  ngOnDestroy(): void {
+    this.authSubscription.unsubscribe();
+  }
+
+  private subscribeToAuth(): void {
+    const userSub = this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+      this.logger.debug('HeaderComponent', 'Usuario actualizado en header', user?.username);
+    });
+
+    const authSub = this.authService.isAuthenticated$.subscribe(isAuth => {
+      this.isAuthenticated = isAuth;
+      this.logger.debug('HeaderComponent', `Estado auth: ${isAuth}`);
+    });
+
+    this.authSubscription.add(userSub);
+    this.authSubscription.add(authSub);
+  }
+
+  quickLoginAsUser(): void {
+    this.authService.quickLogin('user');
+    this.showUserMenu = false;
+  }
+
+  quickLoginAsAdmin(): void {
+    this.authService.quickLogin('admin');
+    this.showUserMenu = false;
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.showUserMenu = false;
+    this.router.navigate(['/dashboard']);
+  }
+
+  toggleUserMenu(): void {
+    this.showUserMenu = !this.showUserMenu;
+  }
+
+  navigateToAdmin(): void {
+    this.router.navigate(['/admin']);
+    this.showUserMenu = false;
+  }
+
+  canAccessAdmin(): boolean {
+    return this.currentUser?.role === 'admin';
+  }
+
+  getUserDisplayName(): string {
+    return this.currentUser?.username || 'Usuario';
+  }
+
+  getUserRole(): string {
+    if (!this.currentUser) return '';
+    return this.currentUser.role === 'admin' ? 'Administrador' : 'Usuario';
+  }
+}
+1.2 Actualizar header.component.html
+<header class="app-header">
+  <div class="header-container">
+    <div class="header-left">
+      <div class="logo-section">
+        <h1 routerLink="/dashboard" class="logo-link">🏗️ PROVIAS</h1>
+        <span class="subtitle">Sistema de Gestión v18</span>
+      </div>
+    </div>
+
+    <nav class="header-nav">
+      <a routerLink="/dashboard" 
+         routerLinkActive="active" 
+         [routerLinkActiveOptions]="{exact: true}"
+         class="nav-link">
+        📊 Dashboard
+      </a>
+      
+      <a routerLink="/users" 
+         routerLinkActive="active"
+         class="nav-link">
+        👥 Usuarios
+      </a>
+      
+      <a routerLink="/projects" 
+         routerLinkActive="active"
+         class="nav-link">
+        🏗️ Proyectos
+      </a>
+
+      @if (canAccessAdmin()) {
+        <a routerLink="/admin" 
+           routerLinkActive="active"
+           class="nav-link admin-link">
+          ⚙️ Admin
+        </a>
+      }
+    </nav>
+
+    <div class="header-right">
+      @if (!isAuthenticated) {
+        <div class="auth-buttons">
+          <button class="btn btn-sm btn-primary" (click)="quickLoginAsUser()">
+            👤 Login Usuario
+          </button>
+          <button class="btn btn-sm btn-success" (click)="quickLoginAsAdmin()">
+            👑 Login Admin
+          </button>
+        </div>
+      } @else {
+        <div class="user-menu" [class.open]="showUserMenu">
+          <button class="user-button" (click)="toggleUserMenu()">
+            <div class="user-avatar">{{ currentUser?.username?.charAt(0).toUpperCase() }}</div>
+            <div class="user-info">
+              <span class="user-name">{{ getUserDisplayName() }}</span>
+              <small class="user-role">{{ getUserRole() }}</small>
+            </div>
+            <span class="dropdown-arrow">{{ showUserMenu ? '↑' : '↓' }}</span>
+          </button>
+
+          @if (showUserMenu) {
+            <div class="user-dropdown">
+              <div class="dropdown-header">
+                <strong>{{ currentUser?.email }}</strong>
+              </div>
+              
+              <div class="dropdown-items">
+                @if (canAccessAdmin()) {
+                  <button class="dropdown-item" (click)="navigateToAdmin()">
+                    ⚙️ Panel Admin
+                  </button>
+                }
+                
+                <button class="dropdown-item" (click)="logout()">
+                  🚪 Cerrar Sesión
+                </button>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Auth Status Indicator -->
+  <div class="auth-status" [class]="isAuthenticated ? 'authenticated' : 'unauthenticated'">
+    @if (isAuthenticated) {
+      <span class="status-indicator">🟢 Autenticado como {{ getUserRole() }}</span>
+    } @else {
+      <span class="status-indicator">🔴 No autenticado - Usa Quick Login para probar guards</span>
+    }
+  </div>
+</header>
+PASO 2: Agregar Estilos Profesionales (10 minutos)
+2.1 Actualizar styles.scss (estilos globales)
+/* Reset y base */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+/* Layout principal */
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  .main-content {
+    flex: 1;
+    background-color: #ffffff;
+  }
+}
+
+/* Botones globales */
+.btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  &.btn-primary {
+    background: #007bff;
+    color: white;
+    &:hover:not(:disabled) {
+      background: #0056b3;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-success {
+    background: #28a745;
+    color: white;
+    &:hover:not(:disabled) {
+      background: #1e7e34;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-warning {
+    background: #ffc107;
+    color: #212529;
+    &:hover:not(:disabled) {
+      background: #e0a800;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-danger {
+    background: #dc3545;
+    color: white;
+    &:hover:not(:disabled) {
+      background: #c82333;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-secondary {
+    background: #6c757d;
+    color: white;
+    &:hover:not(:disabled) {
+      background: #5a6268;
+      transform: translateY(-1px);
+    }
+  }
+
+  &.btn-sm {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Formularios globales */
+.form-control {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #e9ecef;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+
+  &:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+  }
+}
+
+.form-group {
+  margin-bottom: 1.5rem;
+
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #495057;
+  }
+}
+
+/* Cards globales */
+.card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 1.5rem;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+/* Utilidades */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+
+.text-center { text-align: center; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+.p-1 { padding: 1rem; }
+.p-2 { padding: 2rem; }
+
+/* Loading spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Breadcrumbs */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  padding: 0.75rem 1rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+
+  .breadcrumb-item {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    text-decoration: underline;
+    font-size: 0.9rem;
+
+    &:hover {
+      color: #0056b3;
+    }
+  }
+
+  .breadcrumb-current {
+    color: #6c757d;
+    font-weight: 500;
+  }
+
+  .breadcrumb-separator {
+    color: #6c757d;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .container {
+    padding: 0 0.5rem;
+  }
+  
+  .btn {
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Animaciones para rutas */
+.route-animation-container {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+PASO 3: Integrar Todo en App Principal (10 minutos)
+3.1 Actualizar app.component.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
+import { HeaderComponent } from './components/header/header.component';
+import { FooterComponent } from './components/footer/footer.component';
+import { NavigationComponent } from './shared/navigation/navigation.component';
+import { LoggerService } from './services/logger.service';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    CommonModule, 
+    RouterOutlet, 
+    HeaderComponent, 
+    FooterComponent, 
+    NavigationComponent
+  ],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.scss'
+})
+export class AppComponent implements OnInit {
+  title = 'PROVIAS - Sistema de Gestión Angular v18';
+  currentRoute = '';
+  isLoading = false;
+
+  constructor(
+    private router: Router,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.logger.info('AppComponent', 'Aplicación inicializada');
+    this.setupRouterLogging();
+  }
+
+  private setupRouterLogging(): void {
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        this.currentRoute = event.urlAfterRedirects;
+        this.logger.info('AppComponent', `Navegación completada: ${this.currentRoute}`);
+        
+        // Scroll to top en navegación
+        window.scrollTo(0, 0);
+      });
+  }
+}
+3.2 Actualizar app.component.html
+<div class="app-layout">
+  <app-header></app-header>
+  
+  <div class="app-body">
+    <aside class="app-sidebar">
+      <app-navigation></app-navigation>
+    </aside>
+    
+    <main class="app-main">
+      <div class="route-animation-container">
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+  
+  <app-footer></app-footer>
+</div>
+
+<!-- Loading overlay (opcional) -->
+@if (isLoading) {
+  <div class="loading-overlay">
+    <div class="loading-content">
+      <div class="spinner"></div>
+      <p>Cargando...</p>
+    </div>
+  </div>
+}
+3.3 Actualizar app.component.scss
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-body {
+  flex: 1;
+  display: flex;
+  min-height: 0; // Importante para flex layout
+}
+
+.app-sidebar {
+  width: 280px;
+  background: #2c3e50;
+  color: white;
+  flex-shrink: 0;
+  
+  @media (max-width: 768px) {
+    display: none; // Ocultar en móvil
+  }
+}
+
+.app-main {
+  flex: 1;
+  background: #ffffff;
+  overflow-y: auto;
+  padding: 2rem;
+  
+  @media (max-width: 768px) {
+    padding: 1rem;
+  }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  
+  .loading-content {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    text-align: center;
+    
+    p {
+      margin-top: 1rem;
+      color: #666;
+    }
+  }
+}
+
+/* Animación de entrada para rutas */
+.route-animation-container {
+  animation: slideInFromRight 0.3s ease-out;
+}
+
+@keyframes slideInFromRight {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+PASO 4: Crear Componente de Estado Global (7 minutos)
+4.1 Generar componente de estado
+ng generate component shared/app-status --standalone
+4.2 Implementar app-status.component.ts
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Subscription, combineLatest } from 'rxjs';
+import { AuthService } from '../../services/auth.service';
+import { UserManagementService } from '../../services/user-management.service';
+import { LoggerService } from '../../services/logger.service';
+
+@Component({
+  selector: 'app-status',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './app-status.component.html',
+  styleUrl: './app-status.component.scss'
+})
+export class AppStatusComponent implements OnInit, OnDestroy {
+  appStats = {
+    isAuthenticated: false,
+    currentUser: null as any,
+    totalUsers: 0,
+    activeUsers: 0,
+    selectedUser: null as any,
+    currentRoute: ''
+  };
+
+  private subscription = new Subscription();
+
+  constructor(
+    private authService: AuthService,
+    private userService: UserManagementService,
+    private logger: LoggerService
+  ) {}
+
+  ngOnInit(): void {
+    this.subscribeToAppState();
+  }
+
+  ngOnDestroy(): void {
+    this.subscription.unsubscribe();
+  }
+
+  private subscribeToAppState(): void {
+    const combined = combineLatest([
+      this.authService.isAuthenticated$,
+      this.authService.currentUser$,
+      this.userService.getUsers(),
+      this.userService.getSelectedUser()
+    ]);
+
+    const sub = combined.subscribe(([isAuth, currentUser, users, selectedUser]) => {
+      this.appStats = {
+        isAuthenticated: isAuth,
+        currentUser,
+        totalUsers: users.length,
+        activeUsers: users.filter(u => u.isActive).length,
+        selectedUser,
+        currentRoute: window.location.pathname
+      };
+    });
+
+    this.subscription.add(sub);
+  }
+
+  clearAllLogs(): void {
+    this.logger.clearLogs();
+  }
+
+  getStatusColor(): string {
+    return this.appStats.isAuthenticated ? '#28a745' : '#dc3545';
+  }
+}
+4.3 Integrar en footer.component.html
+<footer class="app-footer">
+  <div class="footer-container">
+    <div class="footer-content">
+      <div class="company-info">
+        <h3>PROVIAS DESCENTRALIZADO</h3>
+        <p>Sistema de Gestión con Angular 18</p>
+        <small>Laboratorio Sesión 2 - Componentes y Enrutamiento</small>
+      </div>
+      
+      <div class="tech-stack">
+        <h4>Stack Tecnológico</h4>
+        <ul>
+          <li>✅ Angular 18.x</li>
+          <li>✅ TypeScript 5.x</li>
+          <li>✅ RxJS 7.x</li>
+          <li>✅ Angular Router</li>
+          <li>✅ Standalone Components</li>
+        </ul>
+      </div>
+      
+      <div class="features-demo">
+        <h4>Features Implementadas</h4>
+        <ul>
+          <li>🔄 Lifecycle Hooks</li>
+          <li>📡 Component Communication</li>
+          <li>🛣️ Angular Router</li>
+          <li>🛡️ Route Guards</li>
+          <li>🏗️ SPA Completa</li>
+        </ul>
+      </div>
+      
+      <div class="app-status">
+        <h4>Estado de la App</h4>
+        <app-status></app-status>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 PROVIAS - Curso Angular v18 - Sesión 2 Completada ✅</p>
+      <small>Instructor: Ing. Jhonny Alexander Ramirez Chiroque</small>
+    </div>
+  </div>
+</footer>
+✅ RESULTADO FINAL LAB 5
+•	✅ SPA completamente funcional con todas las características
+•	✅ Header con autenticación y menús dinámicos
+•	✅ Sidebar navigation responsiva
+•	✅ Layout profesional con animaciones
+•	✅ Estado global monitoreado en tiempo real
+•	✅ Todas las comunicaciones funcionando perfectamente
+•	✅ Guards de seguridad implementados y probados
+•	✅ Rutas parametrizadas con manejo de errores
+•	✅ Estilos profesionales y responsive design
+________________________________________
+RESUMEN COMPLETO DE LA SESIÓN 2
+🎯 OBJETIVOS ALCANZADOS
+✅ LAB 1 - Lifecycle Hooks:
+•	Implementación completa de todos los hooks de ciclo de vida
+•	Logger service para monitoreo de eventos
+•	Manejo correcto de subscripciones y limpieza de recursos
+•	Demo interactivo de creación/destrucción de componentes
+✅ LAB 2 - Comunicación entre Componentes:
+•	Comunicación Parent → Child via @Input
+•	Comunicación Child → Parent via @Output
+•	Comunicación entre siblings via Services
+•	CRUD completo funcionando con comunicación reactiva
+✅ LAB 3 - Angular Router:
+•	Configuración completa de rutas básicas y parametrizadas
+•	Navigation component con RouterLink y RouterLinkActive
+•	Breadcrumb navigation dinámico
+•	Página 404 y manejo de rutas no encontradas
+✅ LAB 4 - Guards y Seguridad:
+•	AuthService con persistencia localStorage
+•	Guards de autenticación y autorización
+•	Guard de cambios no guardados
+•	Lazy loading implementado
+✅ LAB 5 - SPA Completa:
+•	Aplicación integrada con layout profesional
+•	Header con autenticación dinámica
+•	Sidebar navigation responsiva
+•	Estado global monitoreado
+•	Animaciones y transiciones
+🛠️ TECNOLOGÍAS DOMINADAS
+•	Angular 18 - Framework completo
+•	TypeScript - Tipado estático
+•	RxJS - Programación reactiva
+•	Angular Router - Navegación SPA
+•	Standalone Components - Arquitectura moderna
+•	Route Guards - Seguridad avanzada
+•	Component Communication - Arquitectura escalable
+🏆 APLICACIÓN FINAL
+Al completar todos los laboratorios, los estudiantes han construido una Single Page Application completa que incluye:
+•	🔐 Sistema de autenticación con roles
+•	👥 Gestión de usuarios con CRUD completo
+•	🛣️ Navegación avanzada con rutas protegidas
+•	🎨 Interfaz profesional responsive
+•	📊 Dashboard con estadísticas en tiempo real
+•	🛡️ Seguridad implementada correctamente
+•	🔄 Estado reactivo gestionado correctamente
+Esta aplicación representa el nivel de calidad y complejidad esperado en proyectos empresariales reales con Angular.
+
+
+

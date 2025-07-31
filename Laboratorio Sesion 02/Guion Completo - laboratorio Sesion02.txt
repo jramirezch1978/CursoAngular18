@@ -1,0 +1,140 @@
+GUIÓN DETALLADO - SESIÓN 2: COMPONENTES Y ENRUTAMIENTO - ANGULAR v18
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Portada del Curso (2 minutos)
+¡Excelente! Nos volvemos a encontrar para nuestra segunda aventura con Angular 18.
+Bienvenidos nuevamente, soy Jhonny Alexander Ramirez Chiroque y espero que hayan tenido una semana productiva practicando con el proyecto que creamos la sesión pasada. Hoy es jueves 31 de julio de 2025, y nos espera una sesión completamente diferente a la anterior.
+Si la sesión pasada fue como aprender las reglas de conducir y conocer las partes del automóvil, hoy nos subimos al vehículo y vamos a manejar en ciudad, con tráfico real, semáforos, y todas las situaciones que se presentan en el día a día de un desarrollador Angular.
+Hoy trabajaremos con el corazón mismo de Angular: los componentes y su comunicación. Es como entender cómo funcionan los órganos del cuerpo humano, pero no solo individualmente, sino cómo se comunican entre sí para que todo el organismo funcione perfectamente.
+La metodología de hoy será 100% laboratorio práctico. Esto significa que van a escribir código desde el primer minuto hasta el último. No se preocupen si algo no sale perfecto en el primer intento; en programación, los errores son maestros excelentes y cada bug que resolvamos juntos será una lección que nunca olvidarán.
+Al final de estas tres horas, no solo van a entender cómo funcionan los componentes Angular, sino que habrán construido una aplicación web completa con navegación, diferentes vistas, y toda la arquitectura que usan las aplicaciones empresariales más modernas.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Permítanme ser muy específico sobre lo que vamos a lograr hoy, porque cada objetivo que ven en pantalla se va a materializar en código funcionando.
+El ciclo de vida de componentes no es solo teoría académica. Es como entender el ciclo de vida de una planta: cuándo nace, cuándo crece, cuándo florece, y cuándo muere. En Angular, saber esto les permitirá controlar exactamente cuándo cargar datos, cuándo limpiar recursos, y cómo optimizar el rendimiento de sus aplicaciones.
+Imaginen que están desarrollando una aplicación para el seguimiento de proyectos de PROVIAS. Un componente padre podría mostrar la lista de todos los proyectos, mientras que componentes hijos muestran los detalles de cada proyecto específico. La comunicación entre estos componentes es fundamental, y hoy aprenderán no solo cómo hacerlo, sino cuándo usar cada patrón.
+Angular Router es el sistema nervioso de cualquier aplicación moderna. Es lo que permite que los usuarios naveguen de una vista a otra sin recargar la página completa. Es la diferencia entre una aplicación web que se siente como una página estática de los años 90, versus una que se siente tan fluida como una aplicación móvil.
+Los guards de ruta son como los sistemas de seguridad de un edificio corporativo. No todos pueden acceder a todas las áreas, y necesitamos verificar permisos antes de permitir el acceso. Hoy implementaremos esto de manera práctica y comprensible.
+Al final de la sesión, habrán construido lo que en la industria llamamos una SPA moderna: una Single Page Application que rival con cualquier aplicación empresarial que usen en su trabajo diario.
+________________________________________
+Diapositiva 3: Agenda de la Sesión (1 minuto)
+Esta agenda está diseñada como un viaje progresivo, donde cada laboratorio construye sobre el anterior.
+Empezamos con el laboratorio de ciclo de vida porque es fundamental entender cuándo y cómo nacen y mueren los componentes antes de hacerlos comunicarse entre sí. Es como aprender a caminar antes de correr.
+El segundo laboratorio, comunicación entre componentes, es donde la magia realmente comienza. Van a ver cómo un componente padre puede enviar información a sus hijos, y cómo los hijos pueden notificar eventos de vuelta a los padres. Es como enseñar a los miembros de una familia a comunicarse efectivamente.
+Después del break, cuando ya estén cómodos con los componentes individuales, introduciremos Angular Router. Aquí es donde su aplicación pasa de ser una página única a convertirse en una verdadera aplicación multicomponente.
+Los últimos dos laboratorios son donde todo se integra. Implementaremos seguridad con guards y construiremos una SPA completa que podrían mostrar con orgullo en cualquier entrevista técnica.
+Cada laboratorio tiene exactamente 30 minutos porque he cronometrado cada ejercicio para que sea desafiante pero alcanzable. No se queden atrás; si tienen dudas, levanten la mano inmediatamente.
+________________________________________
+Diapositiva 4: LAB 1 - Ciclo de Vida de Componentes (5 minutos)
+El ciclo de vida de componentes es como el ciclo de vida de un empleado en una empresa.
+Cuando contratan a una persona nueva, primero está el proceso de inducción donde se le asigna su escritorio y se le explican las políticas de la empresa. Luego viene el período donde realmente comienza a trabajar y ser productivo. Finalmente, cuando deja la empresa, hay un proceso de salida donde entrega sus herramientas y cierra sus proyectos pendientes.
+Los componentes Angular siguen un patrón similar. El constructor es como el proceso de contratación: se asignan las dependencias básicas, pero aún no se hace trabajo real. Es importante entender que en el constructor NUNCA deben hacer llamadas HTTP o lógica pesada, solo asignación de dependencias.
+ngOnInit es donde realmente comienza la vida útil del componente. Es como el primer día de trabajo real del empleado. Aquí es donde cargan datos, inicializan variables, se suscriben a servicios. Piensenlo como el momento donde el componente dice "ya estoy listo para funcionar".
+ngOnDestroy es crucial y frecuentemente olvidado por desarrolladores novatos. Es como el último día de trabajo: hay que limpiar, deshacer subscripciones, cancelar temporizadores. Si no lo hacen, su aplicación tendrá fugas de memoria como una oficina donde nadie apaga las luces al irse.
+En este laboratorio van a crear un componente que simula el procesamiento de documentos gubernamentales. Van a ver exactamente cuándo se ejecuta cada lifecycle hook y van a implementar la limpieza apropiada. Esto es fundamental porque en aplicaciones reales, los componentes se crean y destruyen constantemente cuando los usuarios navegan.
+________________________________________
+Diapositiva 5: LAB 2 - Comunicación entre Componentes (5 minutos)
+La comunicación entre componentes es como la comunicación en una oficina eficiente.
+Imaginen una oficina donde el gerente necesita asignar tareas a diferentes empleados, y los empleados necesitan reportar cuando terminan su trabajo. Sin un sistema de comunicación claro, todo sería caos.
+En Angular, @Input es como un memo que el jefe envía a sus subordinados. El componente padre dice "aquí tienes la información que necesitas para hacer tu trabajo". Por ejemplo, si tienen un componente que muestra los detalles de un proyecto, el componente padre le pasaría la información del proyecto específico via @Input.
+@Output es como el reporte que el empleado envía de vuelta al jefe cuando termina una tarea. El componente hijo emite un evento que dice "oye, el usuario hizo click en este botón" o "terminé de procesar esta información". Es la forma elegante de comunicación hacia arriba en la jerarquía.
+Pero qué pasa cuando dos empleados de diferentes departamentos necesitan comunicarse? Ahí entran los services. Un service actúa como el sistema de mensajería interna de la empresa. Permite que componentes que no tienen relación directa padre-hijo compartan información.
+En este laboratorio van a construir un sistema de gestión de usuarios para PROVIAS. Tendrán una lista de usuarios (componente padre), tarjetas individuales de usuario (componentes hijos), y un panel de detalles (componente hermano). Van a implementar toda la comunicación necesaria para que funcione como una aplicación real.
+El código que verán incluye decoradores @Input() y @Output(), pero no se asusten por la sintaxis. Es más simple de lo que parece, y una vez que lo vean funcionando, van a entender por qué Angular es tan poderoso para aplicaciones complejas.
+________________________________________
+Diapositiva 6: BREAK (15 minutos)
+Perfecto, es momento de hacer una pausa estratégica y celebrar lo que ya hemos logrado.
+En estos primeros 60 minutos han dominado conceptos que a muchos desarrolladores les toma semanas entender completamente. Han visto cómo nacen y mueren los componentes, han implementado comunicación bidireccional entre componentes, y han usado services para comunicación global.
+Si esto fuera un videojuego, acaban de completar los primeros dos niveles y desbloquearon nuevas habilidades. Ahora tienen las herramientas fundamentales para construir cualquier aplicación Angular.
+Durante este break, les recomiendo encarecidamente que se levanten y muevan el cuerpo. La programación intensiva requiere buena circulación sanguínea y oxigenación del cerebro. Tomen agua, estiren las piernas, y si tienen una ventana cerca, miren algo distante para relajar los ojos.
+También aprovechen para verificar que su servidor de desarrollo siga ejecutándose. Abran la consola de desarrollador del navegador y confirmen que no hay errores. Si ven algún warning o error, es el momento perfecto para resolverlo antes de continuar.
+La segunda mitad va a ser aún más emocionante. Vamos a introducir Angular Router, que transformará su aplicación de una página única en una verdadera aplicación multicomponente. Es como pasar de vivir en un estudio a mudarse a una casa de varios pisos con diferentes habitaciones para diferentes propósitos.
+Si tienen dudas sobre los laboratorios anteriores, anótenlas. Cuando regresemos, dedicaré los primeros cinco minutos a resolver cualquier punto que no haya quedado claro.
+Nos vemos en 15 minutos exactos, a las 20:15. ¡Que tengan un excelente descanso!
+________________________________________
+Diapositiva 7: LAB 3 - Angular Router Configuración (5 minutos)
+Bienvenidos de vuelta. Espero que hayan aprovechado el descanso porque ahora entramos en territorio emocionante: Angular Router.
+Angular Router es como el sistema de navegación GPS de su aplicación. Así como un GPS conoce todas las calles de una ciudad y puede llevarlos de cualquier punto A a cualquier punto B, Angular Router conoce todos los componentes de su aplicación y puede mostrar el correcto según la URL que el usuario visite.
+La configuración que van a implementar es elegante en su simplicidad pero poderosa en sus capacidades. Cuando definimos { path: '', redirectTo: '/dashboard', pathMatch: 'full' }, es como decir "cuando alguien llegue a la entrada principal del edificio, automáticamente dirigelo al lobby".
+Las rutas parametrizadas como users/:id son fascinantes. Es como tener una oficina numerada donde el número cambia dinámicamente. La misma plantilla de oficina puede mostrar información de diferentes empleados dependiendo del número que especifiquen.
+El componente NotFound es crucial en aplicaciones profesionales. Es como tener un recepcionista amable que les dice "lo siento, esa oficina no existe, pero puedo ayudarles a encontrar lo que buscan" en lugar de dejarlos perdidos en un pasillo vacío.
+En este laboratorio van a crear un navigation menu que se siente como los mejores sitios web corporativos. Los enlaces se resaltarán automáticamente cuando estén en la página correspondiente, y la navegación será tan fluida que los usuarios ni siquiera notarán que están cambiando de página.
+El breadcrumb navigation que implementaremos es como las migajas de pan de Hansel y Gretel, pero para aplicaciones web. Siempre sabrán dónde están y cómo regresar a donde estaban antes.
+________________________________________
+Diapositiva 8: LAB 4 - Rutas Avanzadas y Guards (5 minutos)
+Los route guards son como el sistema de seguridad de un edificio corporativo de alta tecnología.
+Imaginen un edificio donde diferentes pisos requieren diferentes niveles de acceso. El primer piso es público, cualquiera puede entrar. El décimo piso requiere tarjeta de empleado. El piso ejecutivo requiere autorización especial. Los route guards implementan exactamente esta lógica en aplicaciones web.
+El guard que van a implementar es inteligente. No solo verifica si el usuario está autenticado, sino que también puede redirigirlo al lugar apropiado si no lo está. Es como un guardia de seguridad que no solo dice "no puedes pasar", sino que también te acompaña a donde necesitas ir para obtener el acceso correcto.
+El lazy loading que implementaremos es una técnica de optimización brillante. Es como tener un edificio donde solo se encienden las luces de las habitaciones cuando alguien las va a usar. Su aplicación solo carga el código del componente Admin cuando el usuario realmente navega a esa sección, no antes.
+Esto es especialmente importante en aplicaciones empresariales grandes. Imaginen una aplicación con 50 módulos diferentes. Sin lazy loading, los usuarios tendrían que descargar código para los 50 módulos incluso si solo van a usar 3. Con lazy loading, solo descargan lo que necesitan, cuando lo necesitan.
+Los route resolvers que vamos a crear son como asistentes personales que preparan todo antes de que lleguen a una reunión. Antes de mostrar el componente, el resolver se asegura de que todos los datos necesarios estén listos y disponibles.
+En términos prácticos, esto significa que cuando un usuario hace click en "Ver Detalles del Proyecto", el resolver carga toda la información del proyecto en el background, y cuando la página se muestra, todo está listo instantáneamente. No hay pantallas de carga molestas.
+________________________________________
+Diapositiva 9: LAB 5 - SPA Completa (5 minutos)
+Este laboratorio final es donde todo se une para crear algo verdaderamente impresionante.
+Una Single Page Application moderna es como una oficina corporativa bien diseñada. Tiene una recepción (header), directorios claros (navigation), diferentes departamentos (components), y todo funciona de manera integrada y profesional.
+La arquitectura que van a construir es la misma que usan aplicaciones como Gmail, Facebook, o cualquier sistema empresarial moderno. Una vez que carga la aplicación inicial, toda la navegación sucede instantáneamente sin recargas de página.
+El layout responsivo que implementaremos significa que su aplicación se verá perfecta tanto en la computadora del escritorio como en la tablet del gerente o en el teléfono móvil del técnico de campo. Es como tener un edificio que automáticamente reorganiza sus habitaciones dependiendo de cuántas personas lo estén visitando.
+El state management con services que desarrollaremos es como tener un sistema de archivo central donde toda la información importante está disponible para cualquier departamento que la necesite. Cuando un componente actualiza información de un usuario, todos los otros componentes que muestran esa información se actualizan automáticamente.
+Las route animations que agregaremos son el toque profesional final. En lugar de cambios abruptos entre páginas, tendrán transiciones suaves que hacen que la aplicación se sienta premium y pulida.
+El error handling global que implementaremos es como tener un equipo de soporte técnico que automáticamente detecta y maneja problemas antes de que los usuarios los noten. Si algo sale mal, la aplicación responde de manera elegante en lugar de simplemente romperse.
+Al final de este laboratorio, tendrán una aplicación que podrían deployer en producción mañana mismo para una empresa real.
+________________________________________
+Diapositiva 10: Conceptos Clave - Lifecycle Hooks (3 minutos)
+Entender el orden exacto de los lifecycle hooks es como conocer el protocolo correcto en una reunión ejecutiva.
+El constructor es como el momento cuando entran a la sala de conferencias y toman asiento. Solo se asignan las cosas básicas: su silla, su lugar en la mesa, sus materiales. Pero la reunión aún no ha comenzado.
+ngOnInit es cuando el moderador dice "comencemos". Aquí es donde realmente inicia el trabajo del componente. Es el momento perfecto para hacer llamadas HTTP porque ya tienen toda la información del contexto disponible.
+ngOnChanges es como tener un asistente que les susurra al oído cada vez que cambia algo importante en la reunión. Solo se ejecuta cuando las propiedades @Input del componente cambian, y es perfecto para reaccionar a esos cambios.
+ngAfterViewInit es como el momento cuando ya están completamente instalados en la reunión, han revisado todos los documentos, y están listos para interactuar con cualquier elemento visual. Aquí es donde pueden manipular elementos del DOM de manera segura.
+ngOnDestroy es crucial y frecuentemente ignorado. Es como asegurarse de apagar el proyector, guardar los documentos, y dejar la sala lista para la siguiente reunión. Si no implementan la limpieza apropiada, su aplicación acumulará memoria utilizada innecesariamente.
+El error más común que veo en desarrolladores junior es poner lógica pesada en el constructor. Es como tratar de dar una presentación antes de que todos lleguen a la reunión. El constructor debe ser rápido y solo para inyección de dependencias.
+________________________________________
+Diapositiva 11: Conceptos Clave - Component Communication (3 minutos)
+La comunicación entre componentes es un arte, y como todo arte, tiene reglas y mejores prácticas.
+@Input es como entregarle un documento importante a un colaborador. El documento contiene toda la información que necesitan para hacer su trabajo. La diferencia es que en Angular, este documento se actualiza automáticamente cada vez que la información cambia en el original.
+@Output es como tener un botón de intercomunicación en su escritorio. Cuando algo importante sucede, presionan el botón y notifican a su supervisor. La diferencia es que en Angular, pueden enviar información detallada junto con la notificación.
+Los services para comunicación son como el sistema de mensajería corporativa. Dos empleados en diferentes pisos pueden comunicarse sin tener que pasar por toda la cadena de mando. Es eficiente y directo.
+RxJS Subjects son como el sistema de notificaciones de toda la empresa. Cuando el CEO anuncia algo importante, todos los empleados lo reciben simultáneamente. En Angular, cuando un Subject emite un valor, todos los componentes suscritos lo reciben instantáneamente.
+La regla de oro es: usen @Input/@Output para relaciones directas padre-hijo, services para estado compartido, y Subjects para eventos globales. Es como saber cuándo usar email directo, cuándo usar el chat del equipo, y cuándo usar el anuncio general de la empresa.
+El patrón que más problemas causa es intentar hacer que componentes hermanos se comuniquen directamente. Es como tratar de que dos empleados de diferentes departamentos se envíen documentos directamente en lugar de usar el sistema corporativo. Técnicamente funciona, pero es caótico a largo plazo.
+________________________________________
+Diapositiva 12: Conceptos Clave - Angular Router (3 minutos)
+Angular Router es la columna vertebral de cualquier aplicación web moderna, y entender su arquitectura es fundamental.
+Piensen en el router como el director de orquesta de su aplicación. Sabe exactamente qué músico (componente) debe tocar en qué momento, y coordina todo para que la sinfonía (aplicación) suene perfecta.
+Las rutas anidadas son como edificios con múltiples pisos y habitaciones. Pueden tener un layout principal (el edificio), con sub-layouts (pisos), y componentes específicos (habitaciones). Cada nivel puede tener su propia lógica y propósito.
+Los parámetros de ruta son dinámicos y poderosos. Es como tener un formulario que se autollena dependiendo de qué enlace clickearon. /usuarios/123 automáticamente carga la información del usuario 123, mientras que /usuarios/456 carga la del usuario 456, usando exactamente el mismo código.
+Los query parameters son como filtros avanzados. /productos?categoria=electronica&precio=max:1000 le dice a la aplicación exactamente qué mostrar sin tener que crear rutas separadas para cada combinación posible.
+El fragment es útil para navegación dentro de páginas largas. Es como tener un índice en un libro que te lleva directamente al capítulo específico que necesitas leer.
+La data estática en rutas es como tener instrucciones especiales adjuntas a cada puerta de oficina. Antes de entrar, ya saben qué tipo de reunión van a tener y pueden prepararse apropiadamente.
+El lazy loading divide su aplicación en chunks manejables, como tener una biblioteca donde solo sacan de los estantes los libros que realmente van a leer.
+________________________________________
+Diapositiva 13: Conceptos Clave - Route Guards (3 minutos)
+Los route guards son como el sistema de seguridad multicapa de una instalación gubernamental de alta importancia.
+CanActivate es como el checkpoint principal en la entrada. Verifica credenciales básicas: ¿está esta persona autorizada para entrar al edificio? En términos de aplicación web, ¿está el usuario logueado? ¿Tiene los permisos necesarios para ver esta página?
+CanDeactivate es como el protocolo de salida segura. Antes de que alguien salga de una zona sensible, verifican que no se lleven documentos clasificados. En aplicaciones web, verifican que el usuario no tenga cambios sin guardar antes de navegar a otra página.
+Los Resolvers son como asistentes que preparan toda la información necesaria antes de una reunión importante. Cargan datos críticos en el background, así cuando el usuario llega a la página, todo está listo y disponible instantáneamente.
+La diferencia entre guards e interceptors es importante: los guards protegen rutas completas, mientras que los interceptors manejan requests HTTP específicos. Es como la diferencia entre el guardia en la puerta del edificio versus el sistema de seguridad que escanea cada documento que entra y sale.
+Un error común es poner lógica de negocio compleja dentro de los guards. Los guards deben ser rápidos y determinísticos. Si necesitan hacer cálculos complejos o múltiples llamadas HTTP, esa lógica debe estar en un service que el guard consulte.
+La cadena de guards se ejecuta en orden específico, como un protocolo de seguridad de múltiples niveles. Si cualquier guard en la cadena dice "no", la navegación se cancela completamente.
+________________________________________
+Diapositiva 14: Arquitectura SPA Moderna (3 minutos)
+Una Single Page Application bien arquitecturada es como una ciudad moderna bien planificada.
+La estructura de carpetas que recomiendo no es arbitraria; está basada en años de experiencia con aplicaciones empresariales de gran escala. Core contiene servicios que toda la aplicación necesita, como un hospital o estación de bomberos que sirve a toda la ciudad.
+Shared es como los parques y espacios públicos: componentes que cualquier parte de la aplicación puede usar. Un botón estándar, un modal genérico, un loading spinner. Son reutilizables y consistentes en toda la aplicación.
+Features es donde vive la funcionalidad específica del negocio. Es como los diferentes distritos de la ciudad: el distrito financiero, el distrito residencial, la zona industrial. Cada uno tiene su propósito específico pero todos forman parte del mismo ecosistema.
+La separación entre Smart y Dumb components es como la diferencia entre gerentes y empleados operativos. Los Smart components (gerentes) toman decisiones, manejan lógica de negocio, y coordinan actividades. Los Dumb components (empleados operativos) se enfocan en hacer una tarea específica muy bien.
+El principio de Single Responsibility es como tener especialistas en lugar de generalistas. Un cardiólogo no hace cirugía cerebral, aunque ambos sean médicos. Un componente de lista de usuarios no debería manejar autenticación, aunque ambos sean componentes.
+Tree-shaking es como un sistema de recolección de basura inteligente que automáticamente elimina todo lo que no se está usando. Su aplicación final solo incluye el código que realmente se ejecuta, haciendo que sea más rápida y eficiente.
+El lazy loading permite que su aplicación crezca sin afectar el rendimiento inicial. Es como construir una ciudad por distritos: no necesitan tener todas las calles pavimentadas desde el día uno.
+________________________________________
+Diapositiva 15: Q&A y Próximos Pasos (3 minutos)
+¡Felicitaciones! Acaban de completar una sesión intensiva que los convierte en desarrolladores Angular competentes.
+Las preguntas que anticipo reflejan los puntos donde la mayoría de desarrolladores tienen dudas iniciales. OnPush change detection es como tener un sistema de notificaciones más eficiente que solo revisa cambios cuando realmente es necesario, en lugar de revisar constantemente.
+El manejo de memoria en subscriptions es crucial en aplicaciones reales. Es como cerrar las llaves de agua cuando terminan de usarlas. Si no lo hacen, eventualmente van a tener problemas serios de rendimiento.
+La diferencia entre guards e interceptors es una pregunta común porque ambos involucran "interceptar" algo. Los guards interceptan navegación, los interceptors interceptan comunicación HTTP. Son herramientas complementarias, no competidoras.
+Lazy loading vs eager loading es una decisión arquitectónica importante. Eager loading es como tener todo disponible inmediatamente pero requiere más tiempo inicial. Lazy loading es como un servicio de entrega bajo demanda: más rápido al inicio, pero pequeñas demoras cuando necesitas algo específico.
+Para la próxima sesión sobre Data Binding y Pipes, van a profundizar en cómo Angular maneja la transformación y presentación de datos. Es como aprender las técnicas avanzadas de un chef después de dominar los fundamentos de cocina.
+Los pipes personalizados que crearemos les permitirán formatear fechas como "hace 2 horas" en lugar de "2025-07-31T19:30:00Z". Es la diferencia entre comunicación técnica y comunicación humana.
+RxJS será su nueva herramienta favorita una vez que entiendan su poder. Es como aprender a usar una navaja suiza después de haber usado herramientas básicas toda la vida.
+¡Excelente trabajo hoy! Nos vemos el martes 5 de agosto a las 19:00 para continuar construyendo sobre esta base sólida que han establecido.
+

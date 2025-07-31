@@ -1,0 +1,359 @@
+<!-- Archivo: src/app/components/user-details/user-details.component.html -->
+<div class="user-details-container">
+  <!-- 🎯 Header del componente -->
+  <div class="details-header">
+    <h3>👤 Detalles del Usuario</h3>
+    @if (selectedUser && !editMode) {
+      <div class="header-actions">
+        <button class="btn btn-primary" (click)="startEdit()">
+          ✏️ Editar
+        </button>
+        <button class="btn btn-secondary" (click)="clearSelection()">
+          🗑️ Limpiar Selección
+        </button>
+      </div>
+    }
+  </div>
+
+  <!-- 📭 Estado sin selección -->
+  @if (!selectedUser) {
+    <div class="no-selection">
+      <div class="empty-state">
+        <div class="empty-icon">🎯</div>
+        <h4>Selecciona un usuario</h4>
+        <p>Haz click en cualquier tarjeta de usuario para ver sus detalles completos aquí</p>
+        
+        <div class="demo-info">
+          <h5>💡 Demo de Comunicación Sibling</h5>
+          <p>
+            Este componente demuestra comunicación entre componentes hermanos (siblings) 
+            a través de un service compartido. Cuando seleccionas un usuario en la lista, 
+            este componente recibe automáticamente la información via <code>UserManagementService</code>.
+          </p>
+          
+          <div class="communication-flow">
+            <div class="flow-step">
+              <span class="step-number">1</span>
+              <span>Usuario hace click en UserCard</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <span class="step-number">2</span>
+              <span>UserCard emite evento a UserList</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <span class="step-number">3</span>
+              <span>UserList llama a UserManagementService</span>
+            </div>
+            <div class="flow-arrow">↓</div>
+            <div class="flow-step">
+              <span class="step-number">4</span>
+              <span>Service notifica a UserDetails via Observable</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  } @else {
+    <!-- 📊 Detalles del usuario seleccionado -->
+    <div class="user-details">
+      @if (!editMode) {
+        <!-- 👁️ Modo visualización -->
+        <div class="details-view">
+          <!-- Header del usuario -->
+          <div class="user-header">
+            <div class="user-avatar" [style.background-color]="getRoleColor()">
+              {{ selectedUser.avatar || '👤' }}
+            </div>
+            
+            <div class="user-basic-info">
+              <h4>{{ selectedUser.name }}</h4>
+              <p class="user-email">📧 {{ selectedUser.email }}</p>
+              <span class="user-status" [class]="getStatusClass()">
+                {{ selectedUser.isActive ? '✅ Usuario Activo' : '❌ Usuario Inactivo' }}
+              </span>
+              <div class="activity-status">
+                🕒 {{ getActivityStatus() }}
+              </div>
+            </div>
+            
+            <div class="user-actions-quick">
+              <button class="btn-icon" (click)="sendEmail()" title="Enviar email">
+                📧
+              </button>
+              @if (selectedUser.projects.length > 0) {
+                <button class="btn-icon" (click)="viewUserProjects()" title="Ver proyectos">
+                  📋
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Grid de información detallada -->
+          <div class="details-grid">
+            <div class="detail-section">
+              <h5>📋 Información Personal</h5>
+              <div class="detail-items">
+                <div class="detail-item">
+                  <span class="detail-label">🆔 ID de Usuario:</span>
+                  <span class="detail-value">{{ selectedUser.id }}</span>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="detail-label">👤 Nombre Completo:</span>
+                  <span class="detail-value">{{ selectedUser.name }}</span>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="detail-label">📧 Email Corporativo:</span>
+                  <span class="detail-value clickable" (click)="sendEmail()">
+                    {{ selectedUser.email }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h5>👔 Información Laboral</h5>
+              <div class="detail-items">
+                <div class="detail-item">
+                  <span class="detail-label">🎭 Rol:</span>
+                  <span class="detail-value role-badge" [style.background-color]="getRoleColor()">
+                    {{ getRoleDisplayName(selectedUser.role) }}
+                  </span>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="detail-label">🔐 Nivel de Acceso:</span>
+                  <span class="detail-value">{{ getAccessLevel() }}</span>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="detail-label">📊 Estado:</span>
+                  <span class="detail-value" [class]="getStatusClass()">
+                    {{ selectedUser.isActive ? 'Activo en el sistema' : 'Cuenta desactivada' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h5>🕒 Actividad</h5>
+              <div class="detail-items">
+                <div class="detail-item">
+                  <span class="detail-label">🕒 Último Acceso:</span>
+                  <span class="detail-value">{{ getLastLoginFormatted() }}</span>
+                </div>
+                
+                <div class="detail-item">
+                  <span class="detail-label">📈 Estado de Actividad:</span>
+                  <span class="detail-value">{{ getActivityStatus() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h5>📋 Proyectos</h5>
+              <div class="detail-items">
+                <div class="detail-item">
+                  <span class="detail-label">📊 Asignaciones:</span>
+                  <span class="detail-value">{{ getProjectsInfo() }}</span>
+                </div>
+                
+                @if (selectedUser.projects.length > 0) {
+                  <div class="detail-item">
+                    <span class="detail-label">🔢 IDs de Proyectos:</span>
+                    <span class="detail-value">
+                      <div class="project-ids">
+                        @for (projectId of selectedUser.projects; track projectId) {
+                          <span class="project-id-badge">{{ projectId }}</span>
+                        }
+                      </div>
+                    </span>
+                  </div>
+                  
+                  <div class="detail-item">
+                    <span class="detail-label">📋 Acciones:</span>
+                    <span class="detail-value">
+                      <button class="btn btn-sm btn-info" (click)="viewUserProjects()">
+                        📋 Ver Detalles de Proyectos
+                      </button>
+                    </span>
+                  </div>
+                }
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones principales -->
+          <div class="main-actions">
+            <button class="btn btn-primary" (click)="startEdit()">
+              ✏️ Editar Usuario
+            </button>
+            
+            <button 
+              class="btn"
+              [class]="selectedUser.isActive ? 'btn-warning' : 'btn-success'"
+              (click)="toggleUserStatus()">
+              {{ selectedUser.isActive ? '⏸️ Desactivar Usuario' : '▶️ Activar Usuario' }}
+            </button>
+            
+            <button class="btn btn-danger" (click)="deleteUser()">
+              🗑️ Eliminar Usuario
+            </button>
+          </div>
+        </div>
+      } @else {
+        <!-- ✏️ Modo edición -->
+        <div class="details-edit">
+          <div class="edit-header">
+            <h4>✏️ Editando: {{ selectedUser.name }}</h4>
+            <p class="edit-subtitle">Modifica la información del usuario</p>
+          </div>
+          
+          <form class="edit-form" (ngSubmit)="saveChanges()">
+            <div class="form-grid">
+              <div class="form-group">
+                <label for="editName">👤 Nombre completo:</label>
+                <input 
+                  type="text" 
+                  id="editName"
+                  [(ngModel)]="editForm.name"
+                  name="name"
+                  class="form-control"
+                  placeholder="Nombre completo del usuario"
+                  required>
+                <small class="form-hint">Nombre y apellidos del empleado</small>
+              </div>
+
+              <div class="form-group">
+                <label for="editEmail">📧 Email corporativo:</label>
+                <input 
+                  type="email" 
+                  id="editEmail"
+                  [(ngModel)]="editForm.email"
+                  name="email"
+                  class="form-control"
+                  placeholder="usuario@provias.gob.pe"
+                  required>
+                <small class="form-hint">Email oficial de PROVIAS</small>
+              </div>
+
+              <div class="form-group">
+                <label for="editRole">👔 Rol en la organización:</label>
+                <select 
+                  id="editRole"
+                  [(ngModel)]="editForm.role"
+                  name="role"
+                  class="form-control"
+                  required>
+                  <option value="">Seleccionar rol...</option>
+                  <option [value]="UserRole.ADMIN">👑 Administrador</option>
+                  <option [value]="UserRole.PROJECT_MANAGER">👨‍💼 Jefe de Proyecto</option>
+                  <option [value]="UserRole.ENGINEER">👨‍🔧 Ingeniero</option>
+                  <option [value]="UserRole.TECHNICIAN">🔧 Técnico</option>
+                </select>
+                <small class="form-hint">Define permisos y responsabilidades</small>
+              </div>
+            </div>
+
+            <!-- Vista previa de cambios -->
+            <div class="changes-preview">
+              <h5>👁️ Vista Previa de Cambios</h5>
+              <div class="preview-grid">
+                <div class="preview-item">
+                  <span class="preview-label">Nombre:</span>
+                  <span class="preview-old">{{ selectedUser.name }}</span>
+                  <span class="preview-arrow">→</span>
+                  <span class="preview-new">{{ editForm.name || 'Sin cambios' }}</span>
+                </div>
+                
+                <div class="preview-item">
+                  <span class="preview-label">Email:</span>
+                  <span class="preview-old">{{ selectedUser.email }}</span>
+                  <span class="preview-arrow">→</span>
+                  <span class="preview-new">{{ editForm.email || 'Sin cambios' }}</span>
+                </div>
+                
+                <div class="preview-item">
+                  <span class="preview-label">Rol:</span>
+                  <span class="preview-old">{{ getRoleDisplayName(selectedUser.role) }}</span>
+                  <span class="preview-arrow">→</span>
+                  <span class="preview-new">
+                    {{ editForm.role ? getRoleDisplayName(editForm.role) : 'Sin cambios' }}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Validación del formulario -->
+            @if (!isFormValid()) {
+              <div class="validation-errors">
+                <h5>⚠️ Corrige los siguientes errores:</h5>
+                <ul>
+                  @if (!editForm.name?.trim()) {
+                    <li>El nombre es obligatorio</li>
+                  }
+                  @if (!editForm.email?.trim()) {
+                    <li>El email es obligatorio</li>
+                  }
+                  @if (!editForm.role) {
+                    <li>Debes seleccionar un rol</li>
+                  }
+                </ul>
+              </div>
+            }
+
+            <!-- Botones de acción -->
+            <div class="form-actions">
+              <button 
+                type="submit" 
+                class="btn btn-success"
+                [disabled]="!isFormValid()">
+                💾 Guardar Cambios
+              </button>
+              
+              <button 
+                type="button" 
+                class="btn btn-secondary"
+                (click)="cancelEdit()">
+                ❌ Cancelar Edición
+              </button>
+            </div>
+          </form>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- 🔄 Información sobre comunicación sibling -->
+  <div class="sibling-communication-info">
+    <h4>🔄 Comunicación Sibling Components</h4>
+    <div class="communication-details">
+      <div class="communication-item">
+        <span class="comm-icon">📡</span>
+        <div class="comm-content">
+          <strong>Service Observable:</strong>
+          <p>Este componente se suscribe a <code>userService.getSelectedUser()</code></p>
+        </div>
+      </div>
+      
+      <div class="communication-item">
+        <span class="comm-icon">🔄</span>
+        <div class="comm-content">
+          <strong>Reactivo:</strong>
+          <p>Se actualiza automáticamente cuando otro componente cambia la selección</p>
+        </div>
+      </div>
+      
+      <div class="communication-item">
+        <span class="comm-icon">🧹</span>
+        <div class="comm-content">
+          <strong>Cleanup:</strong>
+          <p>Se desuscribe automáticamente en ngOnDestroy para evitar memory leaks</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
