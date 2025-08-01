@@ -1,0 +1,116 @@
+.lifecycle-container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-size: 1.8rem;
+  }
+  
+  .info-panel {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-bottom: 1.5rem;
+    
+    h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+    }
+    
+    p {
+      margin: 0.5rem 0;
+      font-size: 1.1rem;
+    }
+  }
+  
+  .controls {
+    text-align: center;
+    margin: 2rem 0;
+    
+    .btn {
+      background: #3498db;
+      color: white;
+      border: none;
+      padding: 0.8rem 1.5rem;
+      border-radius: 6px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      
+      &:hover {
+        background: #2980b9;
+        transform: translateY(-2px);
+      }
+    }
+  }
+  
+  .instructions {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #17a2b8;
+    margin-bottom: 1.5rem;
+    
+    h4 {
+      color: #17a2b8;
+      margin-top: 0;
+    }
+    
+    ol {
+      margin: 0;
+      padding-left: 1.5rem;
+      
+      li {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+      }
+    }
+  }
+  
+  .lifecycle-info {
+    background: #e8f5e8;
+    padding: 1.5rem;
+    border-radius: 8px;
+    border-left: 4px solid #28a745;
+    
+    h4 {
+      color: #28a745;
+      margin-top: 0;
+    }
+    
+    ul {
+      margin: 0;
+      padding-left: 1.5rem;
+      
+      li {
+        margin: 0.5rem 0;
+        line-height: 1.6;
+        
+        code {
+          background: #f1f1f1;
+          padding: 0.2rem 0.4rem;
+          border-radius: 3px;
+          font-family: 'Consolas', 'Monaco', monospace;
+          color: #d63384;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .lifecycle-container {
+    margin: 1rem;
+    padding: 1rem;
+    
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+}
