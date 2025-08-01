@@ -68,5 +68,8 @@
       }
     }
   },
-  "defaultProject": "mi-primera-app-angular"
+  "defaultProject": "mi-primera-app-angular",
+  "cli": {
+    "analytics": false
+  }
 } 
