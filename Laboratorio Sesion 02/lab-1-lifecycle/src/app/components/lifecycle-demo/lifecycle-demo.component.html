@@ -32,7 +32,7 @@
       
       <div class="info-item">
         <label>📍 Última actualización:</label>
-        <span class="info-value">{{ new Date().toLocaleTimeString() }}</span>
+        <span class="info-value">{{ getCurrentTime() }}</span>
       </div>
     </div>
   </section>
@@ -103,7 +103,7 @@
       <div class="hook-card on-changes">
         <div class="hook-icon">🔄</div>
         <h4>ngOnChanges()</h4>
-        <p><strong>Propósito:</strong> Reaccionar a cambios en @Input</p>
+        <p><strong>Propósito:</strong> Reaccionar a cambios en &#64;Input</p>
         <p><strong>Timing:</strong> Cada vez que cambian las propiedades input</p>
         <p><strong>Uso:</strong> Validar datos, transformar inputs</p>
       </div>
@@ -129,7 +129,7 @@
         <h4>ngAfterViewInit()</h4>
         <p><strong>Propósito:</strong> Vista completamente inicializada</p>
         <p><strong>Timing:</strong> Después de renderizar vista</p>
-        <p><strong>Uso:</strong> Manipular DOM, @ViewChild</p>
+        <p><strong>Uso:</strong> Manipular DOM, &#64;ViewChild</p>
       </div>
       
       <div class="hook-card on-destroy">
@@ -153,7 +153,7 @@
           <li>Usar constructor solo para inyección de dependencias</li>
           <li>Hacer HTTP calls en ngOnInit</li>
           <li>Limpiar subscripciones en ngOnDestroy</li>
-          <li>Usar ngOnChanges para validar @Input</li>
+          <li>Usar ngOnChanges para validar &#64;Input</li>
         </ul>
       </div>
       
