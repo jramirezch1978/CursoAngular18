@@ -1,43 +1,234 @@
-<p>Este es mi primer componente YEEE!!!!!!</p>
-<h1>Hola, soy un componente de Angular</h1>
-<hr>
 <div class="lifecycle-container">
-  <h2>🔄 Demostración Lifecycle Hooks</h2>
-  
-  <div class="info-panel">
-    <h3>Estado del Componente</h3>
-    <p><strong>Input Data:</strong> {{ inputData || 'Sin datos' }}</p>
-    <p><strong>Tiempo activo:</strong> Revisar consola cada 2 segundos</p>
-  </div>
-  
-  <div class="controls">
-    <button 
-      (click)="simulateInputChange()" 
-      class="btn btn-primary">
-      🔄 Simular Cambio de Input
-    </button>
-  </div>
-  
-  <div class="instructions">
-    <h4>📋 Instrucciones:</h4>
-    <ol>
-      <li>Abre las DevTools (F12)</li>
-      <li>Ve a la pestaña Console</li>
-      <li>Observa los mensajes de lifecycle hooks</li>
-      <li>Haz click en "Simular Cambio de Input"</li>
-      <li>Navega a otra página para ver ngOnDestroy</li>
+  <!-- 🎯 Header principal con información del demo -->
+  <header class="demo-header">
+    <h2>🔄 Demostración Lifecycle Hooks</h2>
+    <p class="demo-description">
+      Este componente demuestra todos los lifecycle hooks de Angular en acción.
+      Abre las DevTools (F12) y ve a la pestaña Console para ver los logs en tiempo real.
+    </p>
+  </header>
+
+  <!-- 📊 Panel de información del estado actual -->
+  <section class="info-panel">
+    <h3>📊 Estado del Componente</h3>
+    
+    <div class="info-grid">
+      <div class="info-item">
+        <label>📥 Input Data:</label>
+        <span class="info-value">{{ inputData || 'Sin datos' }}</span>
+      </div>
+      
+      <div class="info-item">
+        <label>⏱️ Tiempo activo:</label>
+        <span class="info-value">{{ getComponentAge() }} segundos</span>
+      </div>
+      
+      <div class="info-item">
+        <label>🔄 Timer estado:</label>
+        <span class="info-value" [class.active]="isTimerActive()">
+          {{ isTimerActive() ? '✅ Activo' : '❌ Inactivo' }}
+        </span>
+      </div>
+      
+      <div class="info-item">
+        <label>📍 Última actualización:</label>
+        <span class="info-value"></span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎮 Controles para interactuar con el componente -->
+  <section class="controls-section">
+    <h3>🎮 Controles de Demo</h3>
+    
+    <div class="controls">
+      <button 
+        (click)="simulateInputChange()" 
+        class="btn btn-primary"
+        title="Cambia el inputData para disparar ngOnChanges">
+        🔄 Simular Cambio de Input
+      </button>
+      
+      <button 
+        onclick="window.location.reload()" 
+        class="btn btn-secondary"
+        title="Recarga la página para ver el ciclo completo desde constructor">
+        🔄 Recargar Página
+      </button>
+    </div>
+    
+    <div class="control-hint">
+      💡 <strong>Tip:</strong> Haz click en "Simular Cambio" para ver ngOnChanges en acción
+    </div>
+  </section>
+
+  <!-- 📋 Instrucciones paso a paso -->
+  <section class="instructions">
+    <h3>📋 Instrucciones de Uso</h3>
+    <ol class="instruction-list">
+      <li>
+        <strong>Abre DevTools:</strong> Presiona F12 o Ctrl+Shift+I
+      </li>
+      <li>
+        <strong>Ve a Console:</strong> Click en la pestaña "Console"
+      </li>
+      <li>
+        <strong>Observa logs iniciales:</strong> Verás constructor, ngOnInit, etc.
+      </li>
+      <li>
+        <strong>Interactúa:</strong> Click en "Simular Cambio de Input"
+      </li>
+      <li>
+        <strong>Observa ngOnChanges:</strong> Verás logs del cambio de input
+      </li>
+      <li>
+        <strong>Navega:</strong> Ve a otra página para ver ngOnDestroy
+      </li>
     </ol>
-  </div>
-  
-  <div class="lifecycle-info">
-    <h4>🎯 Hooks Implementados:</h4>
-    <ul>
-      <li><code>constructor()</code> - Inyección de dependencias</li>
-      <li><code>ngOnChanges()</code> - Cambios en Input</li>
-      <li><code>ngOnInit()</code> - Inicialización del componente</li>
-      <li><code>ngAfterContentInit()</code> - Contenido inicializado</li>
-      <li><code>ngAfterViewInit()</code> - Vista inicializada</li>
-      <li><code>ngOnDestroy()</code> - Limpieza de recursos</li>
-    </ul>
-  </div>
+  </section>
+
+  <!-- 🎯 Información educativa sobre cada hook -->
+  <section class="lifecycle-info">
+    <h3>🎯 Lifecycle Hooks Implementados</h3>
+    
+    <div class="hooks-grid">
+      <div class="hook-card constructor">
+        <div class="hook-icon">🔧</div>
+        <h4>constructor()</h4>
+        <p><strong>Propósito:</strong> Inyección de dependencias únicamente</p>
+        <p><strong>Timing:</strong> Antes de cualquier inicialización</p>
+        <p><strong>Uso:</strong> Asignar servicios, variables básicas</p>
+      </div>
+      
+      <div class="hook-card on-changes">
+        <div class="hook-icon">🔄</div>
+        <h4>ngOnChanges()</h4>
+        <p><strong>Propósito:</strong> Reaccionar a cambios en Input</p>
+        <p><strong>Timing:</strong> Cada vez que cambian las propiedades input</p>
+        <p><strong>Uso:</strong> Validar datos, transformar inputs</p>
+      </div>
+      
+      <div class="hook-card on-init">
+        <div class="hook-icon">🚀</div>
+        <h4>ngOnInit()</h4>
+        <p><strong>Propósito:</strong> Inicialización principal</p>
+        <p><strong>Timing:</strong> Una vez después de primer ngOnChanges</p>
+        <p><strong>Uso:</strong> HTTP calls, subscripciones, setup</p>
+      </div>
+      
+      <div class="hook-card after-content">
+        <div class="hook-icon">📝</div>
+        <h4>ngAfterContentInit()</h4>
+        <p><strong>Propósito:</strong> Contenido proyectado listo</p>
+        <p><strong>Timing:</strong> Después de proyectar contenido</p>
+        <p><strong>Uso:</strong> Interactuar con ng-content</p>
+      </div>
+      
+      <div class="hook-card after-view">
+        <div class="hook-icon">👁️</div>
+        <h4>ngAfterViewInit()</h4>
+        <p><strong>Propósito:</strong> Vista completamente inicializada</p>
+        <p><strong>Timing:</strong> Después de renderizar vista</p>
+        <p><strong>Uso:</strong> Manipular DOM, ViewChild</p>
+      </div>
+      
+      <div class="hook-card on-destroy">
+        <div class="hook-icon">🧹</div>
+        <h4>ngOnDestroy()</h4>
+        <p><strong>Propósito:</strong> Limpieza de recursos</p>
+        <p><strong>Timing:</strong> Antes de destruir componente</p>
+        <p><strong>Uso:</strong> Unsubscribe, clearInterval</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⚠️ Sección de mejores prácticas -->
+  <section class="best-practices">
+    <h3>⚠️ Mejores Prácticas y Errores Comunes</h3>
+    
+    <div class="practices-grid">
+      <div class="practice-card do">
+        <h4>✅ SÍ HACER</h4>
+        <ul>
+          <li>Usar constructor solo para inyección de dependencias</li>
+          <li>Hacer HTTP calls en ngOnInit</li>
+          <li>Limpiar subscripciones en ngOnDestroy</li>
+          <li>Usar ngOnChanges para validar Input</li>
+        </ul>
+      </div>
+      
+      <div class="practice-card dont">
+        <h4>❌ NO HACER</h4>
+        <ul>
+          <li>HTTP calls en constructor</li>
+          <li>Olvidar implementar ngOnDestroy</li>
+          <li>Manipular DOM antes de ngAfterViewInit</li>
+          <li>Subscripciones sin unsubscribe</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔧 Sección del Logger Service Demo -->
+  <section class="logger-demo">
+    <h3>📝 Logger Service en Acción</h3>
+    
+    <div class="logger-controls">
+      <button 
+        (click)="demonstrateLogLevels()" 
+        class="btn btn-primary"
+        title="Genera logs de todos los niveles para demo">
+        🎯 Demostrar Niveles de Log
+      </button>
+      
+      <button 
+        (click)="clearLogs()" 
+        class="btn btn-secondary"
+        title="Limpia todos los logs del Logger Service">
+        🧹 Limpiar Logs
+      </button>
+    </div>
+    
+    <div class="log-stats">
+      <h4>📊 Estadísticas de Logging</h4>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-label">Total de logs:</span>
+          <span class="stat-value">{{ getLogStats().total }}</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Componentes loggeando:</span>
+          <span class="stat-value">{{ getLogStats().components }}</span>
+        </div>
+        <div class="stat-item debug">
+          <span class="stat-label">🐛 DEBUG:</span>
+          <span class="stat-value">{{ getLogStats().debug }}</span>
+        </div>
+        <div class="stat-item info">
+          <span class="stat-label">ℹ️ INFO:</span>
+          <span class="stat-value">{{ getLogStats().info }}</span>
+        </div>
+        <div class="stat-item warn">
+          <span class="stat-label">⚠️ WARN:</span>
+          <span class="stat-value">{{ getLogStats().warn }}</span>
+        </div>
+        <div class="stat-item error">
+          <span class="stat-label">❌ ERROR:</span>
+          <span class="stat-value">{{ getLogStats().error }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="logger-info">
+      <h4>🎯 Características del Logger Service</h4>
+      <ul>
+        <li>✅ <strong>Niveles jerárquicos:</strong> DEBUG → INFO → WARN → ERROR</li>
+        <li>✅ <strong>Filtrado automático:</strong> Solo muestra logs del nivel configurado hacia arriba</li>
+        <li>✅ <strong>Formato consistente:</strong> Timestamp, componente, mensaje y datos</li>
+        <li>✅ <strong>Colores en console:</strong> Cada nivel tiene su propio estilo visual</li>
+        <li>✅ <strong>Gestión de memoria:</strong> Limita automáticamente el número de logs</li>
+        <li>✅ <strong>Estadísticas:</strong> Información agregada sobre el logging</li>
+      </ul>
+    </div>
+  </section>
 </div>

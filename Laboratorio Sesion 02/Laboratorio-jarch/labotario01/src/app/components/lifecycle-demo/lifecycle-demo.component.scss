@@ -1,116 +1,401 @@
 .lifecycle-container {
-  max-width: 800px;
+  max-width: 1200px;
   margin: 2rem auto;
   padding: 2rem;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
   
-  h2 {
-    color: #2c3e50;
+  // 🎨 Header principal
+  .demo-header {
     text-align: center;
-    margin-bottom: 2rem;
-    font-size: 1.8rem;
+    margin-bottom: 3rem;
+    
+    h2 {
+      color: #2c3e50;
+      font-size: 2.2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .demo-description {
+      color: #6c757d;
+      font-size: 1.1rem;
+      max-width: 600px;
+      margin: 0 auto;
+    }
   }
   
+  // 📊 Panel de información del estado
   .info-panel {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     color: white;
-    padding: 1.5rem;
-    border-radius: 12px;
-    margin-bottom: 1.5rem;
+    padding: 2rem;
+    border-radius: 15px;
+    margin-bottom: 2rem;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
     
     h3 {
       margin-top: 0;
+      margin-bottom: 1.5rem;
+      font-size: 1.4rem;
+    }
+    
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      
+      .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 8px;
+        backdrop-filter: blur(10px);
+        
+        label {
+          font-weight: 600;
+        }
+        
+        .info-value {
+          font-family: 'Monaco', 'Consolas', monospace;
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          
+          &.active {
+            background: rgba(40, 167, 69, 0.8);
+            animation: pulse 2s infinite;
+          }
+        }
+      }
+    }
+  }
+  
+  // 🎮 Sección de controles
+  .controls-section {
+    margin-bottom: 2rem;
+    
+    h3 {
+      color: #2c3e50;
       margin-bottom: 1rem;
     }
     
-    p {
-      margin: 0.5rem 0;
-      font-size: 1.1rem;
+    .controls {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      flex-wrap: wrap;
     }
-  }
-  
-  .controls {
-    text-align: center;
-    margin: 2rem 0;
     
-    .btn {
-      background: #3498db;
-      color: white;
-      border: none;
-      padding: 0.8rem 1.5rem;
+    .control-hint {
+      color: #6c757d;
+      font-style: italic;
+      padding: 0.5rem;
+      background: #f8f9fa;
       border-radius: 6px;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-      
-      &:hover {
-        background: #2980b9;
-        transform: translateY(-2px);
-      }
+      border-left: 4px solid #17a2b8;
     }
   }
   
+  // 📋 Instrucciones
   .instructions {
     background: #f8f9fa;
-    padding: 1.5rem;
-    border-radius: 8px;
+    padding: 2rem;
+    border-radius: 12px;
     border-left: 4px solid #17a2b8;
-    margin-bottom: 1.5rem;
+    margin-bottom: 2rem;
     
-    h4 {
+    h3 {
       color: #17a2b8;
       margin-top: 0;
+      margin-bottom: 1.5rem;
     }
     
-    ol {
+    .instruction-list {
       margin: 0;
-      padding-left: 1.5rem;
+      padding-left: 2rem;
       
       li {
-        margin: 0.5rem 0;
+        margin: 1rem 0;
         line-height: 1.6;
+        
+        strong {
+          color: #2c3e50;
+        }
       }
     }
   }
   
+  // 🎯 Información de hooks
   .lifecycle-info {
-    background: #e8f5e8;
-    padding: 1.5rem;
-    border-radius: 8px;
-    border-left: 4px solid #28a745;
+    margin-bottom: 2rem;
     
-    h4 {
-      color: #28a745;
-      margin-top: 0;
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
     }
     
-    ul {
-      margin: 0;
-      padding-left: 1.5rem;
+    .hooks-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
       
-      li {
-        margin: 0.5rem 0;
-        line-height: 1.6;
+      .hook-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border-left: 4px solid;
         
-        code {
-          background: #f1f1f1;
-          padding: 0.2rem 0.4rem;
-          border-radius: 3px;
-          font-family: 'Consolas', 'Monaco', monospace;
-          color: #d63384;
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+        
+        .hook-icon {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+        }
+        
+        h4 {
+          margin: 0.5rem 0;
+          font-family: 'Monaco', 'Consolas', monospace;
+          font-size: 1.1rem;
+        }
+        
+        p {
+          margin: 0.5rem 0;
+          font-size: 0.9rem;
+          
+          strong {
+            color: #2c3e50;
+          }
+        }
+        
+        // Colores específicos por hook
+        &.constructor { border-left-color: #007bff; }
+        &.on-changes { border-left-color: #ffc107; }
+        &.on-init { border-left-color: #28a745; }
+        &.after-content { border-left-color: #17a2b8; }
+        &.after-view { border-left-color: #6f42c1; }
+        &.on-destroy { border-left-color: #dc3545; }
+      }
+    }
+  }
+  
+  // ⚠️ Mejores prácticas
+  .best-practices {
+    margin-bottom: 2rem;
+    
+    h3 {
+      color: #2c3e50;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    
+    .practices-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      
+      .practice-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        
+        &.do {
+          background: linear-gradient(135deg, #e8f5e8 0%, #f0fff0 100%);
+          border: 2px solid #28a745;
+        }
+        
+        &.dont {
+          background: linear-gradient(135deg, #ffeaa7 0%, #fab1a0 100%);
+          border: 2px solid #dc3545;
+        }
+        
+        h4 {
+          margin-top: 0;
+          margin-bottom: 1rem;
+          
+          .do & { color: #28a745; }
+          .dont & { color: #dc3545; }
+        }
+        
+        ul {
+          margin: 0;
+          padding-left: 1.5rem;
+          
+          li {
+            margin: 0.5rem 0;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+
+  // 📝 Estilos para la sección del Logger Service
+  .logger-demo {
+    background: #f8f9fa;
+    padding: 2rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    border: 2px solid #dee2e6;
+    
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+    
+    .logger-controls {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+      flex-wrap: wrap;
+    }
+    
+    .log-stats {
+      margin-bottom: 1.5rem;
+      
+      h4 {
+        color: #495057;
+        margin-bottom: 1rem;
+        text-align: center;
+      }
+      
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 0.75rem;
+        
+        .stat-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          background: white;
+          border-radius: 6px;
+          border-left: 3px solid #6c757d;
+          
+          .stat-label {
+            font-weight: 500;
+          }
+          
+          .stat-value {
+            font-weight: bold;
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #2c3e50;
+          }
+          
+          // Colores específicos por nivel
+          &.debug { border-left-color: #6c757d; }
+          &.info { border-left-color: #007bff; }
+          &.warn { border-left-color: #ffc107; }
+          &.error { border-left-color: #dc3545; }
+        }
+      }
+    }
+    
+    .logger-info {
+      h4 {
+        color: #495057;
+        margin-bottom: 1rem;
+      }
+      
+      ul {
+        margin: 0;
+        padding-left: 1.5rem;
+        
+        li {
+          margin: 0.5rem 0;
+          line-height: 1.5;
+          
+          strong {
+            color: #2c3e50;
+          }
         }
       }
     }
   }
 }
 
+// 🎨 Animaciones
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+// 🔘 Estilos globales para botones
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  &.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    
+    &:hover {
+      background: linear-gradient(135deg, #5a6fd8 0%, #6a4190 100%);
+    }
+  }
+  
+  &.btn-secondary {
+    background: #6c757d;
+    color: white;
+    
+    &:hover {
+      background: #5a6268;
+    }
+  }
+}
+
+// 📱 Responsive design
 @media (max-width: 768px) {
   .lifecycle-container {
     margin: 1rem;
     padding: 1rem;
     
-    h2 {
-      font-size: 1.5rem;
+    .demo-header h2 {
+      font-size: 1.8rem;
+    }
+    
+    .info-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .hooks-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .practices-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .controls {
+      flex-direction: column;
     }
   }
 }

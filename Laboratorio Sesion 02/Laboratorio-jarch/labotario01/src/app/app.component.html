@@ -1,36 +1,115 @@
 <div class="app-layout">
-  
-  
+  <!-- 🎯 Header de la aplicación -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">🏗️ PROVIAS DESCENTRALIZADO - Angular v18</p>
+    </div>
+  </header>
+
+  <!-- 📱 Contenido principal -->
   <main class="main-content">
     <div class="container">
-      <section class="lab-section">
-        <h1>🧪 LAB 1: Ciclo de Vida de Componentes</h1>
+      <!-- 🎮 Panel de control principal -->
+      <section class="control-panel">
+        <h2>🎮 Panel de Control del Laboratorio</h2>
         
-        <div class="controls">
-          <button 
-            (click)="toggleLifecycleDemo()" 
-            class="btn"
-            [class.btn-danger]="showLifecycleDemo"
-            [class.btn-success]="!showLifecycleDemo">
-            {{ showLifecycleDemo ? '🗑️ Destruir Componente' : '🔄 Crear Componente' }}
-          </button>
+        <div class="controls-grid">
+          <div class="control-group">
+            <h3>🔄 Gestión del Componente</h3>
+            <div class="button-group">
+              <button 
+                (click)="toggleLifecycleDemo()" 
+                class="btn"
+                [class.btn-danger]="showLifecycleDemo"
+                [class.btn-success]="!showLifecycleDemo">
+                {{ showLifecycleDemo ? '🗑️ Destruir Componente' : '🔄 Crear Componente' }}
+              </button>
+              
+              <span class="status-indicator" [class.active]="showLifecycleDemo">
+                Estado: {{ showLifecycleDemo ? '✅ Activo' : '❌ Destruido' }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="control-group">
+            <h3>📤 Comunicación Parent → Child</h3>
+            <div class="button-group">
+              <button 
+                (click)="updateInputData()" 
+                class="btn btn-primary"
+                [disabled]="!showLifecycleDemo">
+                🎯 Actualizar Input Data
+              </button>
+              
+              <div class="input-preview">
+                <strong>Valor actual:</strong>
+                <code>{{ inputDataForChild }}</code>
+              </div>
+            </div>
+          </div>
         </div>
         
+        <!-- 📋 Instrucciones de uso -->
+        <div class="instructions-mini">
+          <h4>📋 Instrucciones Rápidas:</h4>
+          <ol>
+            <li><strong>Abre DevTools (F12)</strong> y ve a Console</li>
+            <li><strong>Observa logs</strong> de constructor, ngOnInit, etc.</li>
+            <li><strong>Click "Actualizar Input"</strong> para ver ngOnChanges</li>
+            <li><strong>Click "Destruir Componente"</strong> para ver ngOnDestroy</li>
+            <li><strong>Click "Crear Componente"</strong> para ver el ciclo completo otra vez</li>
+          </ol>
+        </div>
+      </section>
+
+      <!-- 🧪 Área del componente demo -->
+      <section class="demo-area">
         @if (showLifecycleDemo) {
-          <app-lifecycle-demo 
-            [inputData]="'Datos desde componente padre'">
-          </app-lifecycle-demo>
+          <div class="component-container">
+            <div class="component-header">
+              <h3>🔄 Componente Lifecycle Demo Activo</h3>
+              <p>El componente está vivo y ejecutando sus lifecycle hooks</p>
+            </div>
+            
+            <!-- 🎯 Aquí se renderiza nuestro componente con @Input -->
+            <app-lifecycle-demo [inputData]="inputDataForChild">
+            </app-lifecycle-demo>
+          </div>
         } @else {
           <div class="component-destroyed">
-            <h3>💀 Componente Destruido</h3>
-            <p>Revisa la consola para ver el log de ngOnDestroy</p>
+            <div class="destroyed-state">
+              <h3>💀 Componente Destruido</h3>
+              <p>El componente ha sido destruido y ngOnDestroy se ejecutó.</p>
+              <p>🔍 <strong>Revisa la console</strong> para ver el log de limpieza de recursos.</p>
+              
+              <div class="destruction-info">
+                <h4>🧹 Qué sucedió en ngOnDestroy:</h4>
+                <ul>
+                  <li>✅ Timer fue limpiado (clearInterval)</li>
+                  <li>✅ Logs de destrucción fueron generados</li>
+                  <li>✅ Recursos fueron liberados correctamente</li>
+                  <li>✅ No hay memory leaks</li>
+                </ul>
+              </div>
+              
+              <button 
+                (click)="toggleLifecycleDemo()" 
+                class="btn btn-success btn-lg">
+                🔄 Crear Componente Nuevamente
+              </button>
+            </div>
           </div>
         }
       </section>
     </div>
-    
-    <router-outlet></router-outlet>
   </main>
-  
-  
+
+  <!-- 🦶 Footer con información técnica -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>&copy; 2025 PROVIAS - LAB 1: Lifecycle Hooks completado</p>
+      <small>Ing. Jhonny Alexander Ramirez Chiroque - Angular v18 Course</small>
+    </div>
+  </footer>
 </div>

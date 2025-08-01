@@ -1,0 +1,241 @@
+<div class="user-list-container">
+  <header class="list-header">
+    <h2>👥 Gestión de Usuarios PROVIAS</h2>
+    <div class="header-stats">
+      <span class="stat">
+        👤 Total: {{ users.length }}
+      </span>
+      <span class="stat">
+        ✅ Activos: {{ getActiveUsersCount() }}
+      </span>
+      @if (selectedUser) {
+        <span class="stat selected">
+          🎯 Seleccionado: {{ selectedUser.name }}
+        </span>
+      }
+    </div>
+  </header>
+
+  <!-- 🔍 Sección de búsqueda y filtros -->
+  <section class="search-filters">
+    <h3>🔍 Búsqueda y Filtros</h3>
+    
+    <div class="filters-grid">
+      <!-- Búsqueda por texto -->
+      <div class="filter-group">
+        <label for="search">🔍 Buscar usuario:</label>
+        <input 
+          type="text" 
+          id="search"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          class="form-control"
+          placeholder="Nombre o email...">
+      </div>
+      
+      <!-- Filtro por rol -->
+      <div class="filter-group">
+        <label for="roleFilter">👔 Filtrar por rol:</label>
+        <select 
+          id="roleFilter"
+          (change)="onRoleFilterChange($event)"
+          class="form-control">
+          <option value="">Todos los roles</option>
+          <option [value]="UserRole.ADMIN">{{ getRoleDisplayName(UserRole.ADMIN) }}</option>
+          <option [value]="UserRole.PROJECT_MANAGER">{{ getRoleDisplayName(UserRole.PROJECT_MANAGER) }}</option>
+          <option [value]="UserRole.ENGINEER">{{ getRoleDisplayName(UserRole.ENGINEER) }}</option>
+          <option [value]="UserRole.TECHNICIAN">{{ getRoleDisplayName(UserRole.TECHNICIAN) }}</option>
+        </select>
+      </div>
+      
+      <!-- Filtro por estado -->
+      <div class="filter-group">
+        <label for="statusFilter">📊 Filtrar por estado:</label>
+        <select 
+          id="statusFilter"
+          (change)="onStatusFilterChange($event)"
+          class="form-control">
+          <option value="">Todos los estados</option>
+          <option value="true">Solo activos</option>
+          <option value="false">Solo inactivos</option>
+        </select>
+      </div>
+    </div>
+    
+    @if (hasActiveFilters()) {
+      <div class="active-filters">
+        <span class="filters-label">Filtros activos:</span>
+        <button 
+          (click)="clearFilters()" 
+          class="btn btn-sm btn-secondary">
+          🧹 Limpiar filtros
+        </button>
+      </div>
+    }
+  </section>
+
+  <!-- 🎮 Controles principales -->
+  <div class="controls">
+    <button 
+      (click)="toggleAddForm()" 
+      class="btn btn-primary">
+      {{ showAddForm ? '❌ Cancelar' : '➕ Agregar Usuario' }}
+    </button>
+    
+    <button 
+      (click)="clearSelection()" 
+      class="btn btn-secondary"
+      [disabled]="!selectedUser">
+      🗑️ Limpiar Selección
+    </button>
+    
+    <button 
+      (click)="generateTestUsers()" 
+      class="btn btn-warning">
+      🎲 Generar Usuarios de Prueba
+    </button>
+    
+    <button 
+      (click)="resetData()" 
+      class="btn btn-danger">
+      🔄 Resetear Datos
+    </button>
+  </div>
+
+  <!-- 📝 Formulario para nuevo usuario -->
+  @if (showAddForm) {
+    <section class="add-user-form">
+      <h3>➕ Agregar Nuevo Usuario</h3>
+      
+      <form (ngSubmit)="addNewUser()" class="user-form">
+        <div class="form-group">
+          <label for="newUserName">👤 Nombre completo:</label>
+          <input 
+            type="text" 
+            id="newUserName"
+            [(ngModel)]="newUserForm.name"
+            name="name"
+            class="form-control"
+            placeholder="Ej: Juan Pérez García"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newUserEmail">📧 Email corporativo:</label>
+          <input 
+            type="email" 
+            id="newUserEmail"
+            [(ngModel)]="newUserForm.email"
+            name="email"
+            class="form-control"
+            placeholder="juan.perez@provias.gob.pe"
+            required>
+        </div>
+
+        <div class="form-group">
+          <label for="newUserRole">👔 Rol:</label>
+          <select 
+            id="newUserRole"
+            [(ngModel)]="newUserForm.role"
+            name="role"
+            class="form-control"
+            required>
+            <option [value]="UserRole.TECHNICIAN">{{ getRoleDisplayName(UserRole.TECHNICIAN) }}</option>
+            <option [value]="UserRole.ENGINEER">{{ getRoleDisplayName(UserRole.ENGINEER) }}</option>
+            <option [value]="UserRole.PROJECT_MANAGER">{{ getRoleDisplayName(UserRole.PROJECT_MANAGER) }}</option>
+            <option [value]="UserRole.ADMIN">{{ getRoleDisplayName(UserRole.ADMIN) }}</option>
+          </select>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="submit" 
+            class="btn btn-success"
+            [disabled]="!isNewUserFormValid()">
+            💾 Crear Usuario
+          </button>
+          
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="toggleAddForm()">
+            ❌ Cancelar
+          </button>
+        </div>
+      </form>
+    </section>
+  }
+
+  <!-- ⏳ Estado de carga -->
+  @if (isLoading) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  }
+
+  <!-- 👥 Lista de usuarios -->
+  <section class="users-section">
+    <h3>👥 Lista de Usuarios ({{ users.length }})</h3>
+    
+    @if (users.length === 0) {
+      <div class="no-users">
+        <h4>📭 No hay usuarios que mostrar</h4>
+        <p>Los filtros aplicados no coinciden con ningún usuario.</p>
+        @if (hasActiveFilters()) {
+          <button (click)="clearFilters()" class="btn btn-primary">
+            🧹 Limpiar filtros
+          </button>
+        } @else {
+          <button (click)="generateTestUsers()" class="btn btn-primary">
+            🎲 Generar usuarios de prueba
+          </button>
+        }
+      </div>
+    } @else {
+      <div class="users-grid">
+        @for (user of users; track user.id) {
+          <app-user-card
+            [user]="user"
+            [isSelected]="selectedUser?.id === user.id"
+            (userSelected)="onUserSelected($event)"
+            (userToggleStatus)="onUserToggleStatus($event)"
+            (userDelete)="onUserDelete($event)">
+          </app-user-card>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- 📡 Demo de comunicación -->
+  <section class="communication-demo">
+    <h3>🔄 Demo de Comunicación entre Componentes</h3>
+    <div class="demo-info">
+      <div class="communication-type">
+        <h4>📤 Parent → Child (Input)</h4>
+        <ul>
+          <li>✅ <code>[user]</code> - Datos del usuario</li>
+          <li>✅ <code>[isSelected]</code> - Estado de selección</li>
+        </ul>
+      </div>
+      
+      <div class="communication-type">
+        <h4>📥 Child → Parent (Output)</h4>
+        <ul>
+          <li>✅ <code>(userSelected)</code> - Usuario clickeado</li>
+          <li>✅ <code>(userToggleStatus)</code> - Cambio de estado</li>
+          <li>✅ <code>(userDelete)</code> - Solicitud de eliminación</li>
+        </ul>
+      </div>
+      
+      <div class="communication-type">
+        <h4>🌐 Service Communication</h4>
+        <ul>
+          <li>✅ <code>BehaviorSubject</code> - Estado reactivo</li>
+          <li>✅ <code>Observable</code> - Subscripciones</li>
+          <li>✅ Comunicación entre siblings</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>

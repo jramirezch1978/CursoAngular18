@@ -1,0 +1,36 @@
+<div class="app-layout">
+  
+  
+  <main class="main-content">
+    <div class="container">
+      <section class="lab-section">
+        <h1>🧪 LAB 1: Ciclo de Vida de Componentes</h1>
+        
+        <div class="controls">
+          <button 
+            (click)="toggleLifecycleDemo()" 
+            class="btn"
+            [class.btn-danger]="showLifecycleDemo"
+            [class.btn-success]="!showLifecycleDemo">
+            {{ showLifecycleDemo ? '🗑️ Destruir Componente' : '🔄 Crear Componente' }}
+          </button>
+        </div>
+        
+        @if (showLifecycleDemo) {
+          <app-lifecycle-demo 
+            [inputData]="'Datos desde componente padre'">
+          </app-lifecycle-demo>
+        } @else {
+          <div class="component-destroyed">
+            <h3>💀 Componente Destruido</h3>
+            <p>Revisa la consola para ver el log de ngOnDestroy</p>
+          </div>
+        }
+      </section>
+    </div>
+    
+    <router-outlet></router-outlet>
+  </main>
+  
+  
+</div>

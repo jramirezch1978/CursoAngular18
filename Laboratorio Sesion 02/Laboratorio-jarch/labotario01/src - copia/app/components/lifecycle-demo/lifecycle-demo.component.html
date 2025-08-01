@@ -1,0 +1,43 @@
+<p>Este es mi primer componente YEEE!!!!!!</p>
+<h1>Hola, soy un componente de Angular</h1>
+<hr>
+<div class="lifecycle-container">
+  <h2>🔄 Demostración Lifecycle Hooks</h2>
+  
+  <div class="info-panel">
+    <h3>Estado del Componente</h3>
+    <p><strong>Input Data:</strong> {{ inputData || 'Sin datos' }}</p>
+    <p><strong>Tiempo activo:</strong> Revisar consola cada 2 segundos</p>
+  </div>
+  
+  <div class="controls">
+    <button 
+      (click)="simulateInputChange()" 
+      class="btn btn-primary">
+      🔄 Simular Cambio de Input
+    </button>
+  </div>
+  
+  <div class="instructions">
+    <h4>📋 Instrucciones:</h4>
+    <ol>
+      <li>Abre las DevTools (F12)</li>
+      <li>Ve a la pestaña Console</li>
+      <li>Observa los mensajes de lifecycle hooks</li>
+      <li>Haz click en "Simular Cambio de Input"</li>
+      <li>Navega a otra página para ver ngOnDestroy</li>
+    </ol>
+  </div>
+  
+  <div class="lifecycle-info">
+    <h4>🎯 Hooks Implementados:</h4>
+    <ul>
+      <li><code>constructor()</code> - Inyección de dependencias</li>
+      <li><code>ngOnChanges()</code> - Cambios en Input</li>
+      <li><code>ngOnInit()</code> - Inicialización del componente</li>
+      <li><code>ngAfterContentInit()</code> - Contenido inicializado</li>
+      <li><code>ngAfterViewInit()</code> - Vista inicializada</li>
+      <li><code>ngOnDestroy()</code> - Limpieza de recursos</li>
+    </ul>
+  </div>
+</div>
