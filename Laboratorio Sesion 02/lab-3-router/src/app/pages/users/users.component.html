@@ -1,0 +1,152 @@
+<div class="users-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>👥 Gestión de Usuarios</h1>
+      <p class="page-description">
+        Administra usuarios del sistema PROVIAS. Esta página demuestra navegación 
+        con parámetros y query parameters.
+      </p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goToDashboard()">
+        🏠 Dashboard
+      </button>
+      <button class="btn btn-primary" (click)="addNewUser()">
+        ➕ Nuevo Usuario
+      </button>
+    </div>
+  </header>
+
+  <!-- 📊 Estadísticas rápidas -->
+  <section class="stats-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ users.length }}</span>
+      <span class="stat-label">Total Usuarios</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ getActiveUsers().length }}</span>
+      <span class="stat-label">Activos</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ getInactiveUsers().length }}</span>
+      <span class="stat-label">Inactivos</span>
+    </div>
+  </section>
+
+  <!-- 🔍 Filtros -->
+  <section class="filters-section">
+    <h3>🔍 Filtros</h3>
+    <div class="filter-buttons">
+      <button 
+        class="filter-btn" 
+        (click)="filterByStatus('all')">
+        Todos
+      </button>
+      <button 
+        class="filter-btn" 
+        (click)="filterByStatus('active')">
+        Solo Activos
+      </button>
+      <button 
+        class="filter-btn" 
+        (click)="filterByStatus('inactive')">
+        Solo Inactivos
+      </button>
+    </div>
+  </section>
+
+  <!-- 👥 Lista de usuarios -->
+  <section class="users-grid">
+    @for (user of users; track user.id) {
+      <div 
+        class="user-card" 
+        [class.selected]="isUserSelected(user.id)"
+        [class.inactive]="!user.isActive">
+        
+        <div class="user-avatar">{{ user.avatar }}</div>
+        
+        <div class="user-info">
+          <h3 class="user-name">{{ user.name }}</h3>
+          <p class="user-email">📧 {{ user.email }}</p>
+          <span class="user-role" [class]="getRoleClass(user.role)">
+            {{ user.role }}
+          </span>
+          
+          <div class="user-status">
+            @if (user.isActive) {
+              <span class="status-badge active">✅ Activo</span>
+            } @else {
+              <span class="status-badge inactive">❌ Inactivo</span>
+            }
+          </div>
+        </div>
+        
+        <div class="user-actions">
+          <button 
+            class="action-btn view" 
+            (click)="viewUser(user.id)"
+            title="Ver detalles">
+            👁️ Ver
+          </button>
+          <button 
+            class="action-btn edit" 
+            (click)="editUser(user.id)"
+            title="Editar usuario">
+            ✏️ Editar
+          </button>
+        </div>
+      </div>
+    }
+  </section>
+
+  <!-- 🧭 Demo de navegación -->
+  <section class="navigation-demo">
+    <h3>🧭 Demo de Navegación Angular Router</h3>
+    
+    <div class="demo-info">
+      <div class="demo-section">
+        <h4>📍 Rutas Implementadas</h4>
+        <ul class="route-list">
+          <li><code>/users</code> - Lista de usuarios (esta página)</li>
+          <li><code>/users/:id</code> - Detalles de usuario específico</li>
+          <li><code>/users/:id/edit</code> - Editar usuario específico</li>
+          <li><code>/users/new</code> - Crear nuevo usuario</li>
+        </ul>
+      </div>
+      
+      <div class="demo-section">
+        <h4>🎯 Funcionalidades Demostradas</h4>
+        <ul class="feature-list">
+          <li>✅ Navegación programática con <code>Router.navigate()</code></li>
+          <li>✅ Parámetros de ruta <code>:id</code></li>
+          <li>✅ Query parameters <code>?filter=active</code></li>
+          <li>✅ Rutas anidadas para acciones específicas</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="test-navigation">
+      <h4>🎮 Prueba la Navegación</h4>
+      <p>Haz clic en "Ver" o "Editar" en cualquier usuario para ver cómo funcionan los parámetros de ruta.</p>
+      
+      <div class="nav-examples">
+        <button 
+          class="example-btn" 
+          (click)="viewUser(1)">
+          👁️ Ver Usuario #1
+        </button>
+        <button 
+          class="example-btn" 
+          (click)="editUser(2)">
+          ✏️ Editar Usuario #2
+        </button>
+        <button 
+          class="example-btn" 
+          (click)="filterByStatus('active')">
+          🔍 Filtrar Activos
+        </button>
+      </div>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,87 @@
+<div class="app-layout">
+  <!-- 🎯 Header de la aplicación -->
+  <header class="app-header">
+    <div class="header-content">
+      <h1>{{ title }}</h1>
+      <p class="subtitle">🏗️ PROVIAS DESCENTRALIZADO - Angular v18</p>
+      <p class="description">
+        Demostración práctica de comunicación entre componentes: 
+        Parent-Child (@Input/@Output) y Service-Based (BehaviorSubject)
+      </p>
+    </div>
+  </header>
+
+  <!-- 📱 Contenido principal -->
+  <main class="main-content">
+    <div class="layout-grid">
+      <!-- 📋 Lista de usuarios (Parent Component) -->
+      <section class="users-section">
+        <app-user-list></app-user-list>
+      </section>
+      
+      <!-- 📄 Detalles del usuario (Sibling Component) -->
+      <aside class="details-section">
+        <app-user-details></app-user-details>
+      </aside>
+    </div>
+  </main>
+
+  <!-- 🎓 Footer educativo -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <h3>🎓 Conceptos Demostrados en este Laboratorio</h3>
+      
+      <div class="concepts-grid">
+        <div class="concept">
+          <h4>📤 Parent → Child</h4>
+          <ul>
+            <li>✅ @Input properties</li>
+            <li>✅ Binding de propiedades []</li>
+            <li>✅ Passing data down</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>📥 Child → Parent</h4>
+          <ul>
+            <li>✅ @Output EventEmitter</li>
+            <li>✅ Event binding ()</li>
+            <li>✅ Custom events</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🌐 Service Communication</h4>
+          <ul>
+            <li>✅ BehaviorSubject</li>
+            <li>✅ Observable patterns</li>
+            <li>✅ Sibling communication</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🔄 State Management</h4>
+          <ul>
+            <li>✅ Centralized service</li>
+            <li>✅ Reactive patterns</li>
+            <li>✅ Subscription management</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="instructions">
+        <p>
+          <strong>📋 Instrucciones:</strong>
+          Haz clic en cualquier tarjeta de usuario para seleccionarlo.
+          Observa cómo la información se actualiza automáticamente en el panel de detalles.
+          Prueba agregar nuevos usuarios, cambiar estados y filtrar la lista.
+        </p>
+        
+        <p>
+          <strong>🔍 Console:</strong>
+          Abre las DevTools (F12) para ver los logs de comunicación en tiempo real.
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

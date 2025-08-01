@@ -1,0 +1,227 @@
+<div class="projects-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>🏗️ Gestión de Proyectos</h1>
+      <p class="page-description">
+        Supervisa el estado de los proyectos de infraestructura vial de PROVIAS. 
+        Demuestra navegación con rutas paramétricas y query parameters.
+      </p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goToDashboard()">
+        🏠 Dashboard
+      </button>
+      <button class="btn btn-primary" (click)="createProject()">
+        ➕ Nuevo Proyecto
+      </button>
+    </div>
+  </header>
+
+  <!-- 📊 Estadísticas por estado -->
+  <section class="stats-section">
+    <div class="stat-card planning">
+      <div class="stat-icon">📋</div>
+      <div class="stat-info">
+        <h3>{{ getProjectsByStatus('planning').length }}</h3>
+        <p>En Planificación</p>
+      </div>
+    </div>
+    
+    <div class="stat-card in-progress">
+      <div class="stat-icon">🚧</div>
+      <div class="stat-info">
+        <h3>{{ getProjectsByStatus('in-progress').length }}</h3>
+        <p>En Ejecución</p>
+      </div>
+    </div>
+    
+    <div class="stat-card completed">
+      <div class="stat-icon">✅</div>
+      <div class="stat-info">
+        <h3>{{ getProjectsByStatus('completed').length }}</h3>
+        <p>Completados</p>
+      </div>
+    </div>
+    
+    <div class="stat-card on-hold">
+      <div class="stat-icon">⏸️</div>
+      <div class="stat-info">
+        <h3>{{ getProjectsByStatus('on-hold').length }}</h3>
+        <p>En Pausa</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔍 Filtros por estado -->
+  <section class="filters-section">
+    <h3>🔍 Filtrar por Estado</h3>
+    <div class="filter-buttons">
+      <button 
+        class="filter-btn" 
+        [class.active]="currentStatusFilter === 'all'"
+        (click)="filterByStatus('all')">
+        Todos ({{ projects.length }})
+      </button>
+      <button 
+        class="filter-btn planning" 
+        [class.active]="currentStatusFilter === 'planning'"
+        (click)="filterByStatus('planning')">
+        📋 Planificación ({{ getProjectsByStatus('planning').length }})
+      </button>
+      <button 
+        class="filter-btn in-progress" 
+        [class.active]="currentStatusFilter === 'in-progress'"
+        (click)="filterByStatus('in-progress')">
+        🚧 En Ejecución ({{ getProjectsByStatus('in-progress').length }})
+      </button>
+      <button 
+        class="filter-btn completed" 
+        [class.active]="currentStatusFilter === 'completed'"
+        (click)="filterByStatus('completed')">
+        ✅ Completados ({{ getProjectsByStatus('completed').length }})
+      </button>
+      <button 
+        class="filter-btn on-hold" 
+        [class.active]="currentStatusFilter === 'on-hold'"
+        (click)="filterByStatus('on-hold')">
+        ⏸️ En Pausa ({{ getProjectsByStatus('on-hold').length }})
+      </button>
+    </div>
+  </section>
+
+  <!-- 🏗️ Lista de proyectos -->
+  <section class="projects-grid">
+    @for (project of getFilteredProjects(); track project.id) {
+      <div class="project-card" [class]="getStatusClass(project.status)">
+        
+        <div class="project-header">
+          <h3 class="project-name">{{ project.name }}</h3>
+          <div class="project-badges">
+            <span class="status-badge" [class]="getStatusClass(project.status)">
+              {{ getStatusText(project.status) }}
+            </span>
+            <span class="priority-badge" [class]="getPriorityClass(project.priority)">
+              {{ getPriorityText(project.priority) }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="project-info">
+          <p class="project-description">{{ project.description }}</p>
+          
+          <div class="project-details">
+            <div class="detail-item">
+              <span class="detail-label">📍 Ubicación:</span>
+              <span class="detail-value">{{ project.location }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <span class="detail-label">💰 Presupuesto:</span>
+              <span class="detail-value">{{ formatBudget(project.budget) }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <span class="detail-label">📅 Inicio:</span>
+              <span class="detail-value">{{ formatDate(project.startDate) }}</span>
+            </div>
+            
+            @if (project.endDate) {
+              <div class="detail-item">
+                <span class="detail-label">🏁 Fin Estimado:</span>
+                <span class="detail-value">{{ formatDate(project.endDate) }}</span>
+              </div>
+            }
+            
+            <div class="detail-item">
+              <span class="detail-label">⏱️ Duración:</span>
+              <span class="detail-value">{{ getProjectDuration(project) }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <span class="detail-label">👥 Asignados:</span>
+              <span class="detail-value">{{ project.assignedUsers }} usuarios</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="project-actions">
+          <button 
+            class="action-btn view" 
+            (click)="viewProject(project.id)"
+            title="Ver detalles del proyecto">
+            👁️ Ver Detalles
+          </button>
+          <button 
+            class="action-btn edit" 
+            (click)="editProject(project.id)"
+            title="Editar proyecto">
+            ✏️ Editar
+          </button>
+        </div>
+      </div>
+    }
+    
+    @if (getFilteredProjects().length === 0) {
+      <div class="no-projects">
+        <h4>📭 No hay proyectos que mostrar</h4>
+        <p>No se encontraron proyectos con el filtro aplicado: <strong>{{ getStatusText(currentStatusFilter) }}</strong></p>
+        <button class="btn btn-primary" (click)="filterByStatus('all')">
+          Ver Todos los Proyectos
+        </button>
+      </div>
+    }
+  </section>
+
+  <!-- 🧭 Demo de navegación -->
+  <section class="navigation-demo">
+    <h3>🧭 Demo de Navegación con Parámetros</h3>
+    
+    <div class="demo-content">
+      <div class="demo-section">
+        <h4>📍 Rutas de Proyectos Implementadas</h4>
+        <ul class="route-list">
+          <li><code>/projects</code> - Lista de proyectos (esta página)</li>
+          <li><code>/projects/:id</code> - Detalles de proyecto específico</li>
+          <li><code>/projects/:id/edit</code> - Editar proyecto específico</li>
+          <li><code>/projects/new</code> - Crear nuevo proyecto</li>
+          <li><code>/projects?status=in-progress</code> - Filtro por estado</li>
+        </ul>
+      </div>
+      
+      <div class="demo-section">
+        <h4>🎯 Prueba Rutas Específicas</h4>
+        <div class="test-buttons">
+          <button 
+            class="demo-btn" 
+            (click)="viewProject(1)">
+            👁️ Ver Proyecto Carretera Huancayo-Ayacucho
+          </button>
+          <button 
+            class="demo-btn" 
+            (click)="editProject(2)">
+            ✏️ Editar Proyecto Puente Río Mantaro
+          </button>
+          <button 
+            class="demo-btn" 
+            (click)="filterByStatus('in-progress')">
+            🔍 Filtrar Solo En Ejecución
+          </button>
+          <button 
+            class="demo-btn" 
+            (click)="createProject()">
+            ➕ Crear Nuevo Proyecto
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="routing-info">
+      <p>
+        <strong>💡 Tip:</strong> 
+        Observa cómo cambia la URL cuando usas los filtros o navegas a proyectos específicos.
+        Los parámetros de ruta (:id) y query parameters (?status=) son fundamentales en Angular Router.
+      </p>
+    </div>
+  </section>
+</div>

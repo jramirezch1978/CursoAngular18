@@ -1,0 +1,153 @@
+<div class="not-found-container">
+  <!-- 🎯 Error principal -->
+  <section class="error-section">
+    <div class="error-content">
+      <div class="error-number">404</div>
+      <h1 class="error-title">¡Página No Encontrada!</h1>
+      <p class="error-message">{{ currentMessage }}</p>
+      
+      <div class="error-details">
+        <p>
+          <strong>🔍 URL Solicitada:</strong> 
+          <code class="url-display">{{ getCurrentUrl() }}</code>
+        </p>
+        <p class="help-text">
+          La página que buscas no existe o ha sido movida. 
+          Te sugerimos algunas alternativas útiles.
+        </p>
+      </div>
+    </div>
+    
+    <div class="error-illustration">
+      <div class="road">🛣️</div>
+      <div class="construction">🚧</div>
+      <div class="worker">👷‍♂️</div>
+    </div>
+  </section>
+
+  <!-- 🎯 Acciones principales -->
+  <section class="actions-section">
+    <h2>🎮 ¿Qué puedes hacer?</h2>
+    
+    <div class="action-buttons">
+      <button class="action-btn primary" (click)="goHome()">
+        🏠 Ir al Dashboard
+      </button>
+      
+      <button class="action-btn secondary" (click)="goBack()">
+        ⬅️ Volver Atrás
+      </button>
+      
+      <button class="action-btn tertiary" (click)="reloadPage()">
+        🔄 Recargar Página
+      </button>
+      
+      <button class="action-btn fun" (click)="getRandomMessage()">
+        🎲 Otro Mensaje
+      </button>
+    </div>
+  </section>
+
+  <!-- 🧭 Rutas sugeridas -->
+  <section class="suggestions-section">
+    <h2>🧭 Páginas Disponibles</h2>
+    <p class="suggestions-intro">
+      Aquí tienes algunas páginas que puedes visitar en el sistema PROVIAS:
+    </p>
+    
+    <div class="suggestions-grid">
+      @for (route of suggestedRoutes; track route.path) {
+        <div class="suggestion-card" (click)="navigateTo(route.path)">
+          <div class="suggestion-icon">{{ route.icon }}</div>
+          <div class="suggestion-content">
+            <h3 class="suggestion-title">{{ route.title }}</h3>
+            <p class="suggestion-description">{{ route.description }}</p>
+            <span class="suggestion-path">{{ route.path }}</span>
+          </div>
+          <div class="suggestion-arrow">➡️</div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 📊 Información de debugging -->
+  <section class="debug-section">
+    <h3>🔧 Información de Debugging</h3>
+    
+    <div class="debug-info">
+      <div class="debug-item">
+        <strong>🌐 URL Completa:</strong>
+        <code>{{ window.location.href }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>📍 Pathname:</strong>
+        <code>{{ getCurrentUrl() }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>🔗 Referrer:</strong>
+        <code>{{ document.referrer || 'Acceso directo' }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>⏰ Timestamp:</strong>
+        <code>{{ new Date().toLocaleString('es-PE') }}</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎓 Info educativa sobre Angular Router -->
+  <section class="educational-section">
+    <h3>🎓 Sobre el Manejo de Rutas 404 en Angular</h3>
+    
+    <div class="educational-content">
+      <div class="concept">
+        <h4>🛣️ Wildcard Route</h4>
+        <p>
+          Esta página se muestra gracias a la ruta wildcard <code>**</code> 
+          configurada en el archivo de rutas. Debe estar siempre al final.
+        </p>
+        <code class="code-example">
+          { path: '**', component: NotFoundComponent }
+        </code>
+      </div>
+      
+      <div class="concept">
+        <h4>🎯 Redirección Automática</h4>
+        <p>
+          Puedes configurar redirecciones automáticas para rutas específicas
+          o implementar lógica personalizada de manejo de errores.
+        </p>
+      </div>
+      
+      <div class="concept">
+        <h4>📊 Análytics de 404</h4>
+        <p>
+          En producción, es recomendable registrar las páginas 404 
+          para identificar enlaces rotos o problemas de navegación.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🏗️ Footer de PROVIAS -->
+  <footer class="provias-footer">
+    <div class="footer-content">
+      <div class="logo-section">
+        <h4>🏗️ PROVIAS DESCENTRALIZADO</h4>
+        <p>Sistema de Gestión de Infraestructura Vial</p>
+      </div>
+      
+      <div class="contact-section">
+        <p>📧 soporte@provias.gob.pe</p>
+        <p>📞 (01) 615-7800</p>
+        <p>📍 Jr. Carabaya 535, Lima - Perú</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 PROVIAS DESCENTRALIZADO - Laboratorio Angular v18</p>
+    </div>
+  </footer>
+</div>
