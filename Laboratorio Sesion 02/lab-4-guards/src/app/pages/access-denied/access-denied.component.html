@@ -1,0 +1,206 @@
+<div class="access-denied-container">
+  <!-- 🔒 Header principal -->
+  <header class="error-header">
+    <div class="error-icon">🔒</div>
+    <h1 class="error-title">{{ getErrorTitle() }}</h1>
+    <p class="error-message">{{ getErrorMessage() }}</p>
+  </header>
+
+  <!-- 📊 Información del acceso -->
+  <section class="access-info">
+    <div class="info-card">
+      <h2>📋 Detalles del Acceso Denegado</h2>
+      
+      <div class="info-grid">
+        @if (attemptedUrl) {
+          <div class="info-item">
+            <label>🔗 URL Solicitada:</label>
+            <code class="url-code">{{ attemptedUrl }}</code>
+          </div>
+        }
+        
+        @if (reason) {
+          <div class="info-item">
+            <label>📝 Motivo:</label>
+            <span class="reason-text">{{ reason }}</span>
+          </div>
+        }
+        
+        @if (requiredPermissions.length > 0) {
+          <div class="info-item permissions-item">
+            <label>🔑 Permisos Requeridos:</label>
+            <div class="permissions-list">
+              @for (permission of getFormattedPermissions(); track $index) {
+                <span class="permission-badge required">{{ permission }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 👤 Información del usuario actual -->
+  @if (currentUser) {
+    <section class="user-info">
+      <div class="user-card">
+        <h2>👤 Tu Información de Usuario</h2>
+        
+        <div class="user-details">
+          <div class="user-summary">
+            <div class="user-avatar">{{ currentUser.avatar || '👤' }}</div>
+            <div class="user-data">
+              <h3>{{ currentUser.fullName }}</h3>
+              <p class="user-email">📧 {{ currentUser.email }}</p>
+              <p class="user-role">🎭 Rol: {{ currentUser.role }}</p>
+            </div>
+          </div>
+          
+          <div class="user-permissions">
+            <h4>🔑 Tus Permisos Actuales ({{ currentUser.permissions.length }}):</h4>
+            <div class="current-permissions">
+              @for (permission of currentUser.permissions; track permission) {
+                <span class="permission-badge current">{{ permission }}</span>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- 🎯 Acciones sugeridas -->
+  <section class="suggested-actions">
+    <h2>💡 ¿Qué Puedes Hacer?</h2>
+    
+    <div class="actions-grid">
+      @for (action of suggestedActions; track action.title) {
+        <div class="action-card" (click)="action.action()">
+          <div class="action-icon">{{ action.icon }}</div>
+          <div class="action-content">
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+          </div>
+          <div class="action-arrow">➡️</div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 🎓 Información educativa sobre guards -->
+  <section class="educational-section">
+    <h2>🎓 Sobre el Control de Acceso en Angular</h2>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🛡️ Guards en Angular</h4>
+        <p>Los guards protegen rutas verificando condiciones antes del acceso:</p>
+        <ul>
+          <li><strong>AuthGuard:</strong> Verifica autenticación</li>
+          <li><strong>AdminGuard:</strong> Verifica permisos específicos</li>
+          <li><strong>RoleGuard:</strong> Verifica roles de usuario</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🔐 Control de Permisos</h4>
+        <p>Sistema granular de autorización:</p>
+        <ul>
+          <li><strong>Roles:</strong> Agrupaciones de permisos</li>
+          <li><strong>Permisos:</strong> Acciones específicas</li>
+          <li><strong>Recursos:</strong> Funcionalidades protegidas</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🎭 Jerarquía de Roles</h4>
+        <p>Estructura organizacional de PROVIAS:</p>
+        <ul>
+          <li><strong>Admin:</strong> Control total del sistema</li>
+          <li><strong>Project Manager:</strong> Gestión de proyectos</li>
+          <li><strong>Engineer:</strong> Trabajo técnico</li>
+          <li><strong>Technician:</strong> Operaciones básicas</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🔄 Flujo de Autorización</h4>
+        <p>Proceso de verificación de acceso:</p>
+        <ul>
+          <li><strong>1.</strong> Verificar autenticación</li>
+          <li><strong>2.</strong> Obtener rol del usuario</li>
+          <li><strong>3.</strong> Verificar permisos</li>
+          <li><strong>4.</strong> Permitir/Denegar acceso</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🚨 Información de seguridad -->
+  <section class="security-info">
+    <div class="security-card">
+      <h2>🚨 Información de Seguridad</h2>
+      
+      <div class="security-content">
+        <div class="security-notice">
+          <h4>🔐 ¿Por qué es importante el control de acceso?</h4>
+          <p>
+            El sistema de permisos protege información sensible y funcionalidades críticas.
+            Cada intento de acceso no autorizado es registrado para auditoría.
+          </p>
+        </div>
+        
+        <div class="security-actions">
+          <h4>📋 Este evento ha sido registrado:</h4>
+          <ul>
+            <li>✅ Timestamp del intento de acceso</li>
+            <li>✅ Usuario que intentó acceder</li>
+            <li>✅ Recurso al que se intentó acceder</li>
+            <li>✅ Motivo de la denegación</li>
+          </ul>
+        </div>
+        
+        <div class="security-contact">
+          <h4>🆘 ¿Necesitas ayuda?</h4>
+          <p>
+            Si crees que este es un error o necesitas permisos adicionales,
+            contacta al administrador del sistema.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎮 Controles de navegación -->
+  <section class="navigation-controls">
+    <div class="controls-grid">
+      <button class="control-btn primary" (click)="goToDashboard()">
+        🏠 Ir al Dashboard
+      </button>
+      
+      <button class="control-btn secondary" (click)="goBack()">
+        ⬅️ Volver Atrás
+      </button>
+      
+      <button class="control-btn info" (click)="goToLogin()">
+        🔐 Cambiar Usuario
+      </button>
+      
+      <button class="control-btn help" (click)="showHelp()">
+        ❓ Ayuda
+      </button>
+    </div>
+  </section>
+
+  <!-- 👨‍💼 Contacto administrativo -->
+  <footer class="admin-contact">
+    <div class="contact-info">
+      <h3>👨‍💼 Contacto Administrativo</h3>
+      <div class="contact-details">
+        <p>📧 Email: admin@provias.gob.pe</p>
+        <p>📞 Teléfono: (01) 615-7800</p>
+        <p>🕐 Horario: Lunes a Viernes, 8:00 AM - 6:00 PM</p>
+      </div>
+    </div>
+  </footer>
+</div>

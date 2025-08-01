@@ -1,0 +1,200 @@
+<nav class="navigation-container">
+  <!-- 🎯 Header principal de navegación -->
+  <header class="nav-header">
+    <div class="brand-section">
+      <h1 class="brand-title" (click)="goHome()">
+        🏗️ PROVIAS DESCENTRALIZADO
+      </h1>
+      <p class="brand-subtitle">Sistema de Gestión Vial - Angular v18</p>
+    </div>
+    
+    <div class="nav-actions">
+      <button class="nav-btn back-btn" (click)="goBack()" title="Volver atrás">
+        ⬅️ Atrás
+      </button>
+      <button class="nav-btn home-btn" (click)="goHome()" title="Ir al dashboard">
+        🏠 Inicio
+      </button>
+    </div>
+  </header>
+
+  <!-- 🍞 Breadcrumbs dinámicos -->
+  <section class="breadcrumbs-section">
+    <div class="breadcrumbs-container">
+      <h2 class="section-title">📍 Navegación</h2>
+      
+      <nav class="breadcrumbs" aria-label="Breadcrumb">
+        <ol class="breadcrumb-list">
+          @for (breadcrumb of breadcrumbs; track breadcrumb.url; let isLast = $last) {
+            <li class="breadcrumb-item" [class.active]="breadcrumb.isActive">
+              @if (!breadcrumb.isActive) {
+                <a 
+                  [routerLink]="breadcrumb.url"
+                  class="breadcrumb-link"
+                  (click)="navigateToBreadcrumb(breadcrumb)">
+                  {{ breadcrumb.label }}
+                </a>
+              } @else {
+                <span class="breadcrumb-current">{{ breadcrumb.label }}</span>
+              }
+              
+              @if (!isLast) {
+                <span class="breadcrumb-separator">➡️</span>
+              }
+            </li>
+          }
+        </ol>
+      </nav>
+    </div>
+  </section>
+
+  <!-- 🧭 Navegación principal -->
+  <section class="main-navigation">
+    <h2 class="section-title">🧭 Menú Principal</h2>
+    
+    <div class="nav-grid">
+      @for (item of navigationItems; track item.path) {
+        <a 
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          class="nav-item"
+          [title]="item.description"
+          (click)="navigateTo(item.path)">
+          
+          <div class="nav-icon">{{ item.icon }}</div>
+          <div class="nav-content">
+            <h3 class="nav-title">{{ item.label }}</h3>
+            <p class="nav-description">{{ item.description }}</p>
+          </div>
+          <div class="nav-indicator">
+            @if (isRouteActive(item.path)) {
+              <span class="active-badge">📍 Actual</span>
+            } @else {
+              <span class="nav-arrow">➡️</span>
+            }
+          </div>
+        </a>
+      }
+    </div>
+  </section>
+
+  <!-- 📊 Información de página actual -->
+  <section class="current-page-info">
+    <h2 class="section-title">📄 Página Actual</h2>
+    
+    <div class="page-info-card">
+      <div class="page-info-content">
+        <h3 class="page-title">{{ getCurrentPageInfo().title }}</h3>
+        <p class="page-description">{{ getCurrentPageInfo().description }}</p>
+        <p class="current-url">
+          <strong>🔗 URL:</strong> 
+          <code>{{ currentUrl }}</code>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎓 Demo de funcionalidades de Router -->
+  <section class="router-demo">
+    <h2 class="section-title">🎓 Demo Angular Router</h2>
+    
+    <div class="demo-grid">
+      <div class="demo-card">
+        <h4>🔗 RouterLink Directiva</h4>
+        <p>Navegación declarativa en templates HTML</p>
+        <div class="demo-examples">
+          <a routerLink="/dashboard" class="demo-link">Dashboard</a>
+          <a routerLink="/users" class="demo-link">Usuarios</a>
+          <a routerLink="/projects" class="demo-link">Proyectos</a>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h4>🎯 Rutas Parametrizadas</h4>
+        <p>URLs dinámicas con parámetros</p>
+        <div class="demo-examples">
+          <a routerLink="/users/1" class="demo-link">Usuario #1</a>
+          <a routerLink="/projects/2" class="demo-link">Proyecto #2</a>
+          <a routerLink="/users/3/edit" class="demo-link">Editar Usuario #3</a>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h4>🔄 Navegación Programática</h4>
+        <p>Router.navigate() desde componentes</p>
+        <div class="demo-examples">
+          <button 
+            class="demo-btn" 
+            (click)="navigateTo('/users/new')">
+            Nuevo Usuario
+          </button>
+          <button 
+            class="demo-btn" 
+            (click)="navigateTo('/projects/new')">
+            Nuevo Proyecto
+          </button>
+        </div>
+      </div>
+      
+      <div class="demo-card">
+        <h4>🍞 Breadcrumbs Dinámicos</h4>
+        <p>Rastro de navegación automático</p>
+        <div class="demo-info">
+          <p>Los breadcrumbs se generan automáticamente basándose en la URL actual.</p>
+          <p>Navega a diferentes páginas para ver cómo se actualizan.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⚡ Acciones rápidas -->
+  <section class="quick-actions">
+    <h2 class="section-title">⚡ Acciones Rápidas</h2>
+    
+    <div class="actions-grid">
+      <button 
+        class="quick-btn dashboard" 
+        (click)="navigateTo('/dashboard')">
+        🏠 Dashboard
+      </button>
+      
+      <button 
+        class="quick-btn users" 
+        (click)="navigateTo('/users')">
+        👥 Ver Usuarios
+      </button>
+      
+      <button 
+        class="quick-btn projects" 
+        (click)="navigateTo('/projects')">
+        🏗️ Ver Proyectos
+      </button>
+      
+      <button 
+        class="quick-btn new-user" 
+        (click)="navigateTo('/users/new')">
+        ➕ Nuevo Usuario
+      </button>
+      
+      <button 
+        class="quick-btn new-project" 
+        (click)="navigateTo('/projects/new')">
+        ➕ Nuevo Proyecto
+      </button>
+      
+      <button 
+        class="quick-btn random" 
+        (click)="navigateTo('/esta-ruta-no-existe')">
+        🚫 Página 404
+      </button>
+    </div>
+  </section>
+
+  <!-- 📱 Responsive notice -->
+  <section class="responsive-notice">
+    <p>
+      💡 <strong>Tip:</strong> Este componente de navegación es completamente responsivo.
+      Prueba cambiar el tamaño de la ventana para ver adaptaciones móviles.
+    </p>
+  </section>
+</nav>

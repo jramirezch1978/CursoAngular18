@@ -1,0 +1,56 @@
+<div class="app-layout">
+  <!-- 🧭 Componente de navegación -->
+  <app-navigation></app-navigation>
+  
+  <!-- 📄 Contenido de las rutas -->
+  <main class="router-content">
+    <router-outlet></router-outlet>
+  </main>
+  
+  <!-- 🎓 Footer educativo -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <h3>🎓 LAB 3 - Angular Router Completado</h3>
+      
+      <div class="concepts-grid">
+        <div class="concept">
+          <h4>🧭 Navegación Implementada</h4>
+          <ul>
+            <li>✅ RouterLink y RouterLinkActive</li>
+            <li>✅ Navegación programática</li>
+            <li>✅ Breadcrumbs dinámicos</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🎯 Rutas Configuradas</h4>
+          <ul>
+            <li>✅ Rutas básicas (/dashboard, /users)</li>
+            <li>✅ Rutas parametrizadas (/users/:id)</li>
+            <li>✅ Rutas anidadas (/users/:id/edit)</li>
+            <li>✅ Wildcard route (**) para 404</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>📊 Funcionalidades</h4>
+          <ul>
+            <li>✅ Query parameters</li>
+            <li>✅ Redirecciones automáticas</li>
+            <li>✅ Títulos dinámicos</li>
+            <li>✅ Tracking de navegación</li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="lab-info">
+        <p>
+          <strong>🔍 Instrucciones:</strong>
+          Usa el menú de navegación superior para explorar las diferentes páginas.
+          Observa cómo se actualizan los breadcrumbs y la información de página actual.
+          Prueba navegar a URLs inexistentes para ver la página 404.
+        </p>
+      </div>
+    </div>
+  </footer>
+</div>

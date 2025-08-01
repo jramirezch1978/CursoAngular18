@@ -1,0 +1,170 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="welcome-section">
+      <h1>🏠 Dashboard PROVIAS</h1>
+      @if (currentUser) {
+        <p class="welcome-text">
+          Bienvenido, <strong>{{ currentUser.fullName }}</strong>
+          <span class="user-role">({{ currentUser.role }})</span>
+        </p>
+      }
+      <p class="description">
+        Esta página está protegida por <code>AuthGuard</code> - Solo usuarios autenticados pueden acceder
+      </p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-danger" (click)="logout()">
+        🚪 Cerrar Sesión
+      </button>
+    </div>
+  </header>
+
+  <!-- 📊 Estadísticas -->
+  <section class="stats-section">
+    <h2>📊 Resumen del Sistema</h2>
+    
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🏗️</div>
+        <div class="stat-info">
+          <h3>{{ stats.totalProjects }}</h3>
+          <p>Proyectos Totales</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">👥</div>
+        <div class="stat-info">
+          <h3>{{ stats.activeUsers }}</h3>
+          <p>Usuarios Activos</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3>{{ stats.completedTasks }}</h3>
+          <p>Tareas Completadas</p>
+        </div>
+      </div>
+      
+      <div class="stat-card">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+          <h3>{{ stats.pendingReviews }}</h3>
+          <p>Revisiones Pendientes</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🚀 Acciones rápidas -->
+  <section class="quick-actions">
+    <h2>🚀 Acciones Disponibles</h2>
+    <p class="actions-description">
+      Las siguientes acciones están disponibles según tus permisos actuales:
+    </p>
+    
+    <div class="actions-grid">
+      @for (action of getAvailableActions(); track action.route) {
+        <div class="action-card" (click)="navigateTo(action.route)">
+          <div class="action-icon">{{ action.icon }}</div>
+          <div class="action-content">
+            <h3>{{ action.title }}</h3>
+            <p>{{ action.description }}</p>
+            <small class="permission-info">Permiso: {{ action.requiredPermission }}</small>
+          </div>
+          <div class="action-arrow">➡️</div>
+        </div>
+      }
+    </div>
+    
+    @if (getAvailableActions().length === 0) {
+      <div class="no-actions">
+        <p>❌ No tienes permisos para realizar acciones adicionales</p>
+        <p>Contacta al administrador para obtener más permisos</p>
+      </div>
+    }
+  </section>
+
+  <!-- 🔐 Información de permisos -->
+  @if (currentUser) {
+    <section class="permissions-section">
+      <h2>🔐 Tus Permisos Actuales</h2>
+      
+      <div class="permissions-info">
+        <div class="user-summary">
+          <div class="user-avatar">{{ currentUser.avatar || '👤' }}</div>
+          <div class="user-details">
+            <h3>{{ currentUser.fullName }}</h3>
+            <p><strong>Email:</strong> {{ currentUser.email }}</p>
+            <p><strong>Rol:</strong> {{ currentUser.role }}</p>
+            <p><strong>Permisos:</strong> {{ currentUser.permissions.length }} asignados</p>
+          </div>
+        </div>
+        
+        <div class="permissions-list">
+          <h4>📋 Lista de Permisos:</h4>
+          <div class="permissions-grid">
+            @for (permission of currentUser.permissions; track permission) {
+              <span class="permission-badge">{{ permission }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- 🎓 Información educativa sobre guards -->
+  <section class="educational-section">
+    <h2>🎓 LAB 4: Demostración de Guards</h2>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🛡️ AuthGuard Activo</h4>
+        <p>Esta página está protegida por AuthGuard</p>
+        <ul>
+          <li>✅ Verificó que estés autenticado</li>
+          <li>✅ Te redirigió aquí después del login</li>
+          <li>✅ Si no estuvieras autenticado → /login</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>👑 AdminGuard Disponible</h4>
+        <p>Algunas acciones requieren permisos especiales</p>
+        <ul>
+          <li>🔒 Panel de Admin (solo admins)</li>
+          <li>⚠️ Si intentas acceder sin permisos → /access-denied</li>
+          <li>✅ Guards verifican permisos antes de navegar</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>📦 Lazy Loading</h4>
+        <p>Componentes se cargan bajo demanda</p>
+        <ul>
+          <li>✅ Este componente se cargó solo cuando accediste</li>
+          <li>✅ Guards se ejecutan antes del lazy loading</li>
+          <li>✅ Mejora el rendimiento inicial</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="test-guards">
+      <h4>🧪 Prueba los Guards</h4>
+      <div class="test-actions">
+        <button class="test-btn" (click)="navigateTo('/admin')">
+          👑 Intentar Acceder a Admin
+        </button>
+        <button class="test-btn" (click)="logout()">
+          🚪 Cerrar Sesión (Activar AuthGuard)
+        </button>
+      </div>
+      <p class="test-description">
+        Observa cómo los guards manejan el acceso según tus permisos
+      </p>
+    </div>
+  </section>
+</div>

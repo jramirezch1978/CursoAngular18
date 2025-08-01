@@ -1,0 +1,236 @@
+<div class="admin-container">
+  <!-- 👑 Header del panel admin -->
+  <header class="admin-header">
+    <div class="header-content">
+      <div class="admin-info">
+        <h1>👑 Panel de Administración</h1>
+        <p class="welcome-text">
+          Bienvenido, <strong>{{ currentUser?.fullName }}</strong>
+        </p>
+        <p class="role-info">
+          Rol: {{ currentUser?.role }} | 
+          Permisos: {{ currentUser?.permissions.length }} activos
+        </p>
+      </div>
+      
+      <div class="header-actions">
+        <button class="action-btn secondary" (click)="refreshData()" title="Refrescar datos">
+          🔄 Refrescar
+        </button>
+        <button class="action-btn primary" (click)="goToDashboard()" title="Ir al dashboard">
+          🏠 Dashboard
+        </button>
+        <button class="action-btn danger" (click)="logout()" title="Cerrar sesión">
+          🚪 Salir
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 📊 Estadísticas del sistema -->
+  <section class="stats-section">
+    <h2>📊 Estadísticas del Sistema</h2>
+    
+    <div class="stats-grid">
+      @for (stat of systemStats; track stat.label) {
+        <div class="stat-card" [style.border-left-color]="stat.color">
+          <div class="stat-icon">{{ stat.icon }}</div>
+          <div class="stat-info">
+            <h3 class="stat-value">{{ stat.value }}</h3>
+            <p class="stat-label">{{ stat.label }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <div class="admin-layout">
+    <!-- ⚙️ Acciones administrativas -->
+    <section class="actions-section">
+      <h2>⚙️ Acciones Administrativas</h2>
+      
+      <!-- Acciones disponibles -->
+      <div class="actions-group">
+        <h3>✅ Acciones Disponibles</h3>
+        <div class="actions-grid">
+          @for (action of getAvailableActions(); track action.title) {
+            <div 
+              class="action-card available" 
+              [style.border-left-color]="action.color"
+              (click)="action.action()">
+              
+              <div class="action-icon">{{ action.icon }}</div>
+              <div class="action-content">
+                <h4 class="action-title">{{ action.title }}</h4>
+                <p class="action-description">{{ action.description }}</p>
+              </div>
+              <div class="action-arrow">➡️</div>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Acciones restringidas -->
+      @if (getRestrictedActions().length > 0) {
+        <div class="actions-group">
+          <h3>🔒 Acciones Restringidas</h3>
+          <p class="restricted-info">
+            Las siguientes acciones requieren permisos adicionales que tu rol actual no posee:
+          </p>
+          
+          <div class="actions-grid">
+            @for (action of getRestrictedActions(); track action.title) {
+              <div class="action-card restricted">
+                <div class="action-icon">{{ action.icon }}</div>
+                <div class="action-content">
+                  <h4 class="action-title">{{ action.title }}</h4>
+                  <p class="action-description">{{ action.description }}</p>
+                  @if (action.requiredPermission) {
+                    <p class="required-permission">
+                      🔑 Requiere: {{ action.requiredPermission }}
+                    </p>
+                  }
+                </div>
+                <div class="action-lock">🔒</div>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </section>
+
+    <!-- 📈 Actividad reciente y eventos -->
+    <aside class="sidebar">
+      <!-- 📈 Actividad reciente -->
+      <section class="activity-section">
+        <h3>📈 Actividad Reciente</h3>
+        
+        <div class="activity-list">
+          @for (activity of recentActivity; track $index) {
+            <div class="activity-item">
+              <div class="activity-icon">{{ activity.icon }}</div>
+              <div class="activity-content">
+                <p class="activity-action">{{ activity.action }}</p>
+                <span class="activity-time">{{ activity.time }} atrás</span>
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- 🚨 Eventos de seguridad -->
+      <section class="security-section">
+        <h3>🚨 Eventos de Seguridad</h3>
+        
+        @if (securityEvents.length === 0) {
+          <div class="no-events">
+            <p>✅ No hay eventos de seguridad recientes</p>
+          </div>
+        } @else {
+          <div class="security-list">
+            @for (event of securityEvents; track $index) {
+              <div class="security-item" [class]="getSecurityEventClass(event)">
+                <div class="event-header">
+                  <span class="event-type">{{ getSecurityEventDescription(event) }}</span>
+                  <span class="event-time">{{ formatTimestamp(event.timestamp) }}</span>
+                </div>
+                
+                @if (event.userId) {
+                  <div class="event-details">
+                    <small>Usuario ID: {{ event.userId }}</small>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+      </section>
+    </aside>
+  </div>
+
+  <!-- 🎓 Información sobre Guards y Lazy Loading -->
+  <section class="educational-section">
+    <h2>🎓 LAB 4: Guards y Lazy Loading Demostrados</h2>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🛡️ AuthGuard</h4>
+        <p>Protege rutas requiriendo autenticación</p>
+        <ul>
+          <li>✅ CanActivate</li>
+          <li>✅ CanActivateChild</li>
+          <li>✅ CanLoad para lazy modules</li>
+          <li>✅ Redirección a login</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>👑 AdminGuard</h4>
+        <p>Verifica permisos específicos de administrador</p>
+        <ul>
+          <li>✅ Verificación de rol</li>
+          <li>✅ Permisos granulares</li>
+          <li>✅ Página de acceso denegado</li>
+          <li>✅ Logging de intentos</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>⚠️ UnsavedChangesGuard</h4>
+        <p>Previene pérdida de datos no guardados</p>
+        <ul>
+          <li>✅ CanDeactivate</li>
+          <li>✅ Confirmación personalizada</li>
+          <li>✅ Interface para componentes</li>
+          <li>✅ Manejo async</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>📦 Lazy Loading</h4>
+        <p>Este módulo se carga bajo demanda</p>
+        <ul>
+          <li>✅ Módulo separado</li>
+          <li>✅ Carga diferida</li>
+          <li>✅ Guards en rutas lazy</li>
+          <li>✅ Optimización de bundle</li>
+        </ul>
+      </div>
+    </div>
+    
+    <div class="demo-info">
+      <h4>💡 Prueba los Guards</h4>
+      <div class="demo-actions">
+        <p><strong>🔐 AuthGuard:</strong> Cierra sesión e intenta acceder a rutas protegidas</p>
+        <p><strong>👑 AdminGuard:</strong> Inicia sesión con un rol diferente a admin</p>
+        <p><strong>⚠️ UnsavedChangesGuard:</strong> Modifica un formulario y trata de navegar</p>
+        <p><strong>📦 Lazy Loading:</strong> Observa las herramientas de desarrollador - este módulo se carga por separado</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔐 Información de permisos del usuario actual -->
+  <section class="permissions-section">
+    <h2>🔐 Tus Permisos Actuales</h2>
+    
+    @if (currentUser) {
+      <div class="permissions-info">
+        <div class="user-summary">
+          <h3>👤 {{ currentUser.fullName }}</h3>
+          <p><strong>Rol:</strong> {{ currentUser.role }}</p>
+          <p><strong>Email:</strong> {{ currentUser.email }}</p>
+          <p><strong>Último acceso:</strong> {{ formatTimestamp(currentUser.lastLogin) }}</p>
+        </div>
+        
+        <div class="permissions-list">
+          <h4>🔑 Permisos Asignados ({{ currentUser.permissions.length }}):</h4>
+          <div class="permissions-grid">
+            @for (permission of currentUser.permissions; track permission) {
+              <span class="permission-badge">{{ permission }}</span>
+            }
+          </div>
+        </div>
+      </div>
+    }
+  </section>
+</div>
