@@ -1,0 +1,448 @@
+<!-- 🏗️ LABORATORIO 1: FUNDAMENTOS DE DATA BINDING -->
+<div class="product-catalog">
+  
+  <!-- 📊 HEADER CON ESTADÍSTICAS -->
+  <header class="catalog-header">
+    <div class="header-content">
+      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
+      <h1>{{ 'catálogo de productos provias' | titlecase }}</h1>
+      <p class="subtitle">Sistema de Gestión de Materiales y Equipos</p>
+      
+      <!-- 📊 Estadísticas en tiempo real -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">{{ totalProductsCount }}</span>
+          <span class="stat-label">Total Productos</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">{{ filteredProductsCount }}</span>
+          <span class="stat-label">Filtrados</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">{{ inStockCount }}</span>
+          <span class="stat-label">En Stock</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">{{ averagePrice | currency:'PEN':'symbol':'1.0-0' }}</span>
+          <span class="stat-label">Precio Promedio</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 🔍 PANEL DE FILTROS - DEMOSTRACIÓN DE TWO-WAY BINDING -->
+  <section class="filters-panel">
+    <h2>🔍 Filtros de Búsqueda</h2>
+    
+    <div class="filters-grid">
+      
+      <!-- 🔄 TWO-WAY BINDING: Campo de búsqueda -->
+      <div class="filter-group">
+        <label for="search">Buscar Productos:</label>
+        <input
+          type="text"
+          id="search"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          (keydown)="onKeyboardSearch($event)"
+          placeholder="Buscar por nombre, descripción o proveedor..."
+          class="search-input"
+          [class.has-value]="searchTerm.length > 0">
+        <small class="input-hint">
+          🎯 Teclas: Enter para buscar, Escape para limpiar
+        </small>
+      </div>
+
+      <!-- 🎯 PROPERTY BINDING: Select con opciones dinámicas -->
+      <div class="filter-group">
+        <label for="category">Categoría:</label>
+        <select
+          id="category"
+          [(ngModel)]="selectedCategory"
+          (change)="onCategoryChange()"
+          class="category-select">
+          <!-- 🔁 STRUCTURAL DIRECTIVE con binding -->
+          @for (category of categories; track category.value) {
+            <option [value]="category.value">
+              {{ category.label }}
+            </option>
+          }
+        </select>
+      </div>
+
+      <!-- 🎚️ RANGE INPUTS: Rango de precios -->
+      <div class="filter-group price-range">
+        <label>Rango de Precio:</label>
+        <div class="range-container">
+          <input
+            type="range"
+            [(ngModel)]="minPrice"
+            (input)="onPriceRangeChange()"
+            [min]="0"
+            [max]="20000"
+            [step]="50"
+            class="price-slider">
+          <input
+            type="range"
+            [(ngModel)]="maxPrice"
+            (input)="onPriceRangeChange()"
+            [min]="0"
+            [max]="20000"
+            [step]="50"
+            class="price-slider">
+        </div>
+        <div class="price-display">
+          {{ minPrice | currency:'PEN':'symbol':'1.0-0' }} - 
+          {{ maxPrice | currency:'PEN':'symbol':'1.0-0' }}
+        </div>
+      </div>
+
+      <!-- ✅ CHECKBOX: Solo productos en stock -->
+      <div class="filter-group">
+        <label class="checkbox-label">
+          <input
+            type="checkbox"
+            [(ngModel)]="showOnlyInStock"
+            (change)="onStockFilterChange()">
+          <span class="checkmark"></span>
+          Solo mostrar en stock
+        </label>
+      </div>
+
+      <!-- 🔄 SORTING: Ordenamiento -->
+      <div class="filter-group sorting">
+        <label for="sort">Ordenar por:</label>
+        <div class="sort-controls">
+          <select
+            id="sort"
+            [(ngModel)]="sortBy"
+            (change)="filterProducts()"
+            class="sort-select">
+            <option value="name">Nombre</option>
+            <option value="price">Precio</option>
+            <option value="rating">Calificación</option>
+          </select>
+          
+          <!-- 🎪 EVENT BINDING: Botón para cambiar dirección -->
+          <button
+            type="button"
+            (click)="changeSortOrder()"
+            class="sort-direction-btn"
+            [title]="'Ordenar ' + (sortDirection === 'asc' ? 'descendente' : 'ascendente')">
+            {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- 🔄 RESET: Limpiar filtros -->
+      <div class="filter-group">
+        <button
+          type="button"
+          (click)="resetFilters()"
+          class="reset-btn">
+          🔄 Limpiar Filtros
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 👁️ CONTROLES DE VISTA -->
+  <section class="view-controls">
+    <div class="controls-row">
+      <div class="results-info">
+        <span>Mostrando {{ filteredProductsCount }} de {{ totalProductsCount }} productos</span>
+      </div>
+      
+      <div class="view-toggle">
+        <!-- 🎯 PROPERTY BINDING: Botones de vista -->
+        <button
+          type="button"
+          (click)="viewMode = 'grid'"
+          class="view-btn"
+          [class.active]="viewMode === 'grid'">
+          📱 Grid
+        </button>
+        <button
+          type="button"
+          (click)="viewMode = 'list'"
+          class="view-btn"
+          [class.active]="viewMode === 'list'">
+          📋 Lista
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🛍️ LISTA DE PRODUCTOS -->
+  <main class="products-section">
+    
+    <!-- 📦 GRID/LIST de productos -->
+    <div class="products-container" [class]="'view-' + viewMode">
+      
+      <!-- 🔁 STRUCTURAL DIRECTIVE: Mostrar productos filtrados -->
+      @for (product of filteredProducts; track product.id) {
+        <article
+          class="product-card"
+          [class.featured]="product.featured"
+          [class.out-of-stock]="!product.inStock"
+          [class.on-sale]="product.discount > 0"
+          (mouseenter)="onProductHover(product, true)"
+          (mouseleave)="onProductHover(product, false)"
+          (focus)="onProductFocus(product)"
+          tabindex="0">
+          
+          <!-- 🖼️ IMAGEN del producto -->
+          <div class="product-image">
+            <!-- 🎯 PROPERTY BINDING: Imagen con atributos dinámicos -->
+            <img
+              [src]="product.image"
+              [alt]="product.name"
+              [title]="product.description"
+              loading="lazy">
+            
+            <!-- 🏷️ BADGES condicionales -->
+            @if (product.featured) {
+              <span class="badge featured-badge">⭐ Destacado</span>
+            }
+            
+            @if (product.discount > 0) {
+              <span class="badge discount-badge">
+                -{{ product.discount }}%
+              </span>
+            }
+            
+            <!-- 📦 ESTADO de stock -->
+            <div class="stock-indicator" [class]="getStockStatus(product).class">
+              {{ getStockStatus(product).text }}
+            </div>
+          </div>
+
+          <!-- 📝 INFORMACIÓN del producto -->
+          <div class="product-info">
+            
+            <!-- 🏷️ CATEGORÍA con icono -->
+            <div class="product-category">
+              <span class="category-icon">{{ getCategoryIcon(product.category) }}</span>
+              <span class="category-name">{{ product.category | titlecase }}</span>
+            </div>
+
+            <!-- 📛 NOMBRE del producto -->
+            <h3 class="product-name">{{ product.name }}</h3>
+
+            <!-- 📄 DESCRIPCIÓN truncada -->
+            <p class="product-description">
+              {{ product.description | slice:0:120 }}
+              @if (product.description.length > 120) {
+                <span class="read-more">... Ver más</span>
+              }
+            </p>
+
+            <!-- ⭐ CALIFICACIÓN -->
+            <div class="product-rating">
+              <span class="stars">{{ getRatingStars(product.rating) }}</span>
+              <span class="rating-number">({{ product.rating | number:'1.1-1' }})</span>
+            </div>
+
+            <!-- 🏢 PROVEEDOR -->
+            <div class="supplier-info">
+              <span class="supplier-label">Proveedor:</span>
+              <span class="supplier-name">{{ product.supplier }}</span>
+            </div>
+
+            <!-- 📋 ESPECIFICACIONES -->
+            <div class="specifications">
+              <h4>Especificaciones:</h4>
+              <ul class="spec-list">
+                @for (spec of product.specifications; track spec.name) {
+                  <li class="spec-item">
+                    <strong>{{ spec.name }}:</strong>
+                    {{ spec.value }} {{ spec.unit }}
+                  </li>
+                }
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- 💰 PRECIO Y ACCIONES -->
+          <div class="product-footer">
+            
+            <!-- 💲 PRECIOS -->
+            <div class="price-section">
+              @if (product.discount > 0) {
+                <div class="original-price">
+                  {{ product.price | currency:'PEN':'symbol':'1.2-2' }}
+                </div>
+              }
+              
+              <div class="final-price">
+                {{ getFinalPrice(product) | currency:'PEN':'symbol':'1.2-2' }}
+              </div>
+              
+              @if (product.discount > 0) {
+                <div class="savings">
+                  Ahorras: {{ getDiscountAmount(product) | currency:'PEN':'symbol':'1.2-2' }}
+                </div>
+              }
+            </div>
+
+            <!-- 🛒 ACCIONES del carrito -->
+            <div class="cart-actions">
+              @if (product.inStock) {
+                <!-- 🎪 EVENT BINDING: Botón agregar al carrito -->
+                <button
+                  type="button"
+                  (click)="addToCart(product, $event)"
+                  class="add-to-cart-btn"
+                  [disabled]="!product.inStock">
+                  🛒 Agregar al Carrito
+                </button>
+              } @else {
+                <button
+                  type="button"
+                  class="notify-btn"
+                  disabled>
+                  🔔 Notificar cuando esté disponible
+                </button>
+              }
+            </div>
+
+          </div>
+
+        </article>
+      } @empty {
+        <!-- 😔 ESTADO VACÍO -->
+        <div class="empty-state">
+          <div class="empty-icon">😔</div>
+          <h3>No se encontraron productos</h3>
+          <p>Intenta ajustar los filtros de búsqueda</p>
+          <button
+            type="button"
+            (click)="resetFilters()"
+            class="reset-filters-btn">
+            🔄 Limpiar Filtros
+          </button>
+        </div>
+      }
+      
+    </div>
+  </main>
+
+  <!-- 🛒 RESUMEN DEL CARRITO (Sidebar) -->
+  <aside class="cart-sidebar" [class.expanded]="(cartSummary$ | async)?.itemCount > 0">
+    
+    <!-- 🎯 ASYNC PIPE: Datos del carrito en tiempo real -->
+    @if (cartSummary$ | async; as summary) {
+      
+      <div class="cart-header">
+        <h3>🛒 Carrito de Compras</h3>
+        <span class="item-count">{{ summary.itemCount }} artículos</span>
+      </div>
+
+      @if (summary.itemCount > 0) {
+        
+        <!-- 📄 ITEMS del carrito -->
+        <div class="cart-items">
+          @for (item of summary.items; track item.product.id) {
+            <div class="cart-item">
+              
+              <img
+                [src]="item.product.image"
+                [alt]="item.product.name"
+                class="cart-item-image">
+              
+              <div class="cart-item-info">
+                <h4 class="cart-item-name">{{ item.product.name }}</h4>
+                <div class="cart-item-price">
+                  {{ getFinalPrice(item.product) | currency:'PEN':'symbol':'1.2-2' }}
+                </div>
+                
+                <!-- 🔢 QUANTITY CONTROLS -->
+                <div class="quantity-controls">
+                  <button
+                    type="button"
+                    (click)="updateCartQuantity(item.product.id, item.quantity - 1)"
+                    class="qty-btn"
+                    [disabled]="item.quantity <= 1">
+                    ➖
+                  </button>
+                  
+                  <span class="quantity">{{ item.quantity }}</span>
+                  
+                  <button
+                    type="button"
+                    (click)="updateCartQuantity(item.product.id, item.quantity + 1)"
+                    class="qty-btn">
+                    ➕
+                  </button>
+                  
+                  <button
+                    type="button"
+                    (click)="removeFromCart(item.product.id)"
+                    class="remove-btn"
+                    title="Eliminar del carrito">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+              
+            </div>
+          }
+        </div>
+
+        <!-- 💰 RESUMEN de precios -->
+        <div class="cart-summary">
+          <div class="summary-row">
+            <span>Subtotal:</span>
+            <span>{{ summary.subtotal | currency:'PEN':'symbol':'1.2-2' }}</span>
+          </div>
+          
+          @if (summary.discount > 0) {
+            <div class="summary-row discount">
+              <span>Descuento:</span>
+              <span>-{{ summary.discount | currency:'PEN':'symbol':'1.2-2' }}</span>
+            </div>
+          }
+          
+          <div class="summary-row">
+            <span>IGV (18%):</span>
+            <span>{{ summary.tax | currency:'PEN':'symbol':'1.2-2' }}</span>
+          </div>
+          
+          <div class="summary-row total">
+            <span>Total:</span>
+            <span>{{ summary.total | currency:'PEN':'symbol':'1.2-2' }}</span>
+          </div>
+        </div>
+
+        <!-- 🎯 ACCIONES del carrito -->
+        <div class="cart-actions-footer">
+          <button
+            type="button"
+            (click)="clearCart()"
+            class="clear-cart-btn">
+            🧹 Limpiar Carrito
+          </button>
+          
+          <button
+            type="button"
+            class="checkout-btn">
+            💳 Proceder al Pago
+          </button>
+        </div>
+
+      } @else {
+        <!-- 🛒 CARRITO VACÍO -->
+        <div class="empty-cart">
+          <div class="empty-cart-icon">🛒</div>
+          <p>Tu carrito está vacío</p>
+          <small>Agrega productos para comenzar tu compra</small>
+        </div>
+      }
+
+    }
+    
+  </aside>
+
+</div>
