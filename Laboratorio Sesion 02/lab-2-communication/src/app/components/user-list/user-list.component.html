@@ -128,7 +128,7 @@
             [(ngModel)]="newUserForm.email"
             name="email"
             class="form-control"
-            placeholder="juan.perez@provias.gob.pe"
+            placeholder="juan.perez&#64;provias.gob.pe"
             required>
         </div>
 
@@ -212,7 +212,7 @@
     <h3>🔄 Demo de Comunicación entre Componentes</h3>
     <div class="demo-info">
       <div class="communication-type">
-        <h4>📤 Parent → Child (@Input)</h4>
+        <h4>📤 Parent → Child (&#64;Input)</h4>
         <ul>
           <li>✅ <code>[user]</code> - Datos del usuario</li>
           <li>✅ <code>[isSelected]</code> - Estado de selección</li>
@@ -220,7 +220,7 @@
       </div>
       
       <div class="communication-type">
-        <h4>📥 Child → Parent (@Output)</h4>
+        <h4>📥 Child → Parent (&#64;Output)</h4>
         <ul>
           <li>✅ <code>(userSelected)</code> - Usuario clickeado</li>
           <li>✅ <code>(userToggleStatus)</code> - Cambio de estado</li>
