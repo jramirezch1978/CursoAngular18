@@ -1,0 +1,202 @@
+<!-- 🏠 HOME PAGE - LAB 1 DATA BINDING DEMO -->
+<div class="home-container">
+  
+  <!-- 🎯 HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
+      <h1 class="hero-title">{{ welcomeTitle }}</h1>
+      <p class="hero-subtitle">{{ provias.mission }}</p>
+      
+      <!-- 🎯 PROPERTY BINDING: Botón con ruteo -->
+      <div class="hero-actions">
+        <button 
+          type="button"
+          [routerLink]="'/products'"
+          class="cta-button primary">
+          🛍️ Explorar Catálogo de Productos
+        </button>
+      </div>
+    </div>
+    
+    <!-- 📊 ESTADÍSTICAS RÁPIDAS -->
+    <div class="stats-section">
+      <h2>📊 PROVIAS en Números</h2>
+      <div class="stats-grid">
+        
+        <div class="stat-card">
+          <div class="stat-icon">🏗️</div>
+          <div class="stat-content">
+            <!-- 🔢 INTERPOLACIÓN con pipes -->
+            <span class="stat-number">{{ statistics.projectsCount }}</span>
+            <span class="stat-label">Proyectos Activos</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🛣️</div>
+          <div class="stat-content">
+            <span class="stat-number">{{ statistics.roadsBuilt | number:'1.0-0' }} km</span>
+            <span class="stat-label">Carreteras Construidas</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">🌉</div>
+          <div class="stat-content">
+            <span class="stat-number">{{ statistics.bridgesBuilt }}</span>
+            <span class="stat-label">Puentes Construidos</span>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <!-- 💰 CURRENCY PIPE con configuración PEN -->
+            <span class="stat-number">{{ statistics.investmentTotal | currency:'PEN':'symbol':'1.0-0' }}</span>
+            <span class="stat-label">Inversión Total</span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎯 FEATURES SECTION -->
+  <section class="features-section">
+    <div class="section-header">
+      <h2>🎯 Características del Sistema</h2>
+      <p>Explora las funcionalidades de nuestro sistema de gestión</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- 🔁 STRUCTURAL DIRECTIVE: Mostrar features -->
+      @for (feature of features; track feature.title; let i = $index) {
+        <article 
+          class="feature-card"
+          [ngClass]="getFeatureClasses(i)"
+          (click)="onFeatureClick(feature)"
+          (mouseenter)="onFeatureClick"
+          [attr.data-feature]="feature.title"
+          tabindex="0">
+          
+          <!-- 🎨 FEATURE ICON -->
+          <div class="feature-icon">{{ feature.icon }}</div>
+          
+          <!-- 📝 FEATURE CONTENT -->
+          <div class="feature-content">
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+            
+            <!-- ✅ BENEFITS LIST -->
+            <ul class="benefits-list">
+              @for (benefit of feature.benefits; track benefit) {
+                <li class="benefit-item">✅ {{ benefit }}</li>
+              }
+            </ul>
+          </div>
+
+          <!-- 🎯 FEATURE ACTIONS -->
+          <div class="feature-actions">
+            <!-- 🎯 PROPERTY BINDING: Botón con ruta dinámica -->
+            <button 
+              type="button"
+              [routerLink]="feature.route"
+              class="feature-btn"
+              [attr.aria-label]="'Ir a ' + feature.title">
+              🚀 Explorar
+            </button>
+          </div>
+
+        </article>
+      }
+    </div>
+  </section>
+
+  <!-- 🏢 ABOUT PROVIAS SECTION -->
+  <section class="about-section">
+    <div class="about-content">
+      <h2>🏢 Acerca de PROVIAS DESCENTRALIZADO</h2>
+      
+      <div class="about-grid">
+        
+        <div class="about-card mission">
+          <h3>🎯 Misión</h3>
+          <p>{{ provias.mission }}</p>
+        </div>
+
+        <div class="about-card vision">
+          <h3>🔮 Visión</h3>
+          <p>{{ provias.vision }}</p>
+        </div>
+
+        <div class="about-card full-name">
+          <h3>📋 Nombre Completo</h3>
+          <p>{{ provias.fullName }}</p>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎓 LEARNING OBJECTIVES -->
+  <section class="learning-section">
+    <div class="learning-content">
+      <h2>🎓 Objetivos de Aprendizaje - LAB 1</h2>
+      <p>Este laboratorio demuestra los conceptos fundamentales de Data Binding en Angular v18</p>
+      
+      <div class="concepts-grid">
+        
+        <div class="concept-card interpolation">
+          <h3>🔤 Interpolación</h3>
+          <p>Mostrar datos dinámicos usando <code>{{ '{{ }}' }}</code></p>
+          <div class="example">
+            <strong>Ejemplo:</strong> {{ welcomeTitle }}
+          </div>
+        </div>
+
+        <div class="concept-card property-binding">
+          <h3>🎯 Property Binding</h3>
+          <p>Enlazar propiedades usando <code>[property]</code></p>
+          <div class="example">
+            <strong>Ejemplo:</strong> [routerLink], [ngClass], [attr.*]
+          </div>
+        </div>
+
+        <div class="concept-card event-binding">
+          <h3>🎪 Event Binding</h3>
+          <p>Manejar eventos usando <code>(event)</code></p>
+          <div class="example">
+            <strong>Ejemplo:</strong> (click), (mouseenter), (keydown)
+          </div>
+        </div>
+
+        <div class="concept-card pipes">
+          <h3>🔧 Pipes</h3>
+          <p>Transformar datos usando pipes built-in</p>
+          <div class="example">
+            <strong>Ejemplo:</strong> currency, number, date
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- 📅 FOOTER INFO -->
+  <section class="footer-info">
+    <div class="footer-content">
+      <p>
+        <!-- 📅 DATE PIPE: Última actualización -->
+        Última actualización: {{ lastUpdate | date:'fullDate':'':'es' }} 
+        a las {{ lastUpdate | date:'HH:mm:ss' }}
+      </p>
+      <p>
+        <!-- 🔤 INTERPOLACIÓN: Año dinámico -->
+        © {{ currentYear }} PROVIAS DESCENTRALIZADO - 
+        Sistema desarrollado con Angular v18
+      </p>
+    </div>
+  </section>
+
+</div>

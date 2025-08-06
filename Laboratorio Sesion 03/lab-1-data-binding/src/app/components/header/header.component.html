@@ -1,0 +1,47 @@
+<!-- 🎯 HEADER NAVIGATION COMPONENT -->
+<header class="main-header">
+  
+  <!-- 🏢 BRAND SECTION -->
+  <div class="brand-section">
+    <div class="logo">
+      <img 
+        src="/assets/provias-logo.png" 
+        alt="PROVIAS DESCENTRALIZADO"
+        class="logo-img"
+        onerror="this.style.display='none'">
+      <div class="logo-text">
+        <h1>{{ title }}</h1>
+        <p>{{ subtitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🧭 NAVIGATION MENU -->
+  <nav class="navigation">
+    @for (item of navigationItems; track item.path) {
+      @if (item.path !== '#') {
+        <a 
+          [routerLink]="item.path" 
+          routerLinkActive="active" 
+          class="nav-link"
+          [attr.title]="item.label">
+          {{ item.label }}
+        </a>
+      } @else {
+        <a 
+          href="#" 
+          (click)="onContactClick(); $event.preventDefault()"
+          class="nav-link"
+          [attr.title]="item.label">
+          {{ item.label }}
+        </a>
+      }
+    }
+  </nav>
+
+  <!-- 📱 MOBILE MENU TOGGLE -->
+  <button class="mobile-menu-toggle" type="button">
+    ☰
+  </button>
+
+</header>

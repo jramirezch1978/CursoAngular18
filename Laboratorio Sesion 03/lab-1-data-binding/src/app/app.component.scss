@@ -1,136 +1,184 @@
-// 🎨 ESTILOS PRINCIPALES DE LA APLICACIÓN
-// LAB 1: FUNDAMENTOS DE DATA BINDING
-
-:host {
-  --app-primary: #1e3a8a;
-  --app-secondary: #fbbf24;
-  --app-text: #374151;
-  --app-bg: #f9fafb;
-  --app-white: #ffffff;
-  --border-radius: 12px;
-}
-
+// 🏗️ APP COMPONENT STYLES - LAB 1
 .app-container {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background: var(--app-bg);
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: #f8fafc;
 
-  // 🎯 HEADER PRINCIPAL
-  .app-header {
-    background: linear-gradient(135deg, var(--app-primary), #3b82f6);
-    color: var(--app-white);
-    padding: 2rem 0;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-
-    .header-content {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 2rem;
-
-      h1 {
-        font-size: 2.5rem;
-        font-weight: 800;
-        margin: 0 0 0.5rem 0;
-        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-      }
-
-      .subtitle {
-        font-size: 1.2rem;
-        opacity: 0.9;
-        margin-bottom: 1.5rem;
-      }
-
-      .lab-info {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        gap: 1rem;
-
-        .lab-badge {
-          background: var(--app-secondary);
-          color: var(--app-primary);
-          padding: 0.5rem 1rem;
-          border-radius: 20px;
-          font-weight: 700;
-          font-size: 0.9rem;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .lab-description {
-          font-weight: 500;
-          opacity: 0.9;
-        }
-      }
-    }
-  }
-
-  // 🛍️ CONTENIDO PRINCIPAL
+  // 🛍️ MAIN CONTENT AREA
   .main-content {
     flex: 1;
-    padding: 0;
-    background: var(--app-bg);
+    width: 100%;
+    overflow-x: hidden;
   }
 
-  // 📄 FOOTER
+  // 📄 APP FOOTER
   .app-footer {
-    background: var(--app-primary);
-    color: var(--app-white);
-    padding: 2rem 0;
-    text-align: center;
+    background: #1e293b;
+    color: white;
+    padding: 2rem;
     margin-top: auto;
 
     .footer-content {
       max-width: 1200px;
       margin: 0 auto;
-      padding: 0 2rem;
+      text-align: center;
 
       p {
         margin: 0.5rem 0;
-        opacity: 0.9;
+        
+        &:first-child {
+          font-size: 1rem;
+          font-weight: 600;
+        }
 
         &.tech-info {
           font-size: 0.9rem;
-          opacity: 0.7;
+          opacity: 0.8;
+          color: #cbd5e1;
         }
 
         strong {
-          color: var(--app-secondary);
+          color: #fbbf24;
         }
       }
     }
   }
 }
 
-// 📱 RESPONSIVE
+// 🎨 GLOBAL STYLES FOR LAB 1
+:host {
+  display: block;
+  width: 100%;
+  font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  
+  // CSS Variables para consistencia
+  --primary-color: #1e3a8a;
+  --secondary-color: #fbbf24;
+  --accent-color: #10b981;
+  --text-color: #1e293b;
+  --text-light: #64748b;
+  --background: #f8fafc;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  
+  // Shadows
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+  
+  // Transitions
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  // Border radius
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+}
+
+// 📱 RESPONSIVE DESIGN
 @media (max-width: 768px) {
   .app-container {
-    .app-header {
-      padding: 1.5rem 0;
-
-      .header-content {
-        padding: 0 1rem;
-
-        h1 {
-          font-size: 2rem;
-        }
-
-        .lab-info {
-          flex-direction: column;
-          gap: 0.5rem;
-        }
-      }
-    }
-
     .app-footer {
-      padding: 1.5rem 0;
+      padding: 1.5rem 1rem;
 
       .footer-content {
-        padding: 0 1rem;
+        p {
+          font-size: 0.9rem;
+
+          &.tech-info {
+            font-size: 0.8rem;
+          }
+        }
       }
     }
+  }
+}
+
+@media (max-width: 480px) {
+  .app-container {
+    .app-footer {
+      padding: 1rem;
+
+      .footer-content {
+        p {
+          font-size: 0.8rem;
+          
+          &.tech-info {
+            font-size: 0.75rem;
+            line-height: 1.4;
+          }
+        }
+      }
+    }
+  }
+}
+
+// 🎯 UTILITY CLASSES FOR DATA BINDING DEMOS
+.binding-demo {
+  padding: 1rem;
+  border: 2px dashed var(--accent-color);
+  border-radius: var(--radius-md);
+  margin: 1rem 0;
+  background: rgba(16, 185, 129, 0.05);
+
+  .demo-label {
+    font-weight: 600;
+    color: var(--accent-color);
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.5rem;
+  }
+
+  .demo-content {
+    color: var(--text-color);
+  }
+}
+
+// 🔤 HIGHLIGHT CLASSES FOR INTERPOLATION
+.interpolation-highlight {
+  background: linear-gradient(120deg, rgba(251, 191, 36, 0.3) 0%, rgba(251, 191, 36, 0.1) 100%);
+  padding: 0.2rem 0.4rem;
+  border-radius: 0.25rem;
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+}
+
+// 🎯 PROPERTY BINDING HIGHLIGHT
+.property-binding-highlight {
+  border: 2px solid var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
+  transition: all var(--transition-normal);
+}
+
+// 🎪 EVENT BINDING HIGHLIGHT
+.event-binding-highlight {
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
+  }
+}
+
+// 🔄 TWO-WAY BINDING HIGHLIGHT
+.two-way-binding-highlight {
+  border: 2px solid var(--accent-color);
+  background: rgba(16, 185, 129, 0.05);
+  
+  &:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.2);
   }
 }

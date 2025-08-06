@@ -3,23 +3,12 @@
 
 <div class="app-container">
   
-  <!-- 🎯 HEADER PRINCIPAL -->
-  <header class="app-header">
-    <div class="header-content">
-      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
-      <h1>{{ title }}</h1>
-      <p class="subtitle">{{ subtitle }}</p>
-      
-      <div class="lab-info">
-        <span class="lab-badge">LAB 1</span>
-        <span class="lab-description">Fundamentos de Data Binding</span>
-      </div>
-    </div>
-  </header>
+  <!-- 🎯 HEADER PRINCIPAL CON NAVEGACIÓN -->
+  <app-header></app-header>
 
-  <!-- 🛍️ COMPONENTE PRINCIPAL -->
+  <!-- 🛍️ ROUTER OUTLET - CONTENIDO DINÁMICO -->
   <main class="main-content">
-    <app-product-list></app-product-list>
+    <router-outlet></router-outlet>
   </main>
 
   <!-- 📄 FOOTER -->
@@ -31,7 +20,7 @@
       </p>
       <p class="tech-info">
         🚀 Angular v18 | 
-        🎯 Data Binding Fundamentals | 
+        🎯 {{ subtitle }} | 
         💻 Standalone Components
       </p>
     </div>

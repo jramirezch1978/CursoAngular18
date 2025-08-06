@@ -1,0 +1,845 @@
+<!-- 📋 LAB 3: PIPES BUILT-IN Y ASYNC -->
+<!-- GESTOR DE TAREAS DE PROVIAS -->
+
+<div class="task-manager-container">
+
+  <!-- 📊 HEADER CON TÍTULO Y ESTADÍSTICAS -->
+  <header class="manager-header">
+    <div class="header-content">
+      <!-- 🔤 INTERPOLACIÓN + PIPES DE TEXTO -->
+      <h1>{{ 'gestión de tareas provias' | titlecase }}</h1>
+      <p class="subtitle">Sistema de Seguimiento de Proyectos Viales</p>
+      
+      <!-- 📅 PIPE DE FECHA -->
+      <div class="current-info">
+        <span class="current-date">{{ new Date() | date:'fullDate':'':'es' }}</span>
+        <span class="current-time">{{ new Date() | date:'HH:mm:ss' }}</span>
+      </div>
+    </div>
+
+    <!-- 📊 ESTADÍSTICAS EN TIEMPO REAL CON ASYNC PIPE -->
+    @if (statistics$ | async; as stats) {
+      <div class="stats-grid">
+        
+        <div class="stat-card total">
+          <div class="stat-icon">📋</div>
+          <div class="stat-content">
+            <!-- 🔢 PIPE NUMBER -->
+            <span class="stat-number">{{ stats.total | number }}</span>
+            <span class="stat-label">Total Tareas</span>
+          </div>
+        </div>
+
+        <div class="stat-card completed">
+          <div class="stat-icon">✅</div>
+          <div class="stat-content">
+            <span class="stat-number">{{ stats.completed | number }}</span>
+            <span class="stat-label">Completadas</span>
+            <!-- 📊 PIPE PERCENT -->
+            <small class="stat-percentage">{{ getCompletionPercentage(stats) | percent:'1.1-1' }}</small>
+          </div>
+        </div>
+
+        <div class="stat-card budget">
+          <div class="stat-icon">💰</div>
+          <div class="stat-content">
+            <!-- 💰 PIPE CURRENCY con configuración PEN -->
+            <span class="stat-number">{{ stats.budgetUsed | currency:'PEN':'symbol':'1.0-0' }}</span>
+            <span class="stat-label">Presupuesto Usado</span>
+            <small class="stat-total">de {{ stats.budgetTotal | currency:'PEN':'symbol':'1.0-0' }}</small>
+          </div>
+        </div>
+
+        <div class="stat-card overdue">
+          <div class="stat-icon">⚠️</div>
+          <div class="stat-content">
+            <span class="stat-number">{{ stats.overdue | number }}</span>
+            <span class="stat-label">Vencidas</span>
+            @if (stats.overdue > 0) {
+              <small class="stat-alert">Requieren atención</small>
+            }
+          </div>
+        </div>
+
+        <div class="stat-card progress">
+          <div class="stat-icon">📈</div>
+          <div class="stat-content">
+            <span class="stat-number">{{ stats.averageProgress | percent:'1.1-1' }}</span>
+            <span class="stat-label">Progreso Promedio</span>
+          </div>
+        </div>
+
+      </div>
+    }
+  </header>
+
+  <!-- 🔍 PANEL DE BÚSQUEDA Y FILTROS -->
+  <section class="search-filters-panel">
+    
+    <!-- 🔍 BÚSQUEDA PRINCIPAL CON DEBOUNCE -->
+    <div class="search-section">
+      <div class="search-input-group">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          (keydown)="onSearchKeydown($event)"
+          placeholder="Buscar tareas por título, descripción, responsable..."
+          class="search-input"
+          [class.has-value]="searchTerm.length > 0">
+        
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="search-clear-btn"
+          [style.opacity]="searchTerm.length > 0 ? '1' : '0'"
+          title="Limpiar búsqueda">
+          ❌
+        </button>
+      </div>
+      
+      <div class="search-info">
+        @if (filteredTasks$ | async; as tasks) {
+          <span>{{ tasks.length | number }} tareas encontradas</span>
+        }
+      </div>
+    </div>
+
+    <!-- 🎛️ FILTROS AVANZADOS -->
+    <div class="filters-section">
+      <button
+        type="button"
+        (click)="toggleFilterPanel()"
+        class="filters-toggle-btn"
+        [class.active]="isFilterPanelOpen">
+        🎛️ Filtros {{ isFilterPanelOpen ? '▲' : '▼' }}
+      </button>
+
+      @if (isFilterPanelOpen) {
+        <div class="filters-grid">
+          
+          <!-- 📂 FILTRO POR TIPO -->
+          <div class="filter-group">
+            <label for="type-filter">Tipo de Tarea:</label>
+            <select
+              id="type-filter"
+              [(ngModel)]="selectedType"
+              (change)="onTypeChange()"
+              class="filter-select">
+              @for (type of taskTypes; track trackByValue($index, type)) {
+                <option [value]="type.value">
+                  {{ getTaskTypeIcon(type.value === 'all' ? 'construccion' : type.value) }} {{ type.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- ⚡ FILTRO POR PRIORIDAD -->
+          <div class="filter-group">
+            <label for="priority-filter">Prioridad:</label>
+            <select
+              id="priority-filter"
+              [(ngModel)]="selectedPriority"
+              (change)="onPriorityChange()"
+              class="filter-select priority-select">
+              @for (priority of taskPriorities; track trackByValue($index, priority)) {
+                <option 
+                  [value]="priority.value"
+                  [style.color]="priority.color">
+                  {{ priority.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- 📊 FILTRO POR ESTADO -->
+          <div class="filter-group">
+            <label for="status-filter">Estado:</label>
+            <select
+              id="status-filter"
+              [(ngModel)]="selectedStatus"
+              (change)="onStatusChange()"
+              class="filter-select status-select">
+              @for (status of taskStatuses; track trackByValue($index, status)) {
+                <option 
+                  [value]="status.value"
+                  [style.color]="status.color">
+                  {{ status.label }}
+                </option>
+              }
+            </select>
+          </div>
+
+          <!-- 🗺️ FILTRO POR REGIÓN -->
+          <div class="filter-group">
+            <label for="region-filter">Región:</label>
+            <select
+              id="region-filter"
+              [(ngModel)]="selectedRegion"
+              (change)="onRegionChange()"
+              class="filter-select">
+              @for (region of regions; track trackByValue($index, region)) {
+                <option [value]="region.value">{{ region.label }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- ✅ MOSTRAR COMPLETADAS -->
+          <div class="filter-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                [(ngModel)]="showCompletedTasks"
+                (change)="onShowCompletedChange()">
+              <span class="checkmark"></span>
+              Mostrar tareas completadas
+            </label>
+          </div>
+
+          <!-- 🔄 RESET FILTROS -->
+          <div class="filter-group">
+            <button
+              type="button"
+              (click)="resetFilters()"
+              class="reset-filters-btn">
+              🔄 Limpiar Filtros
+            </button>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </section>
+
+  <!-- 🎮 CONTROLES DE VISTA -->
+  <section class="view-controls">
+    <div class="controls-left">
+      
+      <!-- 📊 ORDENAMIENTO -->
+      <div class="sort-controls">
+        <label>Ordenar por:</label>
+        <button
+          type="button"
+          (click)="changeSortBy('title')"
+          class="sort-btn"
+          [class.active]="sortBy === 'title'">
+          Título {{ sortBy === 'title' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+        </button>
+        <button
+          type="button"
+          (click)="changeSortBy('dueDate')"
+          class="sort-btn"
+          [class.active]="sortBy === 'dueDate'">
+          Fecha {{ sortBy === 'dueDate' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+        </button>
+        <button
+          type="button"
+          (click)="changeSortBy('priority')"
+          class="sort-btn"
+          [class.active]="sortBy === 'priority'">
+          Prioridad {{ sortBy === 'priority' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+        </button>
+        <button
+          type="button"
+          (click)="changeSortBy('progress')"
+          class="sort-btn"
+          [class.active]="sortBy === 'progress'">
+          Progreso {{ sortBy === 'progress' ? (sortDirection === 'asc' ? '↑' : '↓') : '' }}
+        </button>
+      </div>
+
+    </div>
+
+    <div class="controls-right">
+      
+      <!-- 👁️ MODO DE VISTA -->
+      <div class="view-mode-controls">
+        <button
+          type="button"
+          (click)="viewMode = 'list'"
+          class="view-btn"
+          [class.active]="viewMode === 'list'"
+          title="Vista de lista">
+          📋
+        </button>
+        <button
+          type="button"
+          (click)="viewMode = 'grid'"
+          class="view-btn"
+          [class.active]="viewMode === 'grid'"
+          title="Vista de cuadrícula">
+          ⊞
+        </button>
+        <button
+          type="button"
+          (click)="viewMode = 'kanban'"
+          class="view-btn"
+          [class.active]="viewMode === 'kanban'"
+          title="Vista Kanban">
+          📊
+        </button>
+      </div>
+
+      <!-- 🔄 REFRESCAR -->
+      <button
+        type="button"
+        (click)="refreshTasks()"
+        class="refresh-btn"
+        [disabled]="(loading$ | async) || false"
+        title="Refrescar datos">
+        🔄
+      </button>
+
+    </div>
+  </section>
+
+  <!-- 📋 LISTA DE TAREAS PRINCIPAL -->
+  <main class="tasks-section">
+
+    <!-- ⏳ LOADING STATE -->
+    @if (loading$ | async) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <span>Cargando tareas...</span>
+      </div>
+    }
+
+    <!-- ❌ ERROR STATE -->
+    @if (error$ | async; as error) {
+      <div class="error-container">
+        <div class="error-icon">❌</div>
+        <h3>Error al cargar tareas</h3>
+        <p>{{ error }}</p>
+        <button
+          type="button"
+          (click)="refreshTasks()"
+          class="retry-btn">
+          🔄 Reintentar
+        </button>
+      </div>
+    }
+
+    <!-- 📄 CONTENIDO PRINCIPAL CON ASYNC PIPE -->
+    @if (filteredTasks$ | async; as tasks) {
+      
+      <!-- 📊 SELECCIÓN MASIVA -->
+      @if (tasks.length > 0) {
+        <div class="bulk-actions">
+          <label class="select-all-label">
+            <input
+              type="checkbox"
+              (change)="selectAllTasks(tasks, $event)"
+              [checked]="selectedTaskIds.length === tasks.length && tasks.length > 0">
+            <span class="checkmark"></span>
+            Seleccionar todas ({{ selectedTaskIds.length }}/{{ tasks.length }})
+          </label>
+
+          @if (selectedTaskIds.length > 0) {
+            <div class="bulk-actions-buttons">
+              <button
+                type="button"
+                (click)="deleteSelectedTasks()"
+                class="bulk-action-btn delete-btn">
+                🗑️ Eliminar Seleccionadas ({{ selectedTaskIds.length }})
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- 📋 VISTA LISTA -->
+      @if (viewMode === 'list') {
+        <div class="tasks-list">
+          @for (task of tasks; track trackByTaskId($index, task)) {
+            
+            <article 
+              class="task-item"
+              [ngClass]="getTaskClasses(task)">
+
+              <!-- ✅ CHECKBOX DE SELECCIÓN -->
+              <div class="task-checkbox">
+                <label class="checkbox-label">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedTaskIds.includes(task.id)"
+                    (change)="selectTask(task.id, $event)">
+                  <span class="checkmark"></span>
+                </label>
+              </div>
+
+              <!-- 📄 CONTENIDO PRINCIPAL -->
+              <div class="task-content">
+                
+                <!-- 🏷️ HEADER CON METADATA -->
+                <div class="task-header">
+                  <div class="task-title-section">
+                    <!-- 🔤 PIPE TITLECASE para el título -->
+                    <h3 class="task-title">{{ task.title | titlecase }}</h3>
+                    
+                    <!-- 🏷️ BADGES -->
+                    <div class="task-badges">
+                      <span 
+                        class="badge type-badge"
+                        [title]="'Tipo: ' + task.type">
+                        {{ getTaskTypeIcon(task.type) }} {{ task.type | titlecase }}
+                      </span>
+                      
+                      <span 
+                        class="badge priority-badge"
+                        [style.background-color]="getPriorityColor(task.priority)"
+                        [title]="'Prioridad: ' + task.priority">
+                        {{ task.priority | titlecase }}
+                      </span>
+                      
+                      <span 
+                        class="badge status-badge"
+                        [style.background-color]="getStatusColor(task.status)"
+                        [title]="'Estado: ' + task.status">
+                        {{ task.status | titlecase }}
+                      </span>
+                    </div>
+                  </div>
+
+                  <!-- ⏰ INFORMACIÓN DE FECHAS -->
+                  <div class="task-dates">
+                    <div class="date-item created">
+                      <span class="date-label">Creada:</span>
+                      <!-- 📅 PIPES DE FECHA con formatos diferentes -->
+                      <span class="date-value">{{ task.createdAt | date:'dd/MM/yy' }}</span>
+                    </div>
+                    
+                    <div class="date-item due" [class.overdue]="isOverdue(task.dueDate, task.status)">
+                      <span class="date-label">Vence:</span>
+                      <span class="date-value">{{ task.dueDate | date:'dd/MM/yy HH:mm' }}</span>
+                      
+                      <!-- 📊 DÍAS RESTANTES -->
+                      @if (!isOverdue(task.dueDate, task.status)) {
+                        <small class="days-remaining">
+                          ({{ getDaysUntilDue(task.dueDate) }} días)
+                        </small>
+                      } @else {
+                        <small class="overdue-days">
+                          ({{ Math.abs(getDaysUntilDue(task.dueDate)) }} días vencida)
+                        </small>
+                      }
+                    </div>
+
+                    @if (task.completedAt) {
+                      <div class="date-item completed">
+                        <span class="date-label">Completada:</span>
+                        <span class="date-value">{{ task.completedAt | date:'dd/MM/yy HH:mm' }}</span>
+                      </div>
+                    }
+                  </div>
+                </div>
+
+                <!-- 📝 DESCRIPCIÓN -->
+                <div class="task-description">
+                  <!-- 🔤 PIPE SLICE para truncar descripción -->
+                  <p>{{ task.description | slice:0:200 }}
+                    @if (task.description.length > 200) {
+                      <span class="read-more">... Ver más</span>
+                    }
+                  </p>
+                </div>
+
+                <!-- 👤 RESPONSABLE Y UBICACIÓN -->
+                <div class="task-metadata">
+                  <div class="assignee-info">
+                    <span class="label">Responsable:</span>
+                    <span class="value">{{ task.assignee.name | titlecase }}</span>
+                    <small class="department">({{ task.assignee.department }})</small>
+                  </div>
+
+                  <div class="location-info">
+                    <span class="label">Ubicación:</span>
+                    <span class="value">
+                      {{ task.location.region }}, {{ task.location.province }}
+                      @if (task.location.km) {
+                        - KM {{ task.location.km | number:'1.0-0' }}
+                      }
+                    </span>
+                  </div>
+                </div>
+
+                <!-- 🏷️ TAGS -->
+                @if (task.tags && task.tags.length > 0) {
+                  <div class="task-tags">
+                    @for (tag of task.tags; track $index) {
+                      <span class="tag">{{ tag | titlecase }}</span>
+                    }
+                  </div>
+                }
+
+              </div>
+
+              <!-- 📊 PANEL LATERAL CON MÉTRICAS -->
+              <div class="task-metrics">
+                
+                <!-- 📈 PROGRESO -->
+                <div class="progress-section">
+                  <div class="progress-header">
+                    <span class="progress-label">Progreso:</span>
+                    <!-- 📊 PIPE PERCENT -->
+                    <span class="progress-value">{{ task.progress | percent:'1.1-1' }}</span>
+                  </div>
+                  
+                  <div class="progress-bar-container">
+                    <div 
+                      class="progress-bar"
+                      [style.width.%]="task.progress"
+                      [style.background-color]="getProgressColor(task.progress)">
+                    </div>
+                  </div>
+
+                  <!-- ⚡ CONTROL DE PROGRESO -->
+                  <input
+                    type="range"
+                    [value]="task.progress"
+                    (input)="updateTaskProgress(task.id, $any($event.target).value)"
+                    min="0"
+                    max="100"
+                    step="5"
+                    class="progress-slider"
+                    [disabled]="task.status === 'completada' || task.status === 'cancelada'">
+                </div>
+
+                <!-- 💰 PRESUPUESTO -->
+                <div class="budget-section">
+                  <div class="budget-header">
+                    <span class="budget-label">Presupuesto:</span>
+                  </div>
+                  
+                  <div class="budget-info">
+                    <!-- 💰 PIPE CURRENCY con configuración personalizada -->
+                    <div class="budget-total">
+                      Total: {{ task.budget | currency:'PEN':'symbol':'1.0-0' }}
+                    </div>
+                    
+                    <div class="budget-used">
+                      Usado: {{ task.budgetUsed | currency:'PEN':'symbol':'1.0-0' }}
+                    </div>
+                    
+                    <div class="budget-remaining">
+                      Restante: {{ (task.budget - task.budgetUsed) | currency:'PEN':'symbol':'1.0-0' }}
+                    </div>
+
+                    <!-- 📊 PORCENTAJE DE USO -->
+                    <div class="budget-percentage">
+                      {{ (task.budgetUsed / task.budget) | percent:'1.1-1' }} utilizado
+                    </div>
+                  </div>
+
+                  <!-- 📊 BARRA DE PRESUPUESTO -->
+                  <div class="budget-bar-container">
+                    <div 
+                      class="budget-bar"
+                      [style.width.%]="(task.budgetUsed / task.budget) * 100"
+                      [class.budget-warning]="(task.budgetUsed / task.budget) > 0.8"
+                      [class.budget-danger]="(task.budgetUsed / task.budget) > 0.95">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 🎛️ ACCIONES -->
+                <div class="task-actions">
+                  
+                  <!-- 📊 CAMBIAR ESTADO -->
+                  <div class="status-controls">
+                    <select
+                      [value]="task.status"
+                      (change)="updateTaskStatus(task.id, $any($event.target).value)"
+                      class="status-select">
+                      @for (status of taskStatuses; track status.value) {
+                        @if (status.value !== 'all') {
+                          <option [value]="status.value">{{ status.label }}</option>
+                        }
+                      }
+                    </select>
+                  </div>
+
+                  <!-- 🔧 BOTONES DE ACCIÓN -->
+                  <div class="action-buttons">
+                    <button
+                      type="button"
+                      class="action-btn edit-btn"
+                      title="Editar tarea">
+                      ✏️
+                    </button>
+                    
+                    <button
+                      type="button"
+                      class="action-btn duplicate-btn"
+                      title="Duplicar tarea">
+                      📋
+                    </button>
+                    
+                    <button
+                      type="button"
+                      class="action-btn delete-btn"
+                      (click)="taskService.deleteTask(task.id).subscribe()"
+                      title="Eliminar tarea">
+                      🗑️
+                    </button>
+                  </div>
+
+                </div>
+
+              </div>
+
+            </article>
+
+          } @empty {
+            <!-- 😔 ESTADO VACÍO -->
+            <div class="empty-state">
+              <div class="empty-icon">📋</div>
+              <h3>No se encontraron tareas</h3>
+              <p>Intenta ajustar los filtros de búsqueda o crear una nueva tarea</p>
+              <button
+                type="button"
+                (click)="resetFilters()"
+                class="reset-filters-btn">
+                🔄 Limpiar Filtros
+              </button>
+            </div>
+          }
+
+        </div>
+      }
+
+      <!-- ⊞ VISTA GRID -->
+      @if (viewMode === 'grid') {
+        <div class="tasks-grid">
+          @for (task of tasks; track trackByTaskId($index, task)) {
+            
+            <article 
+              class="task-card"
+              [ngClass]="getTaskClasses(task)">
+
+              <!-- 📄 CARD HEADER -->
+              <div class="card-header">
+                <div class="card-title">
+                  <h4>{{ task.title | slice:0:40 }}{{ task.title.length > 40 ? '...' : '' }}</h4>
+                </div>
+                
+                <div class="card-checkbox">
+                  <input
+                    type="checkbox"
+                    [checked]="selectedTaskIds.includes(task.id)"
+                    (change)="selectTask(task.id, $event)">
+                </div>
+              </div>
+
+              <!-- 📊 CARD CONTENT -->
+              <div class="card-content">
+                
+                <!-- 🏷️ BADGES -->
+                <div class="card-badges">
+                  <span class="badge type-badge">{{ getTaskTypeIcon(task.type) }}</span>
+                  <span 
+                    class="badge priority-badge"
+                    [style.background-color]="getPriorityColor(task.priority)">
+                  </span>
+                  <span 
+                    class="badge status-badge"
+                    [style.background-color]="getStatusColor(task.status)">
+                  </span>
+                </div>
+
+                <!-- 📈 PROGRESO -->
+                <div class="card-progress">
+                  <div class="progress-info">
+                    <span>Progreso: {{ task.progress | percent:'1.0-0' }}</span>
+                  </div>
+                  <div class="progress-bar-small">
+                    <div 
+                      class="progress-fill"
+                      [style.width.%]="task.progress"
+                      [style.background-color]="getProgressColor(task.progress)">
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 💰 PRESUPUESTO -->
+                <div class="card-budget">
+                  <span class="budget-label">Presupuesto:</span>
+                  <span class="budget-value">{{ task.budget | currency:'PEN':'symbol':'1.0-0' }}</span>
+                </div>
+
+                <!-- 📅 FECHA DE VENCIMIENTO -->
+                <div class="card-due-date" [class.overdue]="isOverdue(task.dueDate, task.status)">
+                  <span class="due-label">Vence:</span>
+                  <span class="due-value">{{ task.dueDate | date:'dd/MM' }}</span>
+                </div>
+
+              </div>
+
+              <!-- 🎛️ CARD FOOTER -->
+              <div class="card-footer">
+                <div class="assignee">{{ task.assignee.name | slice:0:20 }}</div>
+                <div class="location">{{ task.location.region }}</div>
+              </div>
+
+            </article>
+
+          }
+        </div>
+      }
+
+      <!-- 📊 VISTA KANBAN -->
+      @if (viewMode === 'kanban') {
+        <div class="kanban-board">
+          
+          @for (status of taskStatuses; track status.value) {
+            @if (status.value !== 'all') {
+              <div class="kanban-column">
+                
+                <div class="column-header" [style.border-color]="status.color">
+                  <h3>{{ status.label }}</h3>
+                  <span class="task-count">
+                    {{ (tasks | filter:status.value:'status').length }}
+                  </span>
+                </div>
+
+                <div class="column-content">
+                  @for (task of tasks; track trackByTaskId($index, task)) {
+                    @if (task.status === status.value) {
+                      
+                      <div class="kanban-card" [ngClass]="getTaskClasses(task)">
+                        
+                        <div class="kanban-card-header">
+                          <h4>{{ task.title | slice:0:30 }}</h4>
+                          <span class="priority-indicator" [style.background-color]="getPriorityColor(task.priority)"></span>
+                        </div>
+
+                        <div class="kanban-card-content">
+                          <p>{{ task.description | slice:0:80 }}...</p>
+                          
+                          <div class="kanban-metrics">
+                            <div class="metric">
+                              <span>{{ task.progress | percent:'1.0-0' }}</span>
+                              <small>Progreso</small>
+                            </div>
+                            
+                            <div class="metric">
+                              <span>{{ task.budget | currency:'PEN':'symbol':'1.0-0' }}</span>
+                              <small>Presupuesto</small>
+                            </div>
+                          </div>
+
+                          <div class="kanban-footer">
+                            <span class="assignee">{{ task.assignee.name | slice:0:15 }}</span>
+                            <span class="due-date">{{ task.dueDate | date:'dd/MM' }}</span>
+                          </div>
+                        </div>
+
+                      </div>
+
+                    }
+                  }
+                </div>
+
+              </div>
+            }
+          }
+
+        </div>
+      }
+
+    }
+
+  </main>
+
+  <!-- 📊 PANEL DE ESTADÍSTICAS DETALLADAS -->
+  <aside class="detailed-stats-panel">
+    @if (statistics$ | async; as stats) {
+      
+      <h3>📊 Estadísticas Detalladas</h3>
+
+      <!-- 📊 POR ESTADO -->
+      <div class="stats-section">
+        <h4>Por Estado:</h4>
+        <div class="stats-list">
+          @for (status of taskStatuses; track status.value) {
+            @if (status.value !== 'all' && stats.byStatus[status.value] > 0) {
+              <div class="stat-item">
+                <span class="stat-label" [style.color]="status.color">
+                  {{ status.label }}:
+                </span>
+                <span class="stat-value">{{ stats.byStatus[status.value] | number }}</span>
+                <span class="stat-percentage">
+                  ({{ (stats.byStatus[status.value] / stats.total) | percent:'1.1-1' }})
+                </span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- ⚡ POR PRIORIDAD -->
+      <div class="stats-section">
+        <h4>Por Prioridad:</h4>
+        <div class="stats-list">
+          @for (priority of taskPriorities; track priority.value) {
+            @if (priority.value !== 'all' && stats.byPriority[priority.value] > 0) {
+              <div class="stat-item">
+                <span class="stat-label" [style.color]="priority.color">
+                  {{ priority.label }}:
+                </span>
+                <span class="stat-value">{{ stats.byPriority[priority.value] | number }}</span>
+                <span class="stat-percentage">
+                  ({{ (stats.byPriority[priority.value] / stats.total) | percent:'1.1-1' }})
+                </span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- 🗺️ POR REGIÓN -->
+      <div class="stats-section">
+        <h4>Por Región:</h4>
+        <div class="stats-list">
+          @for (region of Object.keys(stats.byRegion); track region) {
+            <div class="stat-item">
+              <span class="stat-label">{{ region }}:</span>
+              <span class="stat-value">{{ stats.byRegion[region] | number }}</span>
+              <span class="stat-percentage">
+                ({{ (stats.byRegion[region] / stats.total) | percent:'1.1-1' }})
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- 💰 PRESUPUESTO -->
+      <div class="stats-section">
+        <h4>Presupuesto General:</h4>
+        <div class="budget-stats">
+          <div class="budget-item">
+            <span class="label">Total Asignado:</span>
+            <span class="value">{{ stats.budgetTotal | currency:'PEN':'symbol':'1.0-0' }}</span>
+          </div>
+          
+          <div class="budget-item">
+            <span class="label">Total Usado:</span>
+            <span class="value">{{ stats.budgetUsed | currency:'PEN':'symbol':'1.0-0' }}</span>
+          </div>
+          
+          <div class="budget-item">
+            <span class="label">Disponible:</span>
+            <span class="value">{{ stats.budgetRemaining | currency:'PEN':'symbol':'1.0-0' }}</span>
+          </div>
+
+          <div class="budget-utilization">
+            <span class="label">Utilización:</span>
+            <span class="percentage">{{ getBudgetUtilization(stats) | percent:'1.1-1' }}</span>
+          </div>
+        </div>
+      </div>
+
+    }
+  </aside>
+
+</div>

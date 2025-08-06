@@ -1,0 +1,135 @@
+// 🎯 HEADER COMPONENT STYLES
+.main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+  color: white;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
+  .brand-section {
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .logo-img {
+        width: 50px;
+        height: 50px;
+        border-radius: 8px;
+      }
+
+      .logo-text {
+        h1 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: white;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+          opacity: 0.9;
+          color: #e2e8f0;
+        }
+      }
+    }
+  }
+
+  .navigation {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  // 📱 RESPONSIVE DESIGN
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .brand-section {
+      .logo {
+        .logo-text {
+          h1 {
+            font-size: 1.2rem;
+          }
+          p {
+            display: none;
+          }
+        }
+      }
+    }
+
+    .navigation {
+      display: none;
+    }
+
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
+
+  @media (max-width: 480px) {
+    padding: 0.75rem;
+
+    .brand-section {
+      .logo {
+        gap: 0.5rem;
+
+        .logo-img {
+          width: 40px;
+          height: 40px;
+        }
+
+        .logo-text h1 {
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
