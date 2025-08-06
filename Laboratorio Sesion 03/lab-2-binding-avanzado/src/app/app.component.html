@@ -1,0 +1,33 @@
+<!-- 🏗️ LAB 2: BINDING AVANZADO -->
+<!-- PROVIAS DESCENTRALIZADO - Angular v18 -->
+
+<div class="app-container">
+  
+  <!-- 🎯 HEADER CON NAVEGACIÓN -->
+  <app-header></app-header>
+
+  <!-- 🛍️ ROUTER OUTLET - CONTENIDO DINÁMICO -->
+  <main class="main-content">
+    <router-outlet></router-outlet>
+  </main>
+
+  <!-- 📄 FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>
+        © {{ currentYear }} PROVIAS DESCENTRALIZADO - 
+        <strong>{{ title }}</strong>
+      </p>
+      <p class="tech-info">
+        🚀 Angular v18 | 
+        🎯 {{ subtitle }} | 
+        💻 Standalone Components | 
+        🎨 Advanced Binding
+      </p>
+      <p class="lab-info">
+        🎓 Demostrando NgClass, NgStyle, HostListener y Attribute Binding
+      </p>
+    </div>
+  </footer>
+
+</div>
