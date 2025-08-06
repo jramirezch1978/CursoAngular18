@@ -3,12 +3,80 @@
 
 <div class="app-container">
   
-  <!-- 🎯 HEADER PRINCIPAL CON NAVEGACIÓN -->
-  <app-header></app-header>
+  <!-- 🎯 HEADER PRINCIPAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
+      <h1>{{ title }}</h1>
+      <p class="subtitle">{{ subtitle }}</p>
+      
+      <div class="lab-info">
+        <span class="lab-badge">LAB 1</span>
+        <span class="lab-description">Fundamentos de Data Binding</span>
+      </div>
 
-  <!-- 🛍️ ROUTER OUTLET - CONTENIDO DINÁMICO -->
+      <!-- 🎛️ CONTROLES DE NAVEGACIÓN -->
+      <nav class="view-controls">
+        <button 
+          type="button"
+          (click)="toggleView('home')"
+          class="nav-btn"
+          [class.active]="showHome">
+          🏠 Inicio
+        </button>
+        <button 
+          type="button"
+          (click)="toggleView('products')"
+          class="nav-btn"
+          [class.active]="showProducts">
+          🛍️ Productos
+        </button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- 🛍️ CONTENIDO PRINCIPAL - PRODUCTOS -->
   <main class="main-content">
-    <router-outlet></router-outlet>
+    
+    <!-- 🏠 VISTA HOME (Condicional) -->
+    @if (showHome) {
+      <section class="home-section">
+        <div class="home-content">
+          <h2>🏠 Bienvenido a PROVIAS DESCENTRALIZADO</h2>
+          <p>Sistema de Gestión de Materiales y Equipos para Proyectos Viales</p>
+          
+          <div class="welcome-grid">
+            <div class="welcome-card">
+              <h3>🎯 Objetivo del Lab 1</h3>
+              <p>Aprender los 4 tipos fundamentales de Data Binding en Angular v18</p>
+              <ul>
+                <li>🔤 <strong>Interpolación:</strong> {{ '{{ valor }}' }}</li>
+                <li>🎯 <strong>Property Binding:</strong> [property]="valor"</li>
+                <li>🎪 <strong>Event Binding:</strong> (event)="método()"</li>
+                <li>🔄 <strong>Two-Way Binding:</strong> [(ngModel)]="valor"</li>
+              </ul>
+            </div>
+            
+            <div class="welcome-card">
+              <h3>🛍️ Sistema de Productos</h3>
+              <p>Catálogo completo con todas las funcionalidades de binding</p>
+              <button 
+                type="button"
+                (click)="toggleView('products')"
+                class="cta-button">
+                🚀 Explorar Productos
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- 🛍️ VISTA PRODUCTOS (Condicional) -->
+    @if (showProducts) {
+      <app-product-list></app-product-list>
+    }
+
   </main>
 
   <!-- 📄 FOOTER -->
