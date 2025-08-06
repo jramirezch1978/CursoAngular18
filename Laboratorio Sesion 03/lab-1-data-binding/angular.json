@@ -21,7 +21,9 @@
             "outputPath": "dist/lab-1-data-binding",
             "index": "src/index.html",
             "main": "src/main.ts",
-            "polyfills": [],
+            "polyfills": [
+              "src/polyfills.ts"
+            ],
             "tsConfig": "tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
