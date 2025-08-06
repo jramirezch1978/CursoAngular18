@@ -1,0 +1,63 @@
+<!-- 🎯 HEADER COMPONENT - Lab 2: Binding Avanzado -->
+<header class="app-header" role="banner">
+  
+  <!-- 🏢 BRAND SECTION -->
+  <div class="header-brand">
+    <div class="brand-logo">
+      <span class="logo-icon">🏗️</span>
+      <div class="brand-text">
+        <h1 class="brand-title">{{ title }}</h1>
+        <p class="brand-subtitle">{{ subtitle }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- 🧭 NAVIGATION SECTION -->
+  <nav class="header-nav" role="navigation" aria-label="Navegación principal">
+    <ul class="nav-list">
+      @for (item of navigationItems; track item.path) {
+        <li class="nav-item">
+          @if (item.path === '#') {
+            <button 
+              type="button"
+              class="nav-link nav-button"
+              (click)="onContactClick()"
+              [attr.aria-label]="item.label">
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-text">{{ item.label }}</span>
+            </button>
+          } @else {
+            <a 
+              [routerLink]="item.path" 
+              class="nav-link"
+              routerLinkActive="nav-link--active"
+              [attr.aria-label]="item.label">
+              <span class="nav-icon">{{ item.icon }}</span>
+              <span class="nav-text">{{ item.label }}</span>
+            </a>
+          }
+        </li>
+      }
+    </ul>
+  </nav>
+
+  <!-- 🎛️ ACTIONS SECTION -->
+  <div class="header-actions">
+    <button 
+      type="button" 
+      class="action-btn"
+      aria-label="Información del laboratorio"
+      title="Lab 2: Binding Avanzado">
+      <span class="action-icon">ℹ️</span>
+    </button>
+    
+    <button 
+      type="button" 
+      class="action-btn"
+      aria-label="Configuración"
+      title="Configuración">
+      <span class="action-icon">⚙️</span>
+    </button>
+  </div>
+
+</header>

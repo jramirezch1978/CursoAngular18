@@ -11,7 +11,8 @@ import {
   Alert,
   ProjectMetrics,
   EquipmentStatus,
-  DashboardTheme
+  DashboardTheme,
+  WidgetType
 } from '../../models/dashboard.interface';
 import { DashboardService } from '../../services/dashboard.service';
 
@@ -74,7 +75,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   };
 
   // 🔧 Configuración de widgets
-  availableWidgetTypes = [
+  availableWidgetTypes: Array<{type: WidgetType, label: string, icon: string}> = [
     { type: 'metric', label: 'Métrica', icon: '📊' },
     { type: 'chart', label: 'Gráfico', icon: '📈' },
     { type: 'progress', label: 'Progreso', icon: '⏳' },
@@ -92,7 +93,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   draggedWidget: DashboardWidget | null = null;
   dropZoneActive = false;
 
-  constructor(private dashboardService: DashboardService) {
+  constructor(public dashboardService: DashboardService) {
     // Inicializar observables
     this.widgets$ = this.dashboardService.widgets$;
     this.state$ = this.dashboardService.state$;
@@ -362,6 +363,52 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('⚙️ Panel de configuración abierto');
   }
 
+  // 🎨 Métodos para cambio de tema
+  setLightTheme(): void {
+    this.currentTheme = 'light';
+    this.updateThemeColors();
+  }
+
+  setDarkTheme(): void {
+    this.currentTheme = 'dark';
+    this.updateThemeColors();
+  }
+
+  setHighContrastTheme(): void {
+    this.currentTheme = 'high-contrast';
+    this.updateThemeColors();
+  }
+
+  // 📅 Método para obtener fecha actual
+  getCurrentTime(): Date {
+    return new Date();
+  }
+
+  // 📊 Método para reconocer alertas
+  acknowledgeAlert(alertId: string): void {
+    this.dashboardService.acknowledgeAlert(alertId);
+  }
+
+  // 🎨 Método para obtener icono de tipo de widget
+  getWidgetTypeIcon(type: string): string {
+    const icons = {
+      'metric': '📊',
+      'chart': '📈',
+      'progress': '⏳',
+      'status': '🟢',
+      'alert': '🚨',
+      'map': '🗺️',
+      'table': '📋',
+      'calendar': '📅'
+    };
+    return icons[type as keyof typeof icons] || '📦';
+  }
+
+  // 🔍 Track function para performance
+  trackByWidgetId(index: number, widget: DashboardWidget): string {
+    return widget.id;
+  }
+
   closeConfigPanel(): void {
     this.isConfigPanelOpen = false;
     console.log('⚙️ Panel de configuración cerrado');
@@ -445,7 +492,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('⌨️ Navegación con Tab');
   }
 
-  private updateThemeColors(): void {
+  updateThemeColors(): void {
     switch (this.currentTheme) {
       case 'dark':
         this.themeColors = {
@@ -479,7 +526,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getWidgetTypeLabel(type: DashboardWidget['type']): string {
+  getWidgetTypeLabel(type: DashboardWidget['type']): string {
     const typeMap = {
       'metric': 'Métrica',
       'chart': 'Gráfico',

@@ -1,0 +1,94 @@
+/* 🏗️ APP COMPONENT STYLES - Lab 2: Binding Avanzado */
+
+.app-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: #f8fafc;
+}
+
+/* 🛍️ MAIN CONTENT */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 📄 FOOTER */
+.app-footer {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+  color: white;
+  padding: 2rem;
+  margin-top: auto;
+  
+  @media (max-width: 768px) {
+    padding: 1.5rem 1rem;
+  }
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  text-align: center;
+  
+  p {
+    margin: 0.5rem 0;
+    line-height: 1.6;
+    
+    &:first-child {
+      font-size: 1rem;
+      font-weight: 500;
+      
+      strong {
+        color: #fbbf24;
+      }
+    }
+  }
+}
+
+.tech-info {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.8);
+  font-family: 'Courier New', monospace;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  display: inline-block;
+  margin: 1rem 0 !important;
+}
+
+.lab-info {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+/* 🎨 RESPONSIVE DESIGN */
+@media (max-width: 640px) {
+  .footer-content p {
+    font-size: 0.875rem;
+    
+    &.tech-info {
+      font-size: 0.75rem;
+      padding: 0.4rem 0.8rem;
+    }
+    
+    &.lab-info {
+      font-size: 0.7rem;
+    }
+  }
+}
+
+/* 🌟 ANIMATIONS */
+.app-container {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
