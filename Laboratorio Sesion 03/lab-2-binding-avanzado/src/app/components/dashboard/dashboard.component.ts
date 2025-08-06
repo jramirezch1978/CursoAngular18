@@ -59,6 +59,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   isConfigPanelOpen = false;
   currentTheme: 'light' | 'dark' | 'high-contrast' = 'light';
   
+  // ⏰ Tiempo actual para el reloj
+  currentTime = new Date();
+  
   // 🎨 Configuración de vista
   gridSize = 12;
   rowHeight = 100;
@@ -112,6 +115,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
     // Detectar tamaño de pantalla inicial
     this.checkScreenSize();
+    
+    // Inicializar reloj en tiempo real
+    this.startClock();
     
     // Simular carga inicial
     this.dashboardService.setLoading(true);
@@ -381,7 +387,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // 📅 Método para obtener fecha actual
   getCurrentTime(): Date {
-    return new Date();
+    return this.currentTime;
+  }
+
+  // ⏰ Inicializar reloj en tiempo real
+  private startClock(): void {
+    // Actualizar cada segundo
+    interval(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
+      this.currentTime = new Date();
+    });
   }
 
   // 📊 Método para reconocer alertas
@@ -598,5 +612,18 @@ export class DashboardComponent implements OnInit, OnDestroy {
       minimumFractionDigits: 1,
       maximumFractionDigits: 1
     }).format(value / 100);
+  }
+
+  // 🎨 Método para obtener color basado en el progreso
+  getProgressColor(progress: number): string {
+    if (progress >= 90) {
+      return '#10b981'; // Verde
+    } else if (progress >= 70) {
+      return '#f59e0b'; // Amarillo
+    } else if (progress >= 50) {
+      return '#3b82f6'; // Azul
+    } else {
+      return '#ef4444'; // Rojo
+    }
   }
 }

@@ -876,3 +876,127 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* 📊 CHART WIDGET STYLES */
+.chart-widget {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.chart-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+
+.chart-bars {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 1rem;
+  margin-bottom: 1rem;
+  min-height: 150px;
+}
+
+.chart-bar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  max-width: 80px;
+}
+
+.chart-bar-container {
+  height: 120px;
+  width: 40px;
+  background: #f1f5f9;
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.chart-bar {
+  width: 100%;
+  min-height: 4px;
+  transition: all 0.3s ease;
+  border-radius: 4px 4px 0 0;
+  background: linear-gradient(to top, currentColor 0%, lighten(currentColor, 20%) 100%);
+}
+
+.chart-bar-label {
+  font-size: 0.75rem;
+  color: var(--text-color, #374151);
+  margin-top: 0.5rem;
+  text-align: center;
+  font-weight: 500;
+}
+
+.chart-bar-value {
+  font-size: 0.875rem;
+  color: var(--text-color, #374151);
+  margin-top: 0.25rem;
+  font-weight: 600;
+}
+
+.chart-legend {
+  border-top: 1px solid #e5e7eb;
+  padding-top: 1rem;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+.chart-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.legend-text {
+  color: var(--text-color, #374151);
+}
+
+/* 🎨 TEMA DINÁMICO */
+.dashboard-container {
+  background-color: var(--background-color, #f9fafb);
+  color: var(--text-color, #374151);
+  transition: all 0.3s ease;
+}
+
+.theme-dark {
+  .chart-bar-container {
+    background: #374151;
+  }
+  
+  .chart-legend {
+    border-top-color: #4b5563;
+  }
+}
+
+.theme-high-contrast {
+  .chart-bar-container {
+    background: #f0f0f0;
+    border: 2px solid #000000;
+  }
+  
+  .chart-bar {
+    border: 1px solid #000000;
+  }
+  
+  .chart-legend {
+    border-top-color: #000000;
+  }
+}

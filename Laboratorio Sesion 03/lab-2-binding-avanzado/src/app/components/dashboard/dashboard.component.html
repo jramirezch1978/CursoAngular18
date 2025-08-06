@@ -1,5 +1,14 @@
 <!-- 📊 DASHBOARD COMPONENT - Lab 2: Binding Avanzado -->
-<div class="dashboard-container">
+<div class="dashboard-container" 
+     [ngStyle]="{
+       '--primary-color': themeColors.primary,
+       '--secondary-color': themeColors.secondary,
+       '--accent-color': themeColors.accent,
+       '--background-color': themeColors.background,
+       '--surface-color': themeColors.surface,
+       '--text-color': themeColors.text
+     }"
+     [class]="'theme-' + currentTheme">
 
   <!-- 🎯 HEADER DEL DASHBOARD -->
   <header class="dashboard-header">
@@ -150,8 +159,33 @@
             </div>
           </div>
 
+          <!-- WIDGET TIPO CHART -->
+          <div *ngIf="widget.type === 'chart'" class="chart-widget">
+            <div class="chart-container">
+              <div class="chart-bars">
+                <div *ngFor="let region of widget.data.regions; let i = index" 
+                     class="chart-bar-item">
+                  <div class="chart-bar-container">
+                    <div class="chart-bar" 
+                         [style.height.%]="widget.data.progress[i] || 0"
+                         [style.background-color]="getProgressColor(widget.data.progress[i])">
+                    </div>
+                  </div>
+                  <div class="chart-bar-label">{{ region }}</div>
+                  <div class="chart-bar-value">{{ widget.data.progress[i] || 0 }}%</div>
+                </div>
+              </div>
+              <div class="chart-legend" *ngIf="widget.data.budget">
+                <div class="chart-legend-item" *ngFor="let region of widget.data.regions; let i = index">
+                  <span class="legend-color" [style.background-color]="getProgressColor(widget.data.progress[i])"></span>
+                  <span class="legend-text">{{ region }}: {{ formatCurrency(widget.data.budget[i]) }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- WIDGET GENÉRICO -->
-          <div *ngIf="!['metric', 'progress', 'alert', 'status'].includes(widget.type)" class="generic-widget">
+          <div *ngIf="!['metric', 'progress', 'alert', 'status', 'chart'].includes(widget.type)" class="generic-widget">
             <div class="widget-placeholder">
               <span class="placeholder-icon">{{ getWidgetTypeIcon(widget.type) }}</span>
               <span class="placeholder-text">{{ widget.title }}</span>
