@@ -187,6 +187,135 @@
             }
           }
         }
+
+        // 🎓 LEARNING SECTION
+        .learning-section {
+          margin-top: 4rem;
+          padding: 3rem 0;
+          border-top: 2px solid #e2e8f0;
+
+          h3 {
+            font-size: 2rem;
+            color: #1e3a8a;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-weight: 700;
+          }
+
+          .concepts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+
+            .concept-card {
+              background: white;
+              border: 2px solid #e2e8f0;
+              border-radius: 12px;
+              padding: 1.5rem;
+              transition: all 0.3s ease;
+              position: relative;
+              overflow: hidden;
+
+              &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                height: 4px;
+                background: linear-gradient(90deg, #3b82f6, #10b981);
+                transform: scaleX(0);
+                transition: transform 0.3s ease;
+              }
+
+              &:hover {
+                transform: translateY(-4px);
+                box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+                border-color: #3b82f6;
+
+                &::before {
+                  transform: scaleX(1);
+                }
+              }
+
+              &.interpolation {
+                border-left-color: #fbbf24;
+              }
+
+              &.property-binding {
+                border-left-color: #3b82f6;
+              }
+
+              &.event-binding {
+                border-left-color: #10b981;
+              }
+
+              &.pipes {
+                border-left-color: #f59e0b;
+              }
+
+              h4 {
+                font-size: 1.25rem;
+                margin-bottom: 0.75rem;
+                color: #1e3a8a;
+                font-weight: 600;
+              }
+
+              p {
+                color: #64748b;
+                margin-bottom: 1rem;
+                line-height: 1.5;
+              }
+
+              .example {
+                background: #f8fafc;
+                padding: 1rem;
+                border-radius: 8px;
+                margin-bottom: 1rem;
+                border-left: 4px solid #3b82f6;
+
+                strong {
+                  color: #1e3a8a;
+                }
+
+                .active {
+                  background: #fbbf24;
+                  color: #1e3a8a;
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 4px;
+                  font-weight: 600;
+                }
+
+                .demo-btn {
+                  background: #10b981;
+                  color: white;
+                  border: none;
+                  padding: 0.5rem 1rem;
+                  border-radius: 6px;
+                  cursor: pointer;
+                  font-weight: 500;
+                  transition: all 0.2s ease;
+
+                  &:hover {
+                    background: #059669;
+                    transform: scale(1.05);
+                  }
+                }
+              }
+
+              code {
+                background: #1e293b;
+                color: #e2e8f0;
+                padding: 0.5rem;
+                border-radius: 6px;
+                font-family: 'Courier New', monospace;
+                font-size: 0.85rem;
+                display: block;
+                overflow-x: auto;
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -297,6 +426,15 @@
         .home-content {
           .welcome-grid {
             grid-template-columns: 1fr;
+          }
+
+          .learning-section {
+            margin-top: 2rem;
+            padding: 2rem 0;
+
+            .concepts-grid {
+              grid-template-columns: 1fr;
+            }
           }
         }
       }

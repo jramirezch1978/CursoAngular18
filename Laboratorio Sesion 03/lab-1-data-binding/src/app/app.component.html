@@ -35,7 +35,7 @@
     </div>
   </header>
 
-  <!-- 🛍️ CONTENIDO PRINCIPAL - PRODUCTOS -->
+  <!-- 🛍️ CONTENIDO PRINCIPAL -->
   <main class="main-content">
     
     <!-- 🏠 VISTA HOME (Condicional) -->
@@ -50,22 +50,78 @@
               <h3>🎯 Objetivo del Lab 1</h3>
               <p>Aprender los 4 tipos fundamentales de Data Binding en Angular v18</p>
               <ul>
-                <li>🔤 <strong>Interpolación:</strong> {{ '{{ valor }}' }}</li>
-                <li>🎯 <strong>Property Binding:</strong> [property]="valor"</li>
-                <li>🎪 <strong>Event Binding:</strong> (event)="método()"</li>
-                <li>🔄 <strong>Two-Way Binding:</strong> [(ngModel)]="valor"</li>
+                <li>🔤 <strong>Interpolación:</strong> <code>{{ '{{ valor }}' }}</code></li>
+                <li>🎯 <strong>Property Binding:</strong> <code>[property]="valor"</code></li>
+                <li>🎪 <strong>Event Binding:</strong> <code>(event)="método()"</code></li>
+                <li>🔄 <strong>Two-Way Binding:</strong> <code>[(ngModel)]="valor"</code></li>
               </ul>
             </div>
             
             <div class="welcome-card">
               <h3>🛍️ Sistema de Productos</h3>
               <p>Catálogo completo con todas las funcionalidades de binding</p>
+              <ul>
+                <li>✅ Filtros con Two-Way Binding</li>
+                <li>✅ Carrito reactivo con Async Pipe</li>
+                <li>✅ Event Binding en botones</li>
+                <li>✅ Property Binding en imágenes</li>
+                <li>✅ Class Binding dinámico</li>
+              </ul>
               <button 
                 type="button"
                 (click)="toggleView('products')"
                 class="cta-button">
                 🚀 Explorar Productos
               </button>
+            </div>
+          </div>
+
+          <!-- 🎓 SECCIÓN EDUCATIVA -->
+          <div class="learning-section">
+            <h3>📚 Conceptos de Data Binding</h3>
+            <div class="concepts-grid">
+              
+              <div class="concept-card interpolation">
+                <h4>🔤 Interpolación</h4>
+                <p>Muestra datos dinámicos en el template</p>
+                <div class="example">
+                  <strong>Ejemplo:</strong> {{ title }}
+                </div>
+                <code>&lt;h1&gt;{{ '{{ title }}' }}&lt;/h1&gt;</code>
+              </div>
+
+              <div class="concept-card property-binding">
+                <h4>🎯 Property Binding</h4>
+                <p>Enlaza propiedades de elementos HTML</p>
+                <div class="example">
+                  <strong>Botón activo:</strong> 
+                  <span [class.active]="showHome">Estado</span>
+                </div>
+                <code>[class.active]="showHome"</code>
+              </div>
+
+              <div class="concept-card event-binding">
+                <h4>🎪 Event Binding</h4>
+                <p>Maneja eventos del usuario</p>
+                <div class="example">
+                  <button (click)="toggleView('home')" class="demo-btn">
+                    Click aquí
+                  </button>
+                </div>
+                <code>(click)="toggleView('home')"</code>
+              </div>
+
+              <div class="concept-card pipes">
+                <h4>🔧 Pipes</h4>
+                <p>Transforma datos para mostrar</p>
+                <div class="example">
+                  <strong>Año:</strong> {{ currentYear }}
+                  <br>
+                  <strong>Fecha:</strong> {{ currentYear | number }}
+                </div>
+                <code>{{ '{{ currentYear | number }}' }}</code>
+              </div>
+
             </div>
           </div>
         </div>
@@ -90,6 +146,10 @@
         🚀 Angular v18 | 
         🎯 {{ subtitle }} | 
         💻 Standalone Components
+      </p>
+      <p class="lab-info">
+        🎓 Lab desarrollado para el curso de Angular v18 - 
+        Demostrando todos los tipos de Data Binding
       </p>
     </div>
   </footer>
