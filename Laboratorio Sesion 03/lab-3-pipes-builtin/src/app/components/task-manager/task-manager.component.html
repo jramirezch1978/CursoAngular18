@@ -12,8 +12,8 @@
       
       <!-- 📅 PIPE DE FECHA -->
       <div class="current-info">
-        <span class="current-date">{{ new Date() | date:'fullDate':'':'es' }}</span>
-        <span class="current-time">{{ new Date() | date:'HH:mm:ss' }}</span>
+        <span class="current-date">{{ getCurrentTime() | date:'fullDate':'':'es' }}</span>
+        <span class="current-time">{{ getCurrentTime() | date:'HH:mm:ss' }}</span>
       </div>
     </div>
 

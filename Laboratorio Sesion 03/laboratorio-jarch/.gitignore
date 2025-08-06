@@ -1,0 +1,51 @@
+# LABORATORIO JARCH - Angular v18 PROVIAS DESCENTRALIZADO
+# .gitignore para el directorio del laboratorio JARCH
+
+# Angular projects output
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
+
+# Dependencies
+**/node_modules/
+
+# Angular cache
+**/.angular/
+.angular/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+
+# Environment files
+**/.env
+**/.env.*local
+
+# TypeScript
+**/*.tsbuildinfo
+
+# Testing
+**/coverage/
+**/e2e/reports/
+**/e2e/screenshots/
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-workspace
+
+# System files
+.DS_Store
+Thumbs.db
+
+# JARCH specific
+/resultados-laboratorio/
+/documentos-entrega/
+/archivos-temporales/
+
+# PROVIAS specific
+**/.env.provias
+**/credentials.json

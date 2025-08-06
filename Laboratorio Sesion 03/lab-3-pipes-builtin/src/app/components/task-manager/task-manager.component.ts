@@ -416,4 +416,9 @@ export class TaskManagerComponent implements OnInit, OnDestroy {
   formatNumber(value: number): string {
     return new Intl.NumberFormat('es-PE').format(value);
   }
+
+  // 📅 Método para obtener fecha actual
+  getCurrentTime(): Date {
+    return new Date();
+  }
 }

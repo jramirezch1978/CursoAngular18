@@ -1,4 +1,5 @@
-# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+# Lab 4: Pipes Personalizados - Angular v18 PROVIAS
+# See http://help.github.com/ignore-files/ for more about ignoring files.
 
 # Compiled output
 /dist
@@ -59,23 +60,13 @@ angular.json.bak
 e2e/reports/
 e2e/screenshots/
 
-# PROVIAS & JARCH specific
+# PROVIAS specific
 /uploads
 /storage
 *.log
 .env.provias
-.env.jarch
-/documentos-sensibles
 
-# Build artifacts
-build/
-dist/
-
-# Logs
-logs
-*.log
-lerna-debug.log*
-
-# Cache
-.cache/
-*.cache
+# Custom pipes specific
+/pipes-output
+/custom-pipe-examples
+/generated-pipes
