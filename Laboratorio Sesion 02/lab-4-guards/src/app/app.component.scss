@@ -1,0 +1,17 @@
+// 🛡️ LAB 4: Guards y Autenticación
+// 
+// Este laboratorio demuestra:
+// ✅ AuthService con localStorage
+// ✅ Guards (AuthGuard, AdminGuard, UnsavedChangesGuard)
+// ✅ Lazy loading de componentes
+// ✅ Control de permisos granular
+// ✅ Manejo de acceso denegado
+//
+// El routing maneja toda la navegación y protección
+// Cada componente tiene sus propios estilos
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+}

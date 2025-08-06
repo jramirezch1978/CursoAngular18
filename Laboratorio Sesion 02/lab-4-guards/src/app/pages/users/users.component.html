@@ -1,0 +1,159 @@
+<div class="users-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>👥 Gestión de Usuarios</h1>
+      <p class="page-description">
+        Esta página está protegida por <code>AuthGuard</code>
+      </p>
+      <p class="route-info">
+        <strong>Ruta actual:</strong> <code>{{ currentRoute }}</code>
+      </p>
+      @if (routeParams && Object.keys(routeParams).length > 0) {
+        <p class="params-info">
+          <strong>Parámetros:</strong> <code>{{ routeParams | json }}</code>
+        </p>
+      }
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goToDashboard()">
+        🏠 Dashboard
+      </button>
+      <button class="btn btn-danger" (click)="logout()">
+        🚪 Salir
+      </button>
+    </div>
+  </header>
+
+  <!-- 👥 Lista de usuarios -->
+  <section class="users-section">
+    <h2>📋 Lista de Usuarios</h2>
+    
+    <div class="users-grid">
+      @for (user of users; track user.id) {
+        <div class="user-card" [class]="user.status">
+          <div class="user-info">
+            <h3>{{ user.name }}</h3>
+            <p class="user-role">{{ user.role }}</p>
+            <span class="user-status" [class]="user.status">
+              {{ user.status === 'active' ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 🔐 Información de permisos -->
+  <section class="permissions-demo">
+    <h2>🔐 Demo de Permisos</h2>
+    
+    <div class="permissions-cards">
+      <div class="permission-card">
+        <h4>👥 Ver Usuarios</h4>
+        <p class="permission-status">
+          @if (hasPermission('users:view')) {
+            ✅ <strong>Tienes este permiso</strong>
+          } @else {
+            ❌ <strong>No tienes este permiso</strong>
+          }
+        </p>
+        <small>Permiso: users:view</small>
+      </div>
+      
+      <div class="permission-card">
+        <h4>✏️ Editar Usuarios</h4>
+        <p class="permission-status">
+          @if (hasPermission('users:edit')) {
+            ✅ <strong>Tienes este permiso</strong>
+          } @else {
+            ❌ <strong>No tienes este permiso</strong>
+          }
+        </p>
+        <small>Permiso: users:edit</small>
+      </div>
+      
+      <div class="permission-card">
+        <h4>👑 Panel Admin</h4>
+        <p class="permission-status">
+          @if (hasPermission('admin:panel')) {
+            ✅ <strong>Tienes este permiso</strong>
+          } @else {
+            ❌ <strong>No tienes este permiso</strong>
+          }
+        </p>
+        <small>Permiso: admin:panel</small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🧪 Pruebas de guards -->
+  <section class="guards-test">
+    <h2>🧪 Prueba los Guards</h2>
+    
+    <div class="test-cards">
+      <div class="test-card">
+        <h4>👑 AdminGuard</h4>
+        <p>Intenta acceder al panel de administración</p>
+        <button class="test-btn" (click)="tryAccessAdmin()">
+          Acceder a Admin
+        </button>
+        <small>
+          @if (hasPermission('admin:panel')) {
+            ✅ Deberías poder acceder
+          } @else {
+            ❌ Deberías ser redirigido a /access-denied
+          }
+        </small>
+      </div>
+      
+      <div class="test-card">
+        <h4>🛡️ AuthGuard</h4>
+        <p>Cierra sesión para probar AuthGuard</p>
+        <button class="test-btn danger" (click)="logout()">
+          Cerrar Sesión
+        </button>
+        <small>
+          🔄 Después del logout, intenta acceder a rutas protegidas
+        </small>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎓 Información educativa -->
+  <section class="educational-section">
+    <h2>🎓 Guards en Acción</h2>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🛡️ AuthGuard</h4>
+        <p>Ya verificó tu autenticación para mostrarte esta página</p>
+        <ul>
+          <li>✅ Usuario autenticado</li>
+          <li>✅ Token válido</li>
+          <li>✅ Sesión activa</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🔐 Control de Permisos</h4>
+        <p>Las acciones se habilitan según tus permisos</p>
+        <ul>
+          <li>✅ Verificación en tiempo real</li>
+          <li>✅ UI dinámica</li>
+          <li>✅ Seguridad a nivel de función</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>📦 Lazy Loading</h4>
+        <p>Este componente se cargó bajo demanda</p>
+        <ul>
+          <li>✅ Bundle separado</li>
+          <li>✅ Carga diferida</li>
+          <li>✅ Guards antes de cargar</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>

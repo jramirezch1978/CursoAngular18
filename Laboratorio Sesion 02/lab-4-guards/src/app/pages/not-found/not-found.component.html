@@ -1,0 +1,161 @@
+<div class="not-found-container">
+  <!-- 🚫 Error principal -->
+  <section class="error-section">
+    <div class="error-content">
+      <div class="error-number">404</div>
+      <h1 class="error-title">¡Página No Encontrada!</h1>
+      <p class="error-message">{{ currentMessage }}</p>
+      
+      <div class="error-details">
+        <p>
+          <strong>🔗 URL Solicitada:</strong> 
+          <code class="url-display">{{ currentUrl }}</code>
+        </p>
+        <p class="help-text">
+          La página que buscas no existe o ha sido movida. 
+          Te sugerimos algunas alternativas.
+        </p>
+      </div>
+    </div>
+    
+    <div class="error-illustration">
+      <div class="road">🛣️</div>
+      <div class="construction">🚧</div>
+      <div class="worker">👷‍♂️</div>
+    </div>
+  </section>
+
+  <!-- 🎮 Acciones principales -->
+  <section class="actions-section">
+    <h2>🎮 ¿Qué Puedes Hacer?</h2>
+    
+    <div class="action-buttons">
+      <button class="action-btn primary" (click)="navigateTo('/login')">
+        🔑 Iniciar Sesión
+      </button>
+      
+      <button class="action-btn secondary" (click)="goBack()">
+        ⬅️ Volver Atrás
+      </button>
+      
+      <button class="action-btn tertiary" (click)="reloadPage()">
+        🔄 Recargar Página
+      </button>
+      
+      <button class="action-btn fun" (click)="getNewMessage()">
+        🎲 Otro Mensaje
+      </button>
+    </div>
+  </section>
+
+  <!-- 🧭 Rutas disponibles -->
+  <section class="routes-section">
+    <h2>🧭 Páginas Disponibles</h2>
+    <p class="routes-intro">
+      Estas son las páginas principales del sistema PROVIAS:
+    </p>
+    
+    <div class="routes-grid">
+      @for (route of suggestedRoutes; track route.path) {
+        <div class="route-card" (click)="navigateTo(route.path)">
+          <div class="route-icon">{{ route.icon }}</div>
+          <div class="route-content">
+            <h3 class="route-title">{{ route.title }}</h3>
+            <p class="route-description">{{ route.description }}</p>
+            <span class="route-path">{{ route.path }}</span>
+          </div>
+          <div class="route-arrow">➡️</div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 🎓 Información sobre rutas y guards -->
+  <section class="educational-section">
+    <h2>🎓 Sobre el Routing en Angular</h2>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🧭 Angular Router</h4>
+        <p>Sistema de navegación declarativo y programático</p>
+        <ul>
+          <li>Rutas definidas en configuración</li>
+          <li>Navegación por URL o programática</li>
+          <li>Parámetros y query strings</li>
+          <li>Guards para protección</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🚫 Wildcard Route</h4>
+        <p>Manejo de rutas no encontradas</p>
+        <ul>
+          <li>Patrón ** captura todas las rutas</li>
+          <li>Debe estar al final de la configuración</li>
+          <li>Evita errores de navegación</li>
+          <li>Mejora la experiencia del usuario</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>🛡️ Guards Integration</h4>
+        <p>Los guards trabajan antes de mostrar 404</p>
+        <ul>
+          <li>AuthGuard verifica autenticación</li>
+          <li>AdminGuard verifica permisos</li>
+          <li>Solo llega aquí si la ruta no existe</li>
+          <li>No hay problema de seguridad</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🔧 Información de debugging -->
+  <section class="debug-section">
+    <h2>🔧 Información de Debug</h2>
+    
+    <div class="debug-info">
+      <div class="debug-item">
+        <strong>🌐 URL Completa:</strong>
+        <code>{{ window.location.href }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>📍 Pathname:</strong>
+        <code>{{ currentUrl }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>⏰ Timestamp:</strong>
+        <code>{{ new Date().toLocaleString('es-PE') }}</code>
+      </div>
+      
+      <div class="debug-item">
+        <strong>🔗 Referrer:</strong>
+        <code>{{ document.referrer || 'Acceso directo' }}</code>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🏗️ Footer PROVIAS -->
+  <footer class="provias-footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4>🏗️ PROVIAS DESCENTRALIZADO</h4>
+        <p>Sistema de Gestión de Infraestructura Vial</p>
+        <p>LAB 4: Guards y Autenticación - Angular v18</p>
+      </div>
+      
+      <div class="footer-section">
+        <h4>📞 Contacto</h4>
+        <p>📧 soporte@provias.gob.pe</p>
+        <p>📞 (01) 615-7800</p>
+        <p>📍 Jr. Carabaya 535, Lima - Perú</p>
+      </div>
+    </div>
+    
+    <div class="footer-bottom">
+      <p>&copy; 2025 PROVIAS DESCENTRALIZADO - Laboratorio Angular v18</p>
+    </div>
+  </footer>
+</div>

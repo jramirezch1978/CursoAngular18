@@ -1,0 +1,251 @@
+<div class="login-container">
+  <!-- 🎯 Header de login -->
+  <header class="login-header">
+    <div class="brand-section">
+      <h1 class="brand-title">🏗️ PROVIAS DESCENTRALIZADO</h1>
+      <p class="brand-subtitle">Sistema de Gestión de Infraestructura Vial</p>
+      <p class="lab-title">LAB 4: Autenticación y Guards</p>
+    </div>
+  </header>
+
+  <div class="login-content">
+    <!-- 🔑 Formulario de login -->
+    <section class="login-form-section">
+      <div class="form-container">
+        <h2 class="form-title">🔑 Iniciar Sesión</h2>
+        
+        @if (errorMessage) {
+          <div class="alert alert-error">
+            {{ errorMessage }}
+          </div>
+        }
+
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+          <!-- Campo Usuario -->
+          <div class="form-group">
+            <label for="username" class="form-label">
+              👤 Usuario
+            </label>
+            <input
+              type="text"
+              id="username"
+              formControlName="username"
+              class="form-control"
+              [class.valid]="isFieldValid('username')"
+              [class.invalid]="isFieldInvalid('username')"
+              placeholder="Ingresa tu nombre de usuario"
+              autocomplete="username">
+            
+            @if (isFieldInvalid('username')) {
+              <div class="field-error">
+                {{ getFieldError('username') }}
+              </div>
+            }
+          </div>
+
+          <!-- Campo Contraseña -->
+          <div class="form-group">
+            <label for="password" class="form-label">
+              🔒 Contraseña
+            </label>
+            <input
+              type="password"
+              id="password"
+              formControlName="password"
+              class="form-control"
+              [class.valid]="isFieldValid('password')"
+              [class.invalid]="isFieldInvalid('password')"
+              placeholder="Ingresa tu contraseña"
+              autocomplete="current-password">
+            
+            @if (isFieldInvalid('password')) {
+              <div class="field-error">
+                {{ getFieldError('password') }}
+              </div>
+            }
+          </div>
+
+          <!-- Recordarme -->
+          <div class="form-group checkbox-group">
+            <label class="checkbox-label">
+              <input
+                type="checkbox"
+                formControlName="rememberMe"
+                class="checkbox-input">
+              <span class="checkbox-text">🔖 Recordar mi sesión</span>
+            </label>
+          </div>
+
+          <!-- Botón de login -->
+          <div class="form-actions">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="loginForm.invalid || isLoading"
+              [class.loading]="isLoading">
+              @if (isLoading) {
+                <span class="spinner"></span>
+                Iniciando sesión...
+              } @else {
+                🔑 Iniciar Sesión
+              }
+            </button>
+          </div>
+        </form>
+
+        <!-- Acciones adicionales -->
+        <div class="additional-actions">
+          <button class="link-btn" (click)="showHelp()">
+            ❓ ¿Necesitas ayuda?
+          </button>
+          <button class="link-btn" (click)="goToPublicArea()">
+            🌐 Área pública
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 👥 Usuarios de demostración -->
+    @if (showDemoCredentials) {
+      <section class="demo-section">
+        <div class="demo-container">
+          <div class="demo-header">
+            <h3>👥 Usuarios de Demostración</h3>
+            <p>Haz clic en cualquier usuario para usar sus credenciales</p>
+          </div>
+
+          <div class="demo-users-grid">
+            @for (user of demoUsers; track user.id) {
+              <div 
+                class="demo-user-card" 
+                [class]="getRoleClass(user.role)"
+                (click)="useDemoUser(user)">
+                
+                <div class="user-avatar">{{ user.avatar }}</div>
+                <div class="user-info">
+                  <h4 class="user-name">{{ user.fullName }}</h4>
+                  <p class="user-role">{{ getRoleDisplayName(user.role) }}</p>
+                  <p class="user-username">👤 {{ user.username }}</p>
+                </div>
+                <div class="quick-actions">
+                  <button 
+                    class="quick-login-btn"
+                    (click)="quickLogin(user.username); $event.stopPropagation()"
+                    title="Login automático">
+                    ⚡ Login
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+
+          <div class="demo-info">
+            <h4>🔧 Funcionalidades por Rol:</h4>
+            <div class="roles-info">
+              <div class="role-info admin">
+                <strong>👨‍💼 Administrador:</strong>
+                <ul>
+                  <li>✅ Acceso completo al sistema</li>
+                  <li>✅ Panel de administración</li>
+                  <li>✅ Gestión de usuarios y configuración</li>
+                </ul>
+              </div>
+              
+              <div class="role-info project-manager">
+                <strong>👨‍🏗️ Jefe de Proyecto:</strong>
+                <ul>
+                  <li>✅ Gestión completa de proyectos</li>
+                  <li>✅ Supervisión de equipos</li>
+                  <li>✅ Creación y edición de usuarios</li>
+                </ul>
+              </div>
+              
+              <div class="role-info engineer">
+                <strong>👩‍🔧 Ingeniero:</strong>
+                <ul>
+                  <li>✅ Edición de proyectos asignados</li>
+                  <li>✅ Visualización de usuarios</li>
+                  <li>❌ Sin acceso a administración</li>
+                </ul>
+              </div>
+              
+              <div class="role-info technician">
+                <strong>👨‍💻 Técnico:</strong>
+                <ul>
+                  <li>✅ Consulta de información</li>
+                  <li>✅ Visualización de proyectos</li>
+                  <li>❌ Sin permisos de edición</li>
+                </ul>
+              </div>
+              
+              <div class="role-info guest">
+                <strong>👤 Invitado:</strong>
+                <ul>
+                  <li>✅ Solo lectura básica</li>
+                  <li>❌ Acceso muy limitado</li>
+                  <li>❌ Sin gestión de datos</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- 🎓 Información educativa -->
+    <section class="educational-section">
+      <h3>🎓 Conceptos Demostrados - LAB 4</h3>
+      
+      <div class="concepts-grid">
+        <div class="concept">
+          <h4>🔐 AuthService</h4>
+          <ul>
+            <li>✅ Autenticación con localStorage</li>
+            <li>✅ Gestión de sesiones y tokens</li>
+            <li>✅ Roles y permisos granulares</li>
+            <li>✅ Eventos de seguridad</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🛡️ Guards</h4>
+          <ul>
+            <li>✅ AuthGuard - Protección de rutas</li>
+            <li>✅ AdminGuard - Autorización por roles</li>
+            <li>✅ UnsavedChangesGuard - Prevenir pérdida de datos</li>
+            <li>✅ CanActivate, CanLoad, CanDeactivate</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🔒 Seguridad</h4>
+          <ul>
+            <li>✅ Control de acceso granular</li>
+            <li>✅ Timeout de sesión automático</li>
+            <li>✅ Bloqueo por intentos fallidos</li>
+            <li>✅ Auditoría de eventos de seguridad</li>
+          </ul>
+        </div>
+        
+        <div class="concept">
+          <h4>🎯 Lazy Loading</h4>
+          <ul>
+            <li>✅ Módulos cargados bajo demanda</li>
+            <li>✅ Guards en rutas lazy</li>
+            <li>✅ Optimización de rendimiento</li>
+            <li>✅ Separación de funcionalidades</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- 🔽 Toggle demo credentials -->
+  <div class="demo-toggle">
+    <button 
+      class="toggle-btn" 
+      (click)="toggleDemoCredentials()">
+      {{ showDemoCredentials ? '🔼 Ocultar' : '🔽 Mostrar' }} Usuarios Demo
+    </button>
+  </div>
+</div>

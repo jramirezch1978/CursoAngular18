@@ -1,0 +1,178 @@
+<div class="projects-container">
+  <header class="page-header">
+    <div class="header-content">
+      <h1>🏗️ Gestión de Proyectos</h1>
+      <p class="page-description">
+        Esta página está protegida por <code>AuthGuard</code> - Solo usuarios autenticados
+      </p>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn btn-secondary" (click)="goToDashboard()">
+        🏠 Dashboard
+      </button>
+      <button class="btn btn-danger" (click)="logout()">
+        🚪 Salir
+      </button>
+    </div>
+  </header>
+
+  <!-- 🏗️ Lista de proyectos -->
+  <section class="projects-section">
+    <h2>📋 Proyectos PROVIAS</h2>
+    
+    <div class="projects-grid">
+      @for (project of projects; track project.id) {
+        <div class="project-card" [class]="project.status">
+          <div class="project-header">
+            <h3>{{ project.name }}</h3>
+            <span class="project-status" [class]="project.status">
+              {{ getStatusText(project.status) }}
+            </span>
+          </div>
+          
+          <div class="project-details">
+            <p class="project-location">
+              📍 <strong>Ubicación:</strong> {{ project.location }}
+            </p>
+            <p class="project-budget">
+              💰 <strong>Presupuesto:</strong> {{ formatBudget(project.budget) }}
+            </p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- 🔐 Verificación de permisos -->
+  <section class="permissions-check">
+    <h2>🔐 Verificación de Permisos</h2>
+    
+    <div class="permissions-grid">
+      <div class="permission-item">
+        <h4>👀 Ver Proyectos</h4>
+        @if (hasPermission('projects:view')) {
+          <span class="permission-granted">✅ Tienes acceso</span>
+          <p>Puedes ver la información de todos los proyectos</p>
+        } @else {
+          <span class="permission-denied">❌ Sin acceso</span>
+          <p>No tienes permisos para ver proyectos</p>
+        }
+      </div>
+      
+      <div class="permission-item">
+        <h4>✏️ Editar Proyectos</h4>
+        @if (hasPermission('projects:edit')) {
+          <span class="permission-granted">✅ Tienes acceso</span>
+          <p>Puedes modificar la información de proyectos</p>
+        } @else {
+          <span class="permission-denied">❌ Sin acceso</span>
+          <p>No tienes permisos para editar proyectos</p>
+        }
+      </div>
+      
+      <div class="permission-item">
+        <h4>➕ Crear Proyectos</h4>
+        @if (hasPermission('projects:create')) {
+          <span class="permission-granted">✅ Tienes acceso</span>
+          <p>Puedes crear nuevos proyectos en el sistema</p>
+        } @else {
+          <span class="permission-denied">❌ Sin acceso</span>
+          <p>No tienes permisos para crear proyectos</p>
+        }
+      </div>
+      
+      <div class="permission-item">
+        <h4>🗑️ Eliminar Proyectos</h4>
+        @if (hasPermission('projects:delete')) {
+          <span class="permission-granted">✅ Tienes acceso</span>
+          <p>Puedes eliminar proyectos del sistema</p>
+        } @else {
+          <span class="permission-denied">❌ Sin acceso</span>
+          <p>No tienes permisos para eliminar proyectos</p>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- 📊 Estadísticas por estado -->
+  <section class="stats-section">
+    <h2>📊 Estadísticas de Proyectos</h2>
+    
+    <div class="stats-grid">
+      <div class="stat-card planning">
+        <div class="stat-icon">📋</div>
+        <div class="stat-info">
+          <h3>{{ projects.filter(p => p.status === 'planning').length }}</h3>
+          <p>En Planificación</p>
+        </div>
+      </div>
+      
+      <div class="stat-card in-progress">
+        <div class="stat-icon">🚧</div>
+        <div class="stat-info">
+          <h3>{{ projects.filter(p => p.status === 'in-progress').length }}</h3>
+          <p>En Ejecución</p>
+        </div>
+      </div>
+      
+      <div class="stat-card completed">
+        <div class="stat-icon">✅</div>
+        <div class="stat-info">
+          <h3>{{ projects.filter(p => p.status === 'completed').length }}</h3>
+          <p>Completados</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 🎓 Información educativa -->
+  <section class="educational-section">
+    <h2>🎓 AuthGuard en Funcionamiento</h2>
+    
+    <div class="guard-info">
+      <div class="guard-step">
+        <div class="step-number">1</div>
+        <div class="step-content">
+          <h4>🔍 Verificación de Autenticación</h4>
+          <p>AuthGuard verificó que tienes una sesión válida antes de mostrar esta página</p>
+        </div>
+      </div>
+      
+      <div class="guard-step">
+        <div class="step-number">2</div>
+        <div class="step-content">
+          <h4>🎫 Validación de Token</h4>
+          <p>Se verificó que tu token de sesión no haya expirado</p>
+        </div>
+      </div>
+      
+      <div class="guard-step">
+        <div class="step-number">3</div>
+        <div class="step-content">
+          <h4>📦 Carga del Componente</h4>
+          <p>Solo después de la verificación exitosa se cargó este componente via lazy loading</p>
+        </div>
+      </div>
+      
+      <div class="guard-step">
+        <div class="step-number">4</div>
+        <div class="step-content">
+          <h4>🔐 Control de Permisos</h4>
+          <p>La UI se adapta dinámicamente según tus permisos específicos</p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="test-info">
+      <h4>🧪 Prueba el Guard</h4>
+      <p>
+        Para probar AuthGuard, cierra sesión e intenta acceder directamente a esta URL.
+        Serás redirigido automáticamente a la página de login.
+      </p>
+      <button class="test-logout-btn" (click)="logout()">
+        🚪 Probar AuthGuard (Cerrar Sesión)
+      </button>
+    </div>
+  </section>
+</div>

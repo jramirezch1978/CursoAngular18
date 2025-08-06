@@ -1,0 +1,255 @@
+GUIÓN DETALLADO - SESIÓN 3: DATA BINDING Y PIPES - ANGULAR v18
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Portada del Curso (2 minutos)
+¡Bienvenidos a nuestra tercera sesión del curso Angular 18! Es un gusto enorme volver a verlos.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y hoy, martes 5 de agosto de 2025, nos espera una sesión completamente diferente y emocionante. Si las sesiones anteriores fueron como aprender a usar las herramientas básicas de un taller mecánico, hoy vamos a convertirnos en verdaderos artesanos del código.
+Data Binding y Pipes son como el sistema circulatorio y respiratorio de cualquier aplicación Angular. El data binding es el que permite que la información fluya entre la lógica de negocio y lo que el usuario ve en pantalla, mientras que los pipes son como filtros mágicos que transforman esa información en algo comprensible y útil.
+La metodología de hoy será 100% laboratorio práctico. Esto significa que van a tener las manos en el código durante las próximas tres horas. Es como aprender a tocar guitarra: pueden leer toda la teoría musical del mundo, pero hasta que no pongan los dedos en las cuerdas, no van a hacer música.
+Al final de esta sesión, no solo van a entender estos conceptos, sino que habrán construido un sistema completo de gestión con data binding avanzado y pipes personalizados que podrían implementar mañana mismo en cualquier proyecto empresarial.
+Preparen sus editores de código, abran Visual Studio Code, asegúrense de que su servidor de desarrollo esté listo, y empecemos esta aventura juntos.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Hoy vamos a lograr cosas concretas y medibles que van a transformar la forma en que desarrollan aplicaciones Angular.
+Dominar todas las formas de Data Binding es como aprender los diferentes tipos de comunicación en una empresa. A veces necesitan enviar un memorando unidireccional (interpolación), otras veces necesitan una conversación telefónica bidireccional (two-way binding), y en ocasiones solo necesitan colgar un aviso en el tablón (property binding).
+La interpolación es el pan de cada día en Angular. Es lo que les permite mostrar el nombre del usuario, el saldo de una cuenta, o cualquier dato dinámico. Pero vamos más allá del simple "mostrar texto". Van a aprender cuándo usar cada tipo de binding para optimizar el rendimiento de sus aplicaciones.
+El two-way binding para formularios interactivos es como tener una conversación en tiempo real. Imaginen un formulario de registro donde mientras el usuario escribe su correo, automáticamente se valida y se muestra si está disponible. Esa magia la vamos a implementar hoy.
+Los pipes personalizados son sus herramientas de transformación. Es como tener un traductor universal que convierte números crudos en moneda formateada, fechas en formato legible, o textos largos en resúmenes concisos. Van a crear sus propios pipes que resuelvan problemas específicos de negocio.
+El pipe async es especialmente poderoso porque maneja automáticamente las suscripciones y desuscripciones. Es como tener un asistente personal que se encarga de toda la logística mientras ustedes se enfocan en lo importante.
+Al terminar la sesión, tendrán un sistema completo funcionando que podrán mostrar con orgullo en cualquier entrevista técnica o presentación de proyecto.
+________________________________________
+Diapositiva 3: Agenda de la Sesión (1 minuto)
+Nuestra agenda está diseñada como una escalera donde cada peldaño los prepara para el siguiente.
+Los primeros 40 minutos del Lab 1 son fundamentales. Van a construir los cimientos entendiendo y aplicando los cuatro tipos de data binding. Es como aprender los acordes básicos antes de tocar una canción completa.
+El Lab 2 los llevará al siguiente nivel con binding avanzado y manejo de eventos. Aquí es donde la aplicación cobra vida y responde a las acciones del usuario de manera inteligente.
+Después de 80 minutos intensos de código, nos tomaremos un merecido break de 15 minutos. Aprovechen para estirar las piernas, tomar agua, y procesar lo aprendido.
+Al regresar, el Lab 3 introducirá los pipes built-in y el poderoso async pipe. Van a ver cómo Angular transforma datos crudos en información presentable con elegancia.
+El Lab 4 es donde se vuelven creativos creando sus propios pipes personalizados. Es como pasar de usar herramientas prefabricadas a crear las suyas propias para resolver problemas específicos.
+Los últimos 5 minutos serán para consolidar lo aprendido, resolver dudas finales, y prepararlos para la próxima sesión.
+________________________________________
+Diapositiva 4: Conceptos Core - Data Binding (3 minutos)
+El Data Binding es el corazón palpitante de Angular, y hoy vamos a entender cada latido.
+La interpolación con las dobles llaves es la forma más básica pero más utilizada. Cuando escriben {{ title }}, Angular automáticamente actualiza ese texto cada vez que la variable title cambia en el componente. Es como tener un espejo mágico que siempre refleja el estado actual de sus datos.
+Vean este ejemplo: {{ price | currency }}. No solo mostramos el precio, sino que lo transformamos con un pipe. Si price es 1234.5, el usuario verá $1,234.50. Es la diferencia entre mostrar datos crudos y presentar información profesional.
+El property binding con corchetes cuadrados es unidireccional pero poderoso. Cuando escriben [src]="imageUrl", están diciendo "el atributo src de esta imagen siempre debe ser igual al valor de imageUrl". Si imageUrl cambia, la imagen cambia automáticamente. Es perfecto para atributos dinámicos.
+El [disabled]="!isValid" es un ejemplo perfecto de cómo el property binding mejora la experiencia del usuario. El botón se habilita o deshabilita automáticamente basado en la validez del formulario. No necesitan escribir código adicional para manipular el DOM.
+El event binding con paréntesis es como instalar sensores en su aplicación. (click)="handleClick($event)" dice "cuando alguien haga click aquí, ejecuta esta función". El $event les da acceso a toda la información del evento, como las coordenadas del click o qué tecla se presionó.
+El two-way binding con la sintaxis banana-in-a-box [(ngModel)] es la joya de la corona. Combina property binding y event binding en una sola expresión elegante. Es bidireccional: los cambios en el código actualizan la vista, y los cambios en la vista actualizan el código.
+________________________________________
+Diapositiva 5: LAB 1 - Fundamentos de Data Binding (5 minutos)
+¡Manos a la obra! Vamos a construir un sistema de productos que cualquier e-commerce envidiaría.
+El componente que van a crear es un catálogo de productos dinámico. Imaginen que están construyendo la próxima versión del sistema de inventario de PROVIAS, donde cada producto debe mostrarse con su información actualizada en tiempo real.
+Empezaremos con la interpolación. En el template, escribirán <h2>{{ product.name }}</h2>. Esto toma el nombre del producto desde el objeto y lo muestra. Pero aquí viene lo interesante: si el nombre cambia en la base de datos, automáticamente se actualiza en pantalla sin recargar la página.
+El property binding lo usaremos para las imágenes. [src]="product.image" asegura que cada producto muestre su imagen correcta. Y con [alt]="product.name", mejoramos la accesibilidad. Es como poner etiquetas descriptivas en un almacén para que todos sepan qué hay en cada caja.
+El class binding condicional [class.on-sale]="product.discount > 0" es brillante. Si el producto tiene descuento, automáticamente se le aplica la clase CSS "on-sale" que podría mostrar una etiqueta roja o cambiar el color del precio. Es automatización visual inteligente.
+Para el precio, combinaremos interpolación con pipes: {{ product.price | currency }}. Si el precio es 45.99, el usuario verá $45.99 o S/45.99 dependiendo de la configuración regional. Es la diferencia entre una aplicación amateur y una profesional.
+El event binding en el botón es crucial. (click)="addToCart(product)" ejecuta la función addToCart pasándole el producto completo como parámetro. En la función, pueden agregar el producto al carrito, mostrar una notificación, actualizar el contador del carrito, todo con una sola línea en el template.
+Durante estos 40 minutos, van a crear al menos 5 productos diferentes, implementar la lógica del carrito, y ver cómo todos los tipos de binding trabajan juntos para crear una experiencia fluida.
+________________________________________
+Diapositiva 6: Binding Avanzado - Atributos y Estilos (3 minutos)
+Ahora vamos a subir el nivel y explorar bindings más sofisticados que les darán superpoderes visuales.
+El attribute binding es sutil pero importante. [attr.colspan]="colSpan" les permite modificar atributos HTML que no son propiedades del DOM. Es la diferencia entre cambiar la apariencia y cambiar la estructura. Imaginen una tabla que se reorganiza dinámicamente según los datos que recibe.
+El [attr.for]="inputId" en las etiquetas es crucial para accesibilidad. Conecta labels con inputs dinámicamente, mejorando la experiencia para usuarios con lectores de pantalla. Es como poner señalización braille en un edificio: no todos la necesitan, pero marca la diferencia para quienes sí.
+El class binding tiene tres formas, cada una con su propósito. [class]="cssClass" reemplaza todas las clases, útil cuando necesitan cambiar completamente el estilo de un elemento. Es como cambiar completamente el uniforme de un empleado.
+[class.active]="isActive" agrega o quita una clase específica. Es perfecto para estados binarios como activo/inactivo, visible/oculto, válido/inválido. Como prender o apagar una luz.
+NgClass es el más poderoso. Pueden aplicar múltiples clases basadas en diferentes condiciones. Es como tener un vestuario completo y elegir qué ponerse según la ocasión. El objeto que pasan determina qué clases se aplican y cuáles no.
+El style binding directo [style.width.px]="widthValue" es perfecto para valores calculados dinámicamente. Si tienen un gráfico de barras donde cada barra representa un porcentaje, pueden hacer que el ancho se ajuste automáticamente a los datos.
+NgStyle para múltiples estilos es como tener un estilista personal para cada elemento. Pueden cambiar colores, tamaños, márgenes, todo basado en la lógica del componente. Es especialmente útil para temas dinámicos o personalización de usuario.
+________________________________________
+Diapositiva 7: LAB 2 - Binding Avanzado y Eventos (5 minutos)
+Este laboratorio es donde su aplicación se vuelve verdaderamente interactiva y profesional.
+Van a construir un dashboard que responde inteligentemente a las acciones del usuario. Imaginen el panel de control de un automóvil moderno donde cada indicador se actualiza en tiempo real y responde al toque.
+El ngClass con themeClasses es elegante. En lugar de escribir lógica en el template, crean un getter que devuelve un objeto con las clases apropiadas. Si el tema es oscuro, aplica 'dark-theme'. Si el widget es pequeño, aplica 'compact'. Es como tener presets de configuración.
+El binding de estilo para el ancho del widget [style.width.%]="widgetSize" permite redimensionamiento dinámico. Los usuarios podrían tener un slider que ajusta el tamaño, y el widget se adapta instantáneamente. Es responsive design llevado al siguiente nivel.
+Los atributos de datos [attr.data-priority]="priority" son útiles para CSS avanzado o para que otros scripts accedan a metadata. Es como poner etiquetas invisibles que solo ciertos procesos pueden leer.
+Los eventos mouseenter y mouseleave crean interactividad sutil. Cuando pasan el mouse sobre el widget, se resalta. Cuando lo quitan, vuelve a normal. Es feedback visual instantáneo que hace que la aplicación se sienta viva.
+El two-way binding en el input de búsqueda es mágico. [(ngModel)]="searchTerm" mantiene sincronizado el valor del input con la variable del componente. Mientras el usuario escribe, pueden mostrar resultados en tiempo real, validar la entrada, o habilitar/deshabilitar botones.
+El evento keyup captura cada tecla presionada. Pueden implementar búsqueda instantánea, atajos de teclado, o validación en tiempo real. Es como tener un asistente que responde a cada letra que escriben.
+Durante estos 40 minutos, van a crear un dashboard completamente funcional con widgets que se pueden reorganizar, temas que se pueden cambiar, y búsqueda en tiempo real.
+________________________________________
+Diapositiva 8: BREAK (15 minutos)
+¡Excelente trabajo! Han completado la primera mitad de nuestra sesión intensiva.
+En estos primeros 80 minutos han dominado conceptos que muchos desarrolladores tardan semanas en comprender. Han implementado todos los tipos de data binding, creado componentes verdaderamente interactivos, y aplicado estilos dinámicos como profesionales.
+Si esto fuera un videojuego, acaban de desbloquear las habilidades de "Maestro del Data Binding" y "Arquitecto de Eventos". Ahora tienen el poder de hacer que cualquier interfaz responda exactamente como necesitan.
+Durante este break, les recomiendo que se levanten y caminen un poco. La programación intensiva puede ser agotadora mentalmente, y el movimiento físico ayuda a procesar la información. Es como dejar que el café se asiente antes de tomar el siguiente sorbo.
+Tomen agua, estiren los brazos y el cuello. Miren algo distante por la ventana para relajar los ojos. Si tienen alguna fruta o snack saludable, es buen momento para recargar energía.
+También aprovechen para revisar rápidamente el código que han escrito. Si hay algún error en la consola, es el momento perfecto para solucionarlo. Abran la consola del navegador y verifiquen que no hay warnings.
+La segunda mitad de la sesión será igual de emocionante. Vamos a entrar al mundo de los Pipes, que son como los efectos especiales del cine pero para datos. Van a transformar información cruda en presentaciones elegantes y profesionales.
+Prepárense mentalmente para lo que viene. Los pipes van a cambiar completamente la forma en que presentan información en sus aplicaciones. Es la diferencia entre mostrar "1234567890" y mostrar "(123) 456-7890".
+Nos vemos en exactamente 15 minutos, a las 20:35. ¡Descansen bien!
+________________________________________
+Diapositiva 9: Pipes - Transformadores de Datos (3 minutos)
+Bienvenidos de vuelta. Ahora entramos al fascinante mundo de los Pipes, los magos de la transformación de datos.
+Los pipes son como los filtros de Instagram pero para datos. Toman información cruda y la convierten en algo hermoso y comprensible. La sintaxis es elegante: simplemente agregan una barra vertical y el nombre del pipe después de cualquier expresión.
+Los pipes de texto son los más simples pero increíblemente útiles. {{ 'angular' | uppercase }} convierte todo a mayúsculas. Es perfecto para títulos o cuando necesitan enfatizar algo. El titlecase es especialmente útil para nombres propios donde cada palabra debe empezar con mayúscula.
+Los pipes numéricos son esenciales para aplicaciones financieras. {{ 3.14159 | number:'1.2-2' }} significa "mínimo 1 dígito entero, mínimo 2 decimales, máximo 2 decimales". El resultado es 3.14, perfecto y limpio. Es como tener un contador que siempre muestra los números de forma consistente.
+El pipe percent es brillante para estadísticas. {{ 0.259 | percent }} muestra 26%, no 0.259. Los usuarios entienden porcentajes, no decimales. Con percent:'2.2-2' pueden controlar la precisión: 25.90%.
+El pipe currency es indispensable. {{ 1234.5 | currency }} muestra $1,234.50 por defecto. Pero aquí en Perú, podemos usar {{ 1234.5 | currency:'PEN':'symbol':'1.0-0' }} para mostrar S/ 1,235. Es localización instantánea.
+Los pipes de fecha transforman timestamps ilegibles en fechas comprensibles. Una fecha como 2025-08-05T19:30:00Z se convierte en "5 de agosto de 2025" o "05/08/2025" o "martes, 5 de agosto de 2025". Cada formato tiene su propósito.
+El pipe json es invaluable para debugging. Convierte objetos JavaScript en JSON formateado. En lugar de ver [object Object], ven la estructura completa del objeto. Es como tener rayos X para sus datos.
+El pipe slice es como un cuchillo suizo para arrays y strings. Pueden mostrar solo los primeros 3 elementos de una lista, o los primeros 50 caracteres de un texto. Perfecto para previews y resúmenes.
+________________________________________
+Diapositiva 10: Pipe Async - Manejo de Observables (3 minutos)
+El pipe async es probablemente el pipe más poderoso de Angular, y ahora van a entender por qué.
+Imaginen que están esperando una pizza. Sin async pipe, tendrían que llamar constantemente para preguntar si está lista, y cuando llegue, tendrían que recordar colgar el teléfono. Con async pipe, simplemente esperan y cuando llega la pizza, todo se maneja automáticamente.
+Cuando escriben *ngIf="user$ | async as user", están diciendo "cuando lleguen los datos del usuario, guárdalos en la variable user y muestra este contenido". Angular se encarga de suscribirse al Observable y desuscribirse cuando el componente se destruye.
+El patrón "as" es elegante. En lugar de escribir (user$ | async).name en múltiples lugares, lo asignan una vez a una variable local. Es como recibir un paquete, abrirlo una vez, y luego usar su contenido múltiples veces.
+Con Promises, async pipe espera a que se resuelva y luego muestra el resultado. Es perfecto para operaciones únicas como cargar configuración inicial o datos que no cambian.
+Para requests HTTP, items$ | async es mágico. Hace la petición, espera la respuesta, maneja errores, y limpia todo cuando termina. Sin async pipe, necesitarían escribir al menos 10 líneas de código para hacer lo mismo correctamente.
+El loading state es profesional. Mientras los datos cargan, muestran un spinner o mensaje. Cuando llegan, muestran el contenido. Es la diferencia entre una pantalla en blanco confusa y una experiencia de usuario pulida.
+El operador de navegación segura ?. previene errores. (userData$ | async)?.name no explota si userData es null. Es como tener un airbag en su código.
+Lo más importante: async pipe previene memory leaks. Automáticamente se desuscribe cuando el componente se destruye. Sin esto, tendrían que manejar manualmente todas las suscripciones, lo cual es propenso a errores.
+________________________________________
+Diapositiva 11: LAB 3 - Pipes Built-in y Async (5 minutos)
+Este laboratorio es donde todo cobra vida. Van a construir un sistema de gestión de tareas digno de cualquier empresa moderna.
+El sistema que crearemos podría perfectamente ser usado por PROVIAS para gestionar sus proyectos de infraestructura. Cada tarea tiene título, descripción, valor monetario, progreso y fecha de creación. Todo presentado de forma profesional.
+Empezaremos con el título de la aplicación usando uppercase. Es sutil pero importante: los títulos en mayúsculas dan sensación de importancia y formalidad. Como los letreros en edificios gubernamentales.
+La fecha con date:'fullDate' muestra algo como "martes, 5 de agosto de 2025". Es información contextual que ayuda a los usuarios a orientarse temporalmente. Especialmente útil en reportes y documentos oficiales.
+El filtro de búsqueda es donde brillamos. Mientras el usuario escribe, filtran las tareas en tiempo real. Usan un BehaviorSubject que emite nuevos valores filtrados, y async pipe se encarga de actualizar la vista automáticamente.
+La combinación de pipes es poderosa: filteredTasks$ | async | slice:0:10. Primero obtienen las tareas filtradas, luego muestran solo las primeras 10. Es paginación instantánea sin complejidad adicional.
+Para las descripciones, slice:0:50 muestra solo los primeros 50 caracteres. Es como los previews en WhatsApp: suficiente para entender de qué trata sin abrumar con texto.
+El valor monetario con currency:'PEN':'symbol':'1.2-2' muestra exactamente "S/ 1,234.56". Los contadores y administradores aman esta precisión. Es la diferencia entre software amateur y empresarial.
+El progreso como porcentaje es intuitivo. En lugar de mostrar 0.75, muestran 75%. Los humanos pensamos en porcentajes, no en decimales. Es diseño centrado en el usuario.
+Las estadísticas con async son elegantes. El servicio calcula totales y promedios, y el template los muestra automáticamente cuando están listos. No hay necesidad de manejar estados de carga manualmente.
+Durante estos 40 minutos, van a procesar al menos 20 tareas, implementar filtrado en tiempo real, y ver cómo los pipes transforman datos crudos en información empresarial profesional.
+________________________________________
+Diapositiva 12: Pipes Personalizados - Creación (3 minutos)
+Ahora viene la parte creativa: crear sus propios pipes personalizados para resolver problemas específicos de negocio.
+Un pipe personalizado es como crear su propia herramienta especializada. Imaginen que ninguna herramienta existente hace exactamente lo que necesitan. En lugar de conformarse, crean la suya propia.
+La estructura es simple pero poderosa. El decorador @Pipe define el nombre que usarán en los templates. PipeTransform es la interfaz que garantiza que su pipe tiene el método transform. Es como firmar un contrato que dice "prometo transformar datos".
+El pipe timeAgo que vamos a crear es genial. Transforma fechas aburridas como "2025-08-05T19:00:00Z" en texto amigable como "hace 5 minutos" o "hace 2 días". Es la diferencia entre información técnica e información humana.
+La lógica es elegante. Calculan los segundos transcurridos, luego determinan la unidad apropiada (segundos, minutos, horas, días). Es como un traductor temporal que habla el idioma de los humanos.
+El manejo de casos especiales es importante. Si han pasado menos de 29 segundos, muestran "Justo ahora". Es ese toque de atención al detalle que hace que una aplicación se sienta premium.
+La diferencia entre pipes puros e impuros es crucial. Los puros son como funciones matemáticas: misma entrada, misma salida, siempre. Son eficientes porque Angular los ejecuta solo cuando los inputs cambian.
+Los pipes impuros se ejecutan en cada ciclo de detección de cambios. Son como monitores en tiempo real que siempre están verificando. Útiles para cosas como filtros dinámicos, pero úsenlos con cuidado porque pueden afectar el rendimiento.
+El objeto intervals con las unidades de tiempo es inteligente. En lugar de múltiples if-else, iteran sobre las unidades de mayor a menor hasta encontrar la apropiada. Es código limpio y mantenible.
+________________________________________
+Diapositiva 13: LAB 4 - Pipes Personalizados (5 minutos)
+Este es el laboratorio más creativo. Van a construir una suite completa de pipes personalizados que resolverán problemas reales.
+El FilterPipe es indispensable para cualquier aplicación con listas. Imaginen un directorio de empleados donde necesitan buscar por nombre, departamento, o cualquier campo. Este pipe lo hace posible con una línea en el template.
+La implementación es inteligente. Primero verifican si hay items y texto de búsqueda. Si no, devuelven los items originales. Luego filtran comparando el campo especificado con el texto de búsqueda, todo en minúsculas para hacer la búsqueda case-insensitive.
+El TruncatePipe es perfecto para cards y previews. En lugar de mostrar párrafos completos que rompen el diseño, muestran los primeros 50 caracteres con puntos suspensivos. Es como los trailers de películas: suficiente para interesar sin revelar todo.
+Los parámetros con valores por defecto son profesionales. Si no especifican un límite, usa 25. Si no especifican el trail, usa '...'. Es diseño API amigable que funciona bien por defecto pero permite personalización.
+El FileSizePipe es oro puro para aplicaciones que manejan archivos. Convierte 1048576 bytes en "1.00 MB". Los usuarios no piensan en bytes; piensan en KB, MB, GB. Es traducción de lenguaje máquina a lenguaje humano.
+La matemática es elegante. Usan logaritmos para determinar la unidad apropiada, luego dividen y formatean. Es el tipo de código que separa a desarrolladores junior de senior.
+El uso en templates es limpio. {{ description | truncate:50:'...' }} es autodocumentado. Cualquier desarrollador que lo lea entiende inmediatamente qué hace.
+La combinación con ngFor es poderosa. *ngFor="let item of items | filter:searchTerm:'name'" filtra la lista en tiempo real mientras el usuario escribe. Es la funcionalidad que los usuarios esperan en 2025.
+Durante estos 40 minutos, van a crear al menos 5 pipes personalizados diferentes, cada uno resolviendo un problema específico. Van a ver cómo estos pipes hacen su código más limpio, más reutilizable, y más mantenible.
+________________________________________
+Diapositiva 14: Optimización y Best Practices (2 minutos)
+Ahora hablemos de la diferencia entre código que funciona y código profesional optimizado.
+Los pipes puros son su primera línea de defensa para el rendimiento. Son como cachés automáticos. Angular solo los ejecuta cuando los inputs cambian, no en cada ciclo de detección. Para transformaciones costosas, esto puede ser la diferencia entre una aplicación fluida y una lenta.
+La memoización es una técnica avanzada pero crucial. Si su pipe hace cálculos costosos, guarden los resultados en un Map. La próxima vez que reciban el mismo input, devuelven el resultado cacheado instantáneamente. Es como tener una memoria fotográfica para cálculos.
+El async pipe es una mejor práctica absoluta para Observables. Manejar suscripciones manualmente es propenso a errores y memory leaks. Async pipe es como tener un mayordomo que se encarga de todo el trabajo sucio.
+Los pipes impuros con lógica pesada son un anti-patrón. Es como tener un guardia de seguridad que revisa los documentos de todos cada segundo, incluso si nadie se ha movido. Mata el rendimiento.
+Llamar funciones directamente en templates es tentador pero peligroso. {{ calculateValue() }} se ejecuta en cada ciclo de detección. Pueden ser cientos de veces por segundo. Un pipe se ejecuta solo cuando es necesario.
+Los pipes anidados complejos pueden ser difíciles de debuggear y mantener. Si necesitan más de 3 pipes encadenados, consideren crear un pipe personalizado que haga toda la transformación, o mejor aún, usen computed() de Signals.
+La combinación OnPush + Pipes es la fórmula secreta para aplicaciones ultra rápidas. OnPush reduce las verificaciones de cambios, y los pipes puros reducen las transformaciones innecesarias.
+Para transformaciones complejas que dependen de múltiples valores, Signals con computed() es el futuro. Es reactive programming llevado al siguiente nivel.
+________________________________________
+Diapositiva 15: Q&A y Cierre (5 minutos)
+¡Felicitaciones! Acaban de completar una sesión intensiva que los convierte en verdaderos artesanos del Data Binding y Pipes.
+Hoy han logrado cosas increíbles. Dominaron todos los tipos de data binding, desde la simple interpolación hasta el complejo two-way binding. Sus aplicaciones ahora pueden comunicarse con los usuarios de formas que antes parecían mágicas.
+Implementaron two-way binding con NgModel, convirtiendo formularios estáticos en experiencias interactivas donde cada tecla presionada puede triggear validaciones, búsquedas, o actualizaciones en tiempo real.
+Aplicaron pipes built-in para transformar datos crudos en información profesional. Fechas legibles, monedas formateadas, porcentajes comprensibles. Es la diferencia entre mostrar datos y comunicar información.
+Crearon pipes personalizados que resuelven problemas específicos de negocio. Estos pipes son reutilizables across proyectos. Son herramientas que llevarán en su caja de herramientas profesional para siempre.
+Optimizaron el rendimiento entendiendo la diferencia entre pipes puros e impuros, y cuándo usar cada uno. Este conocimiento los separa de desarrolladores que solo copian y pegan código.
+La próxima sesión, el jueves 7 de agosto, exploraremos el mundo de las Directivas. Si los pipes transforman datos, las directivas transforman el DOM mismo. Van a crear sus propias directivas que agregan comportamiento y funcionalidad a elementos HTML.
+Las directivas estructurales como @if, @for, y @switch son el nuevo estándar en Angular 18. Son más eficientes y más fáciles de leer que las antiguas *ngIf y *ngFor.
+Como tarea opcional, les sugiero crear un pipe personalizado para algún problema que tengan en su trabajo actual. Puede ser formateo de RUC, validación de DNI, o cualquier transformación específica de su dominio.
+Experimenten con la diferencia de rendimiento entre pipes puros e impuros. Creen un pipe impuro que filtre una lista grande y vean cómo afecta el rendimiento. Luego conviértanlo en puro y noten la diferencia. Es aprendizaje práctico valioso.
+Implementen filtrado con pipes en una lista real de su trabajo. Puede ser una lista de clientes, productos, o proyectos. Verán cómo los conceptos de hoy se aplican directamente a problemas reales.
+Preguntas frecuentes que suelen surgir:
+"¿Cuándo debo usar pipes vs métodos en el componente?" - Los pipes son para transformación de presentación. Si la lógica es específica de visualización, use pipes. Si es lógica de negocio, use métodos en el componente.
+"¿Los pipes afectan el SEO?" - Si están usando Server Side Rendering, los pipes se ejecutan en el servidor y el HTML resultante es indexable. Para aplicaciones client-side, consideren pre-rendering para contenido crítico.
+"¿Puedo usar async pipe con Signals?" - Signals no necesitan async pipe porque no son Observables. Usan su propia reactividad. Es uno u otro, no ambos juntos.
+"¿Cómo debuggeo pipes personalizados?" - Pueden usar console.log dentro del método transform, pero recuerden quitarlos en producción. También pueden usar breakpoints en el debugger del navegador.
+Recursos para seguir aprendiendo:
+La documentación oficial de Angular sobre pipes es excelente y está llena de ejemplos prácticos. Especialmente la sección sobre pipes personalizados tiene casos de uso avanzados.
+RxJS tiene operadores que funcionan como pipes para Observables. Aprender RxJS los llevará al siguiente nivel en programación reactiva.
+El repositorio del curso tiene ejemplos adicionales de pipes personalizados que pueden estudiar y adaptar para sus proyectos.
+Para prepararse para la próxima sesión:
+Revisen el concepto de directivas en la documentación. Las directivas son como pipes pero para el DOM en lugar de datos.
+Si tienen tiempo, experimenten creando una directiva simple que cambie el color de un elemento al pasar el mouse. Es un buen calentamiento.
+Piensen en comportamientos repetitivos en sus aplicaciones actuales que podrían beneficiarse de directivas personalizadas.
+Reflexión final:
+Hoy han dado un salto cuántico en sus habilidades Angular. Data Binding y Pipes son fundamentales, pero más importante aún, han aprendido a pensar en términos de flujo de datos y transformación.
+Cada vez que vean datos crudos que necesitan presentación, pensarán en pipes. Cada vez que necesiten sincronizar vista y lógica, pensarán en el binding apropiado. Estas son habilidades que los acompañarán en toda su carrera.
+Recuerden: el mejor código no es el más inteligente, sino el más mantenible. Los pipes y bindings que crearon hoy son reutilizables, testeables, y comprensibles. Eso es código profesional.
+¡Excelente trabajo hoy! Nos vemos el jueves 07 de agosto a las 19:00 para explorar el fascinante mundo de las Directivas!
+Han sido tres horas intensas pero productivas. Descansen bien y practiquen lo aprendido.
+¡Hasta la próxima sesión! 🚀
+________________________________________
+NOTAS ADICIONALES PARA EL INSTRUCTOR
+Puntos clave para enfatizar durante la sesión:
+Durante Lab 1 (Fundamentos de Data Binding):
+•	Asegurarse de que todos tengan FormsModule importado para ngModel
+•	Verificar que entienden la diferencia entre [] para property y () para eventos
+•	Mostrar en DevTools cómo cambian los valores en tiempo real
+•	Hacer énfasis en que el flujo de datos es predecible y unidireccional
+Durante Lab 2 (Binding Avanzado):
+•	Demostrar el impacto en rendimiento de ngClass vs class binding simple
+•	Mostrar cómo ngStyle puede recibir objetos dinámicos
+•	Explicar por qué attribute binding es necesario para ciertos atributos HTML
+•	Practicar con diferentes eventos: click, keyup, change, submit
+Durante Lab 3 (Pipes Built-in):
+•	Mostrar la documentación oficial de cada pipe
+•	Demostrar cómo los parámetros de los pipes afectan la salida
+•	Explicar la importancia del async pipe para prevenir memory leaks
+•	Hacer ejercicios con cadenas de pipes
+Durante Lab 4 (Pipes Personalizados):
+•	Debuggear un pipe paso a paso para mostrar el flujo
+•	Explicar cuándo un pipe se vuelve a ejecutar
+•	Mostrar el impacto de pure: false en el rendimiento
+•	Crear un pipe que falle y mostrar cómo manejarlo
+Problemas comunes y soluciones:
+Error: "Can't bind to 'ngModel'"
+Solución: Importar FormsModule en el componente standalone o en el módulo
+Error: "ExpressionChangedAfterItHasBeenCheckedError"
+Solución: Explicar el ciclo de detección de cambios y usar setTimeout o ChangeDetectorRef
+Pipe personalizado no funciona
+Verificar:
+•	Que esté declarado/importado correctamente
+•	Que el nombre del pipe coincida exactamente
+•	Que implemente PipeTransform
+•	Que retorne un valor
+Async pipe muestra [object Object]
+Solución: Usar el operador safe navigation (?.) o el patrón "as" con ngIf
+Ejercicios adicionales si terminan temprano:
+1.	Pipe de validación de RUC/DNI:
+o	Crear un pipe que valide y formatee documentos peruanos
+o	Mostrar visual feedback si es válido o no
+2.	Dashboard con múltiples filtros:
+o	Implementar filtrado por múltiples criterios
+o	Combinar varios pipes personalizados
+3.	Sistema de notificaciones:
+o	Pipe para tiempo relativo (hace X minutos)
+o	Auto-actualización cada minuto
+4.	Conversor de unidades:
+o	Pipe que convierte entre diferentes unidades
+o	Parametrizable para diferentes tipos de conversión
+Métricas de éxito de la sesión:
+✅ Los estudiantes pueden:
+•	Implementar los 4 tipos de data binding sin consultar notas
+•	Crear un pipe personalizado desde cero
+•	Explicar cuándo usar pipes puros vs impuros
+•	Usar async pipe correctamente con Observables
+•	Combinar múltiples pipes en un template
+•	Optimizar el rendimiento usando pipes apropiadamente
+Preparación para la siguiente sesión:
+Sesión 4: Directivas
+•	Preparar ejemplos de directivas estructurales y de atributo
+•	Tener casos de uso reales de directivas personalizadas
+•	Preparar comparación entre directivas antiguas (*ngIf) y nuevas (@if)
+•	Ejemplos de HostListener y HostBinding
+•	Casos de uso de Renderer2
+Feedback para recolectar:
+1.	¿Qué tipo de binding les pareció más útil?
+2.	¿Qué pipe personalizado crearían para su trabajo actual?
+3.	¿Hubo algún concepto que no quedó claro?
+4.	¿El ritmo de los laboratorios fue apropiado?
+5.	¿Qué les gustaría profundizar más?
+________________________________________
+FIN DEL GUIÓN DE LA SESIÓN 3
+Documento preparado para el curso Angular v18 - PROVIAS DESCENTRALIZADO Instructor: Ing. Jhonny Alexander Ramirez Chiroque Fecha: Martes, 05 de Agosto 2025
+

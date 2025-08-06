@@ -136,4 +136,25 @@ export class LifecycleDemoComponent implements OnInit, OnDestroy,
     this.logger.warn('LifecycleDemoComponent', 'Ejemplo de log WARNING', { tipo: 'demo' });
     this.logger.error('LifecycleDemoComponent', 'Ejemplo de log ERROR', { tipo: 'demo' });
   }
+
+  /**
+   * 🕐 Obtener hora actual formateada
+   */
+  getCurrentTime(): string {
+    return new Date().toLocaleTimeString('es-PE');
+  }
+
+  /**
+   * 📅 Obtener fecha y hora actual completa
+   */
+  getCurrentDateTime(): string {
+    return new Date().toLocaleString('es-PE');
+  }
+
+  /**
+   * ⏱️ Obtener timestamp actual
+   */
+  getCurrentTimestamp(): number {
+    return Date.now();
+  }
 }

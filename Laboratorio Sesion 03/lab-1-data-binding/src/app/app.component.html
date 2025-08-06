@@ -1,0 +1,40 @@
+<!-- 🏗️ LAB 1: FUNDAMENTOS DE DATA BINDING -->
+<!-- PROVIAS DESCENTRALIZADO - Angular v18 -->
+
+<div class="app-container">
+  
+  <!-- 🎯 HEADER PRINCIPAL -->
+  <header class="app-header">
+    <div class="header-content">
+      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
+      <h1>{{ title }}</h1>
+      <p class="subtitle">{{ subtitle }}</p>
+      
+      <div class="lab-info">
+        <span class="lab-badge">LAB 1</span>
+        <span class="lab-description">Fundamentos de Data Binding</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- 🛍️ COMPONENTE PRINCIPAL -->
+  <main class="main-content">
+    <app-product-list></app-product-list>
+  </main>
+
+  <!-- 📄 FOOTER -->
+  <footer class="app-footer">
+    <div class="footer-content">
+      <p>
+        © {{ currentYear }} PROVIAS DESCENTRALIZADO - 
+        <strong>{{ title }}</strong>
+      </p>
+      <p class="tech-info">
+        🚀 Angular v18 | 
+        🎯 Data Binding Fundamentals | 
+        💻 Standalone Components
+      </p>
+    </div>
+  </footer>
+
+</div>

@@ -1,0 +1,117 @@
+.app-layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+// 📄 Contenido principal del router
+.router-content {
+  flex: 1;
+  padding: 2rem 0;
+  
+  // El contenido de cada página maneja sus propios estilos
+  // Aquí solo aplicamos estilos generales de layout
+}
+
+// 🎓 Footer educativo
+.app-footer {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 3rem 0;
+  margin-top: 2rem;
+  
+  .footer-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 2rem;
+    
+    h3 {
+      text-align: center;
+      margin: 0 0 2rem 0;
+      font-size: 1.8rem;
+      color: #ecf0f1;
+    }
+    
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 3rem;
+      
+      .concept {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 1.5rem;
+        border-radius: 12px;
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        
+        h4 {
+          margin: 0 0 1rem 0;
+          color: #3498db;
+          font-size: 1.2rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 2px solid rgba(52, 152, 219, 0.3);
+        }
+        
+        ul {
+          margin: 0;
+          padding: 0;
+          list-style: none;
+          
+          li {
+            margin-bottom: 0.5rem;
+            padding: 0.5rem 0;
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            
+            &::before {
+              content: '▸ ';
+              color: #3498db;
+              font-weight: bold;
+              margin-right: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .lab-info {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 2rem;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      
+      p {
+        margin: 0;
+        line-height: 1.6;
+        color: #ecf0f1;
+        
+        strong {
+          color: #3498db;
+        }
+      }
+    }
+  }
+}
+
+// 📱 Responsive design
+@media (max-width: 768px) {
+  .router-content {
+    padding: 1rem 0;
+  }
+  
+  .app-footer {
+    padding: 2rem 0;
+    
+    .footer-content {
+      padding: 0 1rem;
+      
+      .concepts-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+    }
+  }
+}

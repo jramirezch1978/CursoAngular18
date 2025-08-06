@@ -1,0 +1,372 @@
+.users-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+  
+  // 🎯 Header de la página
+  .page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 2rem;
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    border-radius: 15px;
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    
+    .header-content {
+      h1 {
+        margin: 0 0 1rem 0;
+        font-size: 2.2rem;
+        font-weight: 700;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+      }
+      
+      .page-description {
+        margin: 0 0 0.5rem 0;
+        font-size: 1rem;
+        opacity: 0.9;
+        
+        code {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+        }
+      }
+      
+      .route-info, .params-info {
+        margin: 0 0 0.25rem 0;
+        font-size: 0.9rem;
+        opacity: 0.8;
+        
+        code {
+          background: rgba(255, 255, 255, 0.2);
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+        }
+      }
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 1rem;
+      
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
+        
+        &.btn-secondary {
+          background: rgba(255, 255, 255, 0.2);
+          color: white;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        &.btn-danger {
+          background: rgba(231, 76, 60, 0.9);
+          color: white;
+        }
+      }
+    }
+  }
+  
+  // 👥 Sección de usuarios
+  .users-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    
+    h2 {
+      margin: 0 0 1.5rem 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+    }
+    
+    .users-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      
+      .user-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #3498db;
+        transition: transform 0.3s ease;
+        
+        &:hover {
+          transform: translateY(-2px);
+        }
+        
+        &.inactive {
+          opacity: 0.6;
+          border-left-color: #e74c3c;
+        }
+        
+        .user-info {
+          h3 {
+            margin: 0 0 0.5rem 0;
+            color: #2c3e50;
+            font-size: 1.1rem;
+          }
+          
+          .user-role {
+            margin: 0 0 0.5rem 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+            text-transform: capitalize;
+          }
+          
+          .user-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 15px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            
+            &.active {
+              background: #d4edda;
+              color: #155724;
+            }
+            
+            &.inactive {
+              background: #f8d7da;
+              color: #721c24;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // 🔐 Demo de permisos
+  .permissions-demo {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    
+    h2 {
+      margin: 0 0 1.5rem 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    
+    .permissions-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      
+      .permission-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #e9ecef;
+        
+        h4 {
+          margin: 0 0 1rem 0;
+          color: #2c3e50;
+        }
+        
+        .permission-status {
+          margin: 0 0 0.5rem 0;
+          font-size: 0.9rem;
+          
+          strong {
+            color: #28a745;
+          }
+        }
+        
+        small {
+          color: #6c757d;
+          font-family: 'Courier New', monospace;
+          background: #e9ecef;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+        }
+      }
+    }
+  }
+  
+  // 🧪 Pruebas de guards
+  .guards-test {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    margin-bottom: 2rem;
+    
+    h2 {
+      margin: 0 0 1.5rem 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+      text-align: center;
+    }
+    
+    .test-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+      
+      .test-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        text-align: center;
+        border: 2px solid #e9ecef;
+        
+        h4 {
+          margin: 0 0 1rem 0;
+          color: #2c3e50;
+        }
+        
+        p {
+          margin: 0 0 1rem 0;
+          color: #6c757d;
+          font-size: 0.9rem;
+        }
+        
+        .test-btn {
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          background: #3498db;
+          color: white;
+          margin-bottom: 1rem;
+          
+          &:hover {
+            transform: translateY(-2px);
+            background: #2980b9;
+          }
+          
+          &.danger {
+            background: #e74c3c;
+            
+            &:hover {
+              background: #c0392b;
+            }
+          }
+        }
+        
+        small {
+          display: block;
+          color: #6c757d;
+          font-size: 0.8rem;
+          line-height: 1.4;
+        }
+      }
+    }
+  }
+  
+  // 🎓 Sección educativa
+  .educational-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    
+    h2 {
+      text-align: center;
+      margin: 0 0 2rem 0;
+      color: #2c3e50;
+      font-size: 1.5rem;
+    }
+    
+    .concepts-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      
+      .concept {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 8px;
+        border-left: 4px solid #007bff;
+        
+        h4 {
+          margin: 0 0 0.5rem 0;
+          color: #2c3e50;
+          font-size: 1.1rem;
+        }
+        
+        p {
+          margin: 0 0 1rem 0;
+          color: #6c757d;
+          font-size: 0.9rem;
+        }
+        
+        ul {
+          margin: 0;
+          padding-left: 1.2rem;
+          
+          li {
+            color: #495057;
+            font-size: 0.85rem;
+            margin-bottom: 0.25rem;
+          }
+        }
+      }
+    }
+  }
+  
+  // 📱 Responsive design
+  @media (max-width: 768px) {
+    padding: 1rem;
+    
+    .page-header {
+      flex-direction: column;
+      text-align: center;
+      gap: 1rem;
+      
+      .header-content h1 {
+        font-size: 1.8rem;
+      }
+      
+      .header-actions {
+        flex-direction: column;
+        width: 100%;
+        
+        .btn {
+          width: 100%;
+        }
+      }
+    }
+    
+    .users-grid {
+      grid-template-columns: 1fr !important;
+    }
+    
+    .permissions-cards {
+      grid-template-columns: 1fr !important;
+    }
+    
+    .test-cards {
+      grid-template-columns: 1fr !important;
+    }
+    
+    .concepts-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+}

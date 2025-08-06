@@ -1,0 +1,228 @@
+<div class="user-details-container">
+  <!-- 📋 Header del componente -->
+  <div class="details-header">
+    <h2>👤 Detalles del Usuario</h2>
+    <p class="component-info">
+      <strong>🔗 Sibling Communication:</strong> 
+      Este componente recibe datos del usuario seleccionado mediante un Observable compartido
+    </p>
+  </div>
+
+  <!-- 👤 Contenido principal -->
+  @if (selectedUser) {
+    <div class="user-content">
+      <!-- 📊 Modo Vista -->
+      @if (!editMode) {
+        <div class="view-mode">
+          <div class="user-card">
+            <!-- Avatar y datos básicos -->
+            <div class="user-header">
+              <div class="user-avatar">{{ selectedUser.avatar }}</div>
+              <div class="user-basic-info">
+                <h3 class="user-name">{{ selectedUser.name }}</h3>
+                <p class="user-email">📧 {{ selectedUser.email }}</p>
+                <span class="user-status" [class]="getStatusClass()">
+                  {{ selectedUser.isActive ? '🟢 Activo' : '🔴 Inactivo' }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Información detallada -->
+            <div class="user-details">
+              <div class="detail-row">
+                <label>🆔 ID:</label>
+                <span>{{ selectedUser.id }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <label>🎭 Rol:</label>
+                <span class="role-badge" [class]="'role-' + selectedUser.role">
+                  {{ getRoleDisplayName(selectedUser.role) }}
+                </span>
+              </div>
+              
+              <div class="detail-row">
+                <label>📅 Último Login:</label>
+                <span>{{ selectedUser.lastLogin | date:'dd/MM/yyyy HH:mm' }}</span>
+              </div>
+              
+              <div class="detail-row">
+                <label>🏗️ Proyectos:</label>
+                <span class="projects-count">{{ selectedUser.projects.length }} asignados</span>
+              </div>
+            </div>
+
+            <!-- Lista de proyectos -->
+            <div class="projects-section">
+              <h4>🏗️ Proyectos Asignados</h4>
+              @if (selectedUser.projects.length > 0) {
+                <div class="projects-list">
+                  @for (project of selectedUser.projects; track project) {
+                    <div class="project-item">
+                      <span class="project-name">{{ project }}</span>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="no-projects">Sin proyectos asignados</p>
+              }
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+              <button 
+                class="btn btn-primary" 
+                (click)="startEdit()"
+                title="Editar información del usuario">
+                ✏️ Editar
+              </button>
+              
+              <button 
+                class="btn" 
+                [class]="selectedUser.isActive ? 'btn-warning' : 'btn-success'"
+                (click)="toggleUserStatus()"
+                [title]="selectedUser.isActive ? 'Desactivar usuario' : 'Activar usuario'">
+                {{ selectedUser.isActive ? '⏸️ Desactivar' : '▶️ Activar' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ✏️ Modo Edición -->
+      @if (editMode) {
+        <div class="edit-mode">
+          <div class="edit-card">
+            <div class="edit-header">
+              <h3>✏️ Editando Usuario</h3>
+              <p>Modifica la información del usuario seleccionado</p>
+            </div>
+
+            <form class="edit-form" (ngSubmit)="saveChanges()">
+              <!-- Nombre -->
+              <div class="form-group">
+                <label for="edit-name">👤 Nombre Completo</label>
+                <input
+                  type="text"
+                  id="edit-name"
+                  [(ngModel)]="editForm.name"
+                  name="name"
+                  class="form-control"
+                  placeholder="Ingresa el nombre completo"
+                  required>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group">
+                <label for="edit-email">📧 Correo Electrónico</label>
+                <input
+                  type="email"
+                  id="edit-email"
+                  [(ngModel)]="editForm.email"
+                  name="email"
+                  class="form-control"
+                  placeholder="usuario@provias.gob.pe"
+                  required>
+              </div>
+
+              <!-- Rol -->
+              <div class="form-group">
+                <label for="edit-role">🎭 Rol del Usuario</label>
+                <select
+                  id="edit-role"
+                  [(ngModel)]="editForm.role"
+                  name="role"
+                  class="form-control"
+                  required>
+                  <option value="">Seleccionar rol...</option>
+                  <option [value]="UserRole.ADMIN">{{ getRoleDisplayName(UserRole.ADMIN) }}</option>
+                  <option [value]="UserRole.PROJECT_MANAGER">{{ getRoleDisplayName(UserRole.PROJECT_MANAGER) }}</option>
+                  <option [value]="UserRole.ENGINEER">{{ getRoleDisplayName(UserRole.ENGINEER) }}</option>
+                  <option [value]="UserRole.TECHNICIAN">{{ getRoleDisplayName(UserRole.TECHNICIAN) }}</option>
+                </select>
+              </div>
+
+              <!-- Botones del formulario -->
+              <div class="form-actions">
+                <button 
+                  type="submit" 
+                  class="btn btn-success"
+                  [disabled]="!isFormValid()"
+                  title="Guardar cambios">
+                  💾 Guardar Cambios
+                </button>
+                
+                <button 
+                  type="button" 
+                  class="btn btn-secondary"
+                  (click)="cancelEdit()"
+                  title="Cancelar edición">
+                  ❌ Cancelar
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+    </div>
+  } @else {
+    <!-- 📝 Estado sin usuario seleccionado -->
+    <div class="no-selection">
+      <div class="empty-state">
+        <div class="empty-icon">👤</div>
+        <h3>Selecciona un Usuario</h3>
+        <p>
+          Haz clic en cualquier usuario de la lista para ver sus detalles aquí.
+          Este es un ejemplo de <strong>comunicación entre componentes hermanos</strong>.
+        </p>
+        
+        <div class="communication-info">
+          <h4>🔗 Cómo Funciona la Comunicación</h4>
+          <ol>
+            <li><strong>UserListComponent</strong> emite cuando un usuario es seleccionado</li>
+            <li><strong>UserManagementService</strong> mantiene el estado del usuario seleccionado</li>
+            <li><strong>UserDetailsComponent</strong> se suscribe a los cambios via Observable</li>
+            <li>Los datos se actualizan automáticamente en tiempo real</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- 🎓 Información educativa -->
+  <div class="educational-section">
+    <h3>🎓 Conceptos Demostrados</h3>
+    
+    <div class="concepts-grid">
+      <div class="concept">
+        <h4>🔗 Sibling Communication</h4>
+        <p>Comunicación entre componentes hermanos mediante un servicio compartido</p>
+        <ul>
+          <li>✅ Observable pattern</li>
+          <li>✅ Estado compartido</li>
+          <li>✅ Reactividad automática</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>📡 BehaviorSubject</h4>
+        <p>Mantiene el último valor emitido y lo envía a nuevos suscriptores</p>
+        <ul>
+          <li>✅ Estado inicial</li>
+          <li>✅ Valor actual siempre disponible</li>
+          <li>✅ Múltiples suscriptores</li>
+        </ul>
+      </div>
+      
+      <div class="concept">
+        <h4>📝 Two-way Binding</h4>
+        <p>Formularios reactivos con [(ngModel)]</p>
+        <ul>
+          <li>✅ Sincronización automática</li>
+          <li>✅ Validación en tiempo real</li>
+          <li>✅ Estado del formulario</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,1618 @@
+# **LABORATORIO SESIÓN 3 - PARTE 2: PIPES PERSONALIZADOS Y FINALIZACIÓN**
+
+**PROVIAS DESCENTRALIZADO - Angular v18**
+
+---
+
+## **CONTINUACIÓN ESTILOS LAB 3**
+
+**Completar task-manager.component.scss:**
+
+```scss
+  // Animaciones (continuación)
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  @keyframes pulse-urgent {
+    0% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+    }
+    70% {
+      box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+  }
+
+  // Responsive design
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .manager-header h1 {
+      font-size: 2rem;
+    }
+
+    .stats-grid {
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    }
+
+    .task-card {
+      .task-header {
+        flex-direction: column;
+        align-items: flex-start;
+
+        h3 {
+          margin-right: 0;
+          margin-bottom: 0.5rem;
+        }
+      }
+
+      .task-info .info-row {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        .label {
+          margin-bottom: 0.25rem;
+        }
+      }
+    }
+
+    .pipes-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+}
+```
+
+**PASO 4: Integrar Task Manager *(10 minutos)***
+
+**4.1 Actualizar rutas en app.routes.ts:**
+
+```typescript
+import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { ProductListComponent } from './components/data-binding/product-list/product-list.component';
+import { DashboardComponent } from './components/data-binding/dashboard/dashboard.component';
+import { TaskManagerComponent } from './components/pipes-demo/task-manager/task-manager.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'products', component: ProductListComponent },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'tasks', component: TaskManagerComponent },
+  { path: '**', redirectTo: '/home' }
+];
+```
+
+**4.2 Actualizar navegación en header.component.html:**
+
+```html
+<nav class="navigation">
+  <a routerLink="/home" routerLinkActive="active" class="nav-link">🏠 Inicio</a>
+  <a routerLink="/products" routerLinkActive="active" class="nav-link">🛍️ Productos</a>
+  <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">📊 Dashboard</a>
+  <a routerLink="/tasks" routerLinkActive="active" class="nav-link">📋 Tareas</a>
+  <a href="#" class="nav-link">📞 Contacto</a>
+</nav>
+```
+
+---
+
+## **LAB 4: PIPES PERSONALIZADOS**
+
+*Duración: 40 minutos*  
+*Objetivo: Crear suite completa de pipes personalizados para casos de uso reales*
+
+**PASO 1: Crear Pipes Base *(15 minutos)***
+
+**1.1 Generar pipes personalizados**
+
+```bash
+# Crear directorio para pipes
+mkdir -p src/app/pipes
+
+# Generar pipes usando Angular CLI
+ng generate pipe pipes/filter --standalone
+ng generate pipe pipes/truncate --standalone  
+ng generate pipe pipes/file-size --standalone
+ng generate pipe pipes/time-ago --standalone
+ng generate pipe pipes/search-highlight --standalone
+ng generate pipe pipes/sort-by --standalone
+```
+
+**1.2 Implementar FilterPipe**
+
+**Actualizar pipes/filter.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'filter',
+  standalone: true,
+  pure: false // Necesario para arrays que cambian dinámicamente
+})
+export class FilterPipe implements PipeTransform {
+  transform(items: any[], searchText: string, field?: string): any[] {
+    if (!items || !searchText) {
+      return items;
+    }
+
+    const filterValue = searchText.toLowerCase();
+
+    return items.filter(item => {
+      if (field) {
+        // Buscar en un campo específico
+        const fieldValue = this.getNestedProperty(item, field);
+        return fieldValue?.toString().toLowerCase().includes(filterValue);
+      } else {
+        // Buscar en todas las propiedades del objeto
+        return this.searchInAllProperties(item, filterValue);
+      }
+    });
+  }
+
+  private getNestedProperty(obj: any, path: string): any {
+    return path.split('.').reduce((current, prop) => current?.[prop], obj);
+  }
+
+  private searchInAllProperties(obj: any, searchValue: string): boolean {
+    if (obj === null || obj === undefined) {
+      return false;
+    }
+
+    // Convertir a string y buscar
+    if (typeof obj === 'string' || typeof obj === 'number') {
+      return obj.toString().toLowerCase().includes(searchValue);
+    }
+
+    // Si es un array, buscar en cada elemento
+    if (Array.isArray(obj)) {
+      return obj.some(item => this.searchInAllProperties(item, searchValue));
+    }
+
+    // Si es un objeto, buscar en cada propiedad
+    if (typeof obj === 'object') {
+      return Object.values(obj).some(value => 
+        this.searchInAllProperties(value, searchValue)
+      );
+    }
+
+    return false;
+  }
+}
+```
+
+**1.3 Implementar TruncatePipe**
+
+**Actualizar pipes/truncate.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'truncate',
+  standalone: true,
+  pure: true
+})
+export class TruncatePipe implements PipeTransform {
+  transform(
+    value: string, 
+    limit: number = 25, 
+    trail: string = '...', 
+    wordBoundary: boolean = false
+  ): string {
+    if (!value) return '';
+    
+    if (value.length <= limit) {
+      return value;
+    }
+
+    if (wordBoundary) {
+      // Truncar en límite de palabra
+      const truncated = value.substring(0, limit);
+      const lastSpace = truncated.lastIndexOf(' ');
+      
+      if (lastSpace > 0) {
+        return truncated.substring(0, lastSpace) + trail;
+      }
+    }
+
+    return value.substring(0, limit) + trail;
+  }
+}
+```
+
+**1.4 Implementar FileSizePipe**
+
+**Actualizar pipes/file-size.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'fileSize',
+  standalone: true,
+  pure: true
+})
+export class FileSizePipe implements PipeTransform {
+  transform(bytes: number, decimals: number = 2, units: 'binary' | 'decimal' = 'binary'): string {
+    if (bytes === 0) return '0 Bytes';
+    if (bytes < 0) return 'Invalid size';
+
+    const k = units === 'binary' ? 1024 : 1000;
+    const dm = decimals < 0 ? 0 : decimals;
+    
+    const sizes = units === 'binary' 
+      ? ['Bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB']
+      : ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB'];
+
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    const size = parseFloat((bytes / Math.pow(k, i)).toFixed(dm));
+
+    return `${size} ${sizes[i]}`;
+  }
+}
+```
+
+**1.5 Implementar TimeAgoPipe**
+
+**Actualizar pipes/time-ago.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+@Pipe({
+  name: 'timeAgo',
+  standalone: true,
+  pure: false // Para actualizar automáticamente con el tiempo
+})
+export class TimeAgoPipe implements PipeTransform {
+  transform(value: Date | string | number): string {
+    if (!value) return '';
+
+    const now = new Date();
+    const date = new Date(value);
+    const seconds = Math.floor((now.getTime() - date.getTime()) / 1000);
+
+    if (seconds < 0) {
+      return 'En el futuro';
+    }
+
+    if (seconds < 30) {
+      return 'Justo ahora';
+    }
+
+    const intervals = [
+      { label: 'año', seconds: 31536000, plural: 'años' },
+      { label: 'mes', seconds: 2592000, plural: 'meses' },
+      { label: 'semana', seconds: 604800, plural: 'semanas' },
+      { label: 'día', seconds: 86400, plural: 'días' },
+      { label: 'hora', seconds: 3600, plural: 'horas' },
+      { label: 'minuto', seconds: 60, plural: 'minutos' },
+      { label: 'segundo', seconds: 1, plural: 'segundos' }
+    ];
+
+    for (const interval of intervals) {
+      const count = Math.floor(seconds / interval.seconds);
+      if (count > 0) {
+        const label = count === 1 ? interval.label : interval.plural;
+        return `hace ${count} ${label}`;
+      }
+    }
+
+    return 'hace un momento';
+  }
+}
+```
+
+**PASO 2: Pipes Avanzados *(15 minutos)***
+
+**2.1 Implementar SearchHighlightPipe**
+
+**Actualizar pipes/search-highlight.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+
+@Pipe({
+  name: 'searchHighlight',
+  standalone: true,
+  pure: true
+})
+export class SearchHighlightPipe implements PipeTransform {
+  constructor(private sanitizer: DomSanitizer) {}
+
+  transform(
+    text: string, 
+    search: string, 
+    className: string = 'highlight',
+    caseSensitive: boolean = false
+  ): SafeHtml {
+    if (!text || !search) {
+      return text;
+    }
+
+    const flags = caseSensitive ? 'g' : 'gi';
+    const regex = new RegExp(`(${this.escapeRegex(search)})`, flags);
+    
+    const highlightedText = text.replace(regex, 
+      `<span class="${className}">$1</span>`
+    );
+
+    return this.sanitizer.bypassSecurityTrustHtml(highlightedText);
+  }
+
+  private escapeRegex(string: string): string {
+    return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+}
+```
+
+**2.2 Implementar SortByPipe**
+
+**Actualizar pipes/sort-by.pipe.ts:**
+
+```typescript
+import { Pipe, PipeTransform } from '@angular/core';
+
+type SortDirection = 'asc' | 'desc';
+
+@Pipe({
+  name: 'sortBy',
+  standalone: true,
+  pure: false
+})
+export class SortByPipe implements PipeTransform {
+  transform(
+    array: any[], 
+    field: string, 
+    direction: SortDirection = 'asc',
+    dataType: 'string' | 'number' | 'date' = 'string'
+  ): any[] {
+    if (!array || !field) {
+      return array;
+    }
+
+    const sortedArray = [...array].sort((a, b) => {
+      const aValue = this.getNestedProperty(a, field);
+      const bValue = this.getNestedProperty(b, field);
+
+      let comparison = 0;
+
+      switch (dataType) {
+        case 'number':
+          comparison = (Number(aValue) || 0) - (Number(bValue) || 0);
+          break;
+          
+        case 'date':
+          const aDate = new Date(aValue);
+          const bDate = new Date(bValue);
+          comparison = aDate.getTime() - bDate.getTime();
+          break;
+          
+        default: // string
+          const aStr = (aValue || '').toString().toLowerCase();
+          const bStr = (bValue || '').toString().toLowerCase();
+          comparison = aStr.localeCompare(bStr);
+      }
+
+      return direction === 'desc' ? -comparison : comparison;
+    });
+
+    return sortedArray;
+  }
+
+  private getNestedProperty(obj: any, path: string): any {
+    return path.split('.').reduce((current, prop) => current?.[prop], obj);
+  }
+}
+```
+
+**PASO 3: Crear Componente Demo de Pipes *(10 minutos)***
+
+**3.1 Generar componente demo**
+
+```bash
+ng generate component components/pipes-demo/pipes-showcase --standalone
+```
+
+**3.2 Implementar pipes-showcase.component.ts**
+
+```typescript
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+// Importar pipes personalizados
+import { FilterPipe } from '../../../pipes/filter.pipe';
+import { TruncatePipe } from '../../../pipes/truncate.pipe';
+import { FileSizePipe } from '../../../pipes/file-size.pipe';
+import { TimeAgoPipe } from '../../../pipes/time-ago.pipe';
+import { SearchHighlightPipe } from '../../../pipes/search-highlight.pipe';
+import { SortByPipe } from '../../../pipes/sort-by.pipe';
+
+interface DemoFile {
+  id: number;
+  name: string;
+  description: string;
+  size: number;
+  uploadedAt: Date;
+  type: string;
+  status: 'active' | 'pending' | 'archived';
+}
+
+@Component({
+  selector: 'app-pipes-showcase',
+  standalone: true,
+  imports: [
+    CommonModule, 
+    FormsModule,
+    FilterPipe,
+    TruncatePipe,
+    FileSizePipe,
+    TimeAgoPipe,
+    SearchHighlightPipe,
+    SortByPipe
+  ],
+  templateUrl: './pipes-showcase.component.html',
+  styleUrl: './pipes-showcase.component.scss'
+})
+export class PipesShowcaseComponent implements OnInit {
+  // Propiedades para demostración
+  searchTerm = '';
+  truncateLimit = 50;
+  sortField = 'name';
+  sortDirection: 'asc' | 'desc' = 'asc';
+  highlightClass = 'highlight';
+
+  // Datos de ejemplo
+  demoFiles: DemoFile[] = [
+    {
+      id: 1,
+      name: 'Proyecto_Carretera_Norte.pdf',
+      description: 'Documentación completa del proyecto de construcción de carretera en la región norte del país. Incluye especificaciones técnicas, cronograma de trabajo y presupuesto detallado.',
+      size: 2548576,
+      uploadedAt: new Date('2025-08-01T10:30:00'),
+      type: 'PDF',
+      status: 'active'
+    },
+    {
+      id: 2,
+      name: 'Planos_Puente_Peatonal.dwg',
+      description: 'Planos arquitectónicos y estructurales para la construcción del puente peatonal en la avenida principal.',
+      size: 15728640,
+      uploadedAt: new Date('2025-07-28T14:15:00'),
+      type: 'AutoCAD',
+      status: 'active'
+    },
+    {
+      id: 3,
+      name: 'Estudio_Impacto_Ambiental.docx',
+      description: 'Evaluación del impacto ambiental para el proyecto de ampliación vial.',
+      size: 3145728,
+      uploadedAt: new Date('2025-07-25T09:00:00'),
+      type: 'Word',
+      status: 'pending'
+    },
+    {
+      id: 4,
+      name: 'Presupuesto_Anual_2025.xlsx',
+      description: 'Hoja de cálculo con el presupuesto anual detallado por partidas y proyectos.',
+      size: 1048576,
+      uploadedAt: new Date('2025-07-20T16:45:00'),
+      type: 'Excel',
+      status: 'archived'
+    },
+    {
+      id: 5,
+      name: 'Video_Supervision_Obra.mp4',
+      description: 'Video de supervisión de obra tomado mediante drone para el seguimiento del avance de construcción.',
+      size: 104857600,
+      uploadedAt: new Date('2025-08-03T11:20:00'),
+      type: 'Video',
+      status: 'active'
+    }
+  ];
+
+  // Campos para ordenamiento
+  sortOptions = [
+    { value: 'name', label: 'Nombre' },
+    { value: 'size', label: 'Tamaño' },
+    { value: 'uploadedAt', label: 'Fecha de subida' },
+    { value: 'type', label: 'Tipo' }
+  ];
+
+  ngOnInit(): void {
+    console.log('🎯 LAB 4: Pipes Showcase inicializado');
+  }
+
+  // Obtener archivos filtrados
+  getFilteredFiles(): DemoFile[] {
+    let filtered = this.demoFiles;
+    
+    if (this.searchTerm) {
+      filtered = new FilterPipe().transform(filtered, this.searchTerm);
+    }
+    
+    return new SortByPipe().transform(
+      filtered, 
+      this.sortField, 
+      this.sortDirection,
+      this.getSortDataType()
+    );
+  }
+
+  // Determinar tipo de datos para ordenamiento
+  private getSortDataType(): 'string' | 'number' | 'date' {
+    switch (this.sortField) {
+      case 'size': return 'number';
+      case 'uploadedAt': return 'date';
+      default: return 'string';
+    }
+  }
+
+  // Cambiar dirección de ordenamiento
+  toggleSortDirection(): void {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  }
+
+  // Resetear filtros
+  resetFilters(): void {
+    this.searchTerm = '';
+    this.sortField = 'name';
+    this.sortDirection = 'asc';
+  }
+
+  // Obtener clase para estado
+  getStatusClass(status: string): string {
+    const classes = {
+      'active': 'status-active',
+      'pending': 'status-pending',
+      'archived': 'status-archived'
+    };
+    return classes[status as keyof typeof classes] || '';
+  }
+
+  // Obtener icono para tipo de archivo
+  getFileIcon(type: string): string {
+    const icons = {
+      'PDF': '📄',
+      'AutoCAD': '📐',
+      'Word': '📝',
+      'Excel': '📊',
+      'Video': '🎥'
+    };
+    return icons[type as keyof typeof icons] || '📁';
+  }
+}
+```
+
+**3.3 Crear template pipes-showcase.component.html**
+
+```html
+<div class="pipes-showcase-container">
+  <!-- Header -->
+  <header class="showcase-header">
+    <h1>🔧 Showcase de Pipes Personalizados</h1>
+    <p class="subtitle">Demostración interactiva de pipes personalizados para PROVIAS</p>
+  </header>
+
+  <!-- Controles de Demostración -->
+  <section class="demo-controls">
+    <h2>⚙️ Controles de Demostración</h2>
+    
+    <div class="controls-grid">
+      <!-- Control de Búsqueda -->
+      <div class="control-group">
+        <label for="search">🔍 Filtro de Búsqueda:</label>
+        <input
+          type="text"
+          id="search"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar archivos..."
+          class="form-control">
+        <small class="pipe-info">Usa: <code>FilterPipe</code></small>
+      </div>
+
+      <!-- Control de Truncado -->
+      <div class="control-group">
+        <label for="truncate">✂️ Límite de Truncado: {{ truncateLimit }}</label>
+        <input
+          type="range"
+          id="truncate"
+          [(ngModel)]="truncateLimit"
+          min="20"
+          max="150"
+          class="form-range">
+        <small class="pipe-info">Usa: <code>TruncatePipe</code></small>
+      </div>
+
+      <!-- Control de Ordenamiento -->
+      <div class="control-group">
+        <label for="sort-field">📊 Ordenar por:</label>
+        <div class="sort-controls">
+          <select
+            id="sort-field"
+            [(ngModel)]="sortField"
+            class="form-control">
+            @for (option of sortOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+          <button
+            (click)="toggleSortDirection()"
+            class="btn btn-secondary"
+            [title]="'Ordenamiento: ' + (sortDirection === 'asc' ? 'Ascendente' : 'Descendente')">
+            {{ sortDirection === 'asc' ? '⬆️' : '⬇️' }}
+          </button>
+        </div>
+        <small class="pipe-info">Usa: <code>SortByPipe</code></small>
+      </div>
+
+      <!-- Acciones -->
+      <div class="control-group">
+        <button
+          (click)="resetFilters()"
+          class="btn btn-warning">
+          🔄 Reset Filtros
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lista de Archivos -->
+  <section class="files-section">
+    <h2>📁 Gestión de Archivos ({{ getFilteredFiles().length }} archivos)</h2>
+    
+    <div class="files-grid">
+      @for (file of getFilteredFiles(); track file.id) {
+        <div class="file-card" [class]="getStatusClass(file.status)">
+          <!-- Header del archivo -->
+          <div class="file-header">
+            <div class="file-icon">{{ getFileIcon(file.type) }}</div>
+            <div class="file-info">
+              <h3 [innerHTML]="file.name | searchHighlight:searchTerm:'search-highlight'"></h3>
+              <span class="file-type">{{ file.type }}</span>
+            </div>
+            <div class="file-status" [class]="getStatusClass(file.status)">
+              {{ file.status | titlecase }}
+            </div>
+          </div>
+
+          <!-- Descripción truncada -->
+          <div class="file-description">
+            <p [innerHTML]="(file.description | truncate:truncateLimit:'...' | searchHighlight:searchTerm:'search-highlight')"></p>
+          </div>
+
+          <!-- Metadatos -->
+          <div class="file-metadata">
+            <div class="metadata-row">
+              <span class="label">📦 Tamaño:</span>
+              <span class="value">{{ file.size | fileSize:2:'binary' }}</span>
+            </div>
+            
+            <div class="metadata-row">
+              <span class="label">📅 Subido:</span>
+              <span class="value">{{ file.uploadedAt | date:'dd/MM/yy HH:mm' }}</span>
+            </div>
+            
+            <div class="metadata-row">
+              <span class="label">⏰ Hace:</span>
+              <span class="value">{{ file.uploadedAt | timeAgo }}</span>
+            </div>
+          </div>
+
+          <!-- Demostración de truncado con word boundary -->
+          <div class="truncate-demo">
+            <h4>Demostración de Truncado:</h4>
+            <div class="truncate-examples">
+              <div class="truncate-example">
+                <strong>Normal:</strong> {{ file.description | truncate:60:'...' }}
+              </div>
+              <div class="truncate-example">
+                <strong>Word Boundary:</strong> {{ file.description | truncate:60:'...':true }}
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="no-files">
+          <h3>😔 No se encontraron archivos</h3>
+          <p>Intenta ajustar los filtros de búsqueda</p>
+          <button (click)="resetFilters()" class="btn btn-primary">
+            🔄 Limpiar Filtros
+          </button>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Documentación de Pipes -->
+  <section class="pipes-documentation">
+    <h2>📚 Documentación de Pipes Personalizados</h2>
+    
+    <div class="docs-grid">
+      <!-- FilterPipe -->
+      <div class="doc-card">
+        <h3>🔍 FilterPipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>array | filter:searchTerm:field</code>
+          
+          <h4>Parámetros:</h4>
+          <ul>
+            <li><strong>searchTerm:</strong> Texto a buscar</li>
+            <li><strong>field:</strong> Campo específico (opcional)</li>
+          </ul>
+          
+          <h4>Características:</h4>
+          <ul>
+            <li>✅ Búsqueda case-insensitive</li>
+            <li>✅ Soporte para propiedades anidadas</li>
+            <li>✅ Búsqueda en arrays y objetos</li>
+            <li>❌ Pipe impuro (re-evalúa en cada ciclo)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TruncatePipe -->
+      <div class="doc-card">
+        <h3>✂️ TruncatePipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>text | truncate:limit:trail:wordBoundary</code>
+          
+          <h4>Parámetros:</h4>
+          <ul>
+            <li><strong>limit:</strong> Número máximo de caracteres</li>
+            <li><strong>trail:</strong> Texto al final ('...' por defecto)</li>
+            <li><strong>wordBoundary:</strong> Respetar límites de palabra</li>
+          </ul>
+          
+          <h4>Características:</h4>
+          <ul>
+            <li>✅ Pipe puro (alta performance)</li>
+            <li>✅ Respeta límites de palabra</li>
+            <li>✅ Trail personalizable</li>
+            <li>✅ Manejo de strings vacíos</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- FileSizePipe -->
+      <div class="doc-card">
+        <h3>📦 FileSizePipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>bytes | fileSize:decimals:units</code>
+          
+          <h4>Parámetros:</h4>
+          <ul>
+            <li><strong>decimals:</strong> Número de decimales</li>
+            <li><strong>units:</strong> 'binary' (1024) o 'decimal' (1000)</li>
+          </ul>
+          
+          <h4>Características:</h4>
+          <ul>
+            <li>✅ Soporte binario y decimal</li>
+            <li>✅ Unidades correctas (KiB vs KB)</li>
+            <li>✅ Manejo de valores negativos</li>
+            <li>✅ Precisión configurable</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- TimeAgoPipe -->
+      <div class="doc-card">
+        <h3>⏰ TimeAgoPipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>date | timeAgo</code>
+          
+          <h4>Características:</h4>
+          <ul>
+            <li>✅ Formato humanizado</li>
+            <li>✅ Soporte múltiples formatos de entrada</li>
+            <li>✅ Actualización automática</li>
+            <li>❌ Pipe impuro (para tiempo real)</li>
+            <li>🌍 Localización en español</li>
+          </ul>
+          
+          <h4>Ejemplos:</h4>
+          <ul>
+            <li>"hace 5 minutos"</li>
+            <li>"hace 2 horas"</li>
+            <li>"hace 3 días"</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SearchHighlightPipe -->
+      <div class="doc-card">
+        <h3>🔦 SearchHighlightPipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>[innerHTML]="text | searchHighlight:term:class"</code>
+          
+          <h4>Parámetros:</h4>
+          <ul>
+            <li><strong>term:</strong> Término a resaltar</li>
+            <li><strong>class:</strong> Clase CSS para el highlight</li>
+            <li><strong>caseSensitive:</strong> Sensible a mayúsculas</li>
+          </ul>
+          
+          <h4>⚠️ Consideraciones de Seguridad:</h4>
+          <ul>
+            <li>Usa DomSanitizer para HTML seguro</li>
+            <li>Escapa caracteres especiales de regex</li>
+            <li>Requiere [innerHTML] en el template</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- SortByPipe -->
+      <div class="doc-card">
+        <h3>📊 SortByPipe</h3>
+        <div class="doc-content">
+          <h4>Uso:</h4>
+          <code>array | sortBy:field:direction:dataType</code>
+          
+          <h4>Parámetros:</h4>
+          <ul>
+            <li><strong>field:</strong> Campo para ordenar</li>
+            <li><strong>direction:</strong> 'asc' o 'desc'</li>
+            <li><strong>dataType:</strong> 'string', 'number', 'date'</li>
+          </ul>
+          
+          <h4>Características:</h4>
+          <ul>
+            <li>✅ Soporte propiedades anidadas</li>
+            <li>✅ Múltiples tipos de datos</li>
+            <li>✅ Localización para strings</li>
+            <li>❌ Pipe impuro (arrays mutables)</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tests de Performance -->
+  <section class="performance-section">
+    <h2>⚡ Comparación de Performance</h2>
+    
+    <div class="performance-info">
+      <div class="perf-card pure">
+        <h3>🟢 Pipes Puros</h3>
+        <ul>
+          <li>TruncatePipe</li>
+          <li>FileSizePipe</li>
+          <li>SearchHighlightPipe</li>
+        </ul>
+        <p><strong>Ventaja:</strong> Solo se ejecutan cuando cambian los inputs</p>
+      </div>
+      
+      <div class="perf-card impure">
+        <h3>🟡 Pipes Impuros</h3>
+        <ul>
+          <li>FilterPipe</li>
+          <li>TimeAgoPipe</li>
+          <li>SortByPipe</li>
+        </ul>
+        <p><strong>Cuidado:</strong> Se ejecutan en cada ciclo de detección</p>
+      </div>
+    </div>
+    
+    <div class="performance-tips">
+      <h3>💡 Tips de Optimización</h3>
+      <ul>
+        <li>🎯 Usar pipes puros siempre que sea posible</li>
+        <li>🔄 Para filtros complejos, considerar usar computed() signals</li>
+        <li>📊 Implementar memo/cache en pipes costosos</li>
+        <li>⚡ OnPush change detection con pipes</li>
+        <li>🧪 Medir performance con Angular DevTools</li>
+      </ul>
+    </div>
+  </section>
+</div>
+```
+
+**PASO 4: Finalizar Lab 4 *(10 minutos)***
+
+**4.1 Crear estilos pipes-showcase.component.scss**
+
+```scss
+.pipes-showcase-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+
+  .showcase-header {
+    text-align: center;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+    }
+  }
+
+  .demo-controls {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      align-items: end;
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+
+      label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #495057;
+      }
+
+      .form-control {
+        padding: 0.75rem;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #007bff;
+        }
+      }
+
+      .form-range {
+        margin: 0.5rem 0;
+      }
+
+      .sort-controls {
+        display: flex;
+        gap: 0.5rem;
+
+        .form-control {
+          flex: 1;
+        }
+
+        .btn {
+          padding: 0.75rem;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-size: 1.2rem;
+          
+          &.btn-secondary {
+            background: #6c757d;
+            color: white;
+            
+            &:hover {
+              background: #545b62;
+            }
+          }
+        }
+      }
+
+      .btn {
+        padding: 0.75rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &.btn-warning {
+          background: #ffc107;
+          color: #212529;
+
+          &:hover {
+            background: #e0a800;
+            transform: translateY(-2px);
+          }
+        }
+      }
+
+      .pipe-info {
+        color: #6c757d;
+        font-size: 0.8rem;
+        font-style: italic;
+        margin-top: 0.25rem;
+
+        code {
+          background: #e9ecef;
+          padding: 0.2rem 0.4rem;
+          border-radius: 3px;
+          font-family: 'Courier New', monospace;
+          color: #d63384;
+        }
+      }
+    }
+  }
+
+  .files-section {
+    margin-bottom: 2rem;
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .files-grid {
+      display: grid;
+      gap: 1.5rem;
+
+      .file-card {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+        border-left: 5px solid #dee2e6;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        &.status-active {
+          border-left-color: #28a745;
+        }
+
+        &.status-pending {
+          border-left-color: #ffc107;
+        }
+
+        &.status-archived {
+          border-left-color: #6c757d;
+        }
+
+        .file-header {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          margin-bottom: 1rem;
+
+          .file-icon {
+            font-size: 2rem;
+            flex-shrink: 0;
+          }
+
+          .file-info {
+            flex: 1;
+
+            h3 {
+              margin: 0 0 0.25rem 0;
+              color: #2c3e50;
+              font-size: 1.1rem;
+
+              ::ng-deep .search-highlight {
+                background: #fff3cd;
+                color: #856404;
+                font-weight: bold;
+                padding: 0.1rem 0.2rem;
+                border-radius: 3px;
+              }
+            }
+
+            .file-type {
+              background: #e9ecef;
+              color: #495057;
+              padding: 0.25rem 0.5rem;
+              border-radius: 12px;
+              font-size: 0.8rem;
+              font-weight: 500;
+            }
+          }
+
+          .file-status {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 500;
+            font-size: 0.9rem;
+
+            &.status-active {
+              background: #d4edda;
+              color: #155724;
+            }
+
+            &.status-pending {
+              background: #fff3cd;
+              color: #856404;
+            }
+
+            &.status-archived {
+              background: #e2e3e5;
+              color: #495057;
+            }
+          }
+        }
+
+        .file-description {
+          margin-bottom: 1rem;
+
+          p {
+            color: #666;
+            line-height: 1.6;
+            margin: 0;
+
+            ::ng-deep .search-highlight {
+              background: #fff3cd;
+              color: #856404;
+              font-weight: bold;
+              padding: 0.1rem 0.2rem;
+              border-radius: 3px;
+            }
+          }
+        }
+
+        .file-metadata {
+          background: #f8f9fa;
+          padding: 1rem;
+          border-radius: 8px;
+          margin-bottom: 1rem;
+
+          .metadata-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+
+            &:last-child {
+              margin-bottom: 0;
+            }
+
+            .label {
+              color: #666;
+              font-weight: 500;
+            }
+
+            .value {
+              color: #2c3e50;
+              font-weight: 600;
+            }
+          }
+        }
+
+        .truncate-demo {
+          border-top: 1px solid #dee2e6;
+          padding-top: 1rem;
+
+          h4 {
+            color: #007bff;
+            font-size: 1rem;
+            margin-bottom: 0.75rem;
+          }
+
+          .truncate-examples {
+            .truncate-example {
+              background: #f8f9fa;
+              padding: 0.75rem;
+              border-radius: 6px;
+              margin-bottom: 0.5rem;
+              font-size: 0.9rem;
+
+              &:last-child {
+                margin-bottom: 0;
+              }
+
+              strong {
+                color: #007bff;
+                display: block;
+                margin-bottom: 0.25rem;
+              }
+            }
+          }
+        }
+      }
+
+      .no-files {
+        grid-column: 1 / -1;
+        text-align: center;
+        padding: 3rem;
+        background: white;
+        border-radius: 16px;
+
+        h3 {
+          color: #6c757d;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          color: #888;
+          margin-bottom: 1.5rem;
+        }
+
+        .btn-primary {
+          background: #007bff;
+          color: white;
+          padding: 0.75rem 1.5rem;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &:hover {
+            background: #0056b3;
+            transform: translateY(-2px);
+          }
+        }
+      }
+    }
+  }
+
+  .pipes-documentation {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .docs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 1.5rem;
+
+      .doc-card {
+        background: #f8f9fa;
+        border: 2px solid #dee2e6;
+        border-radius: 12px;
+        padding: 1.5rem;
+        transition: all 0.3s ease;
+
+        &:hover {
+          border-color: #007bff;
+          transform: translateY(-2px);
+        }
+
+        h3 {
+          color: #007bff;
+          margin-bottom: 1rem;
+          border-bottom: 2px solid #dee2e6;
+          padding-bottom: 0.5rem;
+        }
+
+        .doc-content {
+          h4 {
+            color: #495057;
+            font-size: 0.9rem;
+            margin: 1rem 0 0.5rem 0;
+            text-transform: uppercase;
+            font-weight: 600;
+          }
+
+          code {
+            background: #e9ecef;
+            padding: 0.5rem;
+            border-radius: 4px;
+            display: block;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+          }
+
+          ul {
+            list-style: none;
+            padding: 0;
+            margin: 0.5rem 0;
+
+            li {
+              padding: 0.25rem 0;
+              border-left: 3px solid transparent;
+              padding-left: 1rem;
+              position: relative;
+
+              &:before {
+                content: '▶';
+                position: absolute;
+                left: 0;
+                color: #007bff;
+              }
+
+              strong {
+                color: #2c3e50;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .performance-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .performance-info {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+
+      .perf-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+
+        &.pure {
+          background: linear-gradient(135deg, #d4edda, #c3e6cb);
+          border: 2px solid #28a745;
+
+          h3 {
+            color: #155724;
+          }
+        }
+
+        &.impure {
+          background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+          border: 2px solid #ffc107;
+
+          h3 {
+            color: #856404;
+          }
+        }
+
+        h3 {
+          margin-bottom: 1rem;
+        }
+
+        ul {
+          list-style: none;
+          padding: 0;
+          margin-bottom: 1rem;
+
+          li {
+            background: rgba(255, 255, 255, 0.5);
+            margin: 0.25rem 0;
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-weight: 500;
+          }
+        }
+
+        p {
+          font-weight: 600;
+          margin: 0;
+        }
+      }
+    }
+
+    .performance-tips {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 5px solid #17a2b8;
+
+      h3 {
+        color: #17a2b8;
+        margin-bottom: 1rem;
+      }
+
+      ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+
+        li {
+          padding: 0.5rem 0;
+          border-bottom: 1px solid #dee2e6;
+
+          &:last-child {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .controls-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .docs-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .performance-info {
+      grid-template-columns: 1fr;
+    }
+
+    .file-card .file-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.5rem;
+    }
+  }
+}
+```
+
+**4.2 Integrar Pipes Showcase**
+
+**Actualizar app.routes.ts:**
+
+```typescript
+import { Routes } from '@angular/router';
+import { HomeComponent } from './pages/home/home.component';
+import { ProductListComponent } from './components/data-binding/product-list/product-list.component';
+import { DashboardComponent } from './components/data-binding/dashboard/dashboard.component';
+import { TaskManagerComponent } from './components/pipes-demo/task-manager/task-manager.component';
+import { PipesShowcaseComponent } from './components/pipes-demo/pipes-showcase/pipes-showcase.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: 'home', component: HomeComponent },
+  { path: 'products', component: ProductListComponent },
+  { path: 'dashboard', component: DashboardComponent },
+  { path: 'tasks', component: TaskManagerComponent },
+  { path: 'pipes', component: PipesShowcaseComponent },
+  { path: '**', redirectTo: '/home' }
+];
+```
+
+**Actualizar header.component.html:**
+
+```html
+<nav class="navigation">
+  <a routerLink="/home" routerLinkActive="active" class="nav-link">🏠 Inicio</a>
+  <a routerLink="/products" routerLinkActive="active" class="nav-link">🛍️ Productos</a>
+  <a routerLink="/dashboard" routerLinkActive="active" class="nav-link">📊 Dashboard</a>
+  <a routerLink="/tasks" routerLinkActive="active" class="nav-link">📋 Tareas</a>
+  <a routerLink="/pipes" routerLinkActive="active" class="nav-link">🔧 Pipes</a>
+</nav>
+```
+
+---
+
+## **VERIFICACIÓN FINAL Y ENTREGABLES**
+
+**✅ CHECKLIST COMPLETO SESIÓN 3**
+
+### **Lab 1: Data Binding Fundamentals**
+- ✅ Interpolación funcionando con {{ }}
+- ✅ Property binding en imágenes y atributos
+- ✅ Event binding manejando clicks y eventos
+- ✅ Two-way binding con ngModel
+- ✅ Class binding dinámico según estados
+- ✅ Carrito funcional con todas las operaciones
+
+### **Lab 2: Binding Avanzado**
+- ✅ NgClass con múltiples clases dinámicas
+- ✅ NgStyle con estilos calculados
+- ✅ Attribute binding para datos personalizados
+- ✅ Event binding avanzado con propagación
+- ✅ HostListener para eventos globales
+- ✅ Dashboard interactivo completamente funcional
+
+### **Lab 3: Pipes Built-in y Async**
+- ✅ Pipes de texto (uppercase, titlecase, slice)
+- ✅ Pipes de números (number, percent, currency)
+- ✅ Pipes de fecha con localización
+- ✅ Async pipe manejando Observables automáticamente
+- ✅ Sistema de tareas con filtrado reactivo
+- ✅ Estadísticas en tiempo real
+
+### **Lab 4: Pipes Personalizados**
+- ✅ FilterPipe para búsquedas complejas
+- ✅ TruncatePipe con word boundary
+- ✅ FileSizePipe con unidades binarias/decimales
+- ✅ TimeAgoPipe humanizado en español
+- ✅ SearchHighlightPipe con HTML seguro
+- ✅ SortByPipe para múltiples tipos de datos
+- ✅ Documentación completa de cada pipe
+
+### **Funcionalidades Avanzadas**
+- ✅ Debounce en búsquedas reactivas
+- ✅ Combinación de múltiples pipes
+- ✅ Optimización de performance (pure vs impure)
+- ✅ Manejo seguro de HTML con DomSanitizer
+- ✅ Localización y formateo regional
+- ✅ Responsive design en todos los componentes
+
+### **Navegación y Rutas**
+- ✅ Rutas configuradas para todos los labs
+- ✅ Navegación funcional en header
+- ✅ RouterLinkActive para estados activos
+
+---
+
+## **COMANDOS DE VERIFICACIÓN FINAL**
+
+```bash
+# Verificar que compile sin errores
+ng build
+
+# Ejecutar servidor de desarrollo
+ng serve
+
+# Verificar rutas disponibles
+echo "Rutas implementadas:"
+echo "http://localhost:4200/home"
+echo "http://localhost:4200/products"
+echo "http://localhost:4200/dashboard" 
+echo "http://localhost:4200/tasks"
+echo "http://localhost:4200/pipes"
+
+# Verificar que todos los pipes están funcionando
+echo "✅ Verificar en navegador:"
+echo "1. Navegación entre todas las rutas"
+echo "2. Filtrado reactivo en productos y tareas"
+echo "3. Funcionalidad de dashboard interactivo"
+echo "4. Pipes personalizados en showcase"
+echo "5. Async pipes cargando datos correctamente"
+```
+
+---
+
+## **ENTREGABLES DE LA SESIÓN 3**
+
+1. **🛍️ Sistema de Productos** - Lab 1 con data binding completo
+2. **📊 Dashboard Interactivo** - Lab 2 con binding avanzado  
+3. **📋 Gestor de Tareas** - Lab 3 con pipes built-in y async
+4. **🔧 Showcase de Pipes** - Lab 4 con 6 pipes personalizados
+5. **📚 Documentación** - Documentación completa de todos los pipes
+6. **🎯 Aplicación Integrada** - Todo funcionando en una sola app
+
+### **Conceptos Dominados**
+- ✨ **Los 4 tipos de Data Binding** en profundidad
+- 🔄 **Two-way binding** con FormsModule
+- 🎨 **NgClass y NgStyle** para estilos dinámicos
+- 🎯 **Event binding** avanzado con propagación
+- 📊 **Pipes built-in** de Angular con parámetros
+- 🚀 **Async pipe** para manejo automático de Observables
+- 🔧 **Pipes personalizados** puros e impuros
+- ⚡ **Optimización de performance** con pipes
+- 🛡️ **Seguridad** con DomSanitizer
+- 🌍 **Localización** y formateo regional
+
+**¡Laboratorio Sesión 3 completado exitosamente! 🎉**
