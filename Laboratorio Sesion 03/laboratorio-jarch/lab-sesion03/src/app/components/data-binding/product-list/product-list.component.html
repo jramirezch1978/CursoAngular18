@@ -1,0 +1,182 @@
+<div class="product-list-container">
+  <!-- INTERPOLACIÓN: Mostrando el título -->
+  <header class="list-header">
+    <h1>🏗️ {{ pageTitle }}</h1>
+    <p class="subtitle">Demostración de los 4 tipos de Data Binding en Angular</p>
+  </header>
+
+  <!-- TWO-WAY BINDING: Filtros de búsqueda -->
+  <section class="filters-section">
+    <div class="filters-container">
+      <div class="filter-group">
+        <label for="search">🔍 Buscar:</label>
+        <!-- Two-way binding con ngModel -->
+        <input 
+          type="text" 
+          id="search"
+          [(ngModel)]="searchTerm"
+          placeholder="Buscar productos..."
+          class="form-control">
+        <small class="binding-note">Two-way binding: [(ngModel)]="searchTerm"</small>
+      </div>
+
+      <div class="filter-group">
+        <label for="category">📁 Categoría:</label>
+        <!-- Two-way binding con select -->
+        <select 
+          id="category"
+          [(ngModel)]="selectedCategory"
+          class="form-control">
+          @for (cat of categories; track cat.value) {
+            <option [value]="cat.value">{{ cat.label }}</option>
+          }
+        </select>
+        <small class="binding-note">Two-way binding con select</small>
+      </div>
+
+      <div class="filter-info">
+        <p>Término de búsqueda: <strong>{{ searchTerm || 'Ninguno' }}</strong></p>
+        <p>Categoría seleccionada: <strong>{{ selectedCategory }}</strong></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- LISTA DE PRODUCTOS -->
+  <section class="products-section">
+    <div class="products-grid">
+      @for (product of getFilteredProducts(); track product.id) {
+        <div 
+          class="product-card"
+          [class.on-sale]="product.discount > 0"
+          [class.out-of-stock]="!product.isAvailable">
+          
+          <!-- PROPERTY BINDING: Imagen del producto -->
+          <div class="product-image">
+            <img 
+              [src]="product.image || 'assets/images/placeholder.jpg'"
+              [alt]="product.name"
+              [title]="product.description">
+            
+            @if (product.discount > 0) {
+              <span class="discount-badge">-{{ product.discount }}%</span>
+            }
+            <small class="binding-note">Property binding: [src], [alt], [title]</small>
+          </div>
+
+          <!-- INTERPOLACIÓN: Información del producto -->
+          <div class="product-info">
+            <h3>{{ product.name }}</h3>
+            <p class="description">{{ product.description }}</p>
+            
+            <div class="product-meta">
+              <span class="category">{{ product.category }}</span>
+              <span class="rating">⭐ {{ product.rating }} ({{ product.reviews }})</span>
+            </div>
+
+            <!-- CLASS BINDING: Estado de disponibilidad -->
+            <div 
+              class="availability"
+              [class]="getAvailabilityClass(product)">
+              {{ getAvailabilityText(product) }}
+            </div>
+            <small class="binding-note">Class binding: [class]="expression"</small>
+          </div>
+
+          <!-- INTERPOLACIÓN con PIPES (preview para siguiente sección) -->
+          <div class="product-price">
+            @if (product.discount > 0) {
+              <span class="original-price">S/ {{ product.price }}</span>
+              <span class="discounted-price">S/ {{ getDiscountedPrice(product) }}</span>
+            } @else {
+              <span class="regular-price">S/ {{ product.price }}</span>
+            }
+          </div>
+
+          <!-- EVENT BINDING: Botón agregar al carrito -->
+          <div class="product-actions">
+            <button 
+              class="btn btn-primary"
+              (click)="addToCart(product)"
+              [disabled]="!product.isAvailable">
+              🛒 Agregar al Carrito
+            </button>
+            <small class="binding-note">Event binding: (click)="method()"</small>
+          </div>
+        </div>
+      } @empty {
+        <div class="no-products">
+          <h3>😔 No se encontraron productos</h3>
+          <p>Intenta con otros términos de búsqueda o categorías</p>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- CARRITO DE COMPRAS -->
+  <section class="cart-section">
+    <h2>🛒 Carrito de Compras ({{ cart.itemCount }} items)</h2>
+    
+    @if (cart.items.length > 0) {
+      <div class="cart-items">
+        @for (item of cart.items; track item.product.id) {
+          <div class="cart-item">
+            <span class="item-name">{{ item.product.name }}</span>
+            <span class="item-quantity">x{{ item.quantity }}</span>
+            <span class="item-subtotal">S/ {{ item.subtotal }}</span>
+            <button 
+              class="btn btn-sm btn-danger"
+              (click)="removeFromCart(item)">
+              ❌
+            </button>
+          </div>
+        }
+      </div>
+
+      <div class="cart-totals">
+        <div class="total-row">
+          <span>Subtotal:</span>
+          <span>S/ {{ cart.total }}</span>
+        </div>
+        <div class="total-row final">
+          <span>Total:</span>
+          <span>S/ {{ cart.finalTotal }}</span>
+        </div>
+      </div>
+
+      <button 
+        class="btn btn-warning"
+        (click)="clearCart()">
+        🗑️ Limpiar Carrito
+      </button>
+    } @else {
+      <p class="empty-cart">El carrito está vacío</p>
+    }
+  </section>
+
+  <!-- RESUMEN DE BINDING -->
+  <section class="binding-summary">
+    <h3>📚 Resumen de Data Binding Implementado</h3>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h4>1️⃣ Interpolación</h4>
+        <code>{{ "{{ expression }}" }}</code>
+        <p>Usado para: títulos, descripciones, precios</p>
+      </div>
+      <div class="summary-card">
+        <h4>2️⃣ Property Binding</h4>
+        <code>[property]="value"</code>
+        <p>Usado para: src, alt, disabled</p>
+      </div>
+      <div class="summary-card">
+        <h4>3️⃣ Event Binding</h4>
+        <code>(event)="handler()"</code>
+        <p>Usado para: click, change, input</p>
+      </div>
+      <div class="summary-card">
+        <h4>4️⃣ Two-way Binding</h4>
+        <code>[(ngModel)]="property"</code>
+        <p>Usado para: inputs, selects</p>
+      </div>
+    </div>
+  </section>
+</div>
