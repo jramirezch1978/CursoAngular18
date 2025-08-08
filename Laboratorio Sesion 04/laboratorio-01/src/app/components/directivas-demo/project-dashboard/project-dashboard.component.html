@@ -11,10 +11,10 @@
       <div class="spinner"></div>
       <p>Cargando proyectos de infraestructura...</p>
     </div>
-  } @else if (error(); as errorMessage) {
+  } @else if (error()) {
     <div class="error-state">
       <span class="error-icon">⚠️</span>
-      <p>{{ errorMessage }}</p>
+      <p>{{ error() }}</p>
       <button (click)="loadProjects()" class="btn btn-primary">
         🔄 Reintentar
       </button>
@@ -100,8 +100,8 @@
           <div class="filter-group">
             <label>Estado del Proyecto:</label>
             <select 
-              [(ngModel)]="selectedStatus"
-              (change)="applyFilters()"
+              [value]="selectedStatus()"
+              (change)="onStatusChange($event)"
               class="form-control">
               @for (option of statusOptions; track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
@@ -111,8 +111,8 @@
           <div class="filter-group">
             <label>Tipo de Proyecto:</label>
             <select 
-              [(ngModel)]="selectedType"
-              (change)="applyFilters()"
+              [value]="selectedType()"
+              (change)="onTypeChange($event)"
               class="form-control">
               @for (option of typeOptions; track option.value) {
                 <option [value]="option.value">{{ option.label }}</option>
@@ -123,8 +123,8 @@
             <label>Buscar por Departamento:</label>
             <input 
               type="text"
-              [(ngModel)]="searchTerm"
-              (input)="applyFilters()"
+              [value]="searchTerm()"
+              (input)="onSearchChange($event)"
               placeholder="Ej: Piura, Sullana..."
               class="form-control">
           </div>
@@ -396,17 +396,17 @@
       <div class="summary-card">
         <h3>if / else if / else</h3>
         <p>Control de estados de carga, error y datos vacíos</p>
-        <code>@if (condition) { } @else if (other) { } @else { }</code>
+        <code>@if (condition()) { } @else if (other()) { } @else { }</code>
       </div>
       <div class="summary-card">
         <h3>for / empty</h3>
         <p>Iteración sobre proyectos con manejo de lista vacía</p>
-        <code>@for (item of items; track item.id) { } @empty { }</code>
+        <code>@for (item of items(); track item.id) { } @empty { }</code>
       </div>
       <div class="summary-card">
         <h3>switch / case / default</h3>
         <p>Renderizado condicional según estado y prioridad</p>
-        <code>@switch (value) { @case (x) { } @default { } }</code>
+        <code>@switch (value()) { @case (x()) { } @default { } }</code>
       </div>
       <div class="summary-card">
         <h3>Variables Locales</h3>
