@@ -86,7 +86,11 @@ export class ProjectService {
     this.selectedProjectSignal.set(project || null);
   }
 
-  updateFilter(filter: Partial<typeof this.filterSignal>): void {
+  updateFilter(filter: Partial<{
+    status: ProjectStatus | 'all';
+    type: ProjectType | 'all';
+    department: string;
+  }>): void {
     this.filterSignal.update(current => ({ ...current, ...filter }));
   }
 

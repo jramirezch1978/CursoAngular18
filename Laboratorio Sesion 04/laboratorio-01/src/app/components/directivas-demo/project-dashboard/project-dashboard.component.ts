@@ -12,14 +12,15 @@ import { Project, ProjectStatus, ProjectType, Priority } from '../../../interfac
   styleUrl: './project-dashboard.component.scss'
 })
 export class ProjectDashboardComponent implements OnInit {
-  // Signals del servicio
-  projects = signal<Project[]>([]);
-  loading = signal<boolean>(false);
-  error = signal<string | null>(null);
-  filteredProjects = signal<Project[]>([]);
-  statistics = signal<any>([]);
-  projectsByStatus = signal<Record<ProjectStatus, Project[]>>({});
-  errorMessage = "";
+
+  // Signals del servicio - Inicializados en el constructor
+  projects!: any;
+  loading!: any;
+  error!: any;
+  filteredProjects!: any;
+  statistics!: any;
+  projectsByStatus!: any;
+
   
   // Signals locales
   viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
@@ -36,6 +37,14 @@ export class ProjectDashboardComponent implements OnInit {
     this.selectedType() !== 'all' || 
     this.searchTerm() !== ''
   );
+  
+  // Variables para el template
+  Object = Object;
+  condition = signal(true);
+  other = signal(false);
+  items = signal([{id: 'demo', name: 'Demo Item'}]);
+  value = signal('test');
+  x = signal('x');
   
   // Enums para el template
   ProjectStatus = ProjectStatus;
@@ -59,7 +68,15 @@ export class ProjectDashboardComponent implements OnInit {
     }))
   ];
 
-  constructor(public projectService: ProjectService) {
+  constructor(private projectService: ProjectService) {
+    // Inicializar signals del servicio
+    this.projects = this.projectService.projects;
+    this.loading = this.projectService.loading;
+    this.error = this.projectService.error;
+    this.filteredProjects = this.projectService.filteredProjects;
+    this.statistics = this.projectService.statistics;
+    this.projectsByStatus = this.projectService.projectsByStatus;
+
     console.log('🎯 LAB 1: ProjectDashboard inicializado');
   }
 
@@ -69,14 +86,7 @@ export class ProjectDashboardComponent implements OnInit {
 
   // Métodos de carga y filtrado
   loadProjects(): void {
-    // Signals del servicio
-    this.projects = this.projectService.projects;
-    this.loading = this.projectService.loading;
-    this.error = this.projectService.error;
-    this.filteredProjects = this.projectService.filteredProjects;
-    this.statistics = this.projectService.statistics;
-    this.projectsByStatus = this.projectService.projectsByStatus;
-    this.errorMessage = "";
+    
 
     this.projectService.loadProjects();
   }
@@ -87,6 +97,24 @@ export class ProjectDashboardComponent implements OnInit {
       type: this.selectedType(),
       department: this.searchTerm()
     });
+  }
+
+  onStatusChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedStatus.set(target.value as ProjectStatus | 'all');
+    this.applyFilters();
+  }
+
+  onTypeChange(event: Event): void {
+    const target = event.target as HTMLSelectElement;
+    this.selectedType.set(target.value as ProjectType | 'all');
+    this.applyFilters();
+  }
+
+  onSearchChange(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value);
+    this.applyFilters();
   }
 
   clearFilters(): void {
