@@ -22,6 +22,7 @@ export class ProjectDashboardComponent {
   readonly ProjectType = ProjectType;
   readonly ProjectStatus = ProjectStatus;
   readonly Priority = Priority;
+  readonly Object = Object; // Para usar Object.values en el template
 
   // Signals para el estado local del componente
   readonly viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
@@ -35,12 +36,12 @@ export class ProjectDashboardComponent {
   constructor(private projectService: ProjectService) {}
 
   // Computed signals para acceder a los datos del servicio
-  readonly projects = this.projectService.filteredProjects;
-  readonly loading = this.projectService.loading;
-  readonly error = this.projectService.error;
-  readonly summary = this.projectService.projectSummary;
-  readonly criticalProjects = this.projectService.criticalProjects;
-  readonly recentProjects = this.projectService.recentProjects;
+  readonly projects = computed(() => this.projectService.filteredProjects());
+  readonly loading = computed(() => this.projectService.loading());
+  readonly error = computed(() => this.projectService.error());
+  readonly summary = computed(() => this.projectService.projectSummary());
+  readonly criticalProjects = computed(() => this.projectService.criticalProjects());
+  readonly recentProjects = computed(() => this.projectService.recentProjects());
 
   // Computed signals para utilidades de la vista
   readonly hasActiveFilters = computed(() => {

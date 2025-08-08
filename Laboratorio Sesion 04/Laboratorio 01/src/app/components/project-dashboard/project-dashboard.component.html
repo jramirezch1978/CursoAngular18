@@ -32,11 +32,11 @@
     <div class="loading-spinner"></div>
     <p>Cargando proyectos...</p>
   </div>
-} @else if (error(); as errorMessage) {
+} @else if (error()) {
   <div class="error-container">
     <span class="material-icons error-icon">error</span>
     <h3>Error al cargar proyectos</h3>
-    <p>{{ errorMessage }}</p>
+    <p>{{ error() }}</p>
     <button class="btn btn-primary" (click)="refreshProjects()">
       Reintentar
     </button>
@@ -107,7 +107,7 @@
             class="form-control"
             placeholder="Buscar por título, código o descripción..."
             [value]="searchTerm()"
-            (input)="onSearchChange($event.target.value)">
+            (input)="onSearchChange(($event.target as HTMLInputElement).value)">
         </div>
         
         <!-- Filtro por tipo usando @for -->
@@ -119,7 +119,7 @@
                 <input
                   type="checkbox"
                   [checked]="isTypeSelected(type)"
-                  (change)="onTypeFilterChange(type, $event.target.checked)">
+                  (change)="onTypeFilterChange(type, ($event.target as HTMLInputElement).checked)">
                 <span>{{ getTypeLabel(type) }}</span>
               </label>
             }
@@ -135,7 +135,7 @@
                 <input
                   type="checkbox"
                   [checked]="isStatusSelected(status)"
-                  (change)="onStatusFilterChange(status, $event.target.checked)">
+                  (change)="onStatusFilterChange(status, ($event.target as HTMLInputElement).checked)">
                 <span>{{ getStatusLabel(status) }}</span>
               </label>
             }
@@ -151,7 +151,7 @@
                 <input
                   type="checkbox"
                   [checked]="isPrioritySelected(priority)"
-                  (change)="onPriorityFilterChange(priority, $event.target.checked)">
+                  (change)="onPriorityFilterChange(priority, ($event.target as HTMLInputElement).checked)">
                 <span>{{ getPriorityLabel(priority) }}</span>
               </label>
             }
@@ -370,7 +370,7 @@
       @case ('kanban') {
         <!-- Vista Kanban usando @for con datos agrupados -->
         <div class="kanban-board">
-          @for (statusEntry of Object.entries(projectsForCurrentView() as Record<string, any[]>); track statusEntry[0]) {
+          @for (statusEntry of Object.entries(projectsForCurrentView()); track statusEntry[0]) {
             <div class="kanban-column">
               <div class="column-header">
                 <h3>{{ getStatusLabel(statusEntry[0] as ProjectStatus) }}</h3>
@@ -454,7 +454,7 @@
         </div>
       }
     }
-  }
+  </div>
 }
 
 <!-- Proyectos críticos destacados -->

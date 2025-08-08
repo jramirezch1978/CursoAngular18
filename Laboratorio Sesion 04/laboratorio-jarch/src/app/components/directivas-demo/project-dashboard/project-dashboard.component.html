@@ -387,32 +387,32 @@
         </div>
       </section>
     }
-  }
 
-  <!-- Resumen de Directivas Implementadas -->
-  <section class="directives-summary">
-    <h2>📚 Directivas Estructurales Implementadas</h2>
-    <div class="summary-grid">
-      <div class="summary-card">
-        <h3>if / else if / else</h3>
-        <p>Control de estados de carga, error y datos vacíos</p>
-        <code>@if (condition()) { } @else if (other()) { } @else { }</code>
+    <!-- Resumen de Directivas Implementadas -->
+    <section class="directives-summary">
+      <h2>📚 Directivas Estructurales Implementadas</h2>
+      <div class="summary-grid">
+        <div class="summary-card">
+          <h3>if / else if / else</h3>
+          <p>Control de estados de carga, error y datos vacíos</p>
+          <code>@if (condition()) { } @else if (other()) { } @else { }</code>
+        </div>
+        <div class="summary-card">
+          <h3>for / empty</h3>
+          <p>Iteración sobre proyectos con manejo de lista vacía</p>
+          <code>@for (item of items(); track item.id) { } @empty { }</code>
+        </div>
+        <div class="summary-card">
+          <h3>switch / case / default</h3>
+          <p>Renderizado condicional según estado y prioridad</p>
+          <code>@switch (value()) { @case (x()) { } @default { } }</code>
+        </div>
+        <div class="summary-card">
+          <h3>Variables Locales</h3>
+          <p>Uso de $index, $even, $odd en bucles</p>
+          <code>let i = $index; let even = $even</code>
+        </div>
       </div>
-      <div class="summary-card">
-        <h3>for / empty</h3>
-        <p>Iteración sobre proyectos con manejo de lista vacía</p>
-        <code>@for (item of items(); track item.id) { } @empty { }</code>
-      </div>
-      <div class="summary-card">
-        <h3>switch / case / default</h3>
-        <p>Renderizado condicional según estado y prioridad</p>
-        <code>@switch (value()) { @case (x()) { } @default { } }</code>
-      </div>
-      <div class="summary-card">
-        <h3>Variables Locales</h3>
-        <p>Uso de $index, $even, $odd en bucles</p>
-        <code>let i = $index; let even = $even</code>
-      </div>
-    </div>
-  </section>
+    </section>
+  }
 </div>

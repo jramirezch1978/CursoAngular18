@@ -38,7 +38,7 @@ import { RouterOutlet, RouterModule } from '@angular/router';
       <footer class="app-footer">
         <div class="footer-content">
           <p>&copy; 2024 PROVIAS Nacional - Laboratorio Angular 18 - Directivas Estructurales</p>
-          <p class="version">Lab 01 - Control Flow Syntax (@if, @for, @switch)</p>
+          <p class="version">Lab 01 - Control Flow Syntax (&#64;if, &#64;for, &#64;switch)</p>
         </div>
       </footer>
     </div>
