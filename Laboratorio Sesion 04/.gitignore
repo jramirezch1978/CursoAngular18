@@ -1,0 +1,266 @@
+# LABORATORIO SESIÓN 03 - ANGULAR V18 PROVIAS DESCENTRALIZADO
+# Archivo .gitignore principal para todos los proyectos del laboratorio
+
+# =============================================================================
+# ANGULAR SPECIFIC
+# =============================================================================
+
+# Compiled output
+**/dist/
+**/tmp/
+**/out-tsc/
+**/bazel-out/
+
+# Angular cache and build artifacts
+**/.angular/
+.angular/
+**/angular.json.bak
+**/.ng/
+
+# Coverage reports
+**/coverage/
+**/*.lcov
+
+# E2E test artifacts
+**/e2e/test-output/
+**/e2e/reports/
+**/e2e/screenshots/
+
+# TypeScript build info
+**/*.tsbuildinfo
+
+# =============================================================================
+# NODE.JS & NPM
+# =============================================================================
+
+# Dependencies
+**/node_modules/
+**/jspm_packages/
+
+# Lock files (opcional - puede incluirse si se quiere versionar)
+**/package-lock.json
+**/yarn.lock
+**/pnpm-lock.yaml
+
+# NPM logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+.pnpm-debug.log*
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Optional npm cache directory
+.npm
+
+# Optional eslint cache
+.eslintcache
+
+# Optional stylelint cache
+.stylelintcache
+
+# =============================================================================
+# ENVIRONMENT & CONFIGURATION
+# =============================================================================
+
+# Environment variables
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+
+# Local configuration
+**/config/local.json
+**/credentials.json
+**/.env.provias
+
+# =============================================================================
+# IDEs & EDITORS
+# =============================================================================
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+.history/*
+
+# IntelliJ IDEA / WebStorm
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# Eclipse
+.metadata
+.recommenders/
+.project
+.classpath
+.settings/
+
+# NetBeans
+nbproject/
+nbbuild/
+nbdist/
+.nb-gradle/
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# =============================================================================
+# OPERATING SYSTEMS
+# =============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+
+# =============================================================================
+# BUILD & TESTING
+# =============================================================================
+
+# Build directories
+**/build/
+**/dist/
+**/out/
+
+# Test coverage
+**/coverage/
+**/.nyc_output
+
+# Cypress
+**/cypress/videos/
+**/cypress/screenshots/
+
+# Jest
+**/jest-cache/
+
+# Storybook
+**/storybook-static/
+
+# Lighthouse reports
+**/lighthouse/
+
+# Bundle analysis
+**/bundle-analysis/
+**/stats.json
+
+# =============================================================================
+# SASS & CSS
+# =============================================================================
+
+# Sass cache
+**/.sass-cache/
+
+# CSS maps
+**/*.css.map
+
+# =============================================================================
+# LOGS & TEMPORARY FILES
+# =============================================================================
+
+# Log files
+logs
+*.log
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+*.temp
+
+# Cache directories
+.cache/
+*.cache
+
+# =============================================================================
+# BACKUP & VERSIONING
+# =============================================================================
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Version control
+.svn/
+.hg/
+.bzr/
+
+# =============================================================================
+# PROVIAS DESCENTRALIZADO SPECIFIC
+# =============================================================================
+
+# Documentos sensibles
+**/documentos-privados/
+**/credenciales/
+
+# Uploads y archivos temporales
+**/uploads/
+**/storage/
+
+# Reportes generados
+**/reportes-generated/
+
+# Base de datos local
+**/*.db
+**/*.sqlite
+**/*.sqlite3
+
+# Configuración local de PROVIAS
+**/provias-local.config.json
+
+# =============================================================================
+# CONTENIDO EDUCATIVO
+# =============================================================================
+
+# Mantener los archivos de documentación del laboratorio
+!documento*.txt
+!Guion*.txt
+!README*.md
+!*.md
+
+# Mantener ejemplos y plantillas
+!examples/
+!templates/
+!assets/
+
+# =============================================================================
+# COMENTARIOS
+# =============================================================================
+
+# Este .gitignore está configurado para:
+# - Lab 1: Data Binding básico
+# - Lab 2: Binding Avanzado (NgClass, NgStyle, HostListener)
+# - Lab 3: Pipes Built-in
+# - Lab 4: Pipes Personalizados
+# - Laboratorio JARCH: Implementaciones específicas
+#
+# Configuración para Angular v18 - PROVIAS DESCENTRALIZADO
+# Sesión 03 del Curso Angular 18

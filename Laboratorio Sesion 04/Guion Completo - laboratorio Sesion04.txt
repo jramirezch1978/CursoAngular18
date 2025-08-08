@@ -1,0 +1,236 @@
+GUIÓN DETALLADO - SESIÓN 4: DIRECTIVAS - ANGULAR v18
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Portada del Curso (2 minutos)
+¡Bienvenidos a nuestra cuarta sesión del curso Angular 18! Es un placer verlos nuevamente aquí, listos para otra jornada de aprendizaje intensivo.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y hoy, jueves 7 de agosto de 2025, vamos a sumergirnos en el fascinante mundo de las Directivas. Si en las sesiones anteriores aprendimos a comunicar datos y transformarlos, hoy aprenderemos a controlar y manipular el DOM como verdaderos arquitectos de interfaces.
+Las directivas son como los planos de construcción de un edificio moderno. Imaginen que están diseñando el nuevo centro de operaciones de PROVIAS. No solo necesitan que las puertas se abran y cierren, necesitan que se abran automáticamente cuando alguien se acerca, que cambien de color según el nivel de acceso, y que registren cada entrada. Eso es exactamente lo que hacen las directivas: agregan comportamiento inteligente a elementos simples.
+Hoy la metodología será completamente práctica. Durante las próximas tres horas, sus manos estarán en el teclado el 90% del tiempo. Es como aprender carpintería: pueden leer todos los manuales del mundo, pero hasta que no tomen el martillo y los clavos, no construirán nada real.
+Angular 18 ha revolucionado las directivas con su nueva sintaxis de control flow. Los bloques @if, @for y @switch no son solo azúcar sintáctico; son una reimaginación completa de cómo estructuramos nuestras aplicaciones. Y ustedes van a dominarlas hoy.
+Preparen sus entornos de desarrollo, abran Visual Studio Code, asegúrense de que su proyecto Angular esté funcionando, y comencemos esta aventura práctica juntos.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Hoy no solo van a aprender sobre directivas; van a convertirse en maestros del control del DOM.
+Dominar las directivas estructurales modernas es como aprender a ser el director de orquesta de su aplicación. Con @if, @for y @switch, van a decidir qué elementos aparecen, cuándo aparecen, y cómo se organizan. Es el poder de hacer que su interfaz responda inteligentemente a los datos.
+Las directivas de atributo son sus pinceles para pintar la interfaz. NgClass y NgStyle no son solo formas de cambiar colores; son herramientas para crear experiencias visuales que responden al estado de la aplicación. Imaginen un tablero de control donde los indicadores cambian de verde a rojo automáticamente cuando detectan problemas.
+Crear directivas personalizadas complejas es donde se vuelven verdaderos artesanos. Van a construir comportamientos reutilizables que pueden aplicar a cualquier elemento. Es como crear sus propias herramientas especializadas que nadie más tiene.
+HostListener y HostBinding son sus oídos y manos en el DOM. Con HostListener escuchan eventos: clicks, movimientos del mouse, teclas presionadas. Con HostBinding modifican propiedades: clases, estilos, atributos. Es interactividad en su máxima expresión.
+Renderer2 es su guardaespaldas de seguridad. En lugar de manipular el DOM directamente (que es peligroso y puede causar vulnerabilidades), Renderer2 les proporciona métodos seguros que funcionan en cualquier plataforma, incluso en server-side rendering.
+Las track functions son el secreto para aplicaciones ultrarrápidas con listas grandes. Es la diferencia entre una aplicación que se congela con mil elementos y una que maneja millones sin pestañear.
+Al final de esta sesión, tendrán un sistema completo con directivas que harían que cualquier desarrollador senior se sienta orgulloso.
+________________________________________
+Diapositiva 3: Agenda de la Sesión (1 minuto)
+Nuestra agenda está diseñada como un entrenamiento militar: intenso, progresivo y altamente efectivo.
+Los primeros 45 minutos del Lab 1 son los cimientos. Van a dominar la nueva sintaxis de control flow que Angular 17 y 18 han introducido. Es como aprender un nuevo idioma que es más claro, más eficiente y más poderoso.
+El Lab 2 los llevará a las directivas de atributo avanzadas durante otros 45 minutos. Aquí es donde la magia visual ocurre. Van a hacer que los elementos cambien dinámicamente, respondan a interacciones, y se adapten al contexto.
+Después de 90 minutos de código intenso, nos tomaremos un merecido break de 15 minutos. No lo subestimen; el cerebro necesita procesar toda la información que están absorbiendo.
+Al regresar, el Lab 3 es donde se vuelven creativos. Durante 45 minutos van a crear sus propias directivas personalizadas que resuelven problemas reales de negocio.
+El Lab 4 es la cereza del pastel: 25 minutos de pura adrenalina implementando drag & drop y manipulación avanzada del DOM con Renderer2.
+Los últimos 5 minutos consolidaremos todo lo aprendido y los prepararemos para llevar estas habilidades a sus proyectos reales.
+________________________________________
+Diapositiva 4: Evolución de Directivas en Angular 18 (3 minutos)
+Lo que van a ver ahora es un antes y después en la historia de Angular.
+La nueva sintaxis de control flow es como pasar de escribir en código morse a escribir en lenguaje natural. Miren este ejemplo: @if (isLoggedIn). ¿No es hermosamente simple? No más asteriscos confusos, no más imports de CommonModule solo para un simple if.
+La diferencia es profunda. La sintaxis legacy con *ngIf requería que Angular procesara todo como directivas normales. La nueva sintaxis está integrada directamente en el compilador. Es como la diferencia entre traducir simultáneamente y hablar nativamente el idioma.
+El @for con track es genial. Antes teníamos que escribir trackBy functions separadas. Ahora está integrado: @for (item of items; track item.id). Angular sabe exactamente cómo identificar cada elemento para optimizar el renderizado.
+El @empty es una adición brillante. Cuántas veces han tenido que escribir un *ngIf adicional solo para mostrar "No hay elementos"? Ahora está integrado en el mismo bloque. Es diseño inteligente que entiende casos de uso reales.
+El @switch es más limpio que nunca. En lugar de múltiples *ngSwitchCase, ahora tienen @case que es más legible y más eficiente. Es como tener un panel de control con botones claramente etiquetados en lugar de códigos crípticos.
+El mejor beneficio: tree-shaking mejorado. El código no utilizado se elimina más eficientemente en el build de producción. Sus aplicaciones serán más pequeñas y más rápidas. En un proyecto reciente, vi reducciones del 15% en el tamaño del bundle solo por cambiar a la nueva sintaxis.
+Y sí, la sintaxis legacy todavía funciona. Angular es retrocompatible. Pero como profesionales que somos, vamos a usar las herramientas más modernas y eficientes disponibles.
+________________________________________
+Diapositiva 5: Directivas Estructurales - Conceptos Core (3 minutos)
+Las directivas estructurales son los arquitectos de su DOM. Deciden qué existe y qué no.
+El @if con múltiples condiciones es poderoso. Miren: @if (user && user.role === 'admin'). Están verificando no solo si el usuario existe, sino también su rol. Es como un guardia de seguridad que verifica tanto el ID como el nivel de acceso antes de dejar pasar a alguien.
+El @for con variables locales es una maravilla de diseño. No solo iteran sobre elementos; tienen acceso a índices, primero, último, par, impar. Es como tener un GPS que no solo les dice dónde están, sino también qué hay alrededor.
+La función track es crítica para rendimiento. Imaginen una lista de 1000 empleados. Sin track, Angular recrea todos los elementos DOM cuando algo cambia. Con track, solo actualiza lo que realmente cambió. Es la diferencia entre reconstruir todo un edificio o solo repintar una habitación.
+El @defer es futurista. Permite lazy loading a nivel de componente. Imaginen una página con gráficos pesados. Con @defer (on viewport), el gráfico solo se carga cuando el usuario lo va a ver. Es como tener un asistente que prepara las cosas justo cuando las necesitas, no antes.
+El @placeholder mientras carga es UX profesional. En lugar de un espacio en blanco confuso, muestran un skeleton loader. Los usuarios saben que algo viene. Es la diferencia entre esperar en una sala vacía y esperar en una sala con una pantalla que muestra el progreso.
+Estas directivas no solo modifican apariencia; modifican la estructura misma del DOM. Elementos entran y salen de existencia. Es poder real sobre la arquitectura de su aplicación.
+________________________________________
+Diapositiva 6: LAB 1 - Directivas Estructurales Modernas (5 minutos)
+¡Manos a la obra! Vamos a construir un dashboard de usuarios que sería la envidia de cualquier aplicación empresarial.
+El componente UserDashboardComponent que van a crear es un ejemplo perfecto de cómo las directivas estructurales trabajan juntas. Imaginen que están construyendo el panel de control para los supervisores de PROVIAS, donde necesitan ver el estado de todos los trabajadores en campo en tiempo real.
+Empezaremos con el @if para manejar estados de carga. Mientras los datos llegan del servidor, mostramos un spinner. Si hay un error, mostramos un mensaje de error claro. Si todo está bien, mostramos los usuarios. Es manejo de estados profesional.
+El código es elegante en su simplicidad. @if (loading) muestra el spinner. No necesitan crear variables booleanas adicionales ni lógica compleja. Angular entiende que loading es un signal y reacciona automáticamente cuando cambia.
+El @for con track user.id es crucial. Cada usuario tiene una tarjeta que muestra su información. Pero aquí viene lo interesante: el track asegura que si actualizan la lista (por ejemplo, un usuario cambia de estado), solo esa tarjeta específica se actualiza, no toda la lista.
+El @switch para el estado del usuario es brillante. En lugar de múltiples ifs anidados, tienen un switch limpio que muestra "En línea", "Desconectado" o "Ausente" con diferentes colores. Es como los indicadores de un semáforo: verde, gris, amarillo. Inmediatamente comprensible.
+El @empty es el toque profesional. Si no hay usuarios, no muestran una pantalla vacía confusa. Muestran un mensaje claro: "No hay usuarios disponibles". Es cortesía básica con el usuario.
+Los signals que usamos (users, loading, error) son la nueva forma reactiva de Angular. Cuando loading cambia a false, la vista se actualiza automáticamente. No necesitan detectores de cambios manuales ni subscripciones complicadas.
+Durante estos 45 minutos, van a crear al menos 10 usuarios diferentes con estados variados. Van a simular cambios de estado en tiempo real y ver cómo las directivas responden instantáneamente. Van a agregar usuarios, eliminarlos, cambiar sus estados, y la interfaz se adaptará perfectamente.
+Un tip importante: comiencen con datos hardcodeados para probar las directivas. Una vez que funcione, conecten con servicios reales. Es más fácil debuggear cuando saben que el problema está en las directivas, no en los datos.
+________________________________________
+Diapositiva 7: Directivas de Atributo - NgClass y NgStyle (3 minutos)
+Ahora entramos al mundo del estilizado dinámico. NgClass y NgStyle son sus varita mágicas para transformar la apariencia.
+NgClass con objetos es como tener un vestuario completo y decidir qué ponerse según la ocasión. El objeto que pasan determina qué clases se aplican. 'active': isActive significa "si isActive es true, aplica la clase active". Es condicional puro y simple.
+La sintaxis de array es útil cuando tienen clases base que siempre se aplican más clases dinámicas. Es como tener un uniforme base y agregar insignias según los logros. ['base-class', dynamicClass] siempre aplica base-class y agrega lo que esté en dynamicClass.
+NgStyle para estilos inline es potente pero úsenlo con moderación. 'width.px': widthValue convierte automáticamente el número a píxeles. No necesitan concatenar 'px' manualmente. Angular lo hace por ustedes.
+La transformación con rotate es genial para animaciones. 'transform': 'rotate(' + rotation + 'deg)' permite rotación dinámica. Imaginen un velocímetro digital donde la aguja se mueve según la velocidad. Eso es NgStyle en acción.
+La combinación con signals es el futuro. [ngClass]="themeClasses()" llama a una función computed que calcula las clases basándose en múltiples signals. Cuando cualquier signal cambia, las clases se recalculan automáticamente.
+El tip de rendimiento es crucial: para cálculos complejos, usen computed() de signals. En lugar de recalcular en cada detección de cambios, computed() solo recalcula cuando las dependencias cambian. Es la diferencia entre verificar constantemente si algo cambió versus ser notificado cuando cambia.
+La mejor práctica de preferir clases CSS sobre estilos inline no es solo por limpieza. Las clases CSS son más eficientes, más fáciles de mantener, y permiten mejor separación de responsabilidades. El CSS define cómo se ve algo; Angular decide cuándo aplicarlo.
+________________________________________
+Diapositiva 8: NgModel y Two-Way Binding (3 minutos)
+NgModel es la joya del data binding bidireccional. Es como tener un espejo mágico donde los cambios en cualquier lado se reflejan instantáneamente en el otro.
+Primero, necesitan importar FormsModule. Es como obtener la licencia antes de conducir. Sin FormsModule, NgModel no funciona. Es un paso que muchos olvidan y luego se preguntan por qué tienen errores.
+El two-way binding básico [(ngModel)]="userName" es elegante. Los paréntesis cuadrados son para property binding (entrada), los paréntesis normales son para event binding (salida), y juntos forman la famosa "banana in a box". Cuando el usuario escribe, userName se actualiza. Cuando userName cambia en el código, el input se actualiza.
+La descomposición del banana-in-a-box es educativa. [ngModel]="email" (ngModelChange)="onEmailChange($event)" muestra lo que realmente sucede bajo el capó. Property binding establece el valor, event binding captura los cambios. Es útil cuando necesitan hacer algo adicional cuando el valor cambia, como validación en tiempo real.
+Las validaciones con referencias de template son profesionales. #ageInput="ngModel" crea una referencia al estado del NgModel. Pueden verificar si es válido, tocado, pristine, dirty. Es como tener un inspector de calidad para cada campo.
+El @if con validaciones es UX moderno. Solo muestran errores cuando el campo es inválido Y ha sido tocado. No abruman al usuario con errores antes de que tenga oportunidad de escribir. Es cortesía digital.
+Los selects con NgModel son perfectos para opciones dinámicas. El @for genera las opciones, NgModel mantiene la selección sincronizada. Cuando agregan o quitan opciones, todo sigue funcionando perfectamente.
+La nota sobre Reactive Forms es importante. NgModel es genial para formularios simples y prototipos rápidos. Pero para formularios complejos con validaciones avanzadas, validaciones asíncronas, o formularios dinámicos, Reactive Forms es la herramienta profesional. Es como usar una calculadora básica versus Excel para finanzas.
+________________________________________
+Diapositiva 9: LAB 2 - Directivas de Atributo Avanzadas (5 minutos)
+Este laboratorio es donde su aplicación se vuelve verdaderamente interactiva y personalizable. Van a construir un editor de temas que impresionaría hasta a los diseñadores más exigentes.
+El ThemeEditorComponent que crearemos es como el panel de personalización de un videojuego moderno, pero para su aplicación empresarial. Los usuarios podrán cambiar temas, colores, tamaños, todo en tiempo real.
+El panel de control es intuitivo. Un select para elegir el tema base (claro, oscuro, alto contraste). Es como los modos de lectura en los e-readers modernos. Cada modo optimizado para diferentes condiciones.
+El input de color con [(ngModel)]="primaryColor" es satisfactorio. Mientras mueven el selector de color, toda la interfaz se actualiza instantáneamente. No hay botón "aplicar", no hay retrasos. Es feedback instantáneo que hace que los usuarios sientan control total.
+El slider para el tamaño de fuente es accesibilidad en acción. No todos tienen la misma vista. Permitir ajustar el tamaño de fuente es inclusión digital. El binding bidireccional hace que mientras mueven el slider, el texto crece o decrece en tiempo real.
+El preview con múltiples NgClass es donde la magia ocurre. Basándose en isDarkMode, isCompact, hasAnimations, diferentes clases se aplican. Es como tener múltiples personalidades para la misma interfaz.
+El uso de CSS variables con NgStyle es moderno y eficiente. '--primary-color': primaryColor establece una variable CSS que luego puede ser usada en todo el CSS. Cambian un valor en Angular, y todo el tema se actualiza. Es arquitectura inteligente.
+La combinación de ngClass con objetos dinámicos y ngStyle con CSS variables es poderosa. NgClass maneja los cambios estructurales grandes (tema oscuro vs claro), NgStyle maneja los ajustes finos (colores específicos, tamaños).
+Durante estos 45 minutos, van a implementar al menos 5 temas diferentes, permitir personalización completa de colores, implementar persistencia en localStorage (para que las preferencias se mantengan), y agregar animaciones suaves entre cambios de tema.
+Un detalle importante: usen transiciones CSS para que los cambios de tema no sean abruptos. transition: all 0.3s ease hace que los cambios sean suaves y profesionales, no jarring.
+________________________________________
+Diapositiva 10: BREAK (15 minutos)
+¡Excelente trabajo! Han completado la primera mitad de nuestra sesión intensiva de directivas.
+En estos primeros 90 minutos han logrado cosas impresionantes. Han dominado la nueva sintaxis de control flow que está revolucionando Angular. Han implementado directivas de atributo que hacen que sus interfaces sean dinámicas y responsivas.
+Si comparamos con el mundo real, acaban de aprender a ser tanto arquitectos como decoradores de interiores. Pueden decidir qué habitaciones existen (directivas estructurales) y cómo se ven (directivas de atributo).
+Durante este break, les recomiendo que se levanten y estiren. El código intensivo puede tensar los hombros y el cuello. Hagan algunos estiramientos simples. Sus músculos se los agradecerán.
+Tomen agua, no café en exceso. La hidratación mantiene el cerebro funcionando óptimamente. El café está bien, pero el agua es esencial para mantener la concentración durante las próximas horas.
+Si tienen errores en la consola, ahora es el momento de resolverlos. No dejen que se acumulen. Un error pequeño ahora puede convertirse en un dolor de cabeza grande después.
+Reflexionen sobre lo que han aprendido. ¿Cómo podrían usar estas directivas en sus proyectos actuales? Piensen en casos de uso reales. La mejor forma de solidificar el conocimiento es conectarlo con problemas que ya conocen.
+La segunda mitad será aún más emocionante. Van a crear sus propias directivas personalizadas. Es como pasar de usar herramientas prefabricadas a forjar las suyas propias. Van a usar HostListener para escuchar eventos, HostBinding para modificar propiedades, y Renderer2 para manipulación segura del DOM.
+Prepárense mentalmente. Lo que viene requiere creatividad además de habilidad técnica. Van a pensar en comportamientos reutilizables que pueden aplicar a cualquier elemento.
+Nos vemos en exactamente 15 minutos, a las 20:45. ¡Descansen bien y regresen con energía renovada!
+________________________________________
+Diapositiva 11: Directivas Personalizadas - Arquitectura (3 minutos)
+Ahora entramos en territorio de ingeniería avanzada. Crear directivas personalizadas es como diseñar sus propias herramientas especializadas.
+La estructura de una directiva es elegante. El decorator @Directive define el selector, que es cómo la usarán en los templates. [appTooltip] significa que es una directiva de atributo. Si fuera *appTooltip, sería estructural.
+Los @Input permiten parametrización. appTooltip recibe el texto del tooltip, tooltipPosition define dónde aparece. Es como tener una herramienta ajustable que se adapta a diferentes situaciones.
+@HostBinding es fascinante. Pueden modificar cualquier propiedad del elemento host. 'class.has-tooltip' agrega una clase, 'style.position' establece un estilo. Es control total sobre el elemento desde dentro de la directiva.
+ElementRef les da acceso al elemento DOM nativo, pero aquí viene la advertencia: nunca lo manipulen directamente. Es como tener acceso a los cables eléctricos de su casa; puede hacerlo, pero es peligroso.
+Renderer2 es su herramienta segura. createElement, addClass, setProperty, appendChild - todos métodos que manipulan el DOM de forma segura, compatible con server-side rendering, y protegida contra XSS.
+@HostListener es sus oídos en el DOM. 'mouseenter' y 'mouseleave' detectan cuando el mouse entra y sale. Pueden escuchar cualquier evento: clicks, teclas, scroll, resize, lo que necesiten.
+La lógica de showTooltip es inteligente. Crea un div dinámicamente, le agrega clases según la posición, establece el texto, y lo agrega al elemento. Es creación dinámica de UI en su máxima expresión.
+El patrón de crear y destruir elementos es importante para el rendimiento. No dejen elementos invisibles en el DOM; créenlos cuando se necesiten, destrúyanlos cuando no. Es gestión eficiente de recursos.
+________________________________________
+Diapositiva 12: HostListener y HostBinding (3 minutos)
+HostListener y HostBinding son sus superpoderes para interactuar con el elemento host. Son como tener control remoto total sobre cualquier elemento.
+HostListener para eventos del mouse es lo básico. @HostListener('click', ['$event']) les da acceso al evento completo. Pueden saber exactamente dónde clickearon, qué botón usaron, si tenían teclas modificadoras presionadas. Es información detallada para interacciones precisas.
+El contador de clicks es útil para analytics. Pueden rastrear cuántas veces los usuarios interactúan con elementos específicos. Es data valiosa para mejorar UX.
+Los eventos de teclado abren posibilidades infinitas. @HostListener('keydown', ['$event']) detecta cualquier tecla. Pueden implementar atajos de teclado, navegación con flechas, comandos especiales. Es accesibilidad y productividad.
+Los eventos de window son globales. 'window:resize' detecta cuando cambia el tamaño de la ventana. Útil para layouts responsivos que necesitan recalcular dimensiones. Pero úsenlo con moderación; los eventos globales pueden afectar el rendimiento.
+HostBinding con clases es común. @HostBinding('class.active') agrega o quita la clase 'active' basándose en una variable booleana. Es más limpio que manipular classList manualmente.
+El binding de estilos permite animaciones dinámicas. style.backgroundColor puede cambiar basándose en el estado. Imaginen botones que cambian de color según la validez del formulario.
+Los getters con HostBinding son poderosos pero peligrosos. get transform() se ejecuta en cada detección de cambios. Para lógica simple está bien, pero cálculos complejos matarán el rendimiento.
+El ejemplo del transform con scale es perfecto para hover effects. Cuando isHovered es true, el elemento crece a scale(1.1). Es feedback visual sutil pero efectivo que hace que la interfaz se sienta viva.
+________________________________________
+Diapositiva 13: LAB 3 - Directivas Personalizadas Complejas (5 minutos)
+Este es el laboratorio más creativo. Van a construir tres directivas que resolverán problemas reales que encuentran en cada proyecto.
+La ValidationFeedbackDirective es oro puro para formularios. Imaginen que están validando datos de entrada para el sistema de PROVIAS. No solo necesitan validar; necesitan comunicar visualmente el estado de validación.
+El HostBinding con getter para clases múltiples es inteligente. Basándose en el estado de validación, aplican diferentes clases: border-green para válido, border-red para inválido, border-yellow para pendiente. Es como un semáforo para cada campo del formulario.
+La clase 'shake' cuando hay error es UX delightful. El campo literalmente tiembla cuando hay un error, llamando la atención del usuario. Es feedback que no pueden ignorar.
+La LazyLoadDirective resuelve un problema real de rendimiento. En lugar de cargar todas las imágenes al inicio (que puede ser lento), cargan solo las que están a punto de ser visibles. Es como un camarero que solo trae los platos cuando estás listo para comerlos.
+IntersectionObserver es API moderna del navegador. Detecta cuando un elemento entra en el viewport. Es más eficiente que escuchar eventos de scroll constantemente. Es la diferencia entre verificar constantemente versus ser notificado.
+El placeholder mientras carga es profesional. Los usuarios ven una imagen de placeholder en lugar de un espacio vacío. Cuando la imagen real se carga, hace la transición suavemente. Es la diferencia entre un sitio amateur y uno profesional.
+La HasPermissionDirective es seguridad a nivel de UI. Basándose en los permisos del usuario, elementos se muestran u ocultan. Es como tener diferentes versiones de la misma página según el nivel de acceso.
+El display: none es intencional. No solo oculta visualmente; remueve del layout completamente. Los usuarios no pueden acceder a elementos ocultos ni con inspect element (aunque la seguridad real debe estar en el backend).
+Durante estos 45 minutos, van a implementar estas tres directivas y al menos dos más de su propia creación. Piensen en problemas repetitivos en sus proyectos. ¿Formateo especial? ¿Comportamientos de UI específicos? Conviertan esos patrones en directivas reutilizables.
+________________________________________
+Diapositiva 14: Renderer2 - Manipulación Segura del DOM (3 minutos)
+Renderer2 es su guardián de seguridad para manipulación del DOM. Es la diferencia entre cirugía con bisturí esterilizado versus con un cuchillo de cocina.
+La manipulación directa del DOM es peligrosa. element.innerHTML puede introducir scripts maliciosos (XSS attacks). Es como dejar la puerta de su casa abierta. Renderer2 es su sistema de seguridad.
+createElement es creación segura de elementos. No están parseando HTML strings que podrían contener código malicioso. Están creando elementos programáticamente, con control total.
+setAttribute vs setProperty es sutil pero importante. setAttribute establece atributos HTML, setProperty establece propiedades del DOM. La mayoría de las veces querrán setProperty.
+addClass y removeClass son más seguros que manipular className directamente. No sobrescriben accidentalmente otras clases. Es adición y sustracción precisa, no reemplazo total.
+setStyle para estilos individuales es más eficiente que reemplazar todo el style. Cambian solo lo que necesitan cambiar. Es como ajustar un solo control en lugar de resetear todo el panel.
+appendChild y removeChild para gestión de elementos. Agregan elementos donde los necesitan, los quitan cuando terminan. Es gestión limpia del DOM sin memory leaks.
+El patrón de crear, usar y destruir es importante. El setTimeout que remueve el elemento después de 5 segundos muestra limpieza automática. No dejen basura en el DOM.
+listen para eventos es más poderoso que addEventListener. Retorna una función de cleanup que pueden llamar en ngOnDestroy. Es gestión profesional de eventos sin memory leaks.
+La ventaja de SSR compatibility es enorme para SEO. Renderer2 funciona tanto en el navegador como en el servidor. Su código es universal. Es futureproofing su aplicación.
+________________________________________
+Diapositiva 15: Directivas Estructurales Personalizadas (3 minutos)
+Crear directivas estructurales propias es el nivel más alto de dominio Angular. Es como diseñar nuevos bloques de construcción para el lenguaje mismo.
+La UnlessDirective es el ejemplo perfecto para entender cómo funcionan. Es lo opuesto a *ngIf. Muestra el contenido cuando la condición es falsa. Es como una puerta que se abre cuando NO tienen la llave.
+TemplateRef es la plantilla que el usuario definió. Es el contenido que quieren mostrar condicionalmente. ViewContainerRef es donde se insertará ese contenido. Es como tener el plano (template) y el terreno (container).
+El patrón de hasView previene duplicación. Solo crean la vista si no existe, solo la destruyen si existe. Es gestión de estado básica pero crucial para evitar bugs.
+createEmbeddedView es donde la magia ocurre. Toma el template y lo convierte en elementos DOM reales. Es como imprimir en 3D desde un diseño digital.
+clear() remueve todo del container. Es limpieza total. Útil cuando necesitan resetear completamente una sección del DOM.
+La ForWithIndexDirective muestra el poder del contexto. No solo pasan el item; pasan índice, primero, último, par, impar. Es información rica que el template puede usar.
+El objeto de contexto con $implicit es convención Angular. $implicit es el valor por defecto cuando usan let item. Los demás valores necesitan asignación explícita: let i = index.
+El caso de uso en templates es limpio. *appUnless="isLoggedIn" es inmediatamente comprensible. *appForWithIndex con todas las variables locales da control total sobre la iteración.
+Estas directivas estructurales personalizadas son reutilizables across proyectos. Una vez creadas, se convierten en parte de su toolkit personal. Es inversión en su futuro como desarrollador.
+________________________________________
+Diapositiva 16: LAB 4 - Host Binding y Renderer2 (5 minutos)
+Este es el laboratorio final y más ambicioso. Van a implementar un sistema completo de drag & drop usando directivas.
+El sistema de drag & drop que construiremos es como el que usan en Trello o Jira para mover tarjetas entre columnas. Pero lo harán desde cero, entendiendo cada parte del proceso.
+La DraggableDirective es comprehensiva. El @Input appDraggable permite activar/desactivar el comportamiento. No todos los elementos deben ser arrastrables todo el tiempo.
+El @HostBinding('draggable') es HTML5 nativo. Le dice al navegador que este elemento puede ser arrastrado. Es la base sobre la cual construimos.
+Los EventEmitters dragStart y dragEnd permiten que el componente padre reaccione. Cuando inicia el arrastre, pueden mostrar zonas de drop. Cuando termina, pueden actualizar el estado.
+El binding de opacity durante el arrastre es feedback visual. El elemento se vuelve semi-transparente mientras lo arrastran. Los usuarios saben exactamente qué están moviendo.
+dataTransfer es el mecanismo de HTML5 para pasar datos durante el drag. setData guarda el ID del elemento. getData lo recupera en el drop. Es como un portapapeles temporal para la operación de arrastre.
+El preview element con Renderer2 muestra manipulación avanzada. Crean un elemento de preview personalizado, lo posicionan fuera de vista, y lo usan como ghost image durante el arrastre.
+La DropZoneDirective es el complemento perfecto. Define áreas donde se pueden soltar elementos. El preventDefault() en dragover es crucial; sin él, el navegador no permite el drop.
+El highlight durante dragover es UX excelente. La zona de drop se ilumina cuando arrastran algo sobre ella. Los usuarios saben exactamente dónde pueden soltar.
+El efecto de animación al soltar es el toque profesional. Crean un div temporal con clase 'drop-effect', que puede tener una animación CSS de ripple o glow, y lo remueven después de 500ms.
+Durante estos 25 minutos, van a crear un kanban board funcional. Columnas para "Por hacer", "En progreso", "Completado". Tarjetas que se pueden arrastrar entre columnas. Estado que se actualiza correctamente. Persistencia en localStorage para que los cambios se mantengan.
+________________________________________
+Diapositiva 17: Optimización y Performance (3 minutos)
+La diferencia entre código que funciona y código profesional está en la optimización.
+Las track functions en @for son no negociables para listas grandes. Sin track, Angular no sabe qué elementos son los mismos después de un cambio. Con track, Angular actualiza quirúrgicamente solo lo que cambió. En una lista de 1000 items, puede ser la diferencia entre 16ms y 160ms de render time.
+OnPush change detection es su mejor amigo para performance. Le dice a Angular: "solo verifica cambios en este componente si sus inputs cambian o si ocurre un evento". Reduce drasticamente los ciclos de detección de cambios.
+Unsubscribe en ngOnDestroy es higiene básica. Cada suscripción sin limpiar es un potential memory leak. Es como dejar luces encendidas cuando sales de casa. Use el patrón de takeUntil o async pipe para gestión automática.
+Debounce para eventos frecuentes es crucial. Si escuchan scroll o resize sin debounce, su función puede ejecutarse cientos de veces por segundo. Con debounce de 200ms, se ejecuta máximo 5 veces por segundo. Es la diferencia entre matar el CPU y una experiencia fluida.
+La manipulación directa del DOM debe evitarse siempre. innerHTML es inseguro y no portable. addEventListener sin cleanup causa memory leaks. Siempre usen Renderer2 y los métodos de Angular.
+La lógica pesada en HostBinding getters es un error común. Ese getter se ejecuta en cada detección de cambios. Si hace cálculos complejos, su aplicación se arrastrará. Usen signals con computed() o precalculen valores.
+El memory leak con event listeners es insidioso. Cada listener sin limpiar es memoria que nunca se libera. En una SPA que vive por horas, pueden acumular megabytes de listeners zombies.
+Renderer2 no es solo por seguridad; es por portabilidad. Su código funcionará en el navegador, en el servidor (SSR), en web workers, en cualquier plataforma que Angular soporte en el futuro.
+________________________________________
+Diapositiva 18: Casos de Uso Avanzados (2 minutos)
+Veamos directivas del mundo real que pueden implementar mañana mismo en sus proyectos.
+La SmartFocusDirective resuelve un problema común: hacer focus en el campo correcto automáticamente. Con focusDelay pueden esperar a que animaciones terminen antes de hacer focus. Es UX pulida.
+En formularios de login, hacer focus automático en el campo de usuario mejora la experiencia. En modales, hacer focus en el primer campo acelera la entrada de datos. Son pequeños detalles que suman.
+La InfiniteScrollDirective es essential para listas largas. En lugar de paginación tradicional (que requiere clicks), cargan más contenido automáticamente cuando el usuario llega al final. Es como Netflix o Instagram: scroll infinito sin fricción.
+El cálculo atBottom es simple pero efectivo. Cuando scrollHeight - scrollTop equals clientHeight, están en el fondo. Emiten el evento, el componente carga más datos. Es elegante en su simplicidad.
+La ClickOutsideDirective es perfecta para dropdowns y modales. Cuando el usuario clickea fuera, se cierra. Es comportamiento esperado en UIs modernas. Sin esta directiva, necesitarían lógica compleja en cada componente.
+El document:click es evento global. Verifican si el click fue dentro o fuera del elemento. Si fue fuera, emiten el evento. El componente decide qué hacer (cerrar, guardar, advertir).
+Estos ejemplos no son teóricos. Los uso en cada proyecto. Son patrones que se repiten constantemente. Al convertirlos en directivas, escriben una vez, usan siempre. Es programación DRY en su máxima expresión.
+________________________________________
+Diapositiva 19: Testing de Directivas (2 minutos)
+Testing de directivas es crucial pero a menudo ignorado. Hoy aprenderán a hacerlo correctamente.
+El setup con TestBed es standard Angular testing. Configuran un módulo de prueba, declaran un componente de prueba, crean la directiva. Es un ambiente controlado para testing.
+By.directive es útil para encontrar elementos con la directiva aplicada. No buscan por clase o ID; buscan específicamente elementos que tienen la directiva. Es targeting preciso.
+triggerEventHandler simula eventos. 'mouseenter' trigger el hover, 'mouseleave' lo quita. Pueden probar toda la interacción sin browser real. Es testing automatizado y repetible.
+fixture.detectChanges() es crucial. Le dice a Angular que ejecute detección de cambios. Sin esto, los cambios no se reflejan en el DOM de prueba. Es como presionar "refresh" en su test.
+Las expectativas deben ser específicas. No solo verifiquen que "algo" cambió. Verifiquen el valor exacto. backgroundColor debe ser '#ffff00', no solo "algún color". Es precisión en testing.
+El componente de prueba es minimalista. Solo incluye lo necesario para probar la directiva. No complican con lógica extra. Es testing focused y mantenible.
+Los casos de prueba cubren el camino feliz y los edge cases. ¿Qué pasa si el color es undefined? ¿Si el elemento es null? ¿Si eventos se disparan múltiples veces? Testing robusto previene bugs en producción.
+Este testing les ahorrará horas de debugging. Cuando algo falla, los tests les dicen exactamente qué y dónde. Es inversión en su sanidad mental futura.
+________________________________________
+Diapositiva 20: Q&A y Cierre (5 minutos)
+¡Felicitaciones! Han completado una de las sesiones más intensas y productivas del curso.
+Hoy han logrado algo remarkable. Han dominado el control flow moderno de Angular 18, esas directivas @if, @for, @switch que están revolucionando cómo escribimos aplicaciones. Ya no son principiantes tanteando en la oscuridad; son arquitectos del DOM.
+Las directivas de atributo que implementaron van más allá de cambiar colores. Han creado sistemas de temas dinámicos, interfaces que responden inteligentemente al contexto, experiencias que se adaptan al usuario. Es la diferencia entre una aplicación y una experiencia.
+Las directivas personalizadas que crearon son sus herramientas propias. Como un carpintero que fabrica sus propias herramientas especializadas, ahora tienen directivas que resuelven sus problemas específicos. Lazy loading, validación visual, permisos, drag & drop - son soluciones que pueden llevar a cualquier proyecto.
+HostListener y HostBinding les han dado control quirúrgico sobre el DOM. Pueden escuchar cualquier evento, modificar cualquier propiedad. Es poder que debe usarse responsablemente, y ustedes han aprendido a hacerlo.
+Renderer2 les ha enseñado la forma segura y profesional de manipular el DOM. No más innerHTML peligroso, no más manipulación directa arriesgada. Es código que puede correr en cualquier plataforma, resistente a ataques, profesional en todos los sentidos.
+La optimización con track functions y las mejores prácticas que aprendieron son la diferencia entre un desarrollador junior y uno senior. No es solo hacer que funcione; es hacer que funcione eficientemente, seguramente, manteniblemente.
+La próxima sesión, el martes 12 de agosto, exploraremos el mundo de los Módulos, Componentes y Servicios. Si hoy aprendieron a controlar el DOM, la próxima sesión aprenderán a arquitectar aplicaciones completas. Inyección de dependencias avanzada, servicios singleton, la nueva arquitectura standalone que está cambiando Angular.
+Como tarea opcional, les sugiero crear una directiva que resuelva un problema real en su trabajo. Tal vez una directiva de formateo para RUC peruanos, una directiva de autocompletado para direcciones de Lima, algo específico de su dominio. Verán cómo los conceptos de hoy se aplican inmediatamente.
+Experimenten con TemplateRef y ViewContainerRef. Creen su propia directiva estructural. Tal vez una que muestre contenido basado en la hora del día, o en el tipo de dispositivo. Sean creativos.
+Preguntas frecuentes que suelen surgir:
+"¿Cuándo usar directivas vs componentes?" - Usen directivas para comportamiento reutilizable, componentes para UI reutilizable. Si es lógica sin template, directiva. Si tiene template propio, componente.
+"¿Las nuevas directivas @if/@for son realmente mejores?" - Sí, mediblemente. Mejor tree-shaking, syntax más clara, mejor performance. No hay razón para usar las antiguas en código nuevo.
+"¿Puedo mezclar directivas antiguas y nuevas?" - Técnicamente sí, pero no lo recomiendo. Mantengan consistencia en su codebase. Si migran, migren todo el componente.
+"¿Renderer2 es realmente necesario?" - Para aplicaciones production-ready, absolutamente. Para prototipos rápidos, pueden salirse con la suya. Pero desarrollen el hábito correcto desde el inicio.
+Para prepararse para la próxima sesión:
+Revisen el concepto de inyección de dependencias. Es fundamental para entender servicios. Piensen en funcionalidad compartida en sus aplicaciones que podría ser extraída a servicios.
+Si tienen tiempo, experimenten con servicios simples. Creen uno que maneje el estado de usuario, otro que haga llamadas HTTP. Verán cómo los servicios organizan y centralizan la lógica.
+Reflexión final:
+Hoy han dado un salto cuántico en sus habilidades Angular. Las directivas son el corazón de Angular, y ustedes ahora entienden cómo late ese corazón. Cada vez que vean una interfaz dinámica, pensarán en directivas. Cada vez que necesiten comportamiento reutilizable, crearán una directiva.
+Recuerden: el mejor código es el que no tienen que escribir dos veces. Las directivas que crearon hoy son inversiones en su productividad futura. Úsenlas, compártanlas, mejórenlas.
+Han sido tres horas intensas pero increíblemente productivas. Han pasado de usuarios de Angular a arquitectos de Angular. Están listos para enfrentar cualquier desafío de UI que se les presente.
+¡Excelente trabajo! Nos vemos el martes 12 de agosto a las 19:00 para continuar este viaje increíble!
+Descansen bien, practiquen lo aprendido, y vengan listos para el siguiente nivel.
+¡Hasta la próxima sesión! 🚀
+

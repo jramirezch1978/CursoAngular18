@@ -1,0 +1,4748 @@
+LABORATORIOS PRÁCTICOS - SESIÓN 4: DIRECTIVAS
+PROVIAS DESCENTRALIZADO
+INFORMACIÓN GENERAL
+Curso: Angular v18 - 30 horas académicas
+Modalidad: 100% Online Live - Formato Laboratorio Intensivo
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Sesión: 4 - Directivas
+Fecha: Jueves, 07 de Agosto 2025
+Duración Total: 180 minutos (3 horas)
+Laboratorios: 4 laboratorios principales + 1 configuración inicial
+________________________________________
+REQUISITOS PREVIOS DE SESIONES ANTERIORES
+✅ Verificación del Proyecto Base (Sesiones 1, 2 y 3)
+Los participantes deben tener completado de las sesiones anteriores:
+1.	Proyecto Angular v18 creado con nombre mi-primera-app-angular
+2.	Componentes básicos (Header, Footer, Home) funcionando
+3.	Router configurado con rutas básicas y guards
+4.	Data Binding implementado con ejemplos funcionales
+5.	Pipes personalizados creados y funcionando
+6.	Servicios de datos (TaskService, DataService) implementados
+Si algún participante no completó las sesiones anteriores, deberá ejecutar:
+# Clonar repositorio con código de sesiones anteriores
+git clone https://github.com/provias/angular-curso-sesion3-completo.git
+cd angular-curso-sesion3-completo
+npm install
+ng serve --open
+📋 Verificación Rápida del Proyecto
+# Verificar versión de Angular
+ng version
+# Debe mostrar: Angular CLI: 18.x.x
+
+# Verificar que el proyecto compile
+ng build
+
+# Verificar rutas existentes
+echo "Rutas implementadas de sesiones anteriores:"
+echo "http://localhost:4200/home"
+echo "http://localhost:4200/products"
+echo "http://localhost:4200/dashboard"
+echo "http://localhost:4200/tasks"
+echo "http://localhost:4200/pipes"
+________________________________________
+HERRAMIENTAS Y SOFTWARE NECESARIO
+🛠️ Software Principal
+Herramienta	Versión Mínima	Verificación	Instalación
+Node.js	v18.19.0	node --version	https://nodejs.org
+npm	v9.0.0	npm --version	Incluido con Node.js
+Angular CLI	v18.x	ng version	npm install -g @angular/cli@18
+Visual Studio Code	Última	-	https://code.visualstudio.com
+Git	v2.x	git --version	https://git-scm.com
+Chrome/Edge	Última	-	Navegador con DevTools
+📦 Extensiones VS Code Requeridas
+1.	Angular Language Service - IntelliSense avanzado para templates
+2.	Angular Snippets - Snippets para directivas
+3.	Prettier - Code formatter - Formateo automático
+4.	Error Lens - Muestra errores inline
+5.	Angular DevTools - Debugging de directivas
+6.	GitLens - Control de versiones visual
+🌐 Herramientas del Navegador
+•	Angular DevTools - Extensión para Chrome/Firefox (CRÍTICA para esta sesión)
+•	Redux DevTools - Para debugging de estado (opcional)
+________________________________________
+LAB 0: CONFIGURACIÓN DEL ENTORNO Y VERIFICACIÓN
+Duración: 15 minutos
+Objetivo: Preparar el entorno específico para trabajar con Directivas avanzadas
+PASO 1: Verificación del Proyecto Base (5 minutos)
+1.1 Verificar proyecto existente
+# Navegar al proyecto
+cd mi-primera-app-angular
+
+# Verificar branch de trabajo
+git status
+# Si no está en git, inicializar:
+git init
+git add .
+git commit -m "Estado inicial Sesión 4"
+
+# Crear branch para esta sesión
+git checkout -b sesion-4-directivas
+1.2 Actualizar dependencias necesarias
+# Actualizar Angular a la última versión 18.x
+ng update @angular/core @angular/cli
+
+# Instalar dependencias adicionales para esta sesión
+npm install --save intersection-observer
+npm install --save-dev @types/intersection-observer
+
+# Verificar FormsModule (necesario para NgModel)
+npm list @angular/forms
+1.3 Verificar estructura de carpetas
+# Crear estructura necesaria para la sesión
+mkdir -p src/app/directives/structural
+mkdir -p src/app/directives/attribute
+mkdir -p src/app/directives/custom
+mkdir -p src/app/components/directivas-demo
+mkdir -p src/app/interfaces
+mkdir -p src/app/utils
+PASO 2: Configuración de VS Code para Directivas (5 minutos)
+2.1 Crear/Actualizar configuración del workspace
+Crear archivo .vscode/settings.json:
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "angular.enable-strict-mode-prompt": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 2000,
+  "editor.snippetSuggestions": "top",
+  "emmet.includeLanguages": {
+    "typescript": "html"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "angular.schematicsDefaultOptions": {
+    "directive": {
+      "standalone": true
+    }
+  }
+}
+2.2 Configurar snippets personalizados para directivas
+Crear archivo .vscode/angular-directives.code-snippets:
+{
+  "Angular Directive": {
+    "prefix": "a-directive",
+    "body": [
+      "import { Directive, ElementRef, HostListener, HostBinding, Input, Renderer2 } from '@angular/core';",
+      "",
+      "@Directive({",
+      "  selector: '[app${1:DirectiveName}]',",
+      "  standalone: true",
+      "})",
+      "export class ${2:DirectiveName}Directive {",
+      "  @Input() app${2:DirectiveName} = '';",
+      "",
+      "  constructor(",
+      "    private el: ElementRef,",
+      "    private renderer: Renderer2",
+      "  ) {}",
+      "",
+      "  @HostListener('${3:event}')",
+      "  on${4:Event}() {",
+      "    ${5:// Implementation}",
+      "  }",
+      "}"
+    ],
+    "description": "Crear una directiva Angular personalizada"
+  },
+  "Structural Directive": {
+    "prefix": "a-structural",
+    "body": [
+      "import { Directive, Input, TemplateRef, ViewContainerRef } from '@angular/core';",
+      "",
+      "@Directive({",
+      "  selector: '[app${1:StructuralName}]',",
+      "  standalone: true",
+      "})",
+      "export class ${2:StructuralName}Directive {",
+      "  private hasView = false;",
+      "",
+      "  constructor(",
+      "    private templateRef: TemplateRef<any>,",
+      "    private viewContainer: ViewContainerRef",
+      "  ) {}",
+      "",
+      "  @Input() set app${2:StructuralName}(condition: boolean) {",
+      "    if (condition && !this.hasView) {",
+      "      this.viewContainer.createEmbeddedView(this.templateRef);",
+      "      this.hasView = true;",
+      "    } else if (!condition && this.hasView) {",
+      "      this.viewContainer.clear();",
+      "      this.hasView = false;",
+      "    }",
+      "  }",
+      "}"
+    ],
+    "description": "Crear una directiva estructural personalizada"
+  }
+}
+PASO 3: Configuración de Angular DevTools (3 minutos)
+3.1 Instalar Angular DevTools
+1.	Abrir Chrome/Edge
+2.	Ir a chrome://extensions/ o edge://extensions/
+3.	Buscar "Angular DevTools"
+4.	Instalar la extensión oficial
+5.	Reiniciar el navegador
+3.2 Verificar funcionamiento
+# Iniciar la aplicación
+ng serve --open
+
+# En el navegador:
+# 1. Abrir DevTools (F12)
+# 2. Verificar pestaña "Angular"
+# 3. Debe mostrar el árbol de componentes
+PASO 4: Crear Archivo de Configuración Global (2 minutos)
+4.1 Crear configuración de directivas
+Crear archivo src/app/config/directives.config.ts:
+// Configuración global para directivas
+export const DirectivesConfig = {
+  // Configuración para tooltips
+  tooltip: {
+    defaultPosition: 'top' as const,
+    showDelay: 500,
+    hideDelay: 100,
+    maxWidth: 200
+  },
+  
+  // Configuración para lazy loading
+  lazyLoad: {
+    rootMargin: '50px',
+    threshold: 0.1,
+    defaultPlaceholder: 'assets/images/placeholder.jpg'
+  },
+  
+  // Configuración para drag & drop
+  dragDrop: {
+    dragClass: 'dragging',
+    dropClass: 'drop-zone',
+    overClass: 'drag-over'
+  },
+  
+  // Configuración para validación
+  validation: {
+    showErrorsOnBlur: true,
+    showErrorsOnSubmit: true,
+    errorClass: 'field-error',
+    successClass: 'field-success'
+  }
+};
+✅ CHECKLIST DE VERIFICACIÓN LAB 0
+•	[ ] Node.js v18+ instalado y funcionando
+•	[ ] Angular CLI v18 instalado globalmente
+•	[ ] Proyecto base de sesiones anteriores funcionando
+•	[ ] VS Code con todas las extensiones instaladas
+•	[ ] Angular DevTools funcionando en navegador
+•	[ ] Estructura de carpetas para directivas creada
+•	[ ] Snippets de directivas configurados
+•	[ ] Branch git para sesión 4 creado
+•	[ ] Servidor de desarrollo ejecutándose sin errores
+________________________________________
+LAB 1: DIRECTIVAS ESTRUCTURALES MODERNAS
+Duración: 45 minutos
+Objetivo: Dominar la nueva sintaxis de control flow (@if, @for, @switch) con casos de uso reales
+PASO 1: Crear Interfaces y Modelos (5 minutos)
+1.1 Crear interfaces para el sistema
+Crear archivo src/app/interfaces/infrastructure.interface.ts:
+// Interfaces para el sistema de gestión de infraestructura de PROVIAS
+export interface Project {
+  id: string;
+  code: string;
+  name: string;
+  type: ProjectType;
+  status: ProjectStatus;
+  budget: number;
+  progress: number;
+  startDate: Date;
+  endDate: Date;
+  department: string;
+  province: string;
+  district: string;
+  contractor: Contractor;
+  supervisor: string;
+  priority: Priority;
+  risks: Risk[];
+  milestones: Milestone[];
+  documents: Document[];
+}
+
+export enum ProjectType {
+  CARRETERA = 'carretera',
+  PUENTE = 'puente',
+  TUNEL = 'tunel',
+  MANTENIMIENTO = 'mantenimiento',
+  EMERGENCIA = 'emergencia'
+}
+
+export enum ProjectStatus {
+  PLANIFICACION = 'planificacion',
+  LICITACION = 'licitacion',
+  EJECUCION = 'ejecucion',
+  SUPERVISION = 'supervision',
+  COMPLETADO = 'completado',
+  SUSPENDIDO = 'suspendido',
+  CANCELADO = 'cancelado'
+}
+
+export enum Priority {
+  BAJA = 'baja',
+  MEDIA = 'media',
+  ALTA = 'alta',
+  CRITICA = 'critica'
+}
+
+export interface Contractor {
+  id: string;
+  ruc: string;
+  name: string;
+  email: string;
+  phone: string;
+  representative: string;
+  rating: number;
+}
+
+export interface Risk {
+  id: string;
+  type: 'tecnico' | 'financiero' | 'ambiental' | 'social';
+  description: string;
+  probability: 'baja' | 'media' | 'alta';
+  impact: 'bajo' | 'medio' | 'alto';
+  mitigation: string;
+}
+
+export interface Milestone {
+  id: string;
+  name: string;
+  description: string;
+  dueDate: Date;
+  completed: boolean;
+  completedDate?: Date;
+}
+
+export interface Document {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  uploadedAt: Date;
+  uploadedBy: string;
+}
+PASO 2: Crear Servicio de Proyectos (10 minutos)
+2.1 Generar servicio
+ng generate service services/project --skip-tests
+2.2 Implementar servicio
+Actualizar src/app/services/project.service.ts:
+import { Injectable, signal, computed } from '@angular/core';
+import { Project, ProjectStatus, ProjectType, Priority, Contractor, Risk, Milestone } from '../interfaces/infrastructure.interface';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProjectService {
+  // Signals para manejo reactivo de estado
+  private projectsSignal = signal<Project[]>(this.generateMockProjects());
+  private loadingSignal = signal<boolean>(false);
+  private errorSignal = signal<string | null>(null);
+  private selectedProjectSignal = signal<Project | null>(null);
+  private filterSignal = signal<{
+    status: ProjectStatus | 'all';
+    type: ProjectType | 'all';
+    department: string;
+  }>({
+    status: 'all',
+    type: 'all',
+    department: ''
+  });
+
+  // Computed signals
+  projects = computed(() => this.projectsSignal());
+  loading = computed(() => this.loadingSignal());
+  error = computed(() => this.errorSignal());
+  selectedProject = computed(() => this.selectedProjectSignal());
+  
+  filteredProjects = computed(() => {
+    const projects = this.projectsSignal();
+    const filter = this.filterSignal();
+    
+    return projects.filter(project => {
+      const statusMatch = filter.status === 'all' || project.status === filter.status;
+      const typeMatch = filter.type === 'all' || project.type === filter.type;
+      const deptMatch = !filter.department || 
+        project.department.toLowerCase().includes(filter.department.toLowerCase());
+      
+      return statusMatch && typeMatch && deptMatch;
+    });
+  });
+
+  projectsByStatus = computed(() => {
+    const projects = this.projectsSignal();
+    const grouped = new Map<ProjectStatus, Project[]>();
+    
+    Object.values(ProjectStatus).forEach(status => {
+      grouped.set(status, projects.filter(p => p.status === status));
+    });
+    
+    return grouped;
+  });
+
+  statistics = computed(() => {
+    const projects = this.projectsSignal();
+    return {
+      total: projects.length,
+      enEjecucion: projects.filter(p => p.status === ProjectStatus.EJECUCION).length,
+      completados: projects.filter(p => p.status === ProjectStatus.COMPLETADO).length,
+      presupuestoTotal: projects.reduce((sum, p) => sum + p.budget, 0),
+      progresoPromedio: projects.reduce((sum, p) => sum + p.progress, 0) / projects.length || 0,
+      proyectosCriticos: projects.filter(p => p.priority === Priority.CRITICA).length,
+      riesgosAltos: projects.reduce((sum, p) => 
+        sum + p.risks.filter(r => r.impact === 'alto').length, 0)
+    };
+  });
+
+  constructor() {
+    console.log('🏗️ ProjectService inicializado con', this.projects().length, 'proyectos');
+  }
+
+  // Métodos públicos
+  loadProjects(): void {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    
+    // Simular carga asíncrona
+    setTimeout(() => {
+      this.projectsSignal.set(this.generateMockProjects());
+      this.loadingSignal.set(false);
+    }, 1000);
+  }
+
+  selectProject(projectId: string): void {
+    const project = this.projectsSignal().find(p => p.id === projectId);
+    this.selectedProjectSignal.set(project || null);
+  }
+
+  updateFilter(filter: Partial<typeof this.filterSignal>): void {
+    this.filterSignal.update(current => ({ ...current, ...filter }));
+  }
+
+  updateProjectProgress(projectId: string, progress: number): void {
+    this.projectsSignal.update(projects => 
+      projects.map(p => 
+        p.id === projectId 
+          ? { ...p, progress: Math.min(100, Math.max(0, progress)) }
+          : p
+      )
+    );
+  }
+
+  // Generar datos mock
+  private generateMockProjects(): Project[] {
+    return [
+      {
+        id: 'PRY-001',
+        code: 'PE-3N-2025-001',
+        name: 'Mejoramiento Carretera PE-3N Tramo Piura-Sullana',
+        type: ProjectType.CARRETERA,
+        status: ProjectStatus.EJECUCION,
+        budget: 12500000,
+        progress: 65,
+        startDate: new Date('2025-01-15'),
+        endDate: new Date('2025-12-31'),
+        department: 'Piura',
+        province: 'Piura',
+        district: 'Piura',
+        contractor: {
+          id: 'CTR-001',
+          ruc: '20123456789',
+          name: 'Constructora Vial Norte S.A.C.',
+          email: 'contacto@vialnorte.pe',
+          phone: '073-123456',
+          representative: 'Ing. Carlos Mendoza',
+          rating: 4.5
+        },
+        supervisor: 'Ing. Ana García',
+        priority: Priority.ALTA,
+        risks: [
+          {
+            id: 'RSK-001',
+            type: 'ambiental',
+            description: 'Posible impacto en zona de humedales',
+            probability: 'media',
+            impact: 'alto',
+            mitigation: 'Implementar plan de manejo ambiental específico'
+          },
+          {
+            id: 'RSK-002',
+            type: 'tecnico',
+            description: 'Suelo con baja capacidad portante en km 23-25',
+            probability: 'alta',
+            impact: 'medio',
+            mitigation: 'Reforzamiento con geotextiles y material seleccionado'
+          }
+        ],
+        milestones: [
+          {
+            id: 'ML-001',
+            name: 'Movimiento de tierras',
+            description: 'Completar trabajos de explanación',
+            dueDate: new Date('2025-03-31'),
+            completed: true,
+            completedDate: new Date('2025-03-28')
+          },
+          {
+            id: 'ML-002',
+            name: 'Pavimentación primer tramo',
+            description: 'Pavimentar km 0-15',
+            dueDate: new Date('2025-06-30'),
+            completed: true,
+            completedDate: new Date('2025-06-25')
+          },
+          {
+            id: 'ML-003',
+            name: 'Señalización horizontal',
+            description: 'Completar señalización horizontal en todo el tramo',
+            dueDate: new Date('2025-09-30'),
+            completed: false
+          }
+        ],
+        documents: [
+          {
+            id: 'DOC-001',
+            name: 'Expediente Técnico v2.pdf',
+            type: 'pdf',
+            url: '/documents/exp-tecnico-v2.pdf',
+            uploadedAt: new Date('2025-01-10'),
+            uploadedBy: 'Admin'
+          }
+        ]
+      },
+      {
+        id: 'PRY-002',
+        code: 'PTE-2025-002',
+        name: 'Construcción Puente Vehicular Río Chira',
+        type: ProjectType.PUENTE,
+        status: ProjectStatus.LICITACION,
+        budget: 8500000,
+        progress: 0,
+        startDate: new Date('2025-09-01'),
+        endDate: new Date('2026-06-30'),
+        department: 'Piura',
+        province: 'Sullana',
+        district: 'Marcavelica',
+        contractor: {
+          id: 'CTR-002',
+          ruc: '20987654321',
+          name: 'Ingeniería de Puentes SAC',
+          email: 'info@puentes.pe',
+          phone: '01-555-1234',
+          representative: 'Ing. Luis Torres',
+          rating: 4.8
+        },
+        supervisor: 'Ing. Roberto Silva',
+        priority: Priority.CRITICA,
+        risks: [
+          {
+            id: 'RSK-003',
+            type: 'financiero',
+            description: 'Fluctuación del tipo de cambio para materiales importados',
+            probability: 'alta',
+            impact: 'medio',
+            mitigation: 'Contratos con cobertura cambiaria'
+          }
+        ],
+        milestones: [
+          {
+            id: 'ML-004',
+            name: 'Estudios definitivos',
+            description: 'Completar estudios de suelo y diseño final',
+            dueDate: new Date('2025-10-31'),
+            completed: false
+          }
+        ],
+        documents: []
+      },
+      {
+        id: 'PRY-003',
+        code: 'MNT-2025-003',
+        name: 'Mantenimiento Periódico Red Vial Departamental',
+        type: ProjectType.MANTENIMIENTO,
+        status: ProjectStatus.COMPLETADO,
+        budget: 3200000,
+        progress: 100,
+        startDate: new Date('2025-01-01'),
+        endDate: new Date('2025-06-30'),
+        department: 'Piura',
+        province: 'Morropón',
+        district: 'Chulucanas',
+        contractor: {
+          id: 'CTR-003',
+          ruc: '20456789123',
+          name: 'Mantenimiento Vial Piura EIRL',
+          email: 'mantenimiento@vialpiura.pe',
+          phone: '073-987654',
+          representative: 'Ing. María Flores',
+          rating: 4.2
+        },
+        supervisor: 'Ing. Pedro Ramírez',
+        priority: Priority.MEDIA,
+        risks: [],
+        milestones: [
+          {
+            id: 'ML-005',
+            name: 'Bacheo y sellado de fisuras',
+            description: 'Reparación de superficie de rodadura',
+            dueDate: new Date('2025-04-30'),
+            completed: true,
+            completedDate: new Date('2025-04-25')
+          }
+        ],
+        documents: [
+          {
+            id: 'DOC-002',
+            name: 'Informe Final de Obra.pdf',
+            type: 'pdf',
+            url: '/documents/informe-final.pdf',
+            uploadedAt: new Date('2025-07-01'),
+            uploadedBy: 'Supervisor'
+          }
+        ]
+      },
+      {
+        id: 'PRY-004',
+        code: 'EMG-2025-004',
+        name: 'Atención Emergencia Vial - Huaicos km 45',
+        type: ProjectType.EMERGENCIA,
+        status: ProjectStatus.SUPERVISION,
+        budget: 1500000,
+        progress: 85,
+        startDate: new Date('2025-07-01'),
+        endDate: new Date('2025-08-15'),
+        department: 'Piura',
+        province: 'Huancabamba',
+        district: 'Canchaque',
+        contractor: {
+          id: 'CTR-004',
+          ruc: '20789456123',
+          name: 'Emergencias Viales SAC',
+          email: 'emergencias@vialsac.pe',
+          phone: '073-456789',
+          representative: 'Ing. Jorge Díaz',
+          rating: 4.0
+        },
+        supervisor: 'Ing. Carmen López',
+        priority: Priority.CRITICA,
+        risks: [
+          {
+            id: 'RSK-004',
+            type: 'ambiental',
+            description: 'Posibles nuevos deslizamientos por lluvias',
+            probability: 'media',
+            impact: 'alto',
+            mitigation: 'Monitoreo meteorológico constante y plan de contingencia'
+          }
+        ],
+        milestones: [
+          {
+            id: 'ML-006',
+            name: 'Limpieza de vía',
+            description: 'Retiro de material de derrumbe',
+            dueDate: new Date('2025-07-10'),
+            completed: true,
+            completedDate: new Date('2025-07-09')
+          },
+          {
+            id: 'ML-007',
+            name: 'Estabilización de taludes',
+            description: 'Obras de contención y estabilización',
+            dueDate: new Date('2025-08-10'),
+            completed: false
+          }
+        ],
+        documents: []
+      },
+      {
+        id: 'PRY-005',
+        code: 'PE-1N-2025-005',
+        name: 'Ampliación Carretera PE-1N Sector Urbano',
+        type: ProjectType.CARRETERA,
+        status: ProjectStatus.PLANIFICACION,
+        budget: 18000000,
+        progress: 10,
+        startDate: new Date('2025-11-01'),
+        endDate: new Date('2026-12-31'),
+        department: 'Piura',
+        province: 'Paita',
+        district: 'Paita',
+        contractor: {
+          id: 'CTR-005',
+          ruc: '20147852369',
+          name: 'Consorcio Vial Costa Norte',
+          email: 'info@costanorte.pe',
+          phone: '073-741852',
+          representative: 'Ing. Fernando Vargas',
+          rating: 4.6
+        },
+        supervisor: 'Por asignar',
+        priority: Priority.ALTA,
+        risks: [
+          {
+            id: 'RSK-005',
+            type: 'social',
+            description: 'Resistencia de población por expropiaciones',
+            probability: 'alta',
+            impact: 'alto',
+            mitigation: 'Plan de comunicación y compensación justa'
+          }
+        ],
+        milestones: [
+          {
+            id: 'ML-008',
+            name: 'Liberación de áreas',
+            description: 'Completar proceso de expropiación',
+            dueDate: new Date('2025-10-31'),
+            completed: false
+          }
+        ],
+        documents: []
+      }
+    ];
+  }
+}
+PASO 3: Crear Componente Principal con Control Flow (15 minutos)
+3.1 Generar componente
+ng generate component components/directivas-demo/project-dashboard --standalone --skip-tests
+3.2 Implementar componente con nueva sintaxis
+Actualizar src/app/components/directivas-demo/project-dashboard/project-dashboard.component.ts:
+import { Component, OnInit, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProjectService } from '../../../services/project.service';
+import { Project, ProjectStatus, ProjectType, Priority } from '../../../interfaces/infrastructure.interface';
+
+@Component({
+  selector: 'app-project-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './project-dashboard.component.html',
+  styleUrl: './project-dashboard.component.scss'
+})
+export class ProjectDashboardComponent implements OnInit {
+  // Signals del servicio
+  projects = this.projectService.projects;
+  loading = this.projectService.loading;
+  error = this.projectService.error;
+  filteredProjects = this.projectService.filteredProjects;
+  statistics = this.projectService.statistics;
+  projectsByStatus = this.projectService.projectsByStatus;
+  
+  // Signals locales
+  viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
+  showFilters = signal(true);
+  selectedStatus = signal<ProjectStatus | 'all'>('all');
+  selectedType = signal<ProjectType | 'all'>('all');
+  searchTerm = signal('');
+  
+  // Computed signals para UI
+  hasProjects = computed(() => this.projects().length > 0);
+  hasFilteredProjects = computed(() => this.filteredProjects().length > 0);
+  isFiltered = computed(() => 
+    this.selectedStatus() !== 'all' || 
+    this.selectedType() !== 'all' || 
+    this.searchTerm() !== ''
+  );
+  
+  // Enums para el template
+  ProjectStatus = ProjectStatus;
+  ProjectType = ProjectType;
+  Priority = Priority;
+  
+  // Opciones para filtros
+  statusOptions = [
+    { value: 'all', label: 'Todos los estados' },
+    ...Object.values(ProjectStatus).map(status => ({
+      value: status,
+      label: this.getStatusLabel(status)
+    }))
+  ];
+  
+  typeOptions = [
+    { value: 'all', label: 'Todos los tipos' },
+    ...Object.values(ProjectType).map(type => ({
+      value: type,
+      label: this.getTypeLabel(type)
+    }))
+  ];
+
+  constructor(private projectService: ProjectService) {
+    console.log('🎯 LAB 1: ProjectDashboard inicializado');
+  }
+
+  ngOnInit(): void {
+    this.loadProjects();
+  }
+
+  // Métodos de carga y filtrado
+  loadProjects(): void {
+    this.projectService.loadProjects();
+  }
+
+  applyFilters(): void {
+    this.projectService.updateFilter({
+      status: this.selectedStatus(),
+      type: this.selectedType(),
+      department: this.searchTerm()
+    });
+  }
+
+  clearFilters(): void {
+    this.selectedStatus.set('all');
+    this.selectedType.set('all');
+    this.searchTerm.set('');
+    this.applyFilters();
+  }
+
+  // Métodos de UI
+  changeViewMode(mode: 'grid' | 'list' | 'kanban'): void {
+    this.viewMode.set(mode);
+  }
+
+  toggleFilters(): void {
+    this.showFilters.update(show => !show);
+  }
+
+  selectProject(project: Project): void {
+    this.projectService.selectProject(project.id);
+    console.log('Proyecto seleccionado:', project.name);
+  }
+
+  updateProgress(projectId: string, event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const progress = parseInt(target.value);
+    this.projectService.updateProjectProgress(projectId, progress);
+  }
+
+  // Métodos auxiliares para etiquetas
+  getStatusLabel(status: ProjectStatus): string {
+    const labels: Record<ProjectStatus, string> = {
+      [ProjectStatus.PLANIFICACION]: 'Planificación',
+      [ProjectStatus.LICITACION]: 'Licitación',
+      [ProjectStatus.EJECUCION]: 'En Ejecución',
+      [ProjectStatus.SUPERVISION]: 'Supervisión',
+      [ProjectStatus.COMPLETADO]: 'Completado',
+      [ProjectStatus.SUSPENDIDO]: 'Suspendido',
+      [ProjectStatus.CANCELADO]: 'Cancelado'
+    };
+    return labels[status];
+  }
+
+  getTypeLabel(type: ProjectType): string {
+    const labels: Record<ProjectType, string> = {
+      [ProjectType.CARRETERA]: 'Carretera',
+      [ProjectType.PUENTE]: 'Puente',
+      [ProjectType.TUNEL]: 'Túnel',
+      [ProjectType.MANTENIMIENTO]: 'Mantenimiento',
+      [ProjectType.EMERGENCIA]: 'Emergencia'
+    };
+    return labels[type];
+  }
+
+  getPriorityLabel(priority: Priority): string {
+    const labels: Record<Priority, string> = {
+      [Priority.BAJA]: 'Baja',
+      [Priority.MEDIA]: 'Media',
+      [Priority.ALTA]: 'Alta',
+      [Priority.CRITICA]: 'Crítica'
+    };
+    return labels[priority];
+  }
+
+  getStatusClass(status: ProjectStatus): string {
+    const classes: Record<ProjectStatus, string> = {
+      [ProjectStatus.PLANIFICACION]: 'status-planning',
+      [ProjectStatus.LICITACION]: 'status-bidding',
+      [ProjectStatus.EJECUCION]: 'status-execution',
+      [ProjectStatus.SUPERVISION]: 'status-supervision',
+      [ProjectStatus.COMPLETADO]: 'status-completed',
+      [ProjectStatus.SUSPENDIDO]: 'status-suspended',
+      [ProjectStatus.CANCELADO]: 'status-cancelled'
+    };
+    return classes[status];
+  }
+
+  getPriorityClass(priority: Priority): string {
+    const classes: Record<Priority, string> = {
+      [Priority.BAJA]: 'priority-low',
+      [Priority.MEDIA]: 'priority-medium',
+      [Priority.ALTA]: 'priority-high',
+      [Priority.CRITICA]: 'priority-critical'
+    };
+    return classes[priority];
+  }
+
+  getProgressColor(progress: number): string {
+    if (progress < 25) return '#dc3545';
+    if (progress < 50) return '#ffc107';
+    if (progress < 75) return '#28a745';
+    return '#007bff';
+  }
+}
+3.3 Crear template con nueva sintaxis de control flow
+Actualizar src/app/components/directivas-demo/project-dashboard/project-dashboard.component.html:
+<div class="project-dashboard">
+  <!-- Header del Dashboard -->
+  <header class="dashboard-header">
+    <h1>🏗️ Sistema de Gestión de Proyectos - PROVIAS</h1>
+    <p class="subtitle">Demostración de Directivas Estructurales Modernas (@if, @for, @switch)</p>
+  </header>
+
+  <!-- Estados de Carga y Error con @if -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando proyectos de infraestructura...</p>
+    </div>
+  } @else if (error(); as errorMessage) {
+    <div class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ errorMessage }}</p>
+      <button (click)="loadProjects()" class="btn btn-primary">
+        🔄 Reintentar
+      </button>
+    </div>
+  } @else {
+    <!-- Estadísticas con @if anidados -->
+    @if (hasProjects()) {
+      <section class="statistics-section">
+        <h2>📊 Estadísticas Generales</h2>
+        <div class="stats-grid">
+          @if (statistics(); as stats) {
+            <div class="stat-card">
+              <h3>{{ stats.total }}</h3>
+              <p>Total Proyectos</p>
+            </div>
+            <div class="stat-card execution">
+              <h3>{{ stats.enEjecucion }}</h3>
+              <p>En Ejecución</p>
+            </div>
+            <div class="stat-card completed">
+              <h3>{{ stats.completados }}</h3>
+              <p>Completados</p>
+            </div>
+            <div class="stat-card budget">
+              <h3>S/ {{ (stats.presupuestoTotal / 1000000).toFixed(1) }}M</h3>
+              <p>Presupuesto Total</p>
+            </div>
+            <div class="stat-card progress">
+              <h3>{{ stats.progresoPromedio.toFixed(1) }}%</h3>
+              <p>Progreso Promedio</p>
+            </div>
+            @if (stats.proyectosCriticos > 0) {
+              <div class="stat-card critical">
+                <h3>{{ stats.proyectosCriticos }}</h3>
+                <p>Proyectos Críticos</p>
+              </div>
+            }
+            @if (stats.riesgosAltos > 0) {
+              <div class="stat-card risks">
+                <h3>{{ stats.riesgosAltos }}</h3>
+                <p>Riesgos Altos</p>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+
+    <!-- Controles y Filtros -->
+    <section class="controls-section">
+      <div class="view-controls">
+        <button 
+          (click)="toggleFilters()" 
+          class="btn btn-secondary"
+          [class.active]="showFilters()">
+          🔍 {{ showFilters() ? 'Ocultar' : 'Mostrar' }} Filtros
+        </button>
+        <div class="view-mode-buttons">
+          <button 
+            (click)="changeViewMode('grid')"
+            [class.active]="viewMode() === 'grid'"
+            class="btn btn-icon">
+            ⚏ Grid
+          </button>
+          <button 
+            (click)="changeViewMode('list')"
+            [class.active]="viewMode() === 'list'"
+            class="btn btn-icon">
+            ☰ Lista
+          </button>
+          <button 
+            (click)="changeViewMode('kanban')"
+            [class.active]="viewMode() === 'kanban'"
+            class="btn btn-icon">
+            ⫿ Kanban
+          </button>
+        </div>
+      </div>
+
+      <!-- Panel de Filtros con @if -->
+      @if (showFilters()) {
+        <div class="filters-panel">
+          <div class="filter-group">
+            <label>Estado del Proyecto:</label>
+            <select 
+              [(ngModel)]="selectedStatus"
+              (change)="applyFilters()"
+              class="form-control">
+              @for (option of statusOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Tipo de Proyecto:</label>
+            <select 
+              [(ngModel)]="selectedType"
+              (change)="applyFilters()"
+              class="form-control">
+              @for (option of typeOptions; track option.value) {
+                <option [value]="option.value">{{ option.label }}</option>
+              }
+            </select>
+          </div>
+          <div class="filter-group">
+            <label>Buscar por Departamento:</label>
+            <input 
+              type="text"
+              [(ngModel)]="searchTerm"
+              (input)="applyFilters()"
+              placeholder="Ej: Piura, Sullana..."
+              class="form-control">
+          </div>
+          @if (isFiltered()) {
+            <button (click)="clearFilters()" class="btn btn-warning">
+              🧹 Limpiar Filtros
+            </button>
+          }
+        </div>
+      }
+    </section>
+
+    <!-- Vista Grid con @for y @switch -->
+    @if (viewMode() === 'grid') {
+      <section class="projects-grid">
+        @for (project of filteredProjects(); track project.id) {
+          <div 
+            class="project-card"
+            [class]="getPriorityClass(project.priority)"
+            (click)="selectProject(project)">
+            
+            <!-- Header del Proyecto -->
+            <div class="project-header">
+              <span class="project-code">{{ project.code }}</span>
+              @switch (project.priority) {
+                @case (Priority.CRITICA) {
+                  <span class="priority-badge critical">🔴 CRÍTICA</span>
+                }
+                @case (Priority.ALTA) {
+                  <span class="priority-badge high">🟠 ALTA</span>
+                }
+                @case (Priority.MEDIA) {
+                  <span class="priority-badge medium">🟡 MEDIA</span>
+                }
+                @default {
+                  <span class="priority-badge low">🟢 BAJA</span>
+                }
+              }
+            </div>
+
+            <h3>{{ project.name }}</h3>
+            
+            <!-- Información del Proyecto -->
+            <div class="project-info">
+              <p><strong>Tipo:</strong> {{ getTypeLabel(project.type) }}</p>
+              <p><strong>Ubicación:</strong> {{ project.department }} - {{ project.province }}</p>
+              <p><strong>Contratista:</strong> {{ project.contractor.name }}</p>
+              <p><strong>Supervisor:</strong> {{ project.supervisor }}</p>
+            </div>
+
+            <!-- Estado con @switch -->
+            <div class="project-status">
+              @switch (project.status) {
+                @case (ProjectStatus.PLANIFICACION) {
+                  <span class="status-badge planning">📋 Planificación</span>
+                }
+                @case (ProjectStatus.LICITACION) {
+                  <span class="status-badge bidding">📢 Licitación</span>
+                }
+                @case (ProjectStatus.EJECUCION) {
+                  <span class="status-badge execution">🚧 En Ejecución</span>
+                }
+                @case (ProjectStatus.SUPERVISION) {
+                  <span class="status-badge supervision">👁️ Supervisión</span>
+                }
+                @case (ProjectStatus.COMPLETADO) {
+                  <span class="status-badge completed">✅ Completado</span>
+                }
+                @case (ProjectStatus.SUSPENDIDO) {
+                  <span class="status-badge suspended">⏸️ Suspendido</span>
+                }
+                @default {
+                  <span class="status-badge cancelled">❌ Cancelado</span>
+                }
+              }
+            </div>
+
+            <!-- Progreso -->
+            <div class="project-progress">
+              <div class="progress-header">
+                <span>Progreso</span>
+                <span>{{ project.progress }}%</span>
+              </div>
+              <div class="progress-bar">
+                <div 
+                  class="progress-fill"
+                  [style.width.%]="project.progress"
+                  [style.background-color]="getProgressColor(project.progress)">
+                </div>
+              </div>
+              @if (project.status === ProjectStatus.EJECUCION) {
+                <input 
+                  type="range"
+                  [value]="project.progress"
+                  (change)="updateProgress(project.id, $event)"
+                  min="0"
+                  max="100"
+                  class="progress-slider">
+              }
+            </div>
+
+            <!-- Presupuesto -->
+            <div class="project-budget">
+              <strong>Presupuesto:</strong> S/ {{ (project.budget / 1000000).toFixed(2) }}M
+            </div>
+
+            <!-- Riesgos con @for y @if -->
+            @if (project.risks.length > 0) {
+              <div class="project-risks">
+                <h4>⚠️ Riesgos ({{ project.risks.length }})</h4>
+                @for (risk of project.risks; track risk.id; let i = $index) {
+                  @if (risk.impact === 'alto') {
+                    <div class="risk-item high">
+                      {{ i + 1 }}. {{ risk.description }}
+                    </div>
+                  }
+                }
+              </div>
+            }
+
+            <!-- Hitos con @for -->
+            @if (project.milestones.length > 0) {
+              <div class="project-milestones">
+                <h4>🎯 Hitos</h4>
+                @for (milestone of project.milestones; track milestone.id) {
+                  <div class="milestone-item" [class.completed]="milestone.completed">
+                    @if (milestone.completed) {
+                      ✅
+                    } @else {
+                      ⏳
+                    }
+                    {{ milestone.name }}
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        } @empty {
+          <div class="no-projects">
+            <h3>📭 No se encontraron proyectos</h3>
+            @if (isFiltered()) {
+              <p>No hay proyectos que coincidan con los filtros seleccionados</p>
+              <button (click)="clearFilters()" class="btn btn-primary">
+                Limpiar Filtros
+              </button>
+            } @else {
+              <p>No hay proyectos registrados en el sistema</p>
+              <button (click)="loadProjects()" class="btn btn-primary">
+                Cargar Proyectos
+              </button>
+            }
+          </div>
+        }
+      </section>
+    }
+
+    <!-- Vista Lista con @for -->
+    @if (viewMode() === 'list') {
+      <section class="projects-list">
+        <table class="projects-table">
+          <thead>
+            <tr>
+              <th>Código</th>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Estado</th>
+              <th>Progreso</th>
+              <th>Presupuesto</th>
+              <th>Prioridad</th>
+              <th>Ubicación</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (project of filteredProjects(); track project.id; let even = $even; let odd = $odd) {
+              <tr 
+                [class.even-row]="even"
+                [class.odd-row]="odd"
+                (click)="selectProject(project)">
+                <td>{{ project.code }}</td>
+                <td>{{ project.name }}</td>
+                <td>{{ getTypeLabel(project.type) }}</td>
+                <td>
+                  <span [class]="getStatusClass(project.status)">
+                    {{ getStatusLabel(project.status) }}
+                  </span>
+                </td>
+                <td>
+                  <div class="progress-cell">
+                    <div class="mini-progress">
+                      <div 
+                        class="mini-progress-fill"
+                        [style.width.%]="project.progress">
+                      </div>
+                    </div>
+                    {{ project.progress }}%
+                  </div>
+                </td>
+                <td>S/ {{ (project.budget / 1000000).toFixed(2) }}M</td>
+                <td>
+                  <span [class]="getPriorityClass(project.priority)">
+                    {{ getPriorityLabel(project.priority) }}
+                  </span>
+                </td>
+                <td>{{ project.department }}</td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="8" class="no-data">
+                  No hay proyectos para mostrar
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+
+    <!-- Vista Kanban con @for sobre Map -->
+    @if (viewMode() === 'kanban') {
+      <section class="projects-kanban">
+        <div class="kanban-board">
+          @for (status of Object.values(ProjectStatus); track status) {
+            <div class="kanban-column">
+              <div class="column-header" [class]="getStatusClass(status)">
+                <h3>{{ getStatusLabel(status) }}</h3>
+                @if (projectsByStatus().get(status); as projects) {
+                  <span class="count">{{ projects.length }}</span>
+                }
+              </div>
+              <div class="column-content">
+                @if (projectsByStatus().get(status); as projects) {
+                  @for (project of projects; track project.id) {
+                    @if (!searchTerm() || project.department.toLowerCase().includes(searchTerm().toLowerCase())) {
+                      <div class="kanban-card" (click)="selectProject(project)">
+                        <h4>{{ project.name }}</h4>
+                        <p class="code">{{ project.code }}</p>
+                        <div class="kanban-meta">
+                          <span>{{ getTypeLabel(project.type) }}</span>
+                          <span>{{ project.progress }}%</span>
+                        </div>
+                        @switch (project.priority) {
+                          @case (Priority.CRITICA) {
+                            <span class="priority-indicator critical">●</span>
+                          }
+                          @case (Priority.ALTA) {
+                            <span class="priority-indicator high">●</span>
+                          }
+                        }
+                      </div>
+                    }
+                  } @empty {
+                    <div class="empty-column">
+                      Sin proyectos
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </section>
+    }
+  }
+
+  <!-- Resumen de Directivas Implementadas -->
+  <section class="directives-summary">
+    <h2>📚 Directivas Estructurales Implementadas</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>@if / @else if / @else</h3>
+        <p>Control de estados de carga, error y datos vacíos</p>
+        <code>@if (condition) { } @else if (other) { } @else { }</code>
+      </div>
+      <div class="summary-card">
+        <h3>@for / @empty</h3>
+        <p>Iteración sobre proyectos con manejo de lista vacía</p>
+        <code>@for (item of items; track item.id) { } @empty { }</code>
+      </div>
+      <div class="summary-card">
+        <h3>@switch / @case / @default</h3>
+        <p>Renderizado condicional según estado y prioridad</p>
+        <code>@switch (value) { @case (x) { } @default { } }</code>
+      </div>
+      <div class="summary-card">
+        <h3>Variables Locales</h3>
+        <p>Uso de $index, $even, $odd en bucles</p>
+        <code>let i = $index; let even = $even</code>
+      </div>
+    </div>
+  </section>
+</div>
+PASO 4: Agregar Estilos (10 minutos)
+Crear src/app/components/directivas-demo/project-dashboard/project-dashboard.component.scss:
+.project-dashboard {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  min-height: 100vh;
+
+  .dashboard-header {
+    text-align: center;
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #666;
+      font-size: 1.1rem;
+      font-style: italic;
+    }
+  }
+
+  // Estados de carga y error
+  .loading-state,
+  .error-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem;
+    background: white;
+    border-radius: 16px;
+    margin: 2rem 0;
+
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 1rem;
+    }
+
+    .error-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      color: #666;
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+    }
+  }
+
+  // Sección de estadísticas
+  .statistics-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+
+      .stat-card {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: translateY(-4px);
+        }
+
+        h3 {
+          font-size: 2rem;
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.9;
+        }
+
+        &.execution {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        &.completed {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        &.budget {
+          background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        &.progress {
+          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        &.critical {
+          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        &.risks {
+          background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+        }
+      }
+    }
+  }
+
+  // Controles y filtros
+  .controls-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .view-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      .view-mode-buttons {
+        display: flex;
+        gap: 0.5rem;
+
+        .btn-icon {
+          padding: 0.5rem 1rem;
+          border: 2px solid #dee2e6;
+          background: white;
+          border-radius: 8px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+
+          &.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+          }
+
+          &:hover:not(.active) {
+            background: #f8f9fa;
+          }
+        }
+      }
+    }
+
+    .filters-panel {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #dee2e6;
+
+      .filter-group {
+        display: flex;
+        flex-direction: column;
+
+        label {
+          font-weight: 600;
+          margin-bottom: 0.5rem;
+          color: #495057;
+        }
+
+        .form-control {
+          padding: 0.75rem;
+          border: 2px solid #dee2e6;
+          border-radius: 8px;
+          font-size: 1rem;
+          transition: border-color 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #667eea;
+          }
+        }
+      }
+    }
+  }
+
+  // Vista Grid
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+
+    .project-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      border-left: 5px solid #dee2e6;
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      &.priority-critical {
+        border-left-color: #dc3545;
+      }
+
+      &.priority-high {
+        border-left-color: #fd7e14;
+      }
+
+      &.priority-medium {
+        border-left-color: #ffc107;
+      }
+
+      &.priority-low {
+        border-left-color: #28a745;
+      }
+
+      .project-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .project-code {
+          font-size: 0.9rem;
+          color: #6c757d;
+          font-weight: 500;
+        }
+
+        .priority-badge {
+          padding: 0.25rem 0.5rem;
+          border-radius: 20px;
+          font-size: 0.8rem;
+          font-weight: bold;
+
+          &.critical {
+            background: #ffebee;
+            color: #c62828;
+          }
+
+          &.high {
+            background: #fff3e0;
+            color: #e65100;
+          }
+
+          &.medium {
+            background: #fff8e1;
+            color: #f57c00;
+          }
+
+          &.low {
+            background: #e8f5e9;
+            color: #2e7d32;
+          }
+        }
+      }
+
+      h3 {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 1rem;
+        line-height: 1.4;
+      }
+
+      .project-info {
+        margin-bottom: 1rem;
+
+        p {
+          margin: 0.25rem 0;
+          color: #666;
+          font-size: 0.9rem;
+
+          strong {
+            color: #495057;
+          }
+        }
+      }
+
+      .project-status {
+        margin-bottom: 1rem;
+
+        .status-badge {
+          display: inline-block;
+          padding: 0.5rem 1rem;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 0.9rem;
+
+          &.planning {
+            background: #e3f2fd;
+            color: #1565c0;
+          }
+
+          &.bidding {
+            background: #f3e5f5;
+            color: #6a1b9a;
+          }
+
+          &.execution {
+            background: #fff3e0;
+            color: #e65100;
+          }
+
+          &.supervision {
+            background: #e8eaf6;
+            color: #283593;
+          }
+
+          &.completed {
+            background: #e8f5e9;
+            color: #2e7d32;
+          }
+
+          &.suspended {
+            background: #fff8e1;
+            color: #f57c00;
+          }
+
+          &.cancelled {
+            background: #ffebee;
+            color: #c62828;
+          }
+        }
+      }
+
+      .project-progress {
+        margin-bottom: 1rem;
+
+        .progress-header {
+          display: flex;
+          justify-content: space-between;
+          margin-bottom: 0.5rem;
+          font-size: 0.9rem;
+          color: #666;
+        }
+
+        .progress-bar {
+          height: 8px;
+          background: #e9ecef;
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+          }
+        }
+
+        .progress-slider {
+          width: 100%;
+          margin-top: 0.5rem;
+          cursor: pointer;
+        }
+      }
+
+      .project-budget {
+        font-weight: 500;
+        color: #495057;
+        margin-bottom: 1rem;
+      }
+
+      .project-risks {
+        margin-bottom: 1rem;
+
+        h4 {
+          font-size: 0.9rem;
+          color: #666;
+          margin-bottom: 0.5rem;
+        }
+
+        .risk-item {
+          padding: 0.5rem;
+          border-radius: 6px;
+          margin-bottom: 0.25rem;
+          font-size: 0.85rem;
+
+          &.high {
+            background: #ffebee;
+            color: #c62828;
+          }
+        }
+      }
+
+      .project-milestones {
+        h4 {
+          font-size: 0.9rem;
+          color: #666;
+          margin-bottom: 0.5rem;
+        }
+
+        .milestone-item {
+          padding: 0.25rem 0;
+          font-size: 0.85rem;
+          color: #666;
+
+          &.completed {
+            color: #2e7d32;
+            text-decoration: line-through;
+          }
+        }
+      }
+    }
+
+    .no-projects {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 16px;
+
+      h3 {
+        color: #6c757d;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #888;
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+
+  // Vista Lista
+  .projects-list {
+    background: white;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .projects-table {
+      width: 100%;
+      border-collapse: collapse;
+
+      thead {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+
+        th {
+          padding: 1rem;
+          text-align: left;
+          font-weight: 600;
+        }
+      }
+
+      tbody {
+        tr {
+          border-bottom: 1px solid #dee2e6;
+          cursor: pointer;
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background: #f8f9fa;
+          }
+
+          &.even-row {
+            background: #fafbfc;
+          }
+
+          td {
+            padding: 1rem;
+            color: #495057;
+
+            .progress-cell {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+
+              .mini-progress {
+                width: 50px;
+                height: 4px;
+                background: #e9ecef;
+                border-radius: 2px;
+                overflow: hidden;
+
+                .mini-progress-fill {
+                  height: 100%;
+                  background: #28a745;
+                }
+              }
+            }
+          }
+
+          .no-data {
+            text-align: center;
+            padding: 2rem;
+            color: #6c757d;
+          }
+        }
+      }
+    }
+  }
+
+  // Vista Kanban
+  .projects-kanban {
+    .kanban-board {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1rem;
+      align-items: start;
+
+      .kanban-column {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+        .column-header {
+          padding: 1rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          font-weight: 600;
+          color: white;
+
+          &.status-planning {
+            background: #1565c0;
+          }
+
+          &.status-bidding {
+            background: #6a1b9a;
+          }
+
+          &.status-execution {
+            background: #e65100;
+          }
+
+          &.status-supervision {
+            background: #283593;
+          }
+
+          &.status-completed {
+            background: #2e7d32;
+          }
+
+          &.status-suspended {
+            background: #f57c00;
+          }
+
+          &.status-cancelled {
+            background: #c62828;
+          }
+
+          h3 {
+            margin: 0;
+            font-size: 1rem;
+          }
+
+          .count {
+            background: rgba(255, 255, 255, 0.3);
+            padding: 0.25rem 0.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+          }
+        }
+
+        .column-content {
+          padding: 1rem;
+          min-height: 200px;
+
+          .kanban-card {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+
+            &:hover {
+              background: #e9ecef;
+              transform: translateX(4px);
+            }
+
+            h4 {
+              color: #2c3e50;
+              font-size: 0.95rem;
+              margin-bottom: 0.5rem;
+            }
+
+            .code {
+              color: #6c757d;
+              font-size: 0.8rem;
+              margin-bottom: 0.5rem;
+            }
+
+            .kanban-meta {
+              display: flex;
+              justify-content: space-between;
+              font-size: 0.85rem;
+              color: #666;
+            }
+
+            .priority-indicator {
+              position: absolute;
+              top: 0.5rem;
+              right: 0.5rem;
+              font-size: 0.8rem;
+
+              &.critical {
+                color: #dc3545;
+              }
+
+              &.high {
+                color: #fd7e14;
+              }
+            }
+          }
+
+          .empty-column {
+            text-align: center;
+            color: #adb5bd;
+            font-style: italic;
+            padding: 2rem;
+          }
+        }
+      }
+    }
+  }
+
+  // Resumen de directivas
+  .directives-summary {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-top: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+
+      .summary-card {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        border: 2px solid #dee2e6;
+
+        h3 {
+          color: #667eea;
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          color: #666;
+          margin-bottom: 0.75rem;
+        }
+
+        code {
+          display: block;
+          background: #e9ecef;
+          padding: 0.5rem;
+          border-radius: 4px;
+          font-family: 'Courier New', monospace;
+          color: #d63384;
+          font-size: 0.85rem;
+        }
+      }
+    }
+  }
+
+  // Botones comunes
+  .btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &.btn-primary {
+      background: #667eea;
+      color: white;
+
+      &:hover {
+        background: #5a67d8;
+        transform: translateY(-2px);
+      }
+    }
+
+    &.btn-secondary {
+      background: #6c757d;
+      color: white;
+
+      &:hover {
+        background: #545b62;
+      }
+
+      &.active {
+        background: #667eea;
+      }
+    }
+
+    &.btn-warning {
+      background: #ffc107;
+      color: #212529;
+
+      &:hover {
+        background: #e0a800;
+      }
+    }
+  }
+
+  // Animaciones
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  // Responsive
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .projects-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .kanban-board {
+      grid-template-columns: 1fr;
+    }
+
+    .view-controls {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+}
+PASO 5: Verificar y Probar LAB 1 (5 minutos)
+# Agregar ruta en app.routes.ts
+Actualizar src/app/app.routes.ts:
+import { Routes } from '@angular/router';
+import { ProjectDashboardComponent } from './components/directivas-demo/project-dashboard/project-dashboard.component';
+// ... otras importaciones de sesiones anteriores
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  // ... rutas anteriores
+  { path: 'project-dashboard', component: ProjectDashboardComponent },
+  { path: '**', redirectTo: '/home' }
+];
+Actualizar navegación en header.component.html:
+<nav class="navigation">
+  <!-- ... enlaces anteriores ... -->
+  <a routerLink="/project-dashboard" routerLinkActive="active" class="nav-link">
+    🏗️ Proyectos
+  </a>
+</nav>
+✅ Verificación del LAB 1:
+# Ejecutar la aplicación
+ng serve --open
+
+# Navegar a http://localhost:4200/project-dashboard
+# Verificar:
+# 1. @if funciona para estados de carga
+# 2. @for itera correctamente sobre proyectos
+# 3. @switch muestra estados correctos
+# 4. @empty muestra mensaje cuando no hay datos
+# 5. Variables locales ($index, $even, $odd) funcionan
+# 6. Track functions optimizan el renderizado
+________________________________________
+LAB 2: DIRECTIVAS DE ATRIBUTO AVANZADAS
+Duración: 45 minutos
+Objetivo: Dominar NgClass, NgStyle y NgModel con casos complejos
+PASO 1: Crear Sistema de Configuración Visual (10 minutos)
+1.1 Generar componente de configuración
+ng generate component components/directivas-demo/theme-configurator --standalone --skip-tests
+1.2 Implementar componente
+Actualizar src/app/components/directivas-demo/theme-configurator/theme-configurator.component.ts:
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+
+interface ThemePreset {
+  id: string;
+  name: string;
+  primaryColor: string;
+  secondaryColor: string;
+  backgroundColor: string;
+  textColor: string;
+  borderRadius: number;
+  fontSize: number;
+  spacing: number;
+  animations: boolean;
+}
+
+interface WidgetConfig {
+  id: string;
+  title: string;
+  icon: string;
+  color: string;
+  size: 'small' | 'medium' | 'large';
+  visible: boolean;
+  order: number;
+  content: string;
+  customStyles: { [key: string]: string };
+}
+
+@Component({
+  selector: 'app-theme-configurator',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './theme-configurator.component.html',
+  styleUrl: './theme-configurator.component.scss'
+})
+export class ThemeConfiguratorComponent implements OnInit {
+  // Signals para configuración reactiva
+  selectedTheme = signal<ThemePreset>(this.getDefaultTheme());
+  customColors = signal({
+    primary: '#667eea',
+    secondary: '#764ba2',
+    accent: '#f093fb',
+    warning: '#feca57',
+    danger: '#ff6b6b',
+    success: '#43e97b'
+  });
+  
+  layoutConfig = signal({
+    sidebarPosition: 'left' as 'left' | 'right',
+    headerFixed: true,
+    footerVisible: true,
+    darkMode: false,
+    compactMode: false,
+    animationsEnabled: true
+  });
+  
+  typographyConfig = signal({
+    fontSize: 16,
+    fontFamily: 'Inter',
+    lineHeight: 1.6,
+    letterSpacing: 0,
+    textTransform: 'none' as 'none' | 'uppercase' | 'lowercase' | 'capitalize'
+  });
+  
+  spacingConfig = signal({
+    padding: 16,
+    margin: 16,
+    borderRadius: 8,
+    gap: 16
+  });
+  
+  widgets = signal<WidgetConfig[]>([
+    {
+      id: 'widget-1',
+      title: 'Estadísticas',
+      icon: '📊',
+      color: '#667eea',
+      size: 'medium',
+      visible: true,
+      order: 1,
+      content: 'Datos en tiempo real del sistema',
+      customStyles: {}
+    },
+    {
+      id: 'widget-2',
+      title: 'Notificaciones',
+      icon: '🔔',
+      color: '#f093fb',
+      size: 'small',
+      visible: true,
+      order: 2,
+      content: '5 nuevas notificaciones',
+      customStyles: {}
+    },
+    {
+      id: 'widget-3',
+      title: 'Calendario',
+      icon: '📅',
+      color: '#43e97b',
+      size: 'large',
+      visible: true,
+      order: 3,
+      content: 'Próximos eventos y fechas importantes',
+      customStyles: {}
+    }
+  ]);
+  
+  // Computed signals para clases y estilos dinámicos
+  containerClasses = computed(() => {
+    const layout = this.layoutConfig();
+    return {
+      'dark-theme': layout.darkMode,
+      'light-theme': !layout.darkMode,
+      'compact-mode': layout.compactMode,
+      'animations-enabled': layout.animationsEnabled,
+      'sidebar-left': layout.sidebarPosition === 'left',
+      'sidebar-right': layout.sidebarPosition === 'right',
+      'header-fixed': layout.headerFixed,
+      'footer-hidden': !layout.footerVisible
+    };
+  });
+  
+  containerStyles = computed(() => {
+    const theme = this.selectedTheme();
+    const spacing = this.spacingConfig();
+    const typography = this.typographyConfig();
+    
+    return {
+      '--primary-color': theme.primaryColor,
+      '--secondary-color': theme.secondaryColor,
+      '--background-color': theme.backgroundColor,
+      '--text-color': theme.textColor,
+      '--border-radius': `${theme.borderRadius}px`,
+      '--font-size': `${typography.fontSize}px`,
+      '--spacing': `${spacing.padding}px`,
+      '--gap': `${spacing.gap}px`,
+      'font-family': typography.fontFamily,
+      'line-height': typography.lineHeight,
+      'letter-spacing': `${typography.letterSpacing}px`
+    };
+  });
+  
+  // Presets de temas
+  themePresets: ThemePreset[] = [
+    {
+      id: 'default',
+      name: 'Por Defecto',
+      primaryColor: '#667eea',
+      secondaryColor: '#764ba2',
+      backgroundColor: '#ffffff',
+      textColor: '#2c3e50',
+      borderRadius: 8,
+      fontSize: 16,
+      spacing: 16,
+      animations: true
+    },
+    {
+      id: 'dark',
+      name: 'Modo Oscuro',
+      primaryColor: '#818cf8',
+      secondaryColor: '#c084fc',
+      backgroundColor: '#1a1a1a',
+      textColor: '#ffffff',
+      borderRadius: 12,
+      fontSize: 16,
+      spacing: 20,
+      animations: true
+    },
+    {
+      id: 'high-contrast',
+      name: 'Alto Contraste',
+      primaryColor: '#000000',
+      secondaryColor: '#ffffff',
+      backgroundColor: '#ffffff',
+      textColor: '#000000',
+      borderRadius: 0,
+      fontSize: 18,
+      spacing: 24,
+      animations: false
+    },
+    {
+      id: 'colorful',
+      name: 'Vibrante',
+      primaryColor: '#ff6b6b',
+      secondaryColor: '#4ecdc4',
+      backgroundColor: '#f7f7f7',
+      textColor: '#2d3436',
+      borderRadius: 16,
+      fontSize: 16,
+      spacing: 16,
+      animations: true
+    }
+  ];
+  
+  // Fuentes disponibles
+  availableFonts = [
+    'Inter',
+    'Roboto',
+    'Open Sans',
+    'Lato',
+    'Montserrat',
+    'Poppins',
+    'Raleway',
+    'Playfair Display'
+  ];
+  
+  // Estado de vista previa
+  previewMode = signal<'desktop' | 'tablet' | 'mobile'>('desktop');
+  showGrid = signal(false);
+  showCode = signal(false);
+  
+  ngOnInit(): void {
+    console.log('🎨 LAB 2: Theme Configurator inicializado');
+  }
+  
+  // Métodos para manejo de temas
+  selectPreset(preset: ThemePreset): void {
+    this.selectedTheme.set(preset);
+    this.layoutConfig.update(config => ({
+      ...config,
+      darkMode: preset.id === 'dark',
+      animationsEnabled: preset.animations
+    }));
+  }
+  
+  updateCustomColor(colorKey: string, value: string): void {
+    this.customColors.update(colors => ({
+      ...colors,
+      [colorKey]: value
+    }));
+  }
+  
+  toggleDarkMode(): void {
+    this.layoutConfig.update(config => ({
+      ...config,
+      darkMode: !config.darkMode
+    }));
+  }
+  
+  toggleCompactMode(): void {
+    this.layoutConfig.update(config => ({
+      ...config,
+      compactMode: !config.compactMode
+    }));
+  }
+  
+  toggleAnimations(): void {
+    this.layoutConfig.update(config => ({
+      ...config,
+      animationsEnabled: !config.animationsEnabled
+    }));
+  }
+  
+  // Métodos para widgets
+  addWidget(): void {
+    const newWidget: WidgetConfig = {
+      id: `widget-${Date.now()}`,
+      title: 'Nuevo Widget',
+      icon: '📦',
+      color: '#' + Math.floor(Math.random()*16777215).toString(16),
+      size: 'medium',
+      visible: true,
+      order: this.widgets().length + 1,
+      content: 'Contenido del widget',
+      customStyles: {}
+    };
+    this.widgets.update(widgets => [...widgets, newWidget]);
+  }
+  
+  removeWidget(widgetId: string): void {
+    this.widgets.update(widgets => 
+      widgets.filter(w => w.id !== widgetId)
+    );
+  }
+  
+  updateWidget(widgetId: string, updates: Partial<WidgetConfig>): void {
+    this.widgets.update(widgets =>
+      widgets.map(w => w.id === widgetId ? { ...w, ...updates } : w)
+    );
+  }
+  
+  getWidgetClasses(widget: WidgetConfig): { [key: string]: boolean } {
+    return {
+      'widget': true,
+      'widget-small': widget.size === 'small',
+      'widget-medium': widget.size === 'medium',
+      'widget-large': widget.size === 'large',
+      'widget-visible': widget.visible,
+      'widget-hidden': !widget.visible,
+      'widget-animated': this.layoutConfig().animationsEnabled
+    };
+  }
+  
+  getWidgetStyles(widget: WidgetConfig): { [key: string]: string } {
+    const spacing = this.spacingConfig();
+    return {
+      'background-color': widget.color,
+      'padding': `${spacing.padding}px`,
+      'margin': `${spacing.margin / 2}px`,
+      'border-radius': `${spacing.borderRadius}px`,
+      'order': widget.order.toString(),
+      'opacity': widget.visible ? '1' : '0.3',
+      ...widget.customStyles
+    };
+  }
+  
+  // Métodos auxiliares
+  exportConfiguration(): void {
+    const config = {
+      theme: this.selectedTheme(),
+      colors: this.customColors(),
+      layout: this.layoutConfig(),
+      typography: this.typographyConfig(),
+      spacing: this.spacingConfig(),
+      widgets: this.widgets()
+    };
+    
+    const blob = new Blob([JSON.stringify(config, null, 2)], 
+      { type: 'application/json' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'theme-config.json';
+    a.click();
+    window.URL.revokeObjectURL(url);
+  }
+  
+  resetToDefaults(): void {
+    this.selectPreset(this.themePresets[0]);
+    this.typographyConfig.set({
+      fontSize: 16,
+      fontFamily: 'Inter',
+      lineHeight: 1.6,
+      letterSpacing: 0,
+      textTransform: 'none'
+    });
+    this.spacingConfig.set({
+      padding: 16,
+      margin: 16,
+      borderRadius: 8,
+      gap: 16
+    });
+  }
+  
+  private getDefaultTheme(): ThemePreset {
+    return this.themePresets[0];
+  }
+}
+1.3 Crear template con NgClass y NgStyle avanzados
+Actualizar src/app/components/directivas-demo/theme-configurator/theme-configurator.component.html:
+<div class="theme-configurator" 
+     [ngClass]="containerClasses()"
+     [ngStyle]="containerStyles()">
+  
+  <!-- Header -->
+  <header class="configurator-header">
+    <h1>🎨 Configurador de Temas Avanzado</h1>
+    <p>Demostración de NgClass, NgStyle y NgModel con binding complejo</p>
+  </header>
+
+  <!-- Panel de Control -->
+  <div class="control-panel">
+    <!-- Selector de Presets -->
+    <section class="control-section">
+      <h3>📋 Presets de Tema</h3>
+      <div class="presets-grid">
+        @for (preset of themePresets; track preset.id) {
+          <button 
+            class="preset-button"
+            [ngClass]="{
+              'active': selectedTheme().id === preset.id,
+              'dark': preset.id === 'dark',
+              'contrast': preset.id === 'high-contrast'
+            }"
+            [ngStyle]="{
+              'background': preset.backgroundColor,
+              'color': preset.textColor,
+              'border': '2px solid ' + preset.primaryColor
+            }"
+            (click)="selectPreset(preset)">
+            {{ preset.name }}
+          </button>
+        }
+      </div>
+    </section>
+
+    <!-- Colores Personalizados -->
+    <section class="control-section">
+      <h3>🎨 Colores Personalizados</h3>
+      <div class="color-controls">
+        @for (colorKey of Object.keys(customColors()); track colorKey) {
+          <div class="color-input-group">
+            <label [for]="'color-' + colorKey">
+              {{ colorKey | titlecase }}:
+            </label>
+            <input 
+              [id]="'color-' + colorKey"
+              type="color"
+              [value]="customColors()[colorKey]"
+              (input)="updateCustomColor(colorKey, $any($event.target).value)"
+              [ngStyle]="{
+                'border': '3px solid ' + customColors()[colorKey],
+                'box-shadow': '0 0 10px ' + customColors()[colorKey] + '40'
+              }">
+            <span class="color-value">{{ customColors()[colorKey] }}</span>
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Configuración de Layout -->
+    <section class="control-section">
+      <h3>🏗️ Layout</h3>
+      <div class="layout-controls">
+        <div class="switch-group">
+          <label>
+            <input 
+              type="checkbox"
+              [(ngModel)]="layoutConfig().darkMode"
+              (change)="toggleDarkMode()">
+            <span [ngClass]="{'active': layoutConfig().darkMode}">
+              {{ layoutConfig().darkMode ? '🌙' : '☀️' }} Modo Oscuro
+            </span>
+          </label>
+        </div>
+        <div class="switch-group">
+          <label>
+            <input 
+              type="checkbox"
+              [(ngModel)]="layoutConfig().compactMode"
+              (change)="toggleCompactMode()">
+            <span [ngClass]="{'active': layoutConfig().compactMode}">
+              📐 Modo Compacto
+            </span>
+          </label>
+        </div>
+        <div class="switch-group">
+          <label>
+            <input 
+              type="checkbox"
+              [(ngModel)]="layoutConfig().animationsEnabled"
+              (change)="toggleAnimations()">
+            <span [ngClass]="{'active': layoutConfig().animationsEnabled}">
+              ✨ Animaciones
+            </span>
+          </label>
+        </div>
+        <div class="radio-group">
+          <label>Posición Sidebar:</label>
+          <div class="radio-options">
+            <label>
+              <input 
+                type="radio"
+                name="sidebarPosition"
+                value="left"
+                [(ngModel)]="layoutConfig().sidebarPosition">
+              Izquierda
+            </label>
+            <label>
+              <input 
+                type="radio"
+                name="sidebarPosition"
+                value="right"
+                [(ngModel)]="layoutConfig().sidebarPosition">
+              Derecha
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tipografía -->
+    <section class="control-section">
+      <h3>📝 Tipografía</h3>
+      <div class="typography-controls">
+        <div class="control-group">
+          <label>Tamaño de Fuente: {{ typographyConfig().fontSize }}px</label>
+          <input 
+            type="range"
+            min="12"
+            max="24"
+            [(ngModel)]="typographyConfig().fontSize"
+            [ngStyle]="{
+              'background': 'linear-gradient(to right, ' + 
+                customColors().primary + ' 0%, ' + 
+                customColors().secondary + ' ' + 
+                ((typographyConfig().fontSize - 12) / 12 * 100) + '%, ' +
+                '#e9ecef ' + ((typographyConfig().fontSize - 12) / 12 * 100) + '%, ' +
+                '#e9ecef 100%)'
+            }">
+        </div>
+        <div class="control-group">
+          <label>Familia de Fuente:</label>
+          <select 
+            [(ngModel)]="typographyConfig().fontFamily"
+            [ngStyle]="{'font-family': typographyConfig().fontFamily}">
+            @for (font of availableFonts; track font) {
+              <option [value]="font" [style.font-family]="font">
+                {{ font }}
+              </option>
+            }
+          </select>
+        </div>
+        <div class="control-group">
+          <label>Interlineado: {{ typographyConfig().lineHeight }}</label>
+          <input 
+            type="range"
+            min="1"
+            max="2"
+            step="0.1"
+            [(ngModel)]="typographyConfig().lineHeight">
+        </div>
+        <div class="control-group">
+          <label>Espaciado de Letras: {{ typographyConfig().letterSpacing }}px</label>
+          <input 
+            type="range"
+            min="-2"
+            max="5"
+            [(ngModel)]="typographyConfig().letterSpacing">
+        </div>
+        <div class="control-group">
+          <label>Transformación de Texto:</label>
+          <select [(ngModel)]="typographyConfig().textTransform">
+            <option value="none">Normal</option>
+            <option value="uppercase">MAYÚSCULAS</option>
+            <option value="lowercase">minúsculas</option>
+            <option value="capitalize">Capitalizar</option>
+          </select>
+        </div>
+      </div>
+    </section>
+
+    <!-- Espaciado -->
+    <section class="control-section">
+      <h3>📏 Espaciado</h3>
+      <div class="spacing-controls">
+        <div class="control-group">
+          <label>Padding: {{ spacingConfig().padding }}px</label>
+          <input 
+            type="range"
+            min="0"
+            max="32"
+            [(ngModel)]="spacingConfig().padding">
+        </div>
+        <div class="control-group">
+          <label>Margin: {{ spacingConfig().margin }}px</label>
+          <input 
+            type="range"
+            min="0"
+            max="32"
+            [(ngModel)]="spacingConfig().margin">
+        </div>
+        <div class="control-group">
+          <label>Border Radius: {{ spacingConfig().borderRadius }}px</label>
+          <input 
+            type="range"
+            min="0"
+            max="24"
+            [(ngModel)]="spacingConfig().borderRadius">
+        </div>
+        <div class="control-group">
+          <label>Gap: {{ spacingConfig().gap }}px</label>
+          <input 
+            type="range"
+            min="0"
+            max="32"
+            [(ngModel)]="spacingConfig().gap">
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- Vista Previa -->
+  <div class="preview-section">
+    <div class="preview-header">
+      <h2>👁️ Vista Previa</h2>
+      <div class="preview-controls">
+        <button 
+          [ngClass]="{'active': previewMode() === 'desktop'}"
+          (click)="previewMode.set('desktop')">
+          💻 Desktop
+        </button>
+        <button 
+          [ngClass]="{'active': previewMode() === 'tablet'}"
+          (click)="previewMode.set('tablet')">
+          📱 Tablet
+        </button>
+        <button 
+          [ngClass]="{'active': previewMode() === 'mobile'}"
+          (click)="previewMode.set('mobile')">
+          📱 Mobile
+        </button>
+      </div>
+    </div>
+
+    <div class="preview-container"
+         [ngClass]="{
+           'preview-desktop': previewMode() === 'desktop',
+           'preview-tablet': previewMode() === 'tablet',
+           'preview-mobile': previewMode() === 'mobile'
+         }">
+      
+      <!-- Widgets Dinámicos -->
+      <div class="widgets-container"
+           [ngStyle]="{
+             'display': 'grid',
+             'grid-template-columns': previewMode() === 'mobile' ? '1fr' : 
+                                     previewMode() === 'tablet' ? 'repeat(2, 1fr)' : 
+                                     'repeat(3, 1fr)',
+             'gap': spacingConfig().gap + 'px'
+           }">
+        
+        @for (widget of widgets(); track widget.id) {
+          <div [ngClass]="getWidgetClasses(widget)"
+               [ngStyle]="getWidgetStyles(widget)">
+            
+            <div class="widget-header">
+              <span class="widget-icon">{{ widget.icon }}</span>
+              <h4 [ngStyle]="{
+                'text-transform': typographyConfig().textTransform,
+                'letter-spacing': typographyConfig().letterSpacing + 'px'
+              }">
+                {{ widget.title }}
+              </h4>
+              <button 
+                class="widget-close"
+                (click)="removeWidget(widget.id)">
+                ×
+              </button>
+            </div>
+            
+            <div class="widget-content">
+              <p [ngStyle]="{
+                'font-size': typographyConfig().fontSize + 'px',
+                'line-height': typographyConfig().lineHeight
+              }">
+                {{ widget.content }}
+              </p>
+            </div>
+            
+            <div class="widget-controls">
+              <label>Tamaño:</label>
+              <select 
+                [(ngModel)]="widget.size"
+                (change)="updateWidget(widget.id, {size: widget.size})">
+                <option value="small">Pequeño</option>
+                <option value="medium">Mediano</option>
+                <option value="large">Grande</option>
+              </select>
+              
+              <label>
+                <input 
+                  type="checkbox"
+                  [(ngModel)]="widget.visible"
+                  (change)="updateWidget(widget.id, {visible: widget.visible})">
+                Visible
+              </label>
+            </div>
+          </div>
+        }
+        
+        <button 
+          class="add-widget-button"
+          (click)="addWidget()"
+          [ngStyle]="{
+            'background': customColors().primary,
+            'color': layoutConfig().darkMode ? '#fff' : '#000',
+            'border-radius': spacingConfig().borderRadius + 'px'
+          }">
+          + Agregar Widget
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions-section">
+    <button 
+      class="action-button export"
+      (click)="exportConfiguration()"
+      [ngStyle]="{
+        'background': customColors().success,
+        'color': '#fff'
+      }">
+      📥 Exportar Configuración
+    </button>
+    <button 
+      class="action-button reset"
+      (click)="resetToDefaults()"
+      [ngStyle]="{
+        'background': customColors().warning,
+        'color': '#000'
+      }">
+      🔄 Restablecer
+    </button>
+    <button 
+      class="action-button toggle-code"
+      (click)="showCode.update(v => !v)"
+      [ngClass]="{'active': showCode()}">
+      </> Ver Código
+    </button>
+  </div>
+
+  <!-- Código Generado -->
+  @if (showCode()) {
+    <div class="code-section">
+      <h3>Código CSS Generado</h3>
+      <pre><code>/* Clases Aplicadas */
+{{ containerClasses() | json }}
+
+/* Estilos Inline */
+{{ containerStyles() | json }}
+
+/* Configuración de Widgets */
+@for (widget of widgets(); track widget.id) {
+  /* Widget: {{ widget.title }} */
+  .{{ widget.id }} {
+    {{ getWidgetStyles(widget) | json }}
+  }
+}</code></pre>
+    </div>
+  }
+
+  <!-- Resumen de Directivas -->
+  <section class="directives-summary">
+    <h2>📚 Directivas de Atributo Implementadas</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>NgClass Dinámico</h3>
+        <p>Múltiples clases basadas en estado y configuración</p>
+        <code>[ngClass]="containerClasses()"</code>
+      </div>
+      <div class="summary-card">
+        <h3>NgStyle Computado</h3>
+        <p>Estilos calculados con CSS variables</p>
+        <code>[ngStyle]="containerStyles()"</code>
+      </div>
+      <div class="summary-card">
+        <h3>NgModel Two-way</h3>
+        <p>Binding bidireccional para todos los controles</p>
+        <code>[(ngModel)]="config.property"</code>
+      </div>
+      <div class="summary-card">
+        <h3>Binding Combinado</h3>
+        <p>NgClass + NgStyle + NgModel simultáneos</p>
+        <code>[ngClass]="..." [ngStyle]="..." [(ngModel)]="..."</code>
+      </div>
+    </div>
+  </section>
+</div>
+________________________________________
+LAB 3: DIRECTIVAS PERSONALIZADAS COMPLEJAS
+Duración: 45 minutos
+Objetivo: Crear directivas personalizadas avanzadas con HostListener, HostBinding y Renderer2
+PASO 1: Crear Directivas Base (15 minutos)
+1.1 Directiva de Tooltip Avanzado
+ng generate directive directives/custom/tooltip --standalone
+Actualizar src/app/directives/custom/tooltip.directive.ts:
+import { 
+  Directive, 
+  ElementRef, 
+  HostListener, 
+  Input, 
+  Renderer2,
+  OnDestroy 
+} from '@angular/core';
+
+@Directive({
+  selector: '[appTooltip]',
+  standalone: true
+})
+export class TooltipDirective implements OnDestroy {
+  @Input() appTooltip = '';
+  @Input() tooltipPosition: 'top' | 'bottom' | 'left' | 'right' = 'top';
+  @Input() tooltipDelay = 500;
+  @Input() tooltipClass = '';
+  
+  private tooltipElement?: HTMLDivElement;
+  private delayTimeout?: any;
+
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {
+    this.renderer.setStyle(this.el.nativeElement, 'position', 'relative');
+  }
+
+  @HostListener('mouseenter')
+  onMouseEnter(): void {
+    this.delayTimeout = setTimeout(() => {
+      this.showTooltip();
+    }, this.tooltipDelay);
+  }
+
+  @HostListener('mouseleave')
+  onMouseLeave(): void {
+    clearTimeout(this.delayTimeout);
+    this.hideTooltip();
+  }
+
+  @HostListener('click')
+  onClick(): void {
+    if (this.tooltipElement) {
+      this.hideTooltip();
+    }
+  }
+
+  private showTooltip(): void {
+    if (!this.appTooltip || this.tooltipElement) return;
+
+    // Crear elemento tooltip
+    this.tooltipElement = this.renderer.createElement('div');
+    this.renderer.addClass(this.tooltipElement, 'custom-tooltip');
+    this.renderer.addClass(this.tooltipElement, `tooltip-${this.tooltipPosition}`);
+    
+    if (this.tooltipClass) {
+      this.tooltipClass.split(' ').forEach(cls => {
+        this.renderer.addClass(this.tooltipElement, cls);
+      });
+    }
+
+    // Agregar contenido
+    const text = this.renderer.createText(this.appTooltip);
+    this.renderer.appendChild(this.tooltipElement, text);
+
+    // Posicionar tooltip
+    this.positionTooltip();
+
+    // Agregar al DOM
+    this.renderer.appendChild(document.body, this.tooltipElement);
+
+    // Animación de entrada
+    setTimeout(() => {
+      if (this.tooltipElement) {
+        this.renderer.addClass(this.tooltipElement, 'tooltip-visible');
+      }
+    }, 10);
+  }
+
+  private hideTooltip(): void {
+    if (!this.tooltipElement) return;
+
+    this.renderer.removeClass(this.tooltipElement, 'tooltip-visible');
+    
+    setTimeout(() => {
+      if (this.tooltipElement) {
+        this.renderer.removeChild(document.body, this.tooltipElement);
+        this.tooltipElement = undefined;
+      }
+    }, 300);
+  }
+
+  private positionTooltip(): void {
+    if (!this.tooltipElement) return;
+
+    const hostPos = this.el.nativeElement.getBoundingClientRect();
+    const tooltipPos = this.tooltipElement.getBoundingClientRect();
+    const scrollPos = window.pageYOffset || document.documentElement.scrollTop || document.body.scrollTop || 0;
+
+    let top = 0;
+    let left = 0;
+
+    switch (this.tooltipPosition) {
+      case 'top':
+        top = hostPos.top - tooltipPos.height - 10;
+        left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
+        break;
+      case 'bottom':
+        top = hostPos.bottom + 10;
+        left = hostPos.left + (hostPos.width - tooltipPos.width) / 2;
+        break;
+      case 'left':
+        top = hostPos.top + (hostPos.height - tooltipPos.height) / 2;
+        left = hostPos.left - tooltipPos.width - 10;
+        break;
+      case 'right':
+        top = hostPos.top + (hostPos.height - tooltipPos.height) / 2;
+        left = hostPos.right + 10;
+        break;
+    }
+
+    this.renderer.setStyle(this.tooltipElement, 'position', 'fixed');
+    this.renderer.setStyle(this.tooltipElement, 'top', `${top + scrollPos}px`);
+    this.renderer.setStyle(this.tooltipElement, 'left', `${left}px`);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.delayTimeout);
+    this.hideTooltip();
+  }
+}
+1.2 Directiva de Lazy Load para Imágenes
+ng generate directive directives/custom/lazy-load --standalone
+import { 
+  Directive, 
+  ElementRef, 
+  Input, 
+  OnInit, 
+  OnDestroy,
+  Renderer2,
+  HostBinding
+} from '@angular/core';
+
+@Directive({
+  selector: '[appLazyLoad]',
+  standalone: true
+})
+export class LazyLoadDirective implements OnInit, OnDestroy {
+  @Input() appLazyLoad = ''; // URL de la imagen a cargar
+  @Input() lazyLoadPlaceholder = 'assets/images/placeholder.jpg';
+  @Input() lazyLoadError = 'assets/images/error.jpg';
+  @Input() lazyLoadThreshold = 0.1;
+  @Input() lazyLoadRootMargin = '50px';
+  
+  @HostBinding('class.lazy-loading') isLoading = true;
+  @HostBinding('class.lazy-loaded') isLoaded = false;
+  @HostBinding('class.lazy-error') hasError = false;
+  
+  private observer?: IntersectionObserver;
+  private hasIntersected = false;
+
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {}
+
+  ngOnInit(): void {
+    this.setupPlaceholder();
+    this.setupObserver();
+  }
+
+  ngOnDestroy(): void {
+    if (this.observer) {
+      this.observer.disconnect();
+    }
+  }
+
+  private setupPlaceholder(): void {
+    if (this.el.nativeElement.tagName === 'IMG') {
+      this.renderer.setAttribute(
+        this.el.nativeElement,
+        'src',
+        this.lazyLoadPlaceholder
+      );
+    } else {
+      this.renderer.setStyle(
+        this.el.nativeElement,
+        'background-image',
+        `url(${this.lazyLoadPlaceholder})`
+      );
+    }
+  }
+
+  private setupObserver(): void {
+    const options = {
+      root: null,
+      rootMargin: this.lazyLoadRootMargin,
+      threshold: this.lazyLoadThreshold
+    };
+
+    this.observer = new IntersectionObserver(entries => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && !this.hasIntersected) {
+          this.hasIntersected = true;
+          this.loadImage();
+          this.observer?.unobserve(this.el.nativeElement);
+        }
+      });
+    }, options);
+
+    this.observer.observe(this.el.nativeElement);
+  }
+
+  private loadImage(): void {
+    const img = new Image();
+    
+    img.onload = () => {
+      this.setImage(this.appLazyLoad);
+      this.isLoading = false;
+      this.isLoaded = true;
+      this.renderer.addClass(this.el.nativeElement, 'fade-in');
+    };
+
+    img.onerror = () => {
+      this.setImage(this.lazyLoadError);
+      this.isLoading = false;
+      this.hasError = true;
+      console.error(`Failed to load image: ${this.appLazyLoad}`);
+    };
+
+    img.src = this.appLazyLoad;
+  }
+
+  private setImage(src: string): void {
+    if (this.el.nativeElement.tagName === 'IMG') {
+      this.renderer.setAttribute(this.el.nativeElement, 'src', src);
+    } else {
+      this.renderer.setStyle(
+        this.el.nativeElement,
+        'background-image',
+        `url(${src})`
+      );
+    }
+  }
+}
+1.3 Directiva de Validación Visual
+ng generate directive directives/custom/validation-feedback --standalone
+import { 
+  Directive, 
+  ElementRef, 
+  HostBinding, 
+  HostListener,
+  Input,
+  Renderer2,
+  OnInit,
+  OnDestroy
+} from '@angular/core';
+
+@Directive({
+  selector: '[appValidationFeedback]',
+  standalone: true
+})
+export class ValidationFeedbackDirective implements OnInit, OnDestroy {
+  @Input() appValidationFeedback: 'valid' | 'invalid' | 'pending' | 'none' = 'none';
+  @Input() validationMessage = '';
+  @Input() showOnBlur = true;
+  @Input() showOnDirty = false;
+  
+  private messageElement?: HTMLDivElement;
+  private isDirty = false;
+  private isTouched = false;
+  
+  @HostBinding('class.validation-valid')
+  get isValid(): boolean {
+    return this.shouldShowValidation() && this.appValidationFeedback === 'valid';
+  }
+  
+  @HostBinding('class.validation-invalid')
+  get isInvalid(): boolean {
+    return this.shouldShowValidation() && this.appValidationFeedback === 'invalid';
+  }
+  
+  @HostBinding('class.validation-pending')
+  get isPending(): boolean {
+    return this.shouldShowValidation() && this.appValidationFeedback === 'pending';
+  }
+  
+  @HostBinding('class.validation-shake')
+  private shake = false;
+
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {}
+
+  ngOnInit(): void {
+    this.setupValidationStyles();
+  }
+
+  ngOnDestroy(): void {
+    this.removeMessage();
+  }
+
+  @HostListener('blur')
+  onBlur(): void {
+    this.isTouched = true;
+    this.updateValidationDisplay();
+  }
+
+  @HostListener('input')
+  onInput(): void {
+    this.isDirty = true;
+    this.updateValidationDisplay();
+  }
+
+  @HostListener('focus')
+  onFocus(): void {
+    if (this.appValidationFeedback === 'invalid') {
+      this.showMessage();
+    }
+  }
+
+  private shouldShowValidation(): boolean {
+    if (this.showOnDirty && this.isDirty) return true;
+    if (this.showOnBlur && this.isTouched) return true;
+    return false;
+  }
+
+  private updateValidationDisplay(): void {
+    if (this.shouldShowValidation()) {
+      if (this.appValidationFeedback === 'invalid' && this.validationMessage) {
+        this.showMessage();
+        this.triggerShake();
+      } else {
+        this.removeMessage();
+      }
+    }
+  }
+
+  private setupValidationStyles(): void {
+    const parent = this.el.nativeElement.parentElement;
+    if (parent) {
+      this.renderer.setStyle(parent, 'position', 'relative');
+    }
+  }
+
+  private showMessage(): void {
+    if (this.messageElement) return;
+
+    this.messageElement = this.renderer.createElement('div');
+    this.renderer.addClass(this.messageElement, 'validation-message');
+    this.renderer.addClass(this.messageElement, 'validation-message-error');
+    
+    const text = this.renderer.createText(this.validationMessage);
+    this.renderer.appendChild(this.messageElement, text);
+    
+    const parent = this.el.nativeElement.parentElement;
+    if (parent) {
+      this.renderer.appendChild(parent, this.messageElement);
+    }
+
+    setTimeout(() => {
+      if (this.messageElement) {
+        this.renderer.addClass(this.messageElement, 'validation-message-visible');
+      }
+    }, 10);
+  }
+
+  private removeMessage(): void {
+    if (!this.messageElement) return;
+
+    this.renderer.removeClass(this.messageElement, 'validation-message-visible');
+    
+    setTimeout(() => {
+      if (this.messageElement && this.messageElement.parentElement) {
+        this.renderer.removeChild(
+          this.messageElement.parentElement,
+          this.messageElement
+        );
+        this.messageElement = undefined;
+      }
+    }, 300);
+  }
+
+  private triggerShake(): void {
+    this.shake = true;
+    setTimeout(() => {
+      this.shake = false;
+    }, 500);
+  }
+}
+PASO 2: Crear Componente Demo (15 minutos)
+ng generate component components/directivas-demo/custom-directives-showcase --standalone --skip-tests
+Implementar el componente y template completo para demostrar las directivas personalizadas...
+________________________________________
+LAB 4: HOST BINDING Y RENDERER2 AVANZADO
+Duración: 25 minutos
+Objetivo: Implementar sistema de Drag & Drop completo con directivas
+PASO 1: Crear Directivas de Drag & Drop (10 minutos)
+1.1 Directiva Draggable
+ng generate directive directives/custom/draggable --standalone
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  Input,
+  Output,
+  Renderer2
+} from '@angular/core';
+
+@Directive({
+  selector: '[appDraggable]',
+  standalone: true
+})
+export class DraggableDirective {
+  @Input() appDraggable = true;
+  @Input() dragData: any = null;
+  @Input() dragHandle = '';
+  @Input() dragPreview = true;
+  
+  @Output() dragStart = new EventEmitter<DragEvent>();
+  @Output() dragEnd = new EventEmitter<DragEvent>();
+  @Output() dragMove = new EventEmitter<DragEvent>();
+  
+  @HostBinding('draggable')
+  get draggable(): boolean {
+    return this.appDraggable && !this.dragHandle;
+  }
+  
+  @HostBinding('class.dragging')
+  isDragging = false;
+  
+  @HostBinding('style.cursor')
+  get cursor(): string {
+    return this.appDraggable ? 'move' : 'default';
+  }
+  
+  @HostBinding('style.opacity')
+  get opacity(): string {
+    return this.isDragging ? '0.5' : '1';
+  }
+  
+  @HostBinding('style.transform')
+  get transform(): string {
+    return this.isDragging ? 'scale(1.05)' : 'scale(1)';
+  }
+  
+  private dragCounter = 0;
+
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {
+    this.setupDragHandle();
+  }
+
+  @HostListener('dragstart', ['$event'])
+  onDragStart(event: DragEvent): void {
+    if (!this.appDraggable) {
+      event.preventDefault();
+      return;
+    }
+
+    this.isDragging = true;
+    this.dragCounter = 0;
+
+    // Configurar datos de transferencia
+    event.dataTransfer!.effectAllowed = 'move';
+    event.dataTransfer!.setData('text/plain', JSON.stringify(this.dragData || {}));
+    event.dataTransfer!.setData('dragElementId', this.el.nativeElement.id || '');
+
+    // Crear preview personalizado si está habilitado
+    if (this.dragPreview) {
+      this.createDragPreview(event);
+    }
+
+    this.dragStart.emit(event);
+  }
+
+  @HostListener('dragend', ['$event'])
+  onDragEnd(event: DragEvent): void {
+    this.isDragging = false;
+    this.dragEnd.emit(event);
+    this.cleanupDragPreview();
+  }
+
+  @HostListener('drag', ['$event'])
+  onDrag(event: DragEvent): void {
+    this.dragCounter++;
+    if (this.dragCounter % 5 === 0) { // Emitir cada 5 eventos para optimización
+      this.dragMove.emit(event);
+    }
+  }
+
+  private setupDragHandle(): void {
+    if (this.dragHandle) {
+      const handle = this.el.nativeElement.querySelector(this.dragHandle);
+      if (handle) {
+        this.renderer.setAttribute(handle, 'draggable', 'true');
+        this.renderer.setStyle(handle, 'cursor', 'move');
+      }
+    }
+  }
+
+  private createDragPreview(event: DragEvent): void {
+    const preview = this.renderer.createElement('div');
+    this.renderer.addClass(preview, 'drag-preview');
+    this.renderer.setStyle(preview, 'position', 'absolute');
+    this.renderer.setStyle(preview, 'top', '-1000px');
+    this.renderer.setStyle(preview, 'left', '-1000px');
+    
+    // Copiar contenido del elemento
+    const content = this.el.nativeElement.cloneNode(true);
+    this.renderer.appendChild(preview, content);
+    this.renderer.appendChild(document.body, preview);
+    
+    // Establecer como imagen de arrastre
+    event.dataTransfer!.setDragImage(preview, 0, 0);
+    
+    // Limpiar después de un pequeño retraso
+    setTimeout(() => {
+      this.renderer.removeChild(document.body, preview);
+    }, 0);
+  }
+
+  private cleanupDragPreview(): void {
+    // Limpieza adicional si es necesaria
+  }
+}
+1.2 Directiva DropZone
+ng generate directive directives/custom/drop-zone --standalone
+import {
+  Directive,
+  ElementRef,
+  EventEmitter,
+  HostBinding,
+  HostListener,
+  Input,
+  Output,
+  Renderer2
+} from '@angular/core';
+
+@Directive({
+  selector: '[appDropZone]',
+  standalone: true
+})
+export class DropZoneDirective {
+  @Input() appDropZone = true;
+  @Input() acceptTypes: string[] = [];
+  @Input() dropEffect: 'none' | 'copy' | 'link' | 'move' = 'move';
+  
+  @Output() itemDropped = new EventEmitter<any>();
+  @Output() dragEntered = new EventEmitter<DragEvent>();
+  @Output() dragLeft = new EventEmitter<DragEvent>();
+  @Output() draggedOver = new EventEmitter<DragEvent>();
+  
+  @HostBinding('class.drop-zone')
+  isDropZone = true;
+  
+  @HostBinding('class.drag-over')
+  isDragOver = false;
+  
+  @HostBinding('class.can-drop')
+  canDrop = false;
+  
+  @HostBinding('style.border')
+  get border(): string {
+    if (!this.appDropZone) return '2px solid #dee2e6';
+    return this.isDragOver 
+      ? '2px dashed #667eea' 
+      : '2px solid #dee2e6';
+  }
+  
+  @HostBinding('style.background-color')
+  get backgroundColor(): string {
+    if (!this.appDropZone) return 'transparent';
+    return this.isDragOver 
+      ? 'rgba(102, 126, 234, 0.1)' 
+      : 'transparent';
+  }
+  
+  private dragCounter = 0;
+
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {}
+
+  @HostListener('dragover', ['$event'])
+  onDragOver(event: DragEvent): void {
+    if (!this.appDropZone) return;
+    
+    event.preventDefault();
+    event.dataTransfer!.dropEffect = this.dropEffect;
+    
+    this.draggedOver.emit(event);
+  }
+
+  @HostListener('dragenter', ['$event'])
+  onDragEnter(event: DragEvent): void {
+    if (!this.appDropZone) return;
+    
+    event.preventDefault();
+    this.dragCounter++;
+    
+    if (this.dragCounter === 1) {
+      this.isDragOver = true;
+      this.canDrop = this.checkCanDrop(event);
+      this.addHighlight();
+      this.dragEntered.emit(event);
+    }
+  }
+
+  @HostListener('dragleave', ['$event'])
+  onDragLeave(event: DragEvent): void {
+    if (!this.appDropZone) return;
+    
+    this.dragCounter--;
+    
+    if (this.dragCounter === 0) {
+      this.isDragOver = false;
+      this.canDrop = false;
+      this.removeHighlight();
+      this.dragLeft.emit(event);
+    }
+  }
+
+  @HostListener('drop', ['$event'])
+  onDrop(event: DragEvent): void {
+    if (!this.appDropZone) return;
+    
+    event.preventDefault();
+    event.stopPropagation();
+    
+    this.isDragOver = false;
+    this.canDrop = false;
+    this.dragCounter = 0;
+    
+    // Obtener datos transferidos
+    const data = this.getTransferData(event);
+    
+    // Crear efecto visual de drop
+    this.createDropEffect(event);
+    
+    // Emitir evento con datos
+    this.itemDropped.emit({
+      data: data,
+      event: event,
+      target: this.el.nativeElement
+    });
+    
+    this.removeHighlight();
+  }
+
+  private checkCanDrop(event: DragEvent): boolean {
+    if (this.acceptTypes.length === 0) return true;
+    
+    const types = event.dataTransfer?.types || [];
+    return this.acceptTypes.some(type => types.includes(type));
+  }
+
+  private getTransferData(event: DragEvent): any {
+    const jsonData = event.dataTransfer?.getData('text/plain');
+    try {
+      return jsonData ? JSON.parse(jsonData) : null;
+    } catch {
+      return jsonData;
+    }
+  }
+
+  private addHighlight(): void {
+    this.renderer.addClass(this.el.nativeElement, 'drop-zone-highlight');
+  }
+
+  private removeHighlight(): void {
+    this.renderer.removeClass(this.el.nativeElement, 'drop-zone-highlight');
+  }
+
+  private createDropEffect(event: DragEvent): void {
+    const dropEffect = this.renderer.createElement('div');
+    this.renderer.addClass(dropEffect, 'drop-effect-ripple');
+    
+    // Posicionar en el punto de drop
+    const rect = this.el.nativeElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+    
+    this.renderer.setStyle(dropEffect, 'left', `${x}px`);
+    this.renderer.setStyle(dropEffect, 'top', `${y}px`);
+    this.renderer.appendChild(this.el.nativeElement, dropEffect);
+    
+    // Animar y remover
+    setTimeout(() => {
+      this.renderer.addClass(dropEffect, 'drop-effect-animate');
+    }, 10);
+    
+    setTimeout(() => {
+      this.renderer.removeChild(this.el.nativeElement, dropEffect);
+    }, 600);
+  }
+}
+PASO 2: Crear Sistema Kanban con Drag & Drop (15 minutos)
+2.1 Generar componente Kanban
+ng generate component components/directivas-demo/kanban-board --standalone --skip-tests
+2.2 Implementar componente Kanban
+Actualizar src/app/components/directivas-demo/kanban-board/kanban-board.component.ts:
+import { Component, OnInit, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { DraggableDirective } from '../../../directives/custom/draggable.directive';
+import { DropZoneDirective } from '../../../directives/custom/drop-zone.directive';
+import { TooltipDirective } from '../../../directives/custom/tooltip.directive';
+import { LazyLoadDirective } from '../../../directives/custom/lazy-load.directive';
+import { ValidationFeedbackDirective } from '../../../directives/custom/validation-feedback.directive';
+
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  assignee: string;
+  priority: 'low' | 'medium' | 'high' | 'critical';
+  tags: string[];
+  dueDate: Date;
+  attachments: number;
+  comments: number;
+  avatar?: string;
+  column: string;
+}
+
+interface Column {
+  id: string;
+  title: string;
+  color: string;
+  limit?: number;
+  tasks: Task[];
+}
+
+@Component({
+  selector: 'app-kanban-board',
+  standalone: true,
+  imports: [
+    CommonModule, 
+    FormsModule,
+    DraggableDirective,
+    DropZoneDirective,
+    TooltipDirective,
+    LazyLoadDirective,
+    ValidationFeedbackDirective
+  ],
+  templateUrl: './kanban-board.component.html',
+  styleUrl: './kanban-board.component.scss'
+})
+export class KanbanBoardComponent implements OnInit {
+  // Estado del tablero
+  columns = signal<Column[]>([
+    {
+      id: 'backlog',
+      title: 'Backlog',
+      color: '#6c757d',
+      tasks: []
+    },
+    {
+      id: 'todo',
+      title: 'Por Hacer',
+      color: '#007bff',
+      limit: 5,
+      tasks: []
+    },
+    {
+      id: 'progress',
+      title: 'En Progreso',
+      color: '#ffc107',
+      limit: 3,
+      tasks: []
+    },
+    {
+      id: 'review',
+      title: 'En Revisión',
+      color: '#17a2b8',
+      limit: 2,
+      tasks: []
+    },
+    {
+      id: 'done',
+      title: 'Completado',
+      color: '#28a745',
+      tasks: []
+    }
+  ]);
+
+  // Estado de la UI
+  draggedTask = signal<Task | null>(null);
+  draggedFromColumn = signal<string | null>(null);
+  showAddTaskModal = signal(false);
+  editingTask = signal<Task | null>(null);
+  searchTerm = signal('');
+  filterPriority = signal<'all' | 'low' | 'medium' | 'high' | 'critical'>('all');
+  
+  // Formulario de nueva tarea
+  newTask = signal<Partial<Task>>({
+    title: '',
+    description: '',
+    assignee: '',
+    priority: 'medium',
+    tags: [],
+    dueDate: new Date(),
+    column: 'backlog'
+  });
+
+  // Validación
+  taskValidation = computed(() => {
+    const task = this.newTask();
+    if (!task.title || task.title.length < 3) return 'invalid';
+    if (!task.assignee) return 'invalid';
+    return 'valid';
+  });
+
+  // Estadísticas
+  statistics = computed(() => {
+    const cols = this.columns();
+    const allTasks = cols.flatMap(c => c.tasks);
+    
+    return {
+      total: allTasks.length,
+      backlog: cols.find(c => c.id === 'backlog')?.tasks.length || 0,
+      inProgress: cols.find(c => c.id === 'progress')?.tasks.length || 0,
+      completed: cols.find(c => c.id === 'done')?.tasks.length || 0,
+      critical: allTasks.filter(t => t.priority === 'critical').length,
+      overdue: allTasks.filter(t => new Date(t.dueDate) < new Date()).length
+    };
+  });
+
+  // Usuarios disponibles
+  users = [
+    { id: 'user1', name: 'Carlos López', avatar: 'assets/avatars/carlos.jpg' },
+    { id: 'user2', name: 'Ana García', avatar: 'assets/avatars/ana.jpg' },
+    { id: 'user3', name: 'María Rodriguez', avatar: 'assets/avatars/maria.jpg' },
+    { id: 'user4', name: 'Jorge Mendoza', avatar: 'assets/avatars/jorge.jpg' },
+    { id: 'user5', name: 'Luis Fernández', avatar: 'assets/avatars/luis.jpg' }
+  ];
+
+  // Tags disponibles
+  availableTags = [
+    'Frontend', 'Backend', 'Database', 'API', 'Testing', 
+    'Bug', 'Feature', 'Enhancement', 'Documentation', 'Security'
+  ];
+
+  ngOnInit(): void {
+    console.log('🎯 LAB 4: Kanban Board con Drag & Drop inicializado');
+    this.loadInitialTasks();
+  }
+
+  // Cargar tareas iniciales
+  private loadInitialTasks(): void {
+    const initialTasks: Task[] = [
+      {
+        id: 'task-1',
+        title: 'Implementar autenticación OAuth',
+        description: 'Agregar login con Google y Facebook usando OAuth 2.0',
+        assignee: 'Carlos López',
+        priority: 'high',
+        tags: ['Backend', 'Security', 'API'],
+        dueDate: new Date('2025-08-15'),
+        attachments: 2,
+        comments: 5,
+        avatar: 'assets/avatars/carlos.jpg',
+        column: 'progress'
+      },
+      {
+        id: 'task-2',
+        title: 'Diseñar dashboard de métricas',
+        description: 'Crear mockups y diseño del nuevo dashboard con gráficos interactivos',
+        assignee: 'Ana García',
+        priority: 'medium',
+        tags: ['Frontend', 'Feature'],
+        dueDate: new Date('2025-08-10'),
+        attachments: 3,
+        comments: 2,
+        avatar: 'assets/avatars/ana.jpg',
+        column: 'todo'
+      },
+      {
+        id: 'task-3',
+        title: 'Optimizar consultas de base de datos',
+        description: 'Mejorar performance de queries lentas identificadas en producción',
+        assignee: 'María Rodriguez',
+        priority: 'critical',
+        tags: ['Database', 'Backend'],
+        dueDate: new Date('2025-08-08'),
+        attachments: 1,
+        comments: 8,
+        avatar: 'assets/avatars/maria.jpg',
+        column: 'review'
+      },
+      {
+        id: 'task-4',
+        title: 'Escribir documentación API v2',
+        description: 'Documentar todos los endpoints de la nueva versión de la API',
+        assignee: 'Jorge Mendoza',
+        priority: 'low',
+        tags: ['Documentation', 'API'],
+        dueDate: new Date('2025-08-20'),
+        attachments: 0,
+        comments: 1,
+        avatar: 'assets/avatars/jorge.jpg',
+        column: 'backlog'
+      },
+      {
+        id: 'task-5',
+        title: 'Corregir bug en formulario de registro',
+        description: 'El formulario no valida correctamente el campo de email',
+        assignee: 'Luis Fernández',
+        priority: 'high',
+        tags: ['Bug', 'Frontend'],
+        dueDate: new Date('2025-08-07'),
+        attachments: 0,
+        comments: 3,
+        avatar: 'assets/avatars/luis.jpg',
+        column: 'done'
+      }
+    ];
+
+    // Distribuir tareas en columnas
+    this.columns.update(cols => {
+      return cols.map(col => ({
+        ...col,
+        tasks: initialTasks.filter(task => task.column === col.id)
+      }));
+    });
+  }
+
+  // Drag & Drop handlers
+  onDragStart(task: Task, columnId: string): void {
+    this.draggedTask.set(task);
+    this.draggedFromColumn.set(columnId);
+    console.log('🎯 Arrastrando tarea:', task.title, 'desde columna:', columnId);
+  }
+
+  onDragEnd(): void {
+    this.draggedTask.set(null);
+    this.draggedFromColumn.set(null);
+  }
+
+  onDrop(event: any, targetColumnId: string): void {
+    const task = this.draggedTask();
+    const fromColumnId = this.draggedFromColumn();
+    
+    if (!task || !fromColumnId) return;
+    
+    // Verificar límite de columna
+    const targetColumn = this.columns().find(c => c.id === targetColumnId);
+    if (targetColumn?.limit && targetColumn.tasks.length >= targetColumn.limit) {
+      alert(`La columna "${targetColumn.title}" ha alcanzado su límite de ${targetColumn.limit} tareas`);
+      return;
+    }
+    
+    // Mover tarea
+    this.moveTask(task, fromColumnId, targetColumnId);
+    
+    // Log de actividad
+    console.log(`✅ Tarea "${task.title}" movida de "${fromColumnId}" a "${targetColumnId}"`);
+  }
+
+  private moveTask(task: Task, fromColumnId: string, toColumnId: string): void {
+    this.columns.update(cols => {
+      return cols.map(col => {
+        if (col.id === fromColumnId) {
+          // Remover de columna origen
+          return {
+            ...col,
+            tasks: col.tasks.filter(t => t.id !== task.id)
+          };
+        } else if (col.id === toColumnId) {
+          // Agregar a columna destino
+          const updatedTask = { ...task, column: toColumnId };
+          return {
+            ...col,
+            tasks: [...col.tasks, updatedTask]
+          };
+        }
+        return col;
+      });
+    });
+  }
+
+  // CRUD de tareas
+  addTask(): void {
+    if (this.taskValidation() !== 'valid') return;
+    
+    const task: Task = {
+      id: `task-${Date.now()}`,
+      title: this.newTask().title!,
+      description: this.newTask().description || '',
+      assignee: this.newTask().assignee!,
+      priority: this.newTask().priority as any,
+      tags: this.newTask().tags || [],
+      dueDate: this.newTask().dueDate!,
+      attachments: 0,
+      comments: 0,
+      avatar: this.users.find(u => u.name === this.newTask().assignee)?.avatar,
+      column: this.newTask().column!
+    };
+    
+    this.columns.update(cols => {
+      return cols.map(col => {
+        if (col.id === task.column) {
+          return {
+            ...col,
+            tasks: [...col.tasks, task]
+          };
+        }
+        return col;
+      });
+    });
+    
+    this.resetNewTask();
+    this.showAddTaskModal.set(false);
+  }
+
+  editTask(task: Task): void {
+    this.editingTask.set(task);
+    this.newTask.set({
+      title: task.title,
+      description: task.description,
+      assignee: task.assignee,
+      priority: task.priority,
+      tags: [...task.tags],
+      dueDate: task.dueDate,
+      column: task.column
+    });
+    this.showAddTaskModal.set(true);
+  }
+
+  deleteTask(taskId: string, columnId: string): void {
+    if (!confirm('¿Está seguro de eliminar esta tarea?')) return;
+    
+    this.columns.update(cols => {
+      return cols.map(col => {
+        if (col.id === columnId) {
+          return {
+            ...col,
+            tasks: col.tasks.filter(t => t.id !== taskId)
+          };
+        }
+        return col;
+      });
+    });
+  }
+
+  // Helpers
+  getPriorityClass(priority: string): string {
+    return `priority-${priority}`;
+  }
+
+  getPriorityIcon(priority: string): string {
+    const icons: Record<string, string> = {
+      low: '🟢',
+      medium: '🟡',
+      high: '🟠',
+      critical: '🔴'
+    };
+    return icons[priority] || '⚪';
+  }
+
+  getDaysUntilDue(dueDate: Date): number {
+    const today = new Date();
+    const due = new Date(dueDate);
+    const diff = due.getTime() - today.getTime();
+    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+  }
+
+  isOverdue(dueDate: Date): boolean {
+    return new Date(dueDate) < new Date();
+  }
+
+  resetNewTask(): void {
+    this.newTask.set({
+      title: '',
+      description: '',
+      assignee: '',
+      priority: 'medium',
+      tags: [],
+      dueDate: new Date(),
+      column: 'backlog'
+    });
+    this.editingTask.set(null);
+  }
+
+  toggleTag(tag: string): void {
+    this.newTask.update(task => {
+      const tags = task.tags || [];
+      const index = tags.indexOf(tag);
+      if (index > -1) {
+        tags.splice(index, 1);
+      } else {
+        tags.push(tag);
+      }
+      return { ...task, tags };
+    });
+  }
+}
+2.3 Crear template del Kanban
+Actualizar src/app/components/directivas-demo/kanban-board/kanban-board.component.html:
+<div class="kanban-board">
+  <!-- Header -->
+  <header class="kanban-header">
+    <h1>📋 Tablero Kanban - Sistema de Tareas PROVIAS</h1>
+    <p class="subtitle">Demostración completa de Drag & Drop con Directivas Personalizadas</p>
+  </header>
+
+  <!-- Estadísticas -->
+  <section class="statistics-bar">
+    <div class="stat-item">
+      <span class="stat-value">{{ statistics().total }}</span>
+      <span class="stat-label">Total</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ statistics().backlog }}</span>
+      <span class="stat-label">Backlog</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ statistics().inProgress }}</span>
+      <span class="stat-label">En Progreso</span>
+    </div>
+    <div class="stat-item">
+      <span class="stat-value">{{ statistics().completed }}</span>
+      <span class="stat-label">Completadas</span>
+    </div>
+    <div class="stat-item critical">
+      <span class="stat-value">{{ statistics().critical }}</span>
+      <span class="stat-label">Críticas</span>
+    </div>
+    <div class="stat-item overdue">
+      <span class="stat-value">{{ statistics().overdue }}</span>
+      <span class="stat-label">Vencidas</span>
+    </div>
+  </section>
+
+  <!-- Controles -->
+  <section class="controls-bar">
+    <button 
+      class="btn btn-primary"
+      (click)="showAddTaskModal.set(true)"
+      appTooltip="Crear nueva tarea"
+      tooltipPosition="bottom">
+      ➕ Nueva Tarea
+    </button>
+    
+    <div class="search-box">
+      <input 
+        type="text"
+        [(ngModel)]="searchTerm"
+        placeholder="Buscar tareas..."
+        class="search-input">
+    </div>
+    
+    <select 
+      [(ngModel)]="filterPriority"
+      class="filter-select"
+      appTooltip="Filtrar por prioridad"
+      tooltipPosition="bottom">
+      <option value="all">Todas las prioridades</option>
+      <option value="critical">Crítica</option>
+      <option value="high">Alta</option>
+      <option value="medium">Media</option>
+      <option value="low">Baja</option>
+    </select>
+  </section>
+
+  <!-- Tablero Kanban -->
+  <div class="kanban-columns">
+    @for (column of columns(); track column.id) {
+      <div 
+        class="kanban-column"
+        appDropZone
+        [appDropZone]="true"
+        (itemDropped)="onDrop($event, column.id)"
+        [style.border-top]="'4px solid ' + column.color">
+        
+        <!-- Header de Columna -->
+        <div class="column-header">
+          <h3>{{ column.title }}</h3>
+          <div class="column-meta">
+            <span class="task-count">{{ column.tasks.length }}</span>
+            @if (column.limit) {
+              <span 
+                class="task-limit"
+                [class.limit-reached]="column.tasks.length >= column.limit"
+                appTooltip="Límite de tareas en esta columna"
+                tooltipPosition="top">
+                / {{ column.limit }}
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Tareas -->
+        <div class="column-tasks">
+          @for (task of column.tasks; track task.id) {
+            @if (!searchTerm() || task.title.toLowerCase().includes(searchTerm().toLowerCase())) {
+              @if (filterPriority() === 'all' || task.priority === filterPriority()) {
+                <div 
+                  class="task-card"
+                  [class]="getPriorityClass(task.priority)"
+                  [class.overdue]="isOverdue(task.dueDate)"
+                  appDraggable
+                  [appDraggable]="true"
+                  [dragData]="task"
+                  (dragStart)="onDragStart(task, column.id)"
+                  (dragEnd)="onDragEnd()">
+                  
+                  <!-- Priority Badge -->
+                  <div class="task-priority">
+                    <span 
+                      appTooltip="Prioridad: {{ task.priority }}"
+                      tooltipPosition="right">
+                      {{ getPriorityIcon(task.priority) }}
+                    </span>
+                  </div>
+
+                  <!-- Task Header -->
+                  <div class="task-header">
+                    <h4>{{ task.title }}</h4>
+                    <div class="task-actions">
+                      <button 
+                        class="btn-icon"
+                        (click)="editTask(task)"
+                        appTooltip="Editar tarea"
+                        tooltipPosition="left">
+                        ✏️
+                      </button>
+                      <button 
+                        class="btn-icon"
+                        (click)="deleteTask(task.id, column.id)"
+                        appTooltip="Eliminar tarea"
+                        tooltipPosition="left">
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+
+                  <!-- Task Description -->
+                  @if (task.description) {
+                    <p class="task-description">{{ task.description }}</p>
+                  }
+
+                  <!-- Task Tags -->
+                  @if (task.tags.length > 0) {
+                    <div class="task-tags">
+                      @for (tag of task.tags; track tag) {
+                        <span class="tag">{{ tag }}</span>
+                      }
+                    </div>
+                  }
+
+                  <!-- Task Footer -->
+                  <div class="task-footer">
+                    <div class="task-assignee">
+                      @if (task.avatar) {
+                        <img 
+                          [appLazyLoad]="task.avatar"
+                          [lazyLoadPlaceholder]="'assets/images/avatar-placeholder.jpg'"
+                          alt="{{ task.assignee }}"
+                          class="assignee-avatar"
+                          appTooltip="{{ task.assignee }}"
+                          tooltipPosition="top">
+                      } @else {
+                        <div class="assignee-initials">
+                          {{ task.assignee.split(' ').map(n => n[0]).join('') }}
+                        </div>
+                      }
+                    </div>
+
+                    <div class="task-meta">
+                      @if (task.attachments > 0) {
+                        <span 
+                          class="meta-item"
+                          appTooltip="{{ task.attachments }} archivos adjuntos"
+                          tooltipPosition="top">
+                          📎 {{ task.attachments }}
+                        </span>
+                      }
+                      @if (task.comments > 0) {
+                        <span 
+                          class="meta-item"
+                          appTooltip="{{ task.comments }} comentarios"
+                          tooltipPosition="top">
+                          💬 {{ task.comments }}
+                        </span>
+                      }
+                    </div>
+
+                    <div class="task-due-date" [class.overdue]="isOverdue(task.dueDate)">
+                      @if (isOverdue(task.dueDate)) {
+                        <span appTooltip="Tarea vencida!" tooltipPosition="top">
+                          ⚠️ Vencida
+                        </span>
+                      } @else {
+                        <span appTooltip="Fecha de vencimiento" tooltipPosition="top">
+                          📅 {{ getDaysUntilDue(task.dueDate) }}d
+                        </span>
+                      }
+                    </div>
+                  </div>
+                </div>
+              }
+            }
+          }
+
+          <!-- Empty State -->
+          @if (column.tasks.length === 0) {
+            <div class="empty-column">
+              <p>Sin tareas</p>
+              <small>Arrastra tareas aquí</small>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Modal de Nueva/Editar Tarea -->
+  @if (showAddTaskModal()) {
+    <div class="modal-overlay" (click)="showAddTaskModal.set(false)">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ editingTask() ? '✏️ Editar' : '➕ Nueva' }} Tarea</h2>
+          <button 
+            class="modal-close"
+            (click)="showAddTaskModal.set(false)">
+            ×
+          </button>
+        </div>
+
+        <div class="modal-body">
+          <!-- Título -->
+          <div class="form-group">
+            <label>Título *</label>
+            <input 
+              type="text"
+              [(ngModel)]="newTask().title"
+              placeholder="Título de la tarea"
+              class="form-control"
+              appValidationFeedback
+              [appValidationFeedback]="newTask().title && newTask().title.length >= 3 ? 'valid' : 'invalid'"
+              [validationMessage]="'El título debe tener al menos 3 caracteres'">
+          </div>
+
+          <!-- Descripción -->
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea 
+              [(ngModel)]="newTask().description"
+              placeholder="Descripción detallada de la tarea"
+              class="form-control"
+              rows="3">
+            </textarea>
+          </div>
+
+          <!-- Asignado a -->
+          <div class="form-group">
+            <label>Asignado a *</label>
+            <select 
+              [(ngModel)]="newTask().assignee"
+              class="form-control"
+              appValidationFeedback
+              [appValidationFeedback]="newTask().assignee ? 'valid' : 'invalid'"
+              [validationMessage]="'Debe seleccionar un responsable'">
+              <option value="">Seleccionar...</option>
+              @for (user of users; track user.id) {
+                <option [value]="user.name">{{ user.name }}</option>
+              }
+            </select>
+          </div>
+
+          <!-- Prioridad -->
+          <div class="form-group">
+            <label>Prioridad</label>
+            <div class="priority-selector">
+              <button 
+                type="button"
+                [class.active]="newTask().priority === 'low'"
+                (click)="newTask.update(t => ({...t, priority: 'low'}))"
+                class="priority-btn low">
+                🟢 Baja
+              </button>
+              <button 
+                type="button"
+                [class.active]="newTask().priority === 'medium'"
+                (click)="newTask.update(t => ({...t, priority: 'medium'}))"
+                class="priority-btn medium">
+                🟡 Media
+              </button>
+              <button 
+                type="button"
+                [class.active]="newTask().priority === 'high'"
+                (click)="newTask.update(t => ({...t, priority: 'high'}))"
+                class="priority-btn high">
+                🟠 Alta
+              </button>
+              <button 
+                type="button"
+                [class.active]="newTask().priority === 'critical'"
+                (click)="newTask.update(t => ({...t, priority: 'critical'}))"
+                class="priority-btn critical">
+                🔴 Crítica
+              </button>
+            </div>
+          </div>
+
+          <!-- Tags -->
+          <div class="form-group">
+            <label>Etiquetas</label>
+            <div class="tags-selector">
+              @for (tag of availableTags; track tag) {
+                <button 
+                  type="button"
+                  [class.active]="newTask().tags?.includes(tag)"
+                  (click)="toggleTag(tag)"
+                  class="tag-btn">
+                  {{ tag }}
+                </button>
+              }
+            </div>
+          </div>
+
+          <!-- Fecha de vencimiento -->
+          <div class="form-group">
+            <label>Fecha de vencimiento</label>
+            <input 
+              type="date"
+              [(ngModel)]="newTask().dueDate"
+              class="form-control">
+          </div>
+
+          <!-- Columna -->
+          @if (!editingTask()) {
+            <div class="form-group">
+              <label>Columna inicial</label>
+              <select 
+                [(ngModel)]="newTask().column"
+                class="form-control">
+                @for (column of columns(); track column.id) {
+                  <option [value]="column.id">{{ column.title }}</option>
+                }
+              </select>
+            </div>
+          }
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            class="btn btn-secondary"
+            (click)="showAddTaskModal.set(false)">
+            Cancelar
+          </button>
+          <button 
+            class="btn btn-primary"
+            [disabled]="taskValidation() !== 'valid'"
+            (click)="addTask()">
+            {{ editingTask() ? 'Actualizar' : 'Crear' }} Tarea
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Resumen de Implementación -->
+  <section class="implementation-summary">
+    <h2>🎯 Directivas Implementadas en este Laboratorio</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>DraggableDirective</h3>
+        <ul>
+          <li>@HostBinding para propiedades dinámicas</li>
+          <li>@HostListener para eventos de drag</li>
+          <li>DataTransfer para paso de datos</li>
+          <li>Preview personalizado del arrastre</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>DropZoneDirective</h3>
+        <ul>
+          <li>Detección de drop zones válidas</li>
+          <li>Feedback visual durante hover</li>
+          <li>Efectos de animación al soltar</li>
+          <li>Validación de tipos aceptados</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>TooltipDirective</h3>
+        <ul>
+          <li>Posicionamiento dinámico</li>
+          <li>Delay configurable</li>
+          <li>Renderer2 para DOM seguro</li>
+          <li>Cleanup en destroy</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>LazyLoadDirective</h3>
+        <ul>
+          <li>IntersectionObserver API</li>
+          <li>Placeholders mientras carga</li>
+          <li>Manejo de errores</li>
+          <li>Optimización de imágenes</li>
+        </ul>
+      </div>
+      <div class="summary-card">
+        <h3>ValidationFeedbackDirective</h3>
+        <ul>
+          <li>Feedback visual de validación</li>
+          <li>Mensajes de error dinámicos</li>
+          <li>Estados: valid, invalid, pending</li>
+          <li>Animaciones de shake</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>
+PASO 3: Agregar Estilos Completos (5 minutos)
+Crear archivo global de estilos para directivas en src/styles/directives.scss:
+// Estilos globales para directivas personalizadas
+
+// Tooltip
+.custom-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.9);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  white-space: nowrap;
+  z-index: 10000;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  max-width: 300px;
+
+  &.tooltip-visible {
+    opacity: 1;
+  }
+
+  &.tooltip-top {
+    &::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: rgba(0, 0, 0, 0.9);
+    }
+  }
+
+  &.tooltip-bottom {
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-bottom-color: rgba(0, 0, 0, 0.9);
+    }
+  }
+
+  &.tooltip-left {
+    &::after {
+      content: '';
+      position: absolute;
+      left: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-left-color: rgba(0, 0, 0, 0.9);
+    }
+  }
+
+  &.tooltip-right {
+    &::after {
+      content: '';
+      position: absolute;
+      right: 100%;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 6px solid transparent;
+      border-right-color: rgba(0, 0, 0, 0.9);
+    }
+  }
+}
+
+// Lazy Loading
+.lazy-loading {
+  filter: blur(5px);
+  transition: filter 0.3s ease;
+}
+
+.lazy-loaded {
+  filter: blur(0);
+  animation: fadeIn 0.5s ease;
+}
+
+.lazy-error {
+  filter: grayscale(100%);
+  opacity: 0.5;
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+// Validation Feedback
+.validation-valid {
+  border: 2px solid #28a745 !important;
+  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
+}
+
+.validation-invalid {
+  border: 2px solid #dc3545 !important;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
+}
+
+.validation-pending {
+  border: 2px solid #ffc107 !important;
+  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
+}
+
+.validation-shake {
+  animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+.validation-message {
+  position: absolute;
+  bottom: -25px;
+  left: 0;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  white-space: nowrap;
+  z-index: 1000;
+
+  &.validation-message-error {
+    background: #dc3545;
+    color: white;
+  }
+
+  &.validation-message-visible {
+    opacity: 1;
+  }
+}
+
+// Drag & Drop
+.dragging {
+  cursor: move !important;
+  opacity: 0.5;
+  transform: scale(1.05);
+  transition: all 0.3s ease;
+}
+
+.drop-zone {
+  min-height: 100px;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.drop-zone-highlight {
+  background: rgba(102, 126, 234, 0.1);
+  border: 2px dashed #667eea;
+}
+
+.drag-over {
+  background: rgba(102, 126, 234, 0.05);
+  border-color: #667eea;
+}
+
+.drag-preview {
+  opacity: 0.8;
+  transform: rotate(2deg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.drop-effect-ripple {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: rgba(102, 126, 234, 0.3);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+
+  &.drop-effect-animate {
+    animation: ripple 0.6s ease-out;
+  }
+}
+
+@keyframes ripple {
+  to {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+Importar en src/styles.scss:
+// Estilos globales existentes...
+@import 'styles/directives';
+________________________________________
+INTEGRACIÓN FINAL Y VERIFICACIÓN
+PASO 1: Actualizar Rutas y Navegación
+Actualizar src/app/app.routes.ts:
+import { Routes } from '@angular/router';
+// Importaciones de sesiones anteriores...
+import { ProjectDashboardComponent } from './components/directivas-demo/project-dashboard/project-dashboard.component';
+import { ThemeConfiguratorComponent } from './components/directivas-demo/theme-configurator/theme-configurator.component';
+import { KanbanBoardComponent } from './components/directivas-demo/kanban-board/kanban-board.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  // ... rutas de sesiones anteriores ...
+  
+  // Rutas de Sesión 4 - Directivas
+  { path: 'project-dashboard', component: ProjectDashboardComponent },
+  { path: 'theme-configurator', component: ThemeConfiguratorComponent },
+  { path: 'kanban-board', component: KanbanBoardComponent },
+  
+  { path: '**', redirectTo: '/home' }
+];
+Actualizar navegación en header.component.html:
+<nav class="navigation">
+  <!-- Enlaces anteriores... -->
+  
+  <!-- Dropdown para Directivas -->
+  <div class="nav-dropdown">
+    <button class="nav-link dropdown-toggle">
+      🎯 Directivas <span class="arrow">▼</span>
+    </button>
+    <div class="dropdown-menu">
+      <a routerLink="/project-dashboard" routerLinkActive="active" class="dropdown-item">
+        🏗️ Control Flow (@if, @for, @switch)
+      </a>
+      <a routerLink="/theme-configurator" routerLinkActive="active" class="dropdown-item">
+        🎨 NgClass & NgStyle
+      </a>
+      <a routerLink="/kanban-board" routerLinkActive="active" class="dropdown-item">
+        📋 Drag & Drop (Directivas Custom)
+      </a>
+    </div>
+  </div>
+</nav>
+PASO 2: Verificación Completa
+# Verificar que todas las directivas están creadas
+ls -la src/app/directives/custom/
+
+# Verificar que los componentes están creados
+ls -la src/app/components/directivas-demo/
+
+# Compilar el proyecto
+ng build
+
+# Si hay errores, verificar imports
+ng serve --open
+CHECKLIST FINAL DE LA SESIÓN 4
+✅ LAB 1: Directivas Estructurales Modernas
+•	[ ] @if con múltiples condiciones funcionando
+•	[ ] @for con track functions optimizado
+•	[ ] @switch para estados complejos
+•	[ ] @empty manejando listas vacías
+•	[ ] Variables locales ($index, $even, $odd) funcionando
+•	[ ] Vista Grid, Lista y Kanban implementadas
+✅ LAB 2: Directivas de Atributo Avanzadas
+•	[ ] NgClass con objetos y arrays dinámicos
+•	[ ] NgStyle con computed signals
+•	[ ] NgModel two-way binding en todos los controles
+•	[ ] Binding combinado (NgClass + NgStyle + NgModel)
+•	[ ] Tema dinámico funcionando
+•	[ ] Widgets configurables
+✅ LAB 3: Directivas Personalizadas
+•	[ ] TooltipDirective con posicionamiento dinámico
+•	[ ] LazyLoadDirective con IntersectionObserver
+•	[ ] ValidationFeedbackDirective con estados visuales
+•	[ ] HostListener capturando eventos
+•	[ ] HostBinding modificando propiedades
+•	[ ] Renderer2 para manipulación segura del DOM
+✅ LAB 4: Drag & Drop Completo
+•	[ ] DraggableDirective funcionando
+•	[ ] DropZoneDirective con validaciones
+•	[ ] Kanban board totalmente funcional
+•	[ ] Efectos visuales durante drag & drop
+•	[ ] Límites de columnas respetados
+•	[ ] CRUD de tareas completo
+COMANDOS DE PRUEBA FINAL
+# Test de rendimiento con muchos elementos
+# En la consola del navegador:
+performance.mark('start');
+// Interactuar con la aplicación
+performance.mark('end');
+performance.measure('session', 'start', 'end');
+console.log(performance.getEntriesByType('measure'));
+
+# Verificar que no hay memory leaks
+# En Chrome DevTools > Memory > Take Heap Snapshot
+# Interactuar con drag & drop varias veces
+# Tomar otro snapshot y comparar
+
+# Verificar Angular DevTools
+# Abrir Angular DevTools en Chrome
+# Verificar árbol de componentes
+# Verificar que las directivas aparecen correctamente
+RESUMEN DE APRENDIZAJES
+Conceptos Dominados:
+1.	Control Flow Moderno
+o	Nueva sintaxis @if, @for, @switch
+o	Mejor performance y tree-shaking
+o	Track functions para optimización
+2.	Directivas de Atributo
+o	NgClass y NgStyle avanzados
+o	NgModel con validación
+o	Binding múltiple simultáneo
+3.	Directivas Personalizadas
+o	Ciclo de vida de directivas
+o	HostListener para eventos
+o	HostBinding para propiedades
+o	ElementRef vs Renderer2
+4.	Manipulación Segura del DOM
+o	Renderer2 para compatibilidad
+o	Prevención de XSS
+o	Server-side rendering ready
+5.	Patrones Avanzados
+o	Drag & Drop completo
+o	Lazy loading de imágenes
+o	Validación visual reactiva
+o	Tooltips dinámicos
+PREPARACIÓN PARA SESIÓN 5
+La próxima sesión (Martes 12/08) cubrirá:
+•	Módulos vs Standalone Components
+•	Inyección de Dependencias Avanzada
+•	Servicios Singleton y Providers
+•	Jerarquía de Inyectores
+Tarea Opcional:
+1.	Agregar persistencia en localStorage al Kanban
+2.	Implementar filtros adicionales
+3.	Crear una directiva de autocompletado
+4.	Agregar animaciones a las transiciones
+________________________________________
+CONCLUSIÓN
+¡Felicitaciones! Has completado exitosamente la Sesión 4 de Directivas.
+Has pasado de usar directivas básicas a crear sistemas complejos de interacción con:
+•	Control flow moderno y optimizado
+•	Binding dinámico avanzado
+•	Directivas personalizadas profesionales
+•	Sistema completo de Drag & Drop
+Tu aplicación ahora tiene capacidades de UI que rivalizan con aplicaciones empresariales modernas.
+¡Excelente trabajo! Nos vemos en la Sesión 5! 🚀
+
+
