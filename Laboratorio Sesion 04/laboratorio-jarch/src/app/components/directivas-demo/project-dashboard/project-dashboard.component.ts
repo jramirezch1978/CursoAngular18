@@ -12,6 +12,7 @@ import { Project, ProjectStatus, ProjectType, Priority } from '../../../interfac
   styleUrl: './project-dashboard.component.scss'
 })
 export class ProjectDashboardComponent implements OnInit {
+
   // Signals del servicio - Inicializados en el constructor
   projects!: any;
   loading!: any;
@@ -19,6 +20,7 @@ export class ProjectDashboardComponent implements OnInit {
   filteredProjects!: any;
   statistics!: any;
   projectsByStatus!: any;
+
   
   // Signals locales
   viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
@@ -74,7 +76,7 @@ export class ProjectDashboardComponent implements OnInit {
     this.filteredProjects = this.projectService.filteredProjects;
     this.statistics = this.projectService.statistics;
     this.projectsByStatus = this.projectService.projectsByStatus;
-    
+
     console.log('🎯 LAB 1: ProjectDashboard inicializado');
   }
 
@@ -84,6 +86,8 @@ export class ProjectDashboardComponent implements OnInit {
 
   // Métodos de carga y filtrado
   loadProjects(): void {
+    
+
     this.projectService.loadProjects();
   }
 
