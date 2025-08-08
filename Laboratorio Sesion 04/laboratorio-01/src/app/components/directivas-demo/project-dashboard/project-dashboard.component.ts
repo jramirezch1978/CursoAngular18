@@ -13,12 +13,13 @@ import { Project, ProjectStatus, ProjectType, Priority } from '../../../interfac
 })
 export class ProjectDashboardComponent implements OnInit {
   // Signals del servicio
-  projects = this.projectService.projects;
-  loading = this.projectService.loading;
-  error = this.projectService.error;
-  filteredProjects = this.projectService.filteredProjects;
-  statistics = this.projectService.statistics;
-  projectsByStatus = this.projectService.projectsByStatus;
+  projects = signal<Project[]>([]);
+  loading = signal<boolean>(false);
+  error = signal<string | null>(null);
+  filteredProjects = signal<Project[]>([]);
+  statistics = signal<any>([]);
+  projectsByStatus = signal<Record<ProjectStatus, Project[]>>({});
+  errorMessage = "";
   
   // Signals locales
   viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
@@ -58,7 +59,7 @@ export class ProjectDashboardComponent implements OnInit {
     }))
   ];
 
-  constructor(private projectService: ProjectService) {
+  constructor(public projectService: ProjectService) {
     console.log('🎯 LAB 1: ProjectDashboard inicializado');
   }
 
@@ -68,6 +69,15 @@ export class ProjectDashboardComponent implements OnInit {
 
   // Métodos de carga y filtrado
   loadProjects(): void {
+    // Signals del servicio
+    this.projects = this.projectService.projects;
+    this.loading = this.projectService.loading;
+    this.error = this.projectService.error;
+    this.filteredProjects = this.projectService.filteredProjects;
+    this.statistics = this.projectService.statistics;
+    this.projectsByStatus = this.projectService.projectsByStatus;
+    this.errorMessage = "";
+
     this.projectService.loadProjects();
   }
 

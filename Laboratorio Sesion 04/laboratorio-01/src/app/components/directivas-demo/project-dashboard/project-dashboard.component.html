@@ -11,7 +11,7 @@
       <div class="spinner"></div>
       <p>Cargando proyectos de infraestructura...</p>
     </div>
-  } @else if (error(); as errorMessage) {
+  } @else if (error()) {
     <div class="error-state">
       <span class="error-icon">⚠️</span>
       <p>{{ errorMessage }}</p>
