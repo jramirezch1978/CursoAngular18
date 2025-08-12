@@ -1,0 +1,4850 @@
+LABORATORIOS PRÁCTICOS - SESIÓN 5: MÓDULOS, COMPONENTES Y SERVICIOS
+PROVIAS DESCENTRALIZADO
+INFORMACIÓN GENERAL
+Curso: Angular v18 - 30 horas académicas
+Modalidad: 100% Online Live - Formato Laboratorio Intensivo
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Sesión: 5 - Módulos, Componentes y Servicios
+Fecha: Martes, 12 de Agosto 2025
+Duración Total: 180 minutos (3 horas)
+Laboratorios: 4 laboratorios principales + 1 configuración inicial
+________________________________________
+REQUISITOS PREVIOS DE SESIONES ANTERIORES
+✅ Verificación del Proyecto Base (Sesiones 1-4)
+Los participantes deben tener completado de las sesiones anteriores:
+1.	Proyecto Angular v18 creado con nombre mi-primera-app-angular
+2.	Componentes básicos (Header, Footer, Home) funcionando
+3.	Router configurado con rutas básicas y guards
+4.	Data Binding implementado con ejemplos funcionales
+5.	Pipes personalizados creados y funcionando
+6.	Directivas personalizadas (tooltip, lazy-load, validation)
+7.	Sistema Kanban con drag & drop implementado
+Si algún participante no completó las sesiones anteriores, deberá ejecutar:
+# Clonar repositorio con código de sesiones anteriores
+git clone https://github.com/provias/angular-curso-sesion4-completo.git
+cd angular-curso-sesion4-completo
+npm install
+ng serve --open
+📋 Verificación Rápida del Proyecto
+# Verificar versión de Angular
+ng version
+# Debe mostrar: Angular CLI: 18.x.x
+
+# Verificar que el proyecto compile
+ng build
+
+# Verificar rutas existentes
+echo "Rutas implementadas de sesiones anteriores:"
+echo "http://localhost:4200/home"
+echo "http://localhost:4200/project-dashboard"
+echo "http://localhost:4200/theme-configurator"
+echo "http://localhost:4200/kanban-board"
+________________________________________
+HERRAMIENTAS Y SOFTWARE NECESARIO
+🛠️ Software Principal
+Herramienta	Versión Mínima	Verificación	Instalación
+Node.js	v18.19.0	node --version	https://nodejs.org
+npm	v9.0.0	npm --version	Incluido con Node.js
+Angular CLI	v18.x	ng version	npm install -g @angular/cli@18
+Visual Studio Code	Última	-	https://code.visualstudio.com
+Git	v2.x	git --version	https://git-scm.com
+Chrome/Edge	Última	-	Navegador con DevTools
+📦 Extensiones VS Code Requeridas
+1.	Angular Language Service - IntelliSense avanzado para templates
+2.	Angular Snippets - Snippets para servicios y DI
+3.	Prettier - Code formatter - Formateo automático
+4.	Error Lens - Muestra errores inline
+5.	Angular DevTools - Debugging de inyección
+6.	GitLens - Control de versiones visual
+7.	Angular Schematics - Generación de código asistida
+🌐 Herramientas del Navegador
+•	Angular DevTools - Extensión para Chrome/Firefox (CRÍTICA para esta sesión)
+•	Redux DevTools - Para debugging de estado (si usan NgRx)
+________________________________________
+LAB 0: CONFIGURACIÓN DEL ENTORNO Y VERIFICACIÓN
+Duración: 15 minutos
+Objetivo: Preparar el entorno específico para trabajar con Servicios e Inyección de Dependencias
+PASO 1: Verificación del Proyecto Base (5 minutos)
+1.1 Verificar proyecto existente
+# Navegar al proyecto
+cd mi-primera-app-angular
+
+# Verificar branch de trabajo
+git status
+
+# Si no está en git, inicializar:
+git init
+git add .
+git commit -m "Estado inicial Sesión 5"
+
+# Crear branch para esta sesión
+git checkout -b sesion-5-servicios
+1.2 Actualizar dependencias necesarias
+# Actualizar Angular a la última versión 18.x
+ng update @angular/core @angular/cli
+
+# Instalar dependencias adicionales para esta sesión
+npm install --save @angular/animations
+npm install --save-dev @angular-devkit/build-angular
+
+# Verificar signals (debe estar incluido en Angular 18)
+ng version
+1.3 Verificar estructura de carpetas
+# Crear estructura necesaria para la sesión
+mkdir -p src/app/core/services
+mkdir -p src/app/core/interfaces
+mkdir -p src/app/core/tokens
+mkdir -p src/app/core/providers
+mkdir -p src/app/shared/services
+mkdir -p src/app/features/task-manager
+mkdir -p src/app/features/user-management
+PASO 2: Configuración de VS Code para Servicios (5 minutos)
+2.1 Crear/Actualizar configuración del workspace
+Crear archivo .vscode/settings.json:
+{
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit",
+    "source.fixAll": "explicit"
+  },
+  "typescript.preferences.importModuleSpecifier": "relative",
+  "typescript.suggest.autoImports": true,
+  "angular.enable-strict-mode-prompt": false,
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 2000,
+  "editor.snippetSuggestions": "top",
+  "emmet.includeLanguages": {
+    "typescript": "html"
+  },
+  "[html]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "angular.schematicsDefaultOptions": {
+    "service": {
+      "flat": false,
+      "skipTests": false
+    },
+    "component": {
+      "standalone": true,
+      "changeDetection": "OnPush"
+    }
+  }
+}
+2.2 Configurar snippets personalizados para servicios
+Crear archivo .vscode/angular-services.code-snippets:
+{
+  "Angular Service with Signals": {
+    "prefix": "a-service-signals",
+    "body": [
+      "import { Injectable, signal, computed } from '@angular/core';",
+      "",
+      "@Injectable({",
+      "  providedIn: 'root'",
+      "})",
+      "export class ${1:ServiceName}Service {",
+      "  // State signals",
+      "  private ${2:items}Signal = signal<${3:Item}[]>([]);",
+      "  private loadingSignal = signal<boolean>(false);",
+      "  private errorSignal = signal<string | null>(null);",
+      "",
+      "  // Public computed signals",
+      "  ${2:items} = computed(() => this.${2:items}Signal());",
+      "  loading = computed(() => this.loadingSignal());",
+      "  error = computed(() => this.errorSignal());",
+      "",
+      "  constructor() {",
+      "    console.log('${1:ServiceName}Service initialized');",
+      "  }",
+      "",
+      "  // Public methods",
+      "  load${3:Item}s(): void {",
+      "    this.loadingSignal.set(true);",
+      "    this.errorSignal.set(null);",
+      "    // Implement loading logic",
+      "  }",
+      "}"
+    ],
+    "description": "Create an Angular service with signals"
+  },
+  "Angular Injection Token": {
+    "prefix": "a-injection-token",
+    "body": [
+      "import { InjectionToken } from '@angular/core';",
+      "",
+      "export interface ${1:Config} {",
+      "  ${2:property}: ${3:string};",
+      "}",
+      "",
+      "export const ${4:CONFIG}_TOKEN = new InjectionToken<${1:Config}>('${4:CONFIG}_TOKEN', {",
+      "  providedIn: 'root',",
+      "  factory: () => ({",
+      "    ${2:property}: '${5:defaultValue}'",
+      "  })",
+      "});"
+    ],
+    "description": "Create an injection token"
+  }
+}
+PASO 3: Configuración de Angular DevTools (3 minutos)
+3.1 Instalar Angular DevTools
+1.	Abrir Chrome/Edge
+2.	Ir a chrome://extensions/ o edge://extensions/
+3.	Buscar "Angular DevTools"
+4.	Instalar la extensión oficial
+5.	Reiniciar el navegador
+3.2 Verificar funcionamiento
+# Iniciar la aplicación
+ng serve --open
+
+# En el navegador:
+# 1. Abrir DevTools (F12)
+# 2. Verificar pestaña "Angular"
+# 3. Navegar a "Injector Tree" para ver jerarquía de servicios
+PASO 4: Crear Archivo de Configuración Global (2 minutos)
+4.1 Crear configuración de aplicación
+Crear archivo src/app/core/config/app.config.ts:
+// Configuración global de la aplicación
+export const AppConfig = {
+  // API Configuration
+  api: {
+    baseUrl: 'https://api.provias.gob.pe/v1',
+    timeout: 30000,
+    retryAttempts: 3,
+    retryDelay: 1000
+  },
+  
+  // Cache Configuration
+  cache: {
+    defaultTTL: 300000, // 5 minutos
+    maxSize: 100,
+    strategy: 'memory' as 'memory' | 'localStorage' | 'sessionStorage'
+  },
+  
+  // Logging Configuration
+  logging: {
+    level: 'debug' as 'debug' | 'info' | 'warn' | 'error',
+    enableRemote: false,
+    remoteUrl: 'https://logs.provias.gob.pe'
+  },
+  
+  // Feature Flags
+  features: {
+    enableSignals: true,
+    enableStandalone: true,
+    enableNewTaskManager: true,
+    enableAdvancedReporting: false
+  },
+  
+  // Application Metadata
+  app: {
+    name: 'PROVIAS Task Management System',
+    version: '2.0.0',
+    environment: 'development'
+  }
+};
+✅ CHECKLIST DE VERIFICACIÓN LAB 0
+•	[ ] Node.js v18+ instalado y funcionando
+•	[ ] Angular CLI v18 instalado globalmente
+•	[ ] Proyecto base de sesiones anteriores funcionando
+•	[ ] VS Code con todas las extensiones instaladas
+•	[ ] Angular DevTools funcionando en navegador
+•	[ ] Estructura de carpetas para servicios creada
+•	[ ] Snippets de servicios configurados
+•	[ ] Branch git para sesión 5 creado
+•	[ ] Servidor de desarrollo ejecutándose sin errores
+________________________________________
+LAB 1: SISTEMA DE GESTIÓN CON SERVICIOS Y SIGNALS
+Duración: 45 minutos
+Objetivo: Dominar la inyección de dependencias moderna con inject() y crear servicios reactivos con Signals
+PASO 1: Crear Interfaces del Sistema (5 minutos)
+1.1 Crear interfaces para tareas
+Crear archivo src/app/core/interfaces/task.interface.ts:
+// Interfaces para el sistema de gestión de tareas PROVIAS
+export interface Task {
+  id: string;
+  title: string;
+  description: string;
+  status: TaskStatus;
+  priority: TaskPriority;
+  assigneeId: string;
+  projectId: string;
+  dueDate: Date;
+  createdAt: Date;
+  updatedAt: Date;
+  tags: string[];
+  estimatedHours: number;
+  actualHours: number;
+  completionPercentage: number;
+  attachments: Attachment[];
+  comments: Comment[];
+}
+
+export enum TaskStatus {
+  PENDING = 'pending',
+  IN_PROGRESS = 'in_progress',
+  IN_REVIEW = 'in_review',
+  COMPLETED = 'completed',
+  CANCELLED = 'cancelled',
+  ON_HOLD = 'on_hold'
+}
+
+export enum TaskPriority {
+  LOW = 'low',
+  MEDIUM = 'medium',
+  HIGH = 'high',
+  URGENT = 'urgent',
+  CRITICAL = 'critical'
+}
+
+export interface CreateTaskDto {
+  title: string;
+  description: string;
+  priority: TaskPriority;
+  assigneeId: string;
+  projectId: string;
+  dueDate: Date;
+  estimatedHours: number;
+  tags?: string[];
+}
+
+export interface UpdateTaskDto extends Partial<CreateTaskDto> {
+  status?: TaskStatus;
+  actualHours?: number;
+  completionPercentage?: number;
+}
+
+export interface Attachment {
+  id: string;
+  filename: string;
+  url: string;
+  size: number;
+  uploadedBy: string;
+  uploadedAt: Date;
+}
+
+export interface Comment {
+  id: string;
+  content: string;
+  authorId: string;
+  createdAt: Date;
+  updatedAt?: Date;
+}
+
+export interface TaskFilter {
+  status?: TaskStatus[];
+  priority?: TaskPriority[];
+  assigneeId?: string[];
+  projectId?: string;
+  tags?: string[];
+  searchTerm?: string;
+  dateRange?: {
+    start: Date;
+    end: Date;
+  };
+}
+
+export interface TaskStatistics {
+  total: number;
+  byStatus: Record<TaskStatus, number>;
+  byPriority: Record<TaskPriority, number>;
+  overdue: number;
+  completedThisWeek: number;
+  averageCompletionTime: number;
+  totalEstimatedHours: number;
+  totalActualHours: number;
+}
+PASO 2: Crear Servicio Principal con Signals (10 minutos)
+2.1 Generar servicio de tareas
+ng generate service core/services/task-state --skip-tests
+2.2 Implementar servicio con signals
+Actualizar src/app/core/services/task-state.service.ts:
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
+import { 
+  Task, 
+  TaskStatus, 
+  TaskPriority, 
+  CreateTaskDto, 
+  UpdateTaskDto,
+  TaskFilter,
+  TaskStatistics 
+} from '../interfaces/task.interface';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskStateService {
+  // Signals privados para el estado
+  private tasksSignal = signal<Task[]>([]);
+  private loadingSignal = signal<boolean>(false);
+  private errorSignal = signal<string | null>(null);
+  private filterSignal = signal<TaskFilter>({});
+  private selectedTaskSignal = signal<Task | null>(null);
+
+  // Computed signals públicos
+  tasks = computed(() => this.tasksSignal());
+  loading = computed(() => this.loadingSignal());
+  error = computed(() => this.errorSignal());
+  selectedTask = computed(() => this.selectedTaskSignal());
+  
+  // Tareas filtradas
+  filteredTasks = computed(() => {
+    const tasks = this.tasksSignal();
+    const filter = this.filterSignal();
+    
+    return this.applyFilters(tasks, filter);
+  });
+
+  // Estadísticas computadas
+  statistics = computed((): TaskStatistics => {
+    const tasks = this.filteredTasks();
+    const now = new Date();
+    const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+    
+    const byStatus = Object.values(TaskStatus).reduce((acc, status) => {
+      acc[status] = tasks.filter(t => t.status === status).length;
+      return acc;
+    }, {} as Record<TaskStatus, number>);
+    
+    const byPriority = Object.values(TaskPriority).reduce((acc, priority) => {
+      acc[priority] = tasks.filter(t => t.priority === priority).length;
+      return acc;
+    }, {} as Record<TaskPriority, number>);
+    
+    return {
+      total: tasks.length,
+      byStatus,
+      byPriority,
+      overdue: tasks.filter(t => 
+        t.status !== TaskStatus.COMPLETED && 
+        new Date(t.dueDate) < now
+      ).length,
+      completedThisWeek: tasks.filter(t => 
+        t.status === TaskStatus.COMPLETED &&
+        new Date(t.updatedAt) > weekAgo
+      ).length,
+      averageCompletionTime: this.calculateAverageCompletionTime(tasks),
+      totalEstimatedHours: tasks.reduce((sum, t) => sum + t.estimatedHours, 0),
+      totalActualHours: tasks.reduce((sum, t) => sum + t.actualHours, 0)
+    };
+  });
+
+  // Tareas agrupadas por estado
+  tasksByStatus = computed(() => {
+    const tasks = this.filteredTasks();
+    const grouped = new Map<TaskStatus, Task[]>();
+    
+    Object.values(TaskStatus).forEach(status => {
+      grouped.set(status, tasks.filter(t => t.status === status));
+    });
+    
+    return grouped;
+  });
+
+  // Tareas urgentes
+  urgentTasks = computed(() => {
+    const tasks = this.filteredTasks();
+    const now = new Date();
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+    
+    return tasks.filter(t => 
+      (t.priority === TaskPriority.URGENT || t.priority === TaskPriority.CRITICAL) ||
+      (new Date(t.dueDate) <= tomorrow && t.status !== TaskStatus.COMPLETED)
+    ).sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+  });
+
+  constructor() {
+    console.log('🚀 TaskStateService initialized with Signals');
+    
+    // Effect para logging de cambios
+    effect(() => {
+      const taskCount = this.tasks().length;
+      console.log(`📊 Tasks updated: ${taskCount} tasks in state`);
+    });
+    
+    // Effect para persistencia local
+    effect(() => {
+      const tasks = this.tasks();
+      if (tasks.length > 0) {
+        this.saveToLocalStorage(tasks);
+      }
+    });
+    
+    // Cargar datos iniciales
+    this.loadFromLocalStorage();
+  }
+
+  // Métodos públicos para gestión de tareas
+  loadTasks(): void {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    
+    // Simular carga desde API
+    setTimeout(() => {
+      try {
+        const mockTasks = this.generateMockTasks();
+        this.tasksSignal.set(mockTasks);
+        this.loadingSignal.set(false);
+      } catch (error) {
+        this.errorSignal.set('Error al cargar tareas');
+        this.loadingSignal.set(false);
+      }
+    }, 1000);
+  }
+
+  addTask(dto: CreateTaskDto): Task {
+    const newTask: Task = {
+      id: `task-${Date.now()}`,
+      ...dto,
+      status: TaskStatus.PENDING,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      actualHours: 0,
+      completionPercentage: 0,
+      attachments: [],
+      comments: [],
+      tags: dto.tags || []
+    };
+    
+    this.tasksSignal.update(tasks => [...tasks, newTask]);
+    return newTask;
+  }
+
+  updateTask(id: string, dto: UpdateTaskDto): void {
+    this.tasksSignal.update(tasks =>
+      tasks.map(task =>
+        task.id === id
+          ? { ...task, ...dto, updatedAt: new Date() }
+          : task
+      )
+    );
+  }
+
+  deleteTask(id: string): void {
+    this.tasksSignal.update(tasks => tasks.filter(t => t.id !== id));
+  }
+
+  selectTask(id: string): void {
+    const task = this.tasksSignal().find(t => t.id === id);
+    this.selectedTaskSignal.set(task || null);
+  }
+
+  updateFilter(filter: TaskFilter): void {
+    this.filterSignal.set(filter);
+  }
+
+  changeTaskStatus(id: string, status: TaskStatus): void {
+    this.updateTask(id, { 
+      status,
+      completionPercentage: status === TaskStatus.COMPLETED ? 100 : undefined
+    });
+  }
+
+  assignTask(taskId: string, assigneeId: string): void {
+    this.updateTask(taskId, { assigneeId });
+  }
+
+  updateProgress(taskId: string, percentage: number): void {
+    const validPercentage = Math.max(0, Math.min(100, percentage));
+    this.updateTask(taskId, { 
+      completionPercentage: validPercentage,
+      status: validPercentage === 100 ? TaskStatus.COMPLETED : undefined
+    });
+  }
+
+  // Métodos privados
+  private applyFilters(tasks: Task[], filter: TaskFilter): Task[] {
+    let filtered = [...tasks];
+    
+    if (filter.status?.length) {
+      filtered = filtered.filter(t => filter.status!.includes(t.status));
+    }
+    
+    if (filter.priority?.length) {
+      filtered = filtered.filter(t => filter.priority!.includes(t.priority));
+    }
+    
+    if (filter.assigneeId?.length) {
+      filtered = filtered.filter(t => filter.assigneeId!.includes(t.assigneeId));
+    }
+    
+    if (filter.projectId) {
+      filtered = filtered.filter(t => t.projectId === filter.projectId);
+    }
+    
+    if (filter.tags?.length) {
+      filtered = filtered.filter(t => 
+        filter.tags!.some(tag => t.tags.includes(tag))
+      );
+    }
+    
+    if (filter.searchTerm) {
+      const term = filter.searchTerm.toLowerCase();
+      filtered = filtered.filter(t =>
+        t.title.toLowerCase().includes(term) ||
+        t.description.toLowerCase().includes(term)
+      );
+    }
+    
+    if (filter.dateRange) {
+      filtered = filtered.filter(t => {
+        const dueDate = new Date(t.dueDate);
+        return dueDate >= filter.dateRange!.start && 
+               dueDate <= filter.dateRange!.end;
+      });
+    }
+    
+    return filtered;
+  }
+
+  private calculateAverageCompletionTime(tasks: Task[]): number {
+    const completedTasks = tasks.filter(t => t.status === TaskStatus.COMPLETED);
+    if (completedTasks.length === 0) return 0;
+    
+    const totalTime = completedTasks.reduce((sum, task) => {
+      const created = new Date(task.createdAt).getTime();
+      const completed = new Date(task.updatedAt).getTime();
+      return sum + (completed - created);
+    }, 0);
+    
+    return Math.round(totalTime / completedTasks.length / (1000 * 60 * 60 * 24)); // días
+  }
+
+  private saveToLocalStorage(tasks: Task[]): void {
+    try {
+      localStorage.setItem('provias_tasks', JSON.stringify(tasks));
+    } catch (error) {
+      console.error('Error saving to localStorage:', error);
+    }
+  }
+
+  private loadFromLocalStorage(): void {
+    try {
+      const stored = localStorage.getItem('provias_tasks');
+      if (stored) {
+        const tasks = JSON.parse(stored);
+        this.tasksSignal.set(tasks);
+      }
+    } catch (error) {
+      console.error('Error loading from localStorage:', error);
+    }
+  }
+
+  private generateMockTasks(): Task[] {
+    const projects = ['PRY-001', 'PRY-002', 'PRY-003'];
+    const assignees = ['user-1', 'user-2', 'user-3', 'user-4'];
+    const tags = ['Frontend', 'Backend', 'Database', 'API', 'Testing', 'Documentation'];
+    
+    return Array.from({ length: 15 }, (_, i) => ({
+      id: `task-${i + 1}`,
+      title: `Tarea ${i + 1}: ${this.getRandomTaskTitle()}`,
+      description: `Descripción detallada de la tarea ${i + 1}`,
+      status: Object.values(TaskStatus)[Math.floor(Math.random() * 6)] as TaskStatus,
+      priority: Object.values(TaskPriority)[Math.floor(Math.random() * 5)] as TaskPriority,
+      assigneeId: assignees[Math.floor(Math.random() * assignees.length)],
+      projectId: projects[Math.floor(Math.random() * projects.length)],
+      dueDate: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000),
+      updatedAt: new Date(),
+      tags: tags.slice(0, Math.floor(Math.random() * 3) + 1),
+      estimatedHours: Math.floor(Math.random() * 40) + 8,
+      actualHours: Math.floor(Math.random() * 40),
+      completionPercentage: Math.floor(Math.random() * 101),
+      attachments: [],
+      comments: []
+    }));
+  }
+
+  private getRandomTaskTitle(): string {
+    const titles = [
+      'Implementar autenticación OAuth',
+      'Optimizar consultas de base de datos',
+      'Diseñar dashboard de métricas',
+      'Corregir bug en formulario',
+      'Actualizar documentación API',
+      'Configurar pipeline CI/CD',
+      'Migrar a Angular 18',
+      'Implementar sistema de caché',
+      'Refactorizar servicios',
+      'Crear tests unitarios'
+    ];
+    return titles[Math.floor(Math.random() * titles.length)];
+  }
+}
+PASO 3: Crear Servicios Complementarios (10 minutos)
+3.1 Crear servicio de API
+ng generate service core/services/task-api --skip-tests
+Actualizar src/app/core/services/task-api.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable, of, delay, catchError, retry, throwError } from 'rxjs';
+import { Task, CreateTaskDto, UpdateTaskDto } from '../interfaces/task.interface';
+import { AppConfig } from '../config/app.config';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskApiService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${AppConfig.api.baseUrl}/tasks`;
+  
+  private readonly httpOptions = {
+    headers: new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer ' + this.getAuthToken()
+    })
+  };
+
+  getTasks(): Observable<Task[]> {
+    return this.http.get<Task[]>(this.apiUrl, this.httpOptions)
+      .pipe(
+        retry(AppConfig.api.retryAttempts),
+        catchError(this.handleError)
+      );
+  }
+
+  getTask(id: string): Observable<Task> {
+    return this.http.get<Task>(`${this.apiUrl}/${id}`, this.httpOptions)
+      .pipe(
+        retry(AppConfig.api.retryAttempts),
+        catchError(this.handleError)
+      );
+  }
+
+  createTask(dto: CreateTaskDto): Observable<Task> {
+    return this.http.post<Task>(this.apiUrl, dto, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  updateTask(id: string, dto: UpdateTaskDto): Observable<Task> {
+    return this.http.patch<Task>(`${this.apiUrl}/${id}`, dto, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  deleteTask(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`, this.httpOptions)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  uploadAttachment(taskId: string, file: File): Observable<any> {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    return this.http.post(
+      `${this.apiUrl}/${taskId}/attachments`,
+      formData,
+      { headers: new HttpHeaders({ 'Authorization': 'Bearer ' + this.getAuthToken() }) }
+    ).pipe(
+      catchError(this.handleError)
+    );
+  }
+
+  private getAuthToken(): string {
+    // En producción, obtener de un servicio de autenticación
+    return localStorage.getItem('auth_token') || 'mock-token';
+  }
+
+  private handleError(error: any): Observable<never> {
+    console.error('API Error:', error);
+    return throwError(() => new Error(error.message || 'Server error'));
+  }
+}
+3.2 Crear servicio de notificaciones
+ng generate service shared/services/notification --skip-tests
+Actualizar src/app/shared/services/notification.service.ts:
+import { Injectable, signal, computed } from '@angular/core';
+
+export interface Notification {
+  id: string;
+  type: 'success' | 'error' | 'warning' | 'info';
+  title: string;
+  message?: string;
+  duration?: number;
+  action?: {
+    label: string;
+    callback: () => void;
+  };
+  timestamp: Date;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class NotificationService {
+  private notificationsSignal = signal<Notification[]>([]);
+  
+  notifications = computed(() => this.notificationsSignal());
+  hasNotifications = computed(() => this.notificationsSignal().length > 0);
+  
+  show(notification: Omit<Notification, 'id' | 'timestamp'>): void {
+    const newNotification: Notification = {
+      ...notification,
+      id: `notif-${Date.now()}`,
+      timestamp: new Date(),
+      duration: notification.duration || 5000
+    };
+    
+    this.notificationsSignal.update(current => [...current, newNotification]);
+    
+    if (newNotification.duration && newNotification.duration > 0) {
+      setTimeout(() => {
+        this.remove(newNotification.id);
+      }, newNotification.duration);
+    }
+  }
+  
+  success(title: string, message?: string): void {
+    this.show({ type: 'success', title, message });
+  }
+  
+  error(title: string, message?: string): void {
+    this.show({ type: 'error', title, message, duration: 0 });
+  }
+  
+  warning(title: string, message?: string): void {
+    this.show({ type: 'warning', title, message });
+  }
+  
+  info(title: string, message?: string): void {
+    this.show({ type: 'info', title, message });
+  }
+  
+  remove(id: string): void {
+    this.notificationsSignal.update(current => 
+      current.filter(n => n.id !== id)
+    );
+  }
+  
+  clear(): void {
+    this.notificationsSignal.set([]);
+  }
+}
+PASO 4: Crear Componente con Inject() (10 minutos)
+4.1 Generar componente de lista de tareas
+ng generate component features/task-manager/task-list --standalone
+4.2 Implementar componente con inject()
+Actualizar src/app/features/task-manager/task-list/task-list.component.ts:
+import { Component, OnInit, inject, computed, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { TaskStateService } from '../../../core/services/task-state.service';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { TaskStatus, TaskPriority, TaskFilter } from '../../../core/interfaces/task.interface';
+
+@Component({
+  selector: 'app-task-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './task-list.component.html',
+  styleUrl: './task-list.component.scss'
+})
+export class TaskListComponent implements OnInit {
+  // Inyección con inject() en lugar de constructor
+  private readonly taskService = inject(TaskStateService);
+  private readonly notificationService = inject(NotificationService);
+  
+  // Signals del servicio
+  tasks = this.taskService.filteredTasks;
+  loading = this.taskService.loading;
+  error = this.taskService.error;
+  statistics = this.taskService.statistics;
+  urgentTasks = this.taskService.urgentTasks;
+  
+  // Signals locales para UI
+  viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
+  selectedStatuses = signal<TaskStatus[]>([]);
+  selectedPriorities = signal<TaskPriority[]>([]);
+  searchTerm = signal('');
+  showFilters = signal(true);
+  showStatistics = signal(true);
+  
+  // Computed para filtros activos
+  activeFilter = computed((): TaskFilter => ({
+    status: this.selectedStatuses().length > 0 ? this.selectedStatuses() : undefined,
+    priority: this.selectedPriorities().length > 0 ? this.selectedPriorities() : undefined,
+    searchTerm: this.searchTerm() || undefined
+  }));
+  
+  hasActiveFilters = computed(() => {
+    const filter = this.activeFilter();
+    return !!(filter.status?.length || filter.priority?.length || filter.searchTerm);
+  });
+  
+  // Enums para el template
+  TaskStatus = TaskStatus;
+  TaskPriority = TaskPriority;
+  
+  // Arrays para selects
+  allStatuses = Object.values(TaskStatus);
+  allPriorities = Object.values(TaskPriority);
+  
+  ngOnInit(): void {
+    console.log('TaskListComponent initialized with inject()');
+    this.loadTasks();
+  }
+  
+  loadTasks(): void {
+    this.taskService.loadTasks();
+    this.notificationService.info('Cargando tareas', 'Por favor espere...');
+  }
+  
+  applyFilters(): void {
+    this.taskService.updateFilter(this.activeFilter());
+    
+    if (this.hasActiveFilters()) {
+      const taskCount = this.tasks().length;
+      this.notificationService.success(
+        'Filtros aplicados',
+        `Mostrando ${taskCount} tareas`
+      );
+    }
+  }
+  
+  clearFilters(): void {
+    this.selectedStatuses.set([]);
+    this.selectedPriorities.set([]);
+    this.searchTerm.set('');
+    this.applyFilters();
+  }
+  
+  toggleStatus(status: TaskStatus): void {
+    this.selectedStatuses.update(current => {
+      const index = current.indexOf(status);
+      if (index > -1) {
+        return current.filter(s => s !== status);
+      }
+      return [...current, status];
+    });
+    this.applyFilters();
+  }
+  
+  togglePriority(priority: TaskPriority): void {
+    this.selectedPriorities.update(current => {
+      const index = current.indexOf(priority);
+      if (index > -1) {
+        return current.filter(p => p !== priority);
+      }
+      return [...current, priority];
+    });
+    this.applyFilters();
+  }
+  
+  onSearchTermChange(): void {
+    this.applyFilters();
+  }
+  
+  changeViewMode(mode: 'grid' | 'list' | 'kanban'): void {
+    this.viewMode.set(mode);
+  }
+  
+  selectTask(taskId: string): void {
+    this.taskService.selectTask(taskId);
+  }
+  
+  updateTaskStatus(taskId: string, status: TaskStatus): void {
+    this.taskService.changeTaskStatus(taskId, status);
+    this.notificationService.success('Estado actualizado', `Tarea movida a ${status}`);
+  }
+  
+  updateProgress(taskId: string, event: Event): void {
+    const target = event.target as HTMLInputElement;
+    const percentage = parseInt(target.value);
+    this.taskService.updateProgress(taskId, percentage);
+  }
+  
+  deleteTask(taskId: string): void {
+    if (confirm('¿Está seguro de eliminar esta tarea?')) {
+      this.taskService.deleteTask(taskId);
+      this.notificationService.warning('Tarea eliminada');
+    }
+  }
+  
+  getStatusClass(status: TaskStatus): string {
+    const classes: Record<TaskStatus, string> = {
+      [TaskStatus.PENDING]: 'status-pending',
+      [TaskStatus.IN_PROGRESS]: 'status-progress',
+      [TaskStatus.IN_REVIEW]: 'status-review',
+      [TaskStatus.COMPLETED]: 'status-completed',
+      [TaskStatus.CANCELLED]: 'status-cancelled',
+      [TaskStatus.ON_HOLD]: 'status-hold'
+    };
+    return classes[status];
+  }
+  
+  getPriorityClass(priority: TaskPriority): string {
+    const classes: Record<TaskPriority, string> = {
+      [TaskPriority.LOW]: 'priority-low',
+      [TaskPriority.MEDIUM]: 'priority-medium',
+      [TaskPriority.HIGH]: 'priority-high',
+      [TaskPriority.URGENT]: 'priority-urgent',
+      [TaskPriority.CRITICAL]: 'priority-critical'
+    };
+    return classes[priority];
+  }
+  
+  getPriorityIcon(priority: TaskPriority): string {
+    const icons: Record<TaskPriority, string> = {
+      [TaskPriority.LOW]: '🟢',
+      [TaskPriority.MEDIUM]: '🟡',
+      [TaskPriority.HIGH]: '🟠',
+      [TaskPriority.URGENT]: '🔴',
+      [TaskPriority.CRITICAL]: '🚨'
+    };
+    return icons[priority];
+  }
+}
+PASO 5: Crear Template del Componente (10 minutos)
+Actualizar src/app/features/task-manager/task-list/task-list.component.html:
+<div class="task-list-container">
+  <!-- Header -->
+  <header class="task-header">
+    <h1>📋 Sistema de Gestión de Tareas - PROVIAS</h1>
+    <p class="subtitle">Gestión moderna con Signals e Inject()</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando tareas...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadTasks()">
+        🔄 Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- Statistics -->
+  @if (showStatistics() && statistics()) {
+    <section class="statistics-section">
+      <h2>📊 Estadísticas</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>{{ statistics().total }}</h3>
+          <p>Total Tareas</p>
+        </div>
+        <div class="stat-card pending">
+          <h3>{{ statistics().byStatus[TaskStatus.PENDING] || 0 }}</h3>
+          <p>Pendientes</p>
+        </div>
+        <div class="stat-card progress">
+          <h3>{{ statistics().byStatus[TaskStatus.IN_PROGRESS] || 0 }}</h3>
+          <p>En Progreso</p>
+        </div>
+        <div class="stat-card completed">
+          <h3>{{ statistics().byStatus[TaskStatus.COMPLETED] || 0 }}</h3>
+          <p>Completadas</p>
+        </div>
+        <div class="stat-card overdue">
+          <h3>{{ statistics().overdue }}</h3>
+          <p>Vencidas</p>
+        </div>
+        <div class="stat-card hours">
+          <h3>{{ statistics().totalEstimatedHours }}h</h3>
+          <p>Horas Estimadas</p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="filters-header">
+      <h3>🔍 Filtros</h3>
+      <button 
+        class="btn btn-secondary"
+        (click)="showFilters.update(v => !v)">
+        {{ showFilters() ? 'Ocultar' : 'Mostrar' }}
+      </button>
+    </div>
+
+    @if (showFilters()) {
+      <div class="filters-content">
+        <!-- Status Filter -->
+        <div class="filter-group">
+          <label>Estado:</label>
+          <div class="chip-group">
+            @for (status of allStatuses; track status) {
+              <button 
+                class="chip"
+                [class.active]="selectedStatuses().includes(status)"
+                (click)="toggleStatus(status)">
+                {{ status }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="filter-group">
+          <label>Prioridad:</label>
+          <div class="chip-group">
+            @for (priority of allPriorities; track priority) {
+              <button 
+                class="chip"
+                [class.active]="selectedPriorities().includes(priority)"
+                [class]="getPriorityClass(priority)"
+                (click)="togglePriority(priority)">
+                {{ getPriorityIcon(priority) }} {{ priority }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="filter-group">
+          <label>Buscar:</label>
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchTermChange()"
+            placeholder="Buscar por título o descripción..."
+            class="search-input">
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button class="btn btn-warning" (click)="clearFilters()">
+            🧹 Limpiar Filtros
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- View Mode Selector -->
+  <section class="view-controls">
+    <div class="view-mode-buttons">
+      <button 
+        [class.active]="viewMode() === 'grid'"
+        (click)="changeViewMode('grid')"
+        class="btn btn-icon">
+        ⚏ Grid
+      </button>
+      <button 
+        [class.active]="viewMode() === 'list'"
+        (click)="changeViewMode('list')"
+        class="btn btn-icon">
+        ☰ Lista
+      </button>
+      <button 
+        [class.active]="viewMode() === 'kanban'"
+        (click)="changeViewMode('kanban')"
+        class="btn btn-icon">
+        ⫿ Kanban
+      </button>
+    </div>
+    <button class="btn btn-primary" (click)="loadTasks()">
+      🔄 Actualizar
+    </button>
+  </section>
+
+  <!-- Urgent Tasks Alert -->
+  @if (urgentTasks().length > 0) {
+    <section class="urgent-tasks">
+      <h3>🚨 Tareas Urgentes</h3>
+      <div class="urgent-list">
+        @for (task of urgentTasks(); track task.id; let i = $index) {
+          @if (i < 3) {
+            <div class="urgent-item">
+              <span class="priority-icon">{{ getPriorityIcon(task.priority) }}</span>
+              <span class="task-title">{{ task.title }}</span>
+              <span class="due-date">Vence: {{ task.dueDate | date:'short' }}</span>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Tasks Grid View -->
+  @if (viewMode() === 'grid') {
+    <div class="tasks-grid">
+      @for (task of tasks(); track task.id) {
+        <div 
+          class="task-card"
+          [class]="getStatusClass(task.status)"
+          (click)="selectTask(task.id)">
+          
+          <div class="task-header">
+            <span class="task-id">{{ task.id }}</span>
+            <span [class]="getPriorityClass(task.priority)">
+              {{ getPriorityIcon(task.priority) }}
+            </span>
+          </div>
+
+          <h3>{{ task.title }}</h3>
+          <p class="task-description">{{ task.description }}</p>
+
+          <div class="task-meta">
+            <span class="status-badge" [class]="getStatusClass(task.status)">
+              {{ task.status }}
+            </span>
+            <span class="due-date">📅 {{ task.dueDate | date:'shortDate' }}</span>
+          </div>
+
+          <div class="task-progress">
+            <label>Progreso: {{ task.completionPercentage }}%</label>
+            <input 
+              type="range"
+              [value]="task.completionPercentage"
+              (change)="updateProgress(task.id, $event)"
+              min="0"
+              max="100"
+              class="progress-slider">
+            <div class="progress-bar">
+              <div 
+                class="progress-fill"
+                [style.width.%]="task.completionPercentage">
+              </div>
+            </div>
+          </div>
+
+          <div class="task-actions">
+            <select 
+              [value]="task.status"
+              (change)="updateTaskStatus(task.id, $any($event.target).value)"
+              class="status-select">
+              @for (status of allStatuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+            <button 
+              class="btn btn-danger btn-sm"
+              (click)="deleteTask(task.id); $event.stopPropagation()">
+              🗑️
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="no-tasks">
+          <h3>📭 No se encontraron tareas</h3>
+          @if (hasActiveFilters()) {
+            <p>No hay tareas que coincidan con los filtros seleccionados</p>
+            <button class="btn btn-primary" (click)="clearFilters()">
+              Limpiar Filtros
+            </button>
+          } @else {
+            <p>No hay tareas registradas en el sistema</p>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Implementation Summary -->
+  <section class="implementation-summary">
+    <h2>✅ Características Implementadas</h2>
+    <ul>
+      <li>✨ Servicios con Signals para estado reactivo</li>
+      <li>💉 Inyección con inject() en lugar de constructor</li>
+      <li>📊 Computed signals para estadísticas automáticas</li>
+      <li>🔄 Effects para persistencia automática</li>
+      <li>🎯 Filtrado reactivo con signals</li>
+      <li>📱 Vista responsiva con múltiples modos</li>
+    </ul>
+  </section>
+</div>
+________________________________________
+LAB 2: MIGRACIÓN A COMPONENTES STANDALONE
+Duración: 45 minutos
+Objetivo: Migrar componentes NgModule a Standalone y optimizar imports
+PASO 1: Preparar Componente Legacy (5 minutos)
+1.1 Crear componente legacy para migrar
+Crear archivo src/app/features/user-management/user-dashboard/user-dashboard.component.ts.old:
+// CÓDIGO LEGACY - Antes de migración
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../services/user.service';
+import { MetricsService } from '../services/metrics.service';
+import { ChartService } from '../services/chart.service';
+
+@Component({
+  selector: 'app-user-dashboard',
+  templateUrl: './user-dashboard.component.html',
+  styleUrls: ['./user-dashboard.component.scss']
+})
+export class UserDashboardComponent implements OnInit {
+  users: any[] = [];
+  metrics: any = {};
+  chartData: any = {};
+  loading = false;
+  selectedPeriod = 'month';
+
+  constructor(
+    private userService: UserService,
+    private metricsService: MetricsService,
+    private chartService: ChartService
+  ) {}
+
+  ngOnInit() {
+    this.loadData();
+  }
+
+  loadData() {
+    this.loading = true;
+    this.userService.getUsers().subscribe(users => {
+      this.users = users;
+      this.updateMetrics();
+      this.loading = false;
+    });
+  }
+
+  updateMetrics() {
+    this.metrics = this.metricsService.calculateMetrics(this.users);
+    this.chartData = this.chartService.prepareChartData(this.metrics, this.selectedPeriod);
+  }
+}
+PASO 2: Crear Servicios Modernos (10 minutos)
+2.1 Crear servicio de usuarios con signals
+ng generate service features/user-management/services/user --skip-tests
+Actualizar src/app/features/user-management/services/user.service.ts:
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: 'admin' | 'manager' | 'developer' | 'viewer';
+  department: string;
+  active: boolean;
+  lastLogin: Date;
+  projects: string[];
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UserService {
+  private http = inject(HttpClient);
+  
+  // Signals para estado
+  private usersSignal = signal<User[]>([]);
+  private loadingSignal = signal(false);
+  private selectedUserSignal = signal<User | null>(null);
+  
+  // Computed signals públicos
+  users = computed(() => this.usersSignal());
+  loading = computed(() => this.loadingSignal());
+  selectedUser = computed(() => this.selectedUserSignal());
+  
+  activeUsers = computed(() => 
+    this.usersSignal().filter(u => u.active)
+  );
+  
+  usersByRole = computed(() => {
+    const users = this.usersSignal();
+    return {
+      admin: users.filter(u => u.role === 'admin'),
+      manager: users.filter(u => u.role === 'manager'),
+      developer: users.filter(u => u.role === 'developer'),
+      viewer: users.filter(u => u.role === 'viewer')
+    };
+  });
+  
+  loadUsers(): Observable<User[]> {
+    this.loadingSignal.set(true);
+    return this.http.get<User[]>('/api/users').pipe(
+      tap(users => {
+        this.usersSignal.set(users);
+        this.loadingSignal.set(false);
+      })
+    );
+  }
+  
+  selectUser(userId: string): void {
+    const user = this.usersSignal().find(u => u.id === userId);
+    this.selectedUserSignal.set(user || null);
+  }
+}
+2.2 Crear servicio de métricas
+ng generate service features/user-management/services/metrics --skip-tests
+import { Injectable, computed, inject } from '@angular/core';
+import { UserService } from './user.service';
+
+export interface UserMetrics {
+  totalUsers: number;
+  activeUsers: number;
+  inactiveUsers: number;
+  usersByRole: Record<string, number>;
+  averageProjectsPerUser: number;
+  departmentDistribution: Record<string, number>;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class MetricsService {
+  private userService = inject(UserService);
+  
+  metrics = computed((): UserMetrics => {
+    const users = this.userService.users();
+    
+    if (users.length === 0) {
+      return this.getEmptyMetrics();
+    }
+    
+    const departmentCount = users.reduce((acc, user) => {
+      acc[user.department] = (acc[user.department] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    return {
+      totalUsers: users.length,
+      activeUsers: users.filter(u => u.active).length,
+      inactiveUsers: users.filter(u => !u.active).length,
+      usersByRole: {
+        admin: users.filter(u => u.role === 'admin').length,
+        manager: users.filter(u => u.role === 'manager').length,
+        developer: users.filter(u => u.role === 'developer').length,
+        viewer: users.filter(u => u.role === 'viewer').length
+      },
+      averageProjectsPerUser: users.reduce((sum, u) => sum + u.projects.length, 0) / users.length,
+      departmentDistribution: departmentCount
+    };
+  });
+  
+  private getEmptyMetrics(): UserMetrics {
+    return {
+      totalUsers: 0,
+      activeUsers: 0,
+      inactiveUsers: 0,
+      usersByRole: {},
+      averageProjectsPerUser: 0,
+      departmentDistribution: {}
+    };
+  }
+}
+PASO 3: Migrar Componente a Standalone (15 minutos)
+3.1 Crear componente standalone migrado
+ng generate component features/user-management/user-dashboard --standalone
+Actualizar src/app/features/user-management/user-dashboard/user-dashboard.component.ts:
+import { Component, OnInit, inject, signal, computed, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { UserService } from '../services/user.service';
+import { MetricsService } from '../services/metrics.service';
+
+@Component({
+  selector: 'app-user-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './user-dashboard.component.html',
+  styleUrl: './user-dashboard.component.scss'
+})
+export class UserDashboardComponent implements OnInit {
+  // Servicios inyectados con inject()
+  private userService = inject(UserService);
+  private metricsService = inject(MetricsService);
+  
+  // Signals del servicio
+  users = this.userService.users;
+  loading = this.userService.loading;
+  metrics = this.metricsService.metrics;
+  
+  // Signals locales
+  selectedPeriod = signal<'day' | 'week' | 'month' | 'year'>('month');
+  showChart = signal(true);
+  
+  // Computed para datos del gráfico
+  chartData = computed(() => {
+    const metrics = this.metrics();
+    const period = this.selectedPeriod();
+    
+    return this.prepareChartData(metrics, period);
+  });
+  
+  constructor() {
+    // Effect para logging
+    effect(() => {
+      const userCount = this.users().length;
+      console.log(`📊 Dashboard: ${userCount} usuarios cargados`);
+    });
+  }
+  
+  ngOnInit(): void {
+    this.loadData();
+  }
+  
+  loadData(): void {
+    this.userService.loadUsers().subscribe({
+      next: () => console.log('✅ Usuarios cargados'),
+      error: (err) => console.error('❌ Error cargando usuarios:', err)
+    });
+  }
+  
+  changePeriod(period: 'day' | 'week' | 'month' | 'year'): void {
+    this.selectedPeriod.set(period);
+  }
+  
+  private prepareChartData(metrics: any, period: string): any {
+    // Lógica de preparación de datos para gráficos
+    return {
+      labels: this.getLabelsForPeriod(period),
+      datasets: [{
+        label: 'Usuarios Activos',
+        data: this.getDataForPeriod(metrics, period)
+      }]
+    };
+  }
+  
+  private getLabelsForPeriod(period: string): string[] {
+    switch (period) {
+      case 'day': return ['00:00', '06:00', '12:00', '18:00', '24:00'];
+      case 'week': return ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'];
+      case 'month': return ['Semana 1', 'Semana 2', 'Semana 3', 'Semana 4'];
+      case 'year': return ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+      default: return [];
+    }
+  }
+  
+  private getDataForPeriod(metrics: any, period: string): number[] {
+    // Datos simulados basados en métricas
+    const base = metrics.activeUsers || 0;
+    switch (period) {
+      case 'day': return [base * 0.6, base * 0.8, base, base * 0.9, base * 0.7];
+      case 'week': return Array(7).fill(0).map(() => base + Math.random() * 10);
+      case 'month': return Array(4).fill(0).map(() => base + Math.random() * 20);
+      case 'year': return Array(12).fill(0).map(() => base + Math.random() * 30);
+      default: return [];
+    }
+  }
+}
+PASO 4: Crear Template Migrado (10 minutos)
+Actualizar src/app/features/user-management/user-dashboard/user-dashboard.component.html:
+<div class="user-dashboard">
+  <header class="dashboard-header">
+    <h1>👥 Dashboard de Usuarios - PROVIAS</h1>
+    <p class="subtitle">Componente Standalone Migrado con Signals</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-overlay">
+      <div class="spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  }
+
+  <!-- Metrics Section -->
+  @if (metrics(); as m) {
+    <section class="metrics-section">
+      <h2>📊 Métricas Generales</h2>
+      <div class="metrics-grid">
+        <div class="metric-card total">
+          <h3>{{ m.totalUsers }}</h3>
+          <p>Total Usuarios</p>
+        </div>
+        <div class="metric-card active">
+          <h3>{{ m.activeUsers }}</h3>
+          <p>Activos</p>
+        </div>
+        <div class="metric-card inactive">
+          <h3>{{ m.inactiveUsers }}</h3>
+          <p>Inactivos</p>
+        </div>
+        <div class="metric-card average">
+          <h3>{{ m.averageProjectsPerUser | number:'1.1-1' }}</h3>
+          <p>Proyectos/Usuario</p>
+        </div>
+      </div>
+
+      <!-- Roles Distribution -->
+      <div class="roles-section">
+        <h3>Distribución por Rol</h3>
+        <div class="roles-grid">
+          @for (role of ['admin', 'manager', 'developer', 'viewer']; track role) {
+            <div class="role-card">
+              <span class="role-icon">
+                @switch (role) {
+                  @case ('admin') { 👑 }
+                  @case ('manager') {
+
+
+
+
+
+
+
+
+
+
+
+
+LABORATORIOS SESIÓN 5 (Continuación) - LAB 3 y LAB 4
+LAB 3: PROVIDERS Y JERARQUÍA DE INYECTORES
+Duración: 45 minutos
+Objetivo: Dominar providers avanzados, InjectionTokens y jerarquía de inyectores
+PASO 1: Crear Tokens de Inyección (10 minutos)
+1.1 Crear tokens para configuración
+Crear archivo src/app/core/tokens/config.tokens.ts:
+import { InjectionToken } from '@angular/core';
+
+// Token para configuración de la aplicación
+export interface AppConfiguration {
+  apiUrl: string;
+  environment: 'development' | 'staging' | 'production';
+  version: string;
+  features: {
+    enableAnalytics: boolean;
+    enableNotifications: boolean;
+    enableOfflineMode: boolean;
+    enableDebugMode: boolean;
+  };
+  cache: {
+    strategy: 'memory' | 'localStorage' | 'sessionStorage' | 'indexedDB';
+    ttl: number;
+    maxSize: number;
+  };
+}
+
+export const APP_CONFIG = new InjectionToken<AppConfiguration>('APP_CONFIG', {
+  providedIn: 'root',
+  factory: () => ({
+    apiUrl: 'https://api.provias.gob.pe/v1',
+    environment: 'development',
+    version: '2.0.0',
+    features: {
+      enableAnalytics: false,
+      enableNotifications: true,
+      enableOfflineMode: false,
+      enableDebugMode: true
+    },
+    cache: {
+      strategy: 'memory',
+      ttl: 300000,
+      maxSize: 100
+    }
+  })
+});
+
+// Token para logger
+export interface Logger {
+  log(message: string, ...args: any[]): void;
+  error(message: string, ...args: any[]): void;
+  warn(message: string, ...args: any[]): void;
+  info(message: string, ...args: any[]): void;
+  debug(message: string, ...args: any[]): void;
+}
+
+export const LOGGER_TOKEN = new InjectionToken<Logger>('LOGGER_TOKEN');
+
+// Token para validadores múltiples
+export interface TaskValidator {
+  name: string;
+  validate(task: any): { valid: boolean; errors?: string[] };
+}
+
+export const TASK_VALIDATORS = new InjectionToken<TaskValidator[]>('TASK_VALIDATORS');
+
+// Token para estrategia de caché
+export interface CacheStrategy {
+  get<T>(key: string): T | null;
+  set<T>(key: string, value: T, ttl?: number): void;
+  remove(key: string): void;
+  clear(): void;
+}
+
+export const CACHE_STRATEGY = new InjectionToken<CacheStrategy>('CACHE_STRATEGY');
+PASO 2: Implementar Providers Personalizados (15 minutos)
+2.1 Crear implementaciones de Logger
+Crear archivo src/app/core/services/loggers/console-logger.service.ts:
+import { Injectable } from '@angular/core';
+import { Logger } from '../../tokens/config.tokens';
+
+@Injectable()
+export class ConsoleLoggerService implements Logger {
+  private readonly prefix = '[PROVIAS]';
+  
+  log(message: string, ...args: any[]): void {
+    console.log(`${this.prefix} ${message}`, ...args);
+  }
+  
+  error(message: string, ...args: any[]): void {
+    console.error(`${this.prefix} ERROR: ${message}`, ...args);
+  }
+  
+  warn(message: string, ...args: any[]): void {
+    console.warn(`${this.prefix} WARN: ${message}`, ...args);
+  }
+  
+  info(message: string, ...args: any[]): void {
+    console.info(`${this.prefix} INFO: ${message}`, ...args);
+  }
+  
+  debug(message: string, ...args: any[]): void {
+    if (this.isDebugEnabled()) {
+      console.debug(`${this.prefix} DEBUG: ${message}`, ...args);
+    }
+  }
+  
+  private isDebugEnabled(): boolean {
+    return !!(window as any).debugMode || localStorage.getItem('debug') === 'true';
+  }
+}
+Crear archivo src/app/core/services/loggers/remote-logger.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Logger, APP_CONFIG } from '../../tokens/config.tokens';
+
+@Injectable()
+export class RemoteLoggerService implements Logger {
+  private readonly http = inject(HttpClient);
+  private readonly config = inject(APP_CONFIG);
+  private readonly buffer: LogEntry[] = [];
+  private readonly bufferSize = 50;
+  
+  constructor() {
+    // Enviar logs cada 30 segundos
+    setInterval(() => this.flush(), 30000);
+  }
+  
+  log(message: string, ...args: any[]): void {
+    this.addToBuffer('log', message, args);
+  }
+  
+  error(message: string, ...args: any[]): void {
+    this.addToBuffer('error', message, args);
+    // Errores se envían inmediatamente
+    this.flush();
+  }
+  
+  warn(message: string, ...args: any[]): void {
+    this.addToBuffer('warn', message, args);
+  }
+  
+  info(message: string, ...args: any[]): void {
+    this.addToBuffer('info', message, args);
+  }
+  
+  debug(message: string, ...args: any[]): void {
+    if (this.config.features.enableDebugMode) {
+      this.addToBuffer('debug', message, args);
+    }
+  }
+  
+  private addToBuffer(level: string, message: string, args: any[]): void {
+    this.buffer.push({
+      level,
+      message,
+      args,
+      timestamp: new Date(),
+      environment: this.config.environment,
+      version: this.config.version
+    });
+    
+    if (this.buffer.length >= this.bufferSize) {
+      this.flush();
+    }
+  }
+  
+  private flush(): void {
+    if (this.buffer.length === 0) return;
+    
+    const logs = [...this.buffer];
+    this.buffer.length = 0;
+    
+    this.http.post(`${this.config.apiUrl}/logs`, { logs })
+      .subscribe({
+        error: (err) => console.error('Failed to send logs:', err)
+      });
+  }
+}
+
+interface LogEntry {
+  level: string;
+  message: string;
+  args: any[];
+  timestamp: Date;
+  environment: string;
+  version: string;
+}
+2.2 Crear estrategias de caché
+Crear archivo src/app/core/services/cache/memory-cache.strategy.ts:
+import { Injectable } from '@angular/core';
+import { CacheStrategy } from '../../tokens/config.tokens';
+
+interface CacheEntry<T> {
+  value: T;
+  expiry: number;
+}
+
+@Injectable()
+export class MemoryCacheStrategy implements CacheStrategy {
+  private cache = new Map<string, CacheEntry<any>>();
+  
+  get<T>(key: string): T | null {
+    const entry = this.cache.get(key);
+    
+    if (!entry) return null;
+    
+    if (Date.now() > entry.expiry) {
+      this.cache.delete(key);
+      return null;
+    }
+    
+    return entry.value as T;
+  }
+  
+  set<T>(key: string, value: T, ttl: number = 300000): void {
+    this.cache.set(key, {
+      value,
+      expiry: Date.now() + ttl
+    });
+  }
+  
+  remove(key: string): void {
+    this.cache.delete(key);
+  }
+  
+  clear(): void {
+    this.cache.clear();
+  }
+}
+Crear archivo src/app/core/services/cache/local-storage-cache.strategy.ts:
+import { Injectable } from '@angular/core';
+import { CacheStrategy } from '../../tokens/config.tokens';
+
+@Injectable()
+export class LocalStorageCacheStrategy implements CacheStrategy {
+  private readonly prefix = 'provias_cache_';
+  
+  get<T>(key: string): T | null {
+    try {
+      const item = localStorage.getItem(this.prefix + key);
+      if (!item) return null;
+      
+      const entry = JSON.parse(item);
+      
+      if (Date.now() > entry.expiry) {
+        localStorage.removeItem(this.prefix + key);
+        return null;
+      }
+      
+      return entry.value as T;
+    } catch (error) {
+      console.error('Cache get error:', error);
+      return null;
+    }
+  }
+  
+  set<T>(key: string, value: T, ttl: number = 300000): void {
+    try {
+      const entry = {
+        value,
+        expiry: Date.now() + ttl
+      };
+      localStorage.setItem(this.prefix + key, JSON.stringify(entry));
+    } catch (error) {
+      console.error('Cache set error:', error);
+    }
+  }
+  
+  remove(key: string): void {
+    localStorage.removeItem(this.prefix + key);
+  }
+  
+  clear(): void {
+    const keys = Object.keys(localStorage);
+    keys.forEach(key => {
+      if (key.startsWith(this.prefix)) {
+        localStorage.removeItem(key);
+      }
+    });
+  }
+}
+2.3 Crear validadores de tareas
+Crear archivo src/app/core/services/validators/task-validators.ts:
+import { Injectable } from '@angular/core';
+import { TaskValidator } from '../../tokens/config.tokens';
+
+@Injectable()
+export class RequiredFieldsValidator implements TaskValidator {
+  name = 'RequiredFieldsValidator';
+  
+  validate(task: any): { valid: boolean; errors?: string[] } {
+    const errors: string[] = [];
+    
+    if (!task.title || task.title.trim().length === 0) {
+      errors.push('El título es requerido');
+    }
+    
+    if (!task.description || task.description.trim().length < 10) {
+      errors.push('La descripción debe tener al menos 10 caracteres');
+    }
+    
+    if (!task.assigneeId) {
+      errors.push('Debe asignar la tarea a un usuario');
+    }
+    
+    if (!task.dueDate) {
+      errors.push('La fecha de vencimiento es requerida');
+    }
+    
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+}
+
+@Injectable()
+export class DateRangeValidator implements TaskValidator {
+  name = 'DateRangeValidator';
+  
+  validate(task: any): { valid: boolean; errors?: string[] } {
+    const errors: string[] = [];
+    const now = new Date();
+    const dueDate = new Date(task.dueDate);
+    
+    if (dueDate < now) {
+      errors.push('La fecha de vencimiento no puede ser en el pasado');
+    }
+    
+    const maxDate = new Date();
+    maxDate.setFullYear(maxDate.getFullYear() + 2);
+    
+    if (dueDate > maxDate) {
+      errors.push('La fecha de vencimiento no puede ser mayor a 2 años');
+    }
+    
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+}
+
+@Injectable()
+export class PriorityConsistencyValidator implements TaskValidator {
+  name = 'PriorityConsistencyValidator';
+  
+  validate(task: any): { valid: boolean; errors?: string[] } {
+    const errors: string[] = [];
+    const dueDate = new Date(task.dueDate);
+    const now = new Date();
+    const daysUntilDue = Math.ceil((dueDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (task.priority === 'critical' && daysUntilDue > 7) {
+      errors.push('Las tareas críticas deben vencer en menos de 7 días');
+    }
+    
+    if (task.priority === 'urgent' && daysUntilDue > 14) {
+      errors.push('Las tareas urgentes deben vencer en menos de 14 días');
+    }
+    
+    return {
+      valid: errors.length === 0,
+      errors: errors.length > 0 ? errors : undefined
+    };
+  }
+}
+PASO 3: Configurar Providers en Componente (10 minutos)
+3.1 Crear componente con providers personalizados
+ng generate component features/task-manager/task-form --standalone
+Actualizar src/app/features/task-manager/task-form/task-form.component.ts:
+import { Component, OnInit, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { 
+  LOGGER_TOKEN, 
+  TASK_VALIDATORS, 
+  CACHE_STRATEGY,
+  APP_CONFIG,
+  TaskValidator,
+  Logger,
+  CacheStrategy
+} from '../../../core/tokens/config.tokens';
+import { ConsoleLoggerService } from '../../../core/services/loggers/console-logger.service';
+import { RemoteLoggerService } from '../../../core/services/loggers/remote-logger.service';
+import { MemoryCacheStrategy } from '../../../core/services/cache/memory-cache.strategy';
+import { LocalStorageCacheStrategy } from '../../../core/services/cache/local-storage-cache.strategy';
+import { 
+  RequiredFieldsValidator, 
+  DateRangeValidator, 
+  PriorityConsistencyValidator 
+} from '../../../core/services/validators/task-validators';
+import { TaskStateService } from '../../../core/services/task-state.service';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { CreateTaskDto, TaskPriority } from '../../../core/interfaces/task.interface';
+
+@Component({
+  selector: 'app-task-form',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  providers: [
+    // Logger provider con factory basado en environment
+    {
+      provide: LOGGER_TOKEN,
+      useFactory: (config: any) => {
+        return config.environment === 'production' 
+          ? new RemoteLoggerService()
+          : new ConsoleLoggerService();
+      },
+      deps: [APP_CONFIG]
+    },
+    // Multi-provider para validadores
+    { 
+      provide: TASK_VALIDATORS, 
+      useClass: RequiredFieldsValidator, 
+      multi: true 
+    },
+    { 
+      provide: TASK_VALIDATORS, 
+      useClass: DateRangeValidator, 
+      multi: true 
+    },
+    { 
+      provide: TASK_VALIDATORS, 
+      useClass: PriorityConsistencyValidator, 
+      multi: true 
+    },
+    // Cache strategy provider con factory
+    {
+      provide: CACHE_STRATEGY,
+      useFactory: (config: any) => {
+        switch (config.cache.strategy) {
+          case 'localStorage':
+            return new LocalStorageCacheStrategy();
+          case 'memory':
+          default:
+            return new MemoryCacheStrategy();
+        }
+      },
+      deps: [APP_CONFIG]
+    }
+  ],
+  templateUrl: './task-form.component.html',
+  styleUrl: './task-form.component.scss'
+})
+export class TaskFormComponent implements OnInit {
+  // Inyección de tokens
+  private readonly logger = inject<Logger>(LOGGER_TOKEN);
+  private readonly validators = inject<TaskValidator[]>(TASK_VALIDATORS);
+  private readonly cache = inject<CacheStrategy>(CACHE_STRATEGY);
+  private readonly config = inject(APP_CONFIG);
+  
+  // Servicios regulares
+  private readonly taskService = inject(TaskStateService);
+  private readonly notificationService = inject(NotificationService);
+  
+  // Estado del formulario
+  formData = signal<Partial<CreateTaskDto>>({
+    title: '',
+    description: '',
+    priority: TaskPriority.MEDIUM,
+    assigneeId: '',
+    projectId: '',
+    dueDate: new Date(),
+    estimatedHours: 8,
+    tags: []
+  });
+  
+  validationErrors = signal<string[]>([]);
+  isSubmitting = signal(false);
+  
+  // Datos para selects
+  priorities = Object.values(TaskPriority);
+  users = signal<any[]>([]);
+  projects = signal<any[]>([]);
+  availableTags = ['Frontend', 'Backend', 'Database', 'API', 'Testing', 'Documentation'];
+  
+  ngOnInit(): void {
+    this.logger.info('TaskFormComponent initialized');
+    this.logger.debug('Configuration:', this.config);
+    this.logger.debug('Validators loaded:', this.validators.map(v => v.name));
+    
+    this.loadCachedData();
+    this.loadFormData();
+  }
+  
+  private loadCachedData(): void {
+    // Intentar cargar datos del caché
+    const cachedUsers = this.cache.get<any[]>('users');
+    if (cachedUsers) {
+      this.users.set(cachedUsers);
+      this.logger.debug('Users loaded from cache');
+    } else {
+      this.loadUsers();
+    }
+    
+    const cachedProjects = this.cache.get<any[]>('projects');
+    if (cachedProjects) {
+      this.projects.set(cachedProjects);
+      this.logger.debug('Projects loaded from cache');
+    } else {
+      this.loadProjects();
+    }
+  }
+  
+  private loadUsers(): void {
+    // Simular carga de usuarios
+    const mockUsers = [
+      { id: 'user-1', name: 'Carlos López' },
+      { id: 'user-2', name: 'Ana García' },
+      { id: 'user-3', name: 'María Rodriguez' },
+      { id: 'user-4', name: 'Jorge Mendoza' }
+    ];
+    
+    this.users.set(mockUsers);
+    this.cache.set('users', mockUsers, 600000); // Cache por 10 minutos
+    this.logger.info('Users loaded and cached');
+  }
+  
+  private loadProjects(): void {
+    // Simular carga de proyectos
+    const mockProjects = [
+      { id: 'PRY-001', name: 'Sistema de Gestión PROVIAS' },
+      { id: 'PRY-002', name: 'Portal Web Institucional' },
+      { id: 'PRY-003', name: 'App Mobile PROVIAS' }
+    ];
+    
+    this.projects.set(mockProjects);
+    this.cache.set('projects', mockProjects, 600000);
+    this.logger.info('Projects loaded and cached');
+  }
+  
+  private loadFormData(): void {
+    // Cargar datos del formulario desde caché si existe
+    const cachedForm = this.cache.get<Partial<CreateTaskDto>>('draft_task');
+    if (cachedForm) {
+      this.formData.set(cachedForm);
+      this.logger.info('Draft task loaded from cache');
+      this.notificationService.info('Borrador recuperado', 'Se ha cargado el borrador guardado');
+    }
+  }
+  
+  validateForm(): boolean {
+    const data = this.formData();
+    const errors: string[] = [];
+    
+    // Ejecutar todos los validadores
+    for (const validator of this.validators) {
+      const result = validator.validate(data);
+      if (!result.valid && result.errors) {
+        errors.push(...result.errors);
+        this.logger.warn(`Validation failed for ${validator.name}:`, result.errors);
+      }
+    }
+    
+    this.validationErrors.set(errors);
+    return errors.length === 0;
+  }
+  
+  saveDraft(): void {
+    const data = this.formData();
+    this.cache.set('draft_task', data, 1800000); // 30 minutos
+    this.notificationService.success('Borrador guardado', 'Puedes continuar más tarde');
+    this.logger.info('Draft saved to cache');
+  }
+  
+  clearDraft(): void {
+    this.cache.remove('draft_task');
+    this.formData.set({
+      title: '',
+      description: '',
+      priority: TaskPriority.MEDIUM,
+      assigneeId: '',
+      projectId: '',
+      dueDate: new Date(),
+      estimatedHours: 8,
+      tags: []
+    });
+    this.validationErrors.set([]);
+    this.notificationService.info('Formulario limpiado');
+    this.logger.info('Form and draft cleared');
+  }
+  
+  onSubmit(): void {
+    this.logger.info('Form submission started');
+    
+    if (!this.validateForm()) {
+      this.notificationService.error('Formulario inválido', 'Por favor corrija los errores');
+      this.logger.error('Form validation failed', this.validationErrors());
+      return;
+    }
+    
+    this.isSubmitting.set(true);
+    
+    try {
+      const taskData = this.formData() as CreateTaskDto;
+      const newTask = this.taskService.addTask(taskData);
+      
+      this.logger.info('Task created successfully:', newTask);
+      this.notificationService.success('Tarea creada', `La tarea "${newTask.title}" ha sido creada`);
+      
+      // Limpiar caché del draft
+      this.cache.remove('draft_task');
+      
+      // Resetear formulario
+      this.clearDraft();
+    } catch (error) {
+      this.logger.error('Failed to create task:', error);
+      this.notificationService.error('Error', 'No se pudo crear la tarea');
+    } finally {
+      this.isSubmitting.set(false);
+    }
+  }
+  
+  updateField(field: keyof CreateTaskDto, value: any): void {
+    this.formData.update(data => ({
+      ...data,
+      [field]: value
+    }));
+    
+    // Auto-guardar draft
+    this.saveDraft();
+  }
+  
+  toggleTag(tag: string): void {
+    this.formData.update(data => {
+      const tags = data.tags || [];
+      const index = tags.indexOf(tag);
+      
+      if (index > -1) {
+        tags.splice(index, 1);
+      } else {
+        tags.push(tag);
+      }
+      
+      return { ...data, tags: [...tags] };
+    });
+  }
+}
+PASO 4: Crear Template del Formulario (10 minutos)
+Actualizar src/app/features/task-manager/task-form/task-form.component.html:
+<div class="task-form-container">
+  <header class="form-header">
+    <h2>📝 Nueva Tarea</h2>
+    <p class="subtitle">Providers personalizados con InjectionTokens</p>
+  </header>
+
+  <!-- Validation Errors -->
+  @if (validationErrors().length > 0) {
+    <div class="validation-errors">
+      <h4>⚠️ Errores de validación:</h4>
+      <ul>
+        @for (error of validationErrors(); track error) {
+          <li>{{ error }}</li>
+        }
+      </ul>
+    </div>
+  }
+
+  <form class="task-form" (ngSubmit)="onSubmit()">
+    <!-- Title -->
+    <div class="form-group">
+      <label for="title">Título *</label>
+      <input
+        id="title"
+        type="text"
+        [value]="formData().title"
+        (input)="updateField('title', $any($event.target).value)"
+        placeholder="Título de la tarea"
+        class="form-control"
+        required>
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Descripción *</label>
+      <textarea
+        id="description"
+        [value]="formData().description"
+        (input)="updateField('description', $any($event.target).value)"
+        placeholder="Descripción detallada de la tarea"
+        class="form-control"
+        rows="4"
+        required>
+      </textarea>
+    </div>
+
+    <!-- Priority -->
+    <div class="form-group">
+      <label for="priority">Prioridad</label>
+      <select
+        id="priority"
+        [value]="formData().priority"
+        (change)="updateField('priority', $any($event.target).value)"
+        class="form-control">
+        @for (priority of priorities; track priority) {
+          <option [value]="priority">{{ priority }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Assignee -->
+    <div class="form-group">
+      <label for="assignee">Asignar a *</label>
+      <select
+        id="assignee"
+        [value]="formData().assigneeId"
+        (change)="updateField('assigneeId', $any($event.target).value)"
+        class="form-control"
+        required>
+        <option value="">Seleccionar usuario...</option>
+        @for (user of users(); track user.id) {
+          <option [value]="user.id">{{ user.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Project -->
+    <div class="form-group">
+      <label for="project">Proyecto *</label>
+      <select
+        id="project"
+        [value]="formData().projectId"
+        (change)="updateField('projectId', $any($event.target).value)"
+        class="form-control"
+        required>
+        <option value="">Seleccionar proyecto...</option>
+        @for (project of projects(); track project.id) {
+          <option [value]="project.id">{{ project.name }}</option>
+        }
+      </select>
+    </div>
+
+    <!-- Due Date -->
+    <div class="form-group">
+      <label for="dueDate">Fecha de vencimiento *</label>
+      <input
+        id="dueDate"
+        type="date"
+        [value]="formData().dueDate"
+        (change)="updateField('dueDate', $any($event.target).value)"
+        class="form-control"
+        required>
+    </div>
+
+    <!-- Estimated Hours -->
+    <div class="form-group">
+      <label for="hours">Horas estimadas</label>
+      <input
+        id="hours"
+        type="number"
+        [value]="formData().estimatedHours"
+        (input)="updateField('estimatedHours', +$any($event.target).value)"
+        min="1"
+        max="200"
+        class="form-control">
+    </div>
+
+    <!-- Tags -->
+    <div class="form-group">
+      <label>Etiquetas</label>
+      <div class="tags-selector">
+        @for (tag of availableTags; track tag) {
+          <button
+            type="button"
+            class="tag-btn"
+            [class.active]="formData().tags?.includes(tag)"
+            (click)="toggleTag(tag)">
+            {{ tag }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="form-actions">
+      <button 
+        type="button"
+        class="btn btn-secondary"
+        (click)="clearDraft()">
+        🗑️ Limpiar
+      </button>
+      <button 
+        type="button"
+        class="btn btn-info"
+        (click)="saveDraft()">
+        💾 Guardar Borrador
+      </button>
+      <button 
+        type="submit"
+        class="btn btn-primary"
+        [disabled]="isSubmitting()">
+        @if (isSubmitting()) {
+          <span class="spinner-small"></span> Creando...
+        } @else {
+          ✅ Crear Tarea
+        }
+      </button>
+    </div>
+  </form>
+
+  <!-- Provider Info -->
+  <section class="provider-info">
+    <h3>🔧 Providers Configurados</h3>
+    <ul>
+      <li>Logger: {{ config.environment === 'production' ? 'RemoteLogger' : 'ConsoleLogger' }}</li>
+      <li>Cache Strategy: {{ config.cache.strategy }}</li>
+      <li>Validators: {{ validators.length }} validadores activos</li>
+      <li>Environment: {{ config.environment }}</li>
+      <li>Debug Mode: {{ config.features.enableDebugMode ? 'Enabled' : 'Disabled' }}</li>
+    </ul>
+  </section>
+</div>
+________________________________________
+LAB 4: ARQUITECTURA DE SERVICIOS EMPRESARIALES
+Duración: 25 minutos
+Objetivo: Implementar patrones empresariales (Repository, Unit of Work, Store Pattern)
+PASO 1: Implementar Repository Pattern (10 minutos)
+1.1 Crear repository base abstracto
+Crear archivo src/app/core/patterns/repository.pattern.ts:
+import { Observable } from 'rxjs';
+
+export interface Entity {
+  id: string;
+}
+
+export abstract class Repository<T extends Entity> {
+  abstract getAll(): Observable<T[]>;
+  abstract getById(id: string): Observable<T | null>;
+  abstract create(entity: Omit<T, 'id'>): Observable<T>;
+  abstract update(id: string, entity: Partial<T>): Observable<T>;
+  abstract delete(id: string): Observable<boolean>;
+  abstract exists(id: string): Observable<boolean>;
+  abstract count(): Observable<number>;
+  abstract query(criteria: any): Observable<T[]>;
+}
+1.2 Implementar Task Repository
+Crear archivo src/app/core/repositories/task.repository.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, map, catchError, delay } from 'rxjs';
+import { Repository } from '../patterns/repository.pattern';
+import { Task } from '../interfaces/task.interface';
+import { APP_CONFIG } from '../tokens/config.tokens';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class TaskRepository extends Repository<Task> {
+  private readonly http = inject(HttpClient);
+  private readonly config = inject(APP_CONFIG);
+  private readonly apiUrl = `${this.config.apiUrl}/tasks`;
+  
+  // Mock data para desarrollo
+  private mockTasks: Task[] = this.generateMockTasks();
+  
+  getAll(): Observable<Task[]> {
+    if (this.config.environment === 'development') {
+      return of(this.mockTasks).pipe(delay(500));
+    }
+    
+    return this.http.get<Task[]>(this.apiUrl).pipe(
+      catchError(() => of(this.mockTasks))
+    );
+  }
+  
+  getById(id: string): Observable<Task | null> {
+    if (this.config.environment === 'development') {
+      const task = this.mockTasks.find(t => t.id === id);
+      return of(task || null).pipe(delay(300));
+    }
+    
+    return this.http.get<Task>(`${this.apiUrl}/${id}`).pipe(
+      catchError(() => of(null))
+    );
+  }
+  
+  create(entity: Omit<Task, 'id'>): Observable<Task> {
+    const newTask: Task = {
+      ...entity,
+      id: `task-${Date.now()}`
+    } as Task;
+    
+    if (this.config.environment === 'development') {
+      this.mockTasks.push(newTask);
+      return of(newTask).pipe(delay(500));
+    }
+    
+    return this.http.post<Task>(this.apiUrl, entity);
+  }
+  
+  update(id: string, entity: Partial<Task>): Observable<Task> {
+    if (this.config.environment === 'development') {
+      const index = this.mockTasks.findIndex(t => t.id === id);
+      if (index > -1) {
+        this.mockTasks[index] = { ...this.mockTasks[index], ...entity };
+        return of(this.mockTasks[index]).pipe(delay(300));
+      }
+      throw new Error('Task not found');
+    }
+    
+    return this.http.patch<Task>(`${this.apiUrl}/${id}`, entity);
+  }
+  
+  delete(id: string): Observable<boolean> {
+    if (this.config.environment === 'development') {
+      const index = this.mockTasks.findIndex(t => t.id === id);
+      if (index > -1) {
+        this.mockTasks.splice(index, 1);
+        return of(true).pipe(delay(300));
+      }
+      return of(false);
+    }
+    
+    return this.http.delete(`${this.apiUrl}/${id}`).pipe(
+      map(() => true),
+      catchError(() => of(false))
+    );
+  }
+  
+  exists(id: string): Observable<boolean> {
+    return this.getById(id).pipe(
+      map(task => task !== null)
+    );
+  }
+  
+  count(): Observable<number> {
+    return this.getAll().pipe(
+      map(tasks => tasks.length)
+    );
+  }
+  
+  query(criteria: any): Observable<Task[]> {
+    return this.getAll().pipe(
+      map(tasks => this.filterTasks(tasks, criteria))
+    );
+  }
+  
+  private filterTasks(tasks: Task[], criteria: any): Task[] {
+    let filtered = [...tasks];
+    
+    if (criteria.status) {
+      filtered = filtered.filter(t => t.status === criteria.status);
+    }
+    
+    if (criteria.assigneeId) {
+      filtered = filtered.filter(t => t.assigneeId === criteria.assigneeId);
+    }
+    
+    if (criteria.priority) {
+      filtered = filtered.filter(t => t.priority === criteria.priority);
+    }
+    
+    return filtered;
+  }
+  
+  private generateMockTasks(): Task[] {
+    // Generar datos mock para desarrollo
+    return Array.from({ length: 10 }, (_, i) => ({
+      id: `task-${i + 1}`,
+      title: `Tarea de ejemplo ${i + 1}`,
+      description: `Descripción de la tarea ${i + 1}`,
+      status: 'pending',
+      priority: 'medium',
+      assigneeId: `user-${(i % 4) + 1}`,
+      projectId: `PRY-00${(i % 3) + 1}`,
+      dueDate: new Date(Date.now() + Math.random() * 30 * 24 * 60 * 60 * 1000),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      tags: ['development'],
+      estimatedHours: Math.floor(Math.random() * 40) + 8,
+      actualHours: 0,
+      completionPercentage: 0,
+      attachments: [],
+      comments: []
+    } as any));
+  }
+}
+PASO 2: Implementar Unit of Work Pattern (10 minutos)
+2.1 Crear Unit of Work
+Crear archivo src/app/core/patterns/unit-of-work.pattern.ts:
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { Observable, forkJoin, of } from 'rxjs';
+import { TaskRepository } from '../repositories/task.repository';
+import { Task } from '../interfaces/task.interface';
+import { LOGGER_TOKEN } from '../tokens/config.tokens';
+
+interface TrackedEntity<T> {
+  entity: T;
+  state: 'unchanged' | 'added' | 'modified' | 'deleted';
+  originalEntity?: T;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class UnitOfWork {
+  private readonly taskRepository = inject(TaskRepository);
+  private readonly logger = inject(LOGGER_TOKEN);
+  
+  // Tracking de entidades
+  private trackedTasks = signal<Map<string, TrackedEntity<Task>>>(new Map());
+  
+  // Computed para obtener cambios
+  hasChanges = computed(() => {
+    const tracked = this.trackedTasks();
+    for (const [_, entity] of tracked) {
+      if (entity.state !== 'unchanged') return true;
+    }
+    return false;
+  });
+  
+  changesCount = computed(() => {
+    const tracked = this.trackedTasks();
+    let count = 0;
+    for (const [_, entity] of tracked) {
+      if (entity.state !== 'unchanged') count++;
+    }
+    return count;
+  });
+  
+  // Registrar entidad para tracking
+  registerTask(task: Task): void {
+    const tracked = this.trackedTasks();
+    if (!tracked.has(task.id)) {
+      tracked.set(task.id, {
+        entity: { ...task },
+        state: 'unchanged',
+        originalEntity: { ...task }
+      });
+      this.trackedTasks.set(new Map(tracked));
+      this.logger.debug('Task registered for tracking:', task.id);
+    }
+  }
+  
+  // Marcar como nuevo
+  markAsNew(task: Omit<Task, 'id'>): Task {
+    const newTask: Task = {
+      ...task,
+      id: `temp-${Date.now()}`
+    } as Task;
+    
+    const tracked = this.trackedTasks();
+    tracked.set(newTask.id, {
+      entity: newTask,
+      state: 'added'
+    });
+    this.trackedTasks.set(new Map(tracked));
+    
+    this.logger.info('New task marked for creation:', newTask.id);
+    return newTask;
+  }
+  
+  // Marcar como modificado
+  markAsModified(task: Task): void {
+    const tracked = this.trackedTasks();
+    const existing = tracked.get(task.id);
+    
+    if (existing) {
+      existing.entity = { ...task };
+      existing.state = existing.state === 'added' ? 'added' : 'modified';
+      this.trackedTasks.set(new Map(tracked));
+      this.logger.debug('Task marked as modified:', task.id);
+    } else {
+      this.registerTask(task);
+      this.markAsModified(task);
+    }
+  }
+  
+  // Marcar como eliminado
+  markAsDeleted(taskId: string): void {
+    const tracked = this.trackedTasks();
+    const existing = tracked.get(taskId);
+    
+    if (existing) {
+      if (existing.state === 'added') {
+        // Si es nuevo y no se ha guardado, simplemente lo removemos
+        tracked.delete(taskId);
+      } else {
+        existing.state = 'deleted';
+      }
+      this.trackedTasks.set(new Map(tracked));
+      this.logger.info('Task marked for deletion:', taskId);
+    }
+  }
+  
+  // Commit de todos los cambios
+  commit(): Observable<any> {
+    const operations: Observable<any>[] = [];
+    const tracked = this.trackedTasks();
+    
+    this.logger.info(`Committing ${this.changesCount()} changes...`);
+    
+    for (const [id, trackedEntity] of tracked) {
+      switch (trackedEntity.state) {
+        case 'added':
+          operations.push(
+            this.taskRepository.create(trackedEntity.entity)
+          );
+          break;
+          
+        case 'modified':
+          operations.push(
+            this.taskRepository.update(id, trackedEntity.entity)
+          );
+          break;
+          
+        case 'deleted':
+          operations.push(
+            this.taskRepository.delete(id)
+          );
+          break;
+      }
+    }
+    
+    if (operations.length === 0) {
+      this.logger.info('No changes to commit');
+      return of(null);
+    }
+    
+    return forkJoin(operations).pipe(
+      map(results => {
+        this.logger.info('All changes committed successfully');
+        this.clear();
+        return results;
+      }),
+      catchError(error => {
+        this.logger.error('Commit failed:', error);
+        throw error;
+      })
+    );
+  }
+  
+  // Rollback de cambios
+  rollback(): void {
+    const tracked = this.trackedTasks();
+    const rolledBack = new Map<string, TrackedEntity<Task>>();
+    
+    for (const [id, trackedEntity] of tracked) {
+      if (trackedEntity.state === 'added') {
+        // No agregar entidades nuevas
+        continue;
+      } else if (trackedEntity.originalEntity) {
+        // Restaurar al estado original
+        rolledBack.set(id, {
+          entity: { ...trackedEntity.originalEntity },
+          state: 'unchanged',
+          originalEntity: { ...trackedEntity.originalEntity }
+        });
+      }
+    }
+    
+    this.trackedTasks.set(rolledBack);
+    this.logger.info('Changes rolled back');
+  }
+  
+  // Limpiar tracking
+  clear(): void {
+    this.trackedTasks.set(new Map());
+    this.logger.debug('Unit of Work cleared');
+  }
+  
+  // Obtener cambios pendientes
+  getPendingChanges(): { added: Task[], modified: Task[], deleted: string[] } {
+    const tracked = this.trackedTasks();
+    const changes = {
+      added: [] as Task[],
+      modified: [] as Task[],
+      deleted: [] as string[]
+    };
+    
+    for (const [id, trackedEntity] of tracked) {
+      switch (trackedEntity.state) {
+        case 'added':
+          changes.added.push(trackedEntity.entity);
+          break;
+        case 'modified':
+          changes.modified.push(trackedEntity.entity);
+          break;
+        case 'deleted':
+          changes.deleted.push(id);
+          break;
+      }
+    }
+    
+    return changes;
+  }
+}
+PASO 3: Implementar Global Store con Signals (5 minutos)
+3.1 Crear Store Global
+Crear archivo src/app/core/store/app.store.ts:
+import { Injectable, signal, computed, effect, inject } from '@angular/core';
+import { TaskRepository } from '../repositories/task.repository';
+import { Task, TaskStatus, TaskPriority } from '../interfaces/task.interface';
+import { LOGGER_TOKEN } from '../tokens/config.tokens';
+
+interface AppState {
+  user: {
+    id: string;
+    name: string;
+    email: string;
+    role: string;
+  } | null;
+  tasks: Task[];
+  selectedTaskId: string | null;
+  filters: {
+    status: TaskStatus | null;
+    priority: TaskPriority | null;
+    searchTerm: string;
+  };
+  ui: {
+    sidebarOpen: boolean;
+    theme: 'light' | 'dark';
+    language: 'es' | 'en';
+  };
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AppStore {
+  private readonly taskRepository = inject(TaskRepository);
+  private readonly logger = inject(LOGGER_TOKEN);
+  
+  // Estado principal
+  private state = signal<AppState>({
+    user: null,
+    tasks: [],
+    selectedTaskId: null,
+    filters: {
+      status: null,
+      priority: null,
+      searchTerm: ''
+    },
+    ui: {
+      sidebarOpen: true,
+      theme: 'light',
+      language: 'es'
+    }
+  });
+  
+  // Selectores computados
+  user = computed(() => this.state().user);
+  tasks = computed(() => this.state().tasks);
+  selectedTask = computed(() => {
+    const state = this.state();
+    return state.tasks.find(t => t.id === state.selectedTaskId) || null;
+  });
+  
+  filteredTasks = computed(() => {
+    const state = this.state();
+    let filtered = [...state.tasks];
+    
+    if (state.filters.status) {
+      filtered = filtered.filter(t => t.status === state.filters.status);
+    }
+    
+    if (state.filters.priority) {
+      filtered = filtered.filter(t => t.priority === state.filters.priority);
+    }
+    
+    if (state.filters.searchTerm) {
+      const term = state.filters.searchTerm.toLowerCase();
+      filtered = filtered.filter(t => 
+        t.title.toLowerCase().includes(term) ||
+        t.description.toLowerCase().includes(term)
+      );
+    }
+    
+    return filtered;
+  });
+  
+  tasksByStatus = computed(() => {
+    const tasks = this.tasks();
+    const grouped = new Map<TaskStatus, Task[]>();
+    
+    Object.values(TaskStatus).forEach(status => {
+      grouped.set(status, tasks.filter(t => t.status === status));
+    });
+    
+    return grouped;
+  });
+  
+  statistics = computed(() => {
+    const tasks = this.tasks();
+    return {
+      total: tasks.length,
+      pending: tasks.filter(t => t.status === TaskStatus.PENDING).length,
+      inProgress: tasks.filter(t => t.status === TaskStatus.IN_PROGRESS).length,
+      completed: tasks.filter(t => t.status === TaskStatus.COMPLETED).length,
+      critical: tasks.filter(t => t.priority === TaskPriority.CRITICAL).length,
+      urgent: tasks.filter(t => t.priority === TaskPriority.URGENT).length
+    };
+  });
+  
+  ui = computed(() => this.state().ui);
+  
+  constructor() {
+    // Effect para persistencia
+    effect(() => {
+      const state = this.state();
+      this.saveToLocalStorage(state);
+    });
+    
+    // Effect para logging
+    effect(() => {
+      const stats = this.statistics();
+      this.logger.debug('Store statistics updated:', stats);
+    });
+    
+    // Cargar estado inicial
+    this.loadFromLocalStorage();
+    this.loadTasks();
+  }
+  
+  // Actions
+  setUser(user: AppState['user']): void {
+    this.state.update(s => ({ ...s, user }));
+    this.logger.info('User set:', user?.name);
+  }
+  
+  loadTasks(): void {
+    this.taskRepository.getAll().subscribe(tasks => {
+      this.state.update(s => ({ ...s, tasks }));
+      this.logger.info(`${tasks.length} tasks loaded`);
+    });
+  }
+  
+  addTask(task: Task): void {
+    this.state.update(s => ({
+      ...s,
+      tasks: [...s.tasks, task]
+    }));
+    this.logger.info('Task added:', task.id);
+  }
+  
+  updateTask(taskId: string, updates: Partial<Task>): void {
+    this.state.update(s => ({
+      ...s,
+      tasks: s.tasks.map(t => 
+        t.id === taskId ? { ...t, ...updates } : t
+      )
+    }));
+    this.logger.info('Task updated:', taskId);
+  }
+  
+  deleteTask(taskId: string): void {
+    this.state.update(s => ({
+      ...s,
+      tasks: s.tasks.filter(t => t.id !== taskId)
+    }));
+    this.logger.info('Task deleted:', taskId);
+  }
+  
+  selectTask(taskId: string | null): void {
+    this.state.update(s => ({ ...s, selectedTaskId: taskId }));
+  }
+  
+  updateFilters(filters: Partial<AppState['filters']>): void {
+    this.state.update(s => ({
+      ...s,
+      filters: { ...s.filters, ...filters }
+    }));
+  }
+  
+  toggleSidebar(): void {
+    this.state.update(s => ({
+      ...s,
+      ui: { ...s.ui, sidebarOpen: !s.ui.sidebarOpen }
+    }));
+  }
+  
+  setTheme(theme: 'light' | 'dark'): void {
+    this.state.update(s => ({
+      ...s,
+      ui: { ...s.ui, theme }
+    }));
+    document.body.className = theme;
+  }
+  
+  setLanguage(language: 'es' | 'en'): void {
+    this.state.update(s => ({
+      ...s,
+      ui: { ...s.ui, language }
+    }));
+  }
+  
+  // Persistencia
+  private saveToLocalStorage(state: AppState): void {
+    try {
+      localStorage.setItem('app_state', JSON.stringify({
+        user: state.user,
+        ui: state.ui,
+        filters: state.filters
+      }));
+    } catch (error) {
+      this.logger.error('Failed to save state:', error);
+    }
+  }
+  
+  private loadFromLocalStorage(): void {
+    try {
+      const stored = localStorage.getItem('app_state');
+      if (stored) {
+        const data = JSON.parse(stored);
+        this.state.update(s => ({
+          ...s,
+          user: data.user || null,
+          ui: data.ui || s.ui,
+          filters: data.filters || s.filters
+        }));
+        this.logger.info('State loaded from localStorage');
+      }
+    } catch (error) {
+      this.logger.error('Failed to load state:', error);
+    }
+  }
+  
+  // Reset
+  reset(): void {
+    this.state.set({
+      user: null,
+      tasks: [],
+      selectedTaskId: null,
+      filters: {
+        status: null,
+        priority: null,
+        searchTerm: ''
+      },
+      ui: {
+        sidebarOpen: true,
+        theme: 'light',
+        language: 'es'
+      }
+    });
+    localStorage.removeItem('app_state');
+    this.logger.info('Store reset to initial state');
+  }
+}
+________________________________________
+INTEGRACIÓN FINAL Y VERIFICACIÓN
+PASO 1: Actualizar Rutas
+Actualizar src/app/app.routes.ts:
+import { Routes } from '@angular/router';
+// Importaciones de sesiones anteriores...
+import { TaskListComponent } from './features/task-manager/task-list/task-list.component';
+import { TaskFormComponent } from './features/task-manager/task-form/task-form.component';
+import { UserDashboardComponent } from './features/user-management/user-dashboard/user-dashboard.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  // ... rutas de sesiones anteriores ...
+  
+  // Rutas de Sesión 5
+  { path: 'task-list', component: TaskListComponent },
+  { path: 'task-form', component: TaskFormComponent },
+  { path: 'user-dashboard', component: UserDashboardComponent },
+  
+  { path: '**', redirectTo: '/home' }
+];
+PASO 2: Actualizar Navegación
+Actualizar navegación en header.component.html:
+<nav class="navigation">
+  <!-- Enlaces anteriores... -->
+  
+  <!-- Dropdown para Sesión 5 -->
+  <div class="nav-dropdown">
+    <button class="nav-link dropdown-toggle">
+      💉 Servicios y DI <span class="arrow">▼</span>
+    </button>
+    <div class="dropdown-menu">
+      <a routerLink="/task-list" routerLinkActive="active" class="dropdown-item">
+        📋 Lista de Tareas (Signals)
+      </a>
+      <a routerLink="/task-form" routerLinkActive="active" class="dropdown-item">
+        📝 Formulario (Providers)
+      </a>
+      <a routerLink="/user-dashboard" routerLinkActive="active" class="dropdown-item">
+        👥 Dashboard (Standalone)
+      </a>
+    </div>
+  </div>
+</nav>
+PASO 3: Agregar Estilos Globales
+Crear archivo src/styles/session5.scss:
+// Estilos para Sesión 5
+
+// Loading States
+.loading-state,
+.loading-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 3rem;
+  
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  
+  .spinner-small {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-right: 8px;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Form Styles
+.form-group {
+  margin-bottom: 1.5rem;
+  
+  label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #333;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+    
+    &:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+  }
+  
+  textarea.form-control {
+    resize: vertical;
+    min-height: 100px;
+  }
+}
+
+// Validation Errors
+.validation-errors {
+  background: #fee;
+  border: 2px solid #dc3545;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  
+  h4 {
+    color: #dc3545;
+    margin: 0 0 0.5rem 0;
+  }
+  
+  ul {
+    margin: 0;
+    padding-left: 1.5rem;
+    color: #721c24;
+  }
+}
+
+// Buttons
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  &.btn-primary {
+    background: #667eea;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background: #5a67d8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+  }
+  
+  &.btn-secondary {
+    background: #6c757d;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background: #545b62;
+    }
+  }
+  
+  &.btn-info {
+    background: #17a2b8;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background: #138496;
+    }
+  }
+  
+  &.btn-warning {
+    background: #ffc107;
+    color: #212529;
+    
+    &:hover:not(:disabled) {
+      background: #e0a800;
+    }
+  }
+  
+  &.btn-danger {
+    background: #dc3545;
+    color: white;
+    
+    &:hover:not(:disabled) {
+      background: #c82333;
+    }
+  }
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// Cards and Grids
+.stats-grid,
+.metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 2rem;
+  
+  .stat-card,
+  .metric-card {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 12px;
+    text-align: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-4px);
+    }
+    
+    h3 {
+      font-size: 2rem;
+      margin: 0 0 0.5rem 0;
+      color: #2c3e50;
+    }
+    
+    p {
+      margin: 0;
+      color: #6c757d;
+    }
+    
+    &.active { background: linear-gradient(135deg, #667eea, #764ba2); color: white; }
+    &.pending { background: linear-gradient(135deg, #feca57, #ff9ff3); color: white; }
+    &.progress { background: linear-gradient(135deg, #f093fb, #f5576c); color: white; }
+    &.completed { background: linear-gradient(135deg, #4facfe, #00f2fe); color: white; }
+    &.overdue { background: linear-gradient(135deg, #ff6b6b, #ee5a24); color: white; }
+  }
+}
+
+// Task Cards
+.tasks-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1.5rem;
+  
+  .task-card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    }
+    
+    .task-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+    
+    h3 {
+      color: #2c3e50;
+      margin: 0 0 0.5rem 0;
+    }
+    
+    .task-description {
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+    
+    .task-meta {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      
+      .status-badge {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 500;
+      }
+    }
+    
+    .task-progress {
+      margin-bottom: 1rem;
+      
+      .progress-bar {
+        height: 8px;
+        background: #e9ecef;
+        border-radius: 4px;
+        overflow: hidden;
+        
+        .progress-fill {
+          height: 100%;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+          transition: width 0.3s ease;
+        }
+      }
+      
+      .progress-slider {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+    }
+  }
+}
+
+// Priority Classes
+.priority-low { border-left: 4px solid #28a745; }
+.priority-medium { border-left: 4px solid #ffc107; }
+.priority-high { border-left: 4px solid #fd7e14; }
+.priority-urgent { border-left: 4px solid #dc3545; }
+.priority-critical { border-left: 4px solid #721c24; }
+
+// Status Classes
+.status-pending { background: #fff3cd; color: #856404; }
+.status-progress { background: #cce5ff; color: #004085; }
+.status-review { background: #e2e3e5; color: #383d41; }
+.status-completed { background: #d4edda; color: #155724; }
+.status-cancelled { background: #f8d7da; color: #721c24; }
+.status-hold { background: #e7e8ea; color: #495057; }
+Importar en src/styles.scss:
+// Estilos existentes...
+@import 'styles/session5';
+________________________________________
+VERIFICACIÓN FINAL Y TESTING
+Comandos de Verificación
+# Verificar que el proyecto compila
+ng build
+
+# Ejecutar servidor de desarrollo
+ng serve --open
+
+# Verificar rutas nuevas
+echo "URLs de la Sesión 5:"
+echo "http://localhost:4200/task-list"
+echo "http://localhost:4200/task-form"
+echo "http://localhost:4200/user-dashboard"
+
+# Verificar inyección de dependencias en Angular DevTools
+# 1. Abrir Chrome DevTools (F12)
+# 2. Ir a pestaña "Angular"
+# 3. Navegar a "Injector Tree"
+# 4. Verificar servicios inyectados
+CHECKLIST FINAL DE LA SESIÓN 5
+✅ LAB 1: Servicios con Signals
+•	[ ] TaskStateService con signals funcionando
+•	[ ] Computed signals para estadísticas
+•	[ ] Effects para persistencia automática
+•	[ ] Inject() en lugar de constructor
+•	[ ] NotificationService integrado
+•	[ ] Filtrado reactivo implementado
+✅ LAB 2: Migración a Standalone
+•	[ ] Componente
+LABORATORIOS SESIÓN 5 (Parte 3) - ESTILOS, TESTING Y CONCLUSIÓN
+ESTILOS COMPLETOS PARA TODOS LOS COMPONENTES
+Estilos para Task List Component
+Crear archivo src/app/features/task-manager/task-list/task-list.component.scss:
+.task-list-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+
+  .task-header {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+
+    h1 {
+      color: #2c3e50;
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+      background: linear-gradient(45deg, #667eea, #764ba2);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      color: #6c757d;
+      font-style: italic;
+    }
+  }
+
+  .loading-state,
+  .error-state {
+    background: white;
+    padding: 3rem;
+    border-radius: 16px;
+    text-align: center;
+    margin: 2rem 0;
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+
+    .error-icon {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 1rem;
+    }
+
+    p {
+      font-size: 1.2rem;
+      color: #6c757d;
+      margin-bottom: 1rem;
+    }
+  }
+
+  .statistics-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+
+      .stat-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        h3 {
+          font-size: 2.5rem;
+          margin-bottom: 0.5rem;
+        }
+
+        p {
+          margin: 0;
+          opacity: 0.9;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          letter-spacing: 1px;
+        }
+
+        &.pending {
+          background: linear-gradient(135deg, #feca57 0%, #ff9ff3 100%);
+        }
+
+        &.progress {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        &.completed {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        &.overdue {
+          background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        }
+
+        &.hours {
+          background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+      }
+    }
+  }
+
+  .filters-section {
+    background: white;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .filters-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+
+      h3 {
+        color: #2c3e50;
+        margin: 0;
+      }
+    }
+
+    .filters-content {
+      .filter-group {
+        margin-bottom: 1.5rem;
+
+        label {
+          display: block;
+          font-weight: 600;
+          color: #495057;
+          margin-bottom: 0.5rem;
+        }
+
+        .chip-group {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+
+          .chip {
+            padding: 0.5rem 1rem;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+
+            &:hover {
+              background: #f8f9fa;
+            }
+
+            &.active {
+              background: #667eea;
+              color: white;
+              border-color: #667eea;
+            }
+          }
+        }
+
+        .search-input {
+          width: 100%;
+          padding: 0.75rem;
+          border: 2px solid #dee2e6;
+          border-radius: 8px;
+          font-size: 1rem;
+          transition: border-color 0.3s ease;
+
+          &:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+          }
+        }
+      }
+    }
+  }
+
+  .view-controls {
+    background: white;
+    padding: 1rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    .view-mode-buttons {
+      display: flex;
+      gap: 0.5rem;
+
+      .btn-icon {
+        padding: 0.5rem 1rem;
+        border: 2px solid #dee2e6;
+        background: white;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &.active {
+          background: #667eea;
+          color: white;
+          border-color: #667eea;
+        }
+
+        &:hover:not(.active) {
+          background: #f8f9fa;
+        }
+      }
+    }
+  }
+
+  .urgent-tasks {
+    background: #fff3cd;
+    border: 2px solid #ffc107;
+    padding: 1.5rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+
+    h3 {
+      color: #856404;
+      margin-bottom: 1rem;
+    }
+
+    .urgent-list {
+      .urgent-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 0.75rem;
+        background: white;
+        border-radius: 8px;
+        margin-bottom: 0.5rem;
+
+        .priority-icon {
+          font-size: 1.2rem;
+        }
+
+        .task-title {
+          flex: 1;
+          font-weight: 500;
+        }
+
+        .due-date {
+          color: #6c757d;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .tasks-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 1.5rem;
+
+    .task-card {
+      background: white;
+      border-radius: 16px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+
+      &::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 4px;
+        background: #dee2e6;
+      }
+
+      &.status-pending::before { background: #ffc107; }
+      &.status-progress::before { background: #17a2b8; }
+      &.status-review::before { background: #6c757d; }
+      &.status-completed::before { background: #28a745; }
+      &.status-cancelled::before { background: #dc3545; }
+      &.status-hold::before { background: #868e96; }
+
+      &:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .task-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+
+        .task-id {
+          font-size: 0.85rem;
+          color: #6c757d;
+          font-family: monospace;
+        }
+      }
+
+      h3 {
+        color: #2c3e50;
+        font-size: 1.1rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+      }
+
+      .task-description {
+        color: #6c757d;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+      }
+
+      .task-meta {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+
+        .status-badge {
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          font-weight: 500;
+          text-transform: uppercase;
+        }
+
+        .due-date {
+          padding: 0.25rem 0.75rem;
+          background: #f8f9fa;
+          border-radius: 20px;
+          font-size: 0.85rem;
+          color: #495057;
+        }
+      }
+
+      .task-progress {
+        margin-bottom: 1rem;
+
+        label {
+          display: block;
+          font-size: 0.85rem;
+          color: #6c757d;
+          margin-bottom: 0.5rem;
+        }
+
+        .progress-slider {
+          width: 100%;
+          margin-bottom: 0.5rem;
+        }
+
+        .progress-bar {
+          height: 8px;
+          background: #e9ecef;
+          border-radius: 4px;
+          overflow: hidden;
+
+          .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+          }
+        }
+      }
+
+      .task-actions {
+        display: flex;
+        gap: 0.5rem;
+
+        .status-select {
+          flex: 1;
+          padding: 0.5rem;
+          border: 2px solid #dee2e6;
+          border-radius: 8px;
+          background: white;
+          cursor: pointer;
+
+          &:focus {
+            outline: none;
+            border-color: #667eea;
+          }
+        }
+
+        .btn-sm {
+          padding: 0.5rem;
+          font-size: 0.9rem;
+        }
+      }
+    }
+
+    .no-tasks {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 4rem 2rem;
+      background: white;
+      border-radius: 16px;
+
+      h3 {
+        color: #6c757d;
+        margin-bottom: 1rem;
+      }
+
+      p {
+        color: #adb5bd;
+        margin-bottom: 1.5rem;
+      }
+    }
+  }
+
+  .implementation-summary {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-top: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: 0.5rem 0;
+        color: #495057;
+        border-bottom: 1px solid #e9ecef;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: '✓';
+          color: #28a745;
+          font-weight: bold;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 768px) {
+  .task-list-container {
+    padding: 1rem;
+
+    .stats-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .tasks-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .view-controls {
+      flex-direction: column;
+      gap: 1rem;
+    }
+  }
+}
+
+// Animations
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+Estilos para Task Form Component
+Crear archivo src/app/features/task-manager/task-form/task-form.component.scss:
+.task-form-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 2rem;
+
+  .form-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px 16px 0 0;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2rem;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-size: 0.95rem;
+    }
+  }
+
+  .validation-errors {
+    background: #fee;
+    border: 2px solid #dc3545;
+    border-radius: 8px;
+    padding: 1rem;
+    margin: 1rem 0;
+
+    h4 {
+      color: #dc3545;
+      margin: 0 0 0.5rem 0;
+      font-size: 1rem;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.5rem;
+
+      li {
+        color: #721c24;
+        margin: 0.25rem 0;
+      }
+    }
+  }
+
+  .task-form {
+    background: white;
+    padding: 2rem;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: #2c3e50;
+
+        &::after {
+          content: ' *';
+          color: #dc3545;
+        }
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        &:valid {
+          border-color: #28a745;
+        }
+
+        &:invalid:not(:focus):not(:placeholder-shown) {
+          border-color: #dc3545;
+        }
+      }
+
+      textarea.form-control {
+        resize: vertical;
+        min-height: 100px;
+        font-family: inherit;
+      }
+
+      select.form-control {
+        cursor: pointer;
+
+        option {
+          padding: 0.5rem;
+        }
+      }
+    }
+
+    .tags-selector {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+
+      .tag-btn {
+        padding: 0.5rem 1rem;
+        border: 2px solid #dee2e6;
+        background: white;
+        border-radius: 20px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        &.active {
+          background: #667eea;
+          color: white;
+          border-color: #667eea;
+        }
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 2px solid #e9ecef;
+
+      .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+
+        &.btn-secondary {
+          background: #6c757d;
+          color: white;
+
+          &:hover {
+            background: #545b62;
+          }
+        }
+
+        &.btn-info {
+          background: #17a2b8;
+          color: white;
+
+          &:hover {
+            background: #138496;
+          }
+        }
+
+        &.btn-primary {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+
+          &:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+          }
+
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+          }
+        }
+
+        .spinner-small {
+          width: 16px;
+          height: 16px;
+          border: 2px solid #f3f3f3;
+          border-top: 2px solid white;
+          border-radius: 50%;
+          animation: spin 1s linear infinite;
+        }
+      }
+    }
+  }
+
+  .provider-info {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: 0.5rem 0;
+        color: #495057;
+        border-bottom: 1px solid #dee2e6;
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        &::before {
+          content: '▶';
+          color: #667eea;
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+Estilos para User Dashboard Component
+Crear archivo src/app/features/user-management/user-dashboard/user-dashboard.component.scss:
+.user-dashboard {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+  background: #f8f9fa;
+  min-height: 100vh;
+
+  .dashboard-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    text-align: center;
+    box-shadow: 0 4px 20px rgba(102, 126, 234, 0.3);
+
+    h1 {
+      margin: 0 0 0.5rem 0;
+      font-size: 2.5rem;
+    }
+
+    .subtitle {
+      opacity: 0.9;
+      font-style: italic;
+    }
+  }
+
+  .loading-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.95);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+
+    .spinner {
+      width: 60px;
+      height: 60px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    p {
+      margin-top: 1rem;
+      color: #6c757d;
+      font-size: 1.2rem;
+    }
+  }
+
+  .metrics-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+
+      .metric-card {
+        padding: 1.5rem;
+        border-radius: 12px;
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+
+        &::before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          height: 4px;
+          background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        &:hover {
+          transform: translateY(-4px);
+          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        h3 {
+          font-size: 2.5rem;
+          margin: 0 0 0.5rem 0;
+          background: linear-gradient(45deg, #667eea, #764ba2);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+        }
+
+        p {
+          margin: 0;
+          color: #6c757d;
+          text-transform: uppercase;
+          font-size: 0.85rem;
+          letter-spacing: 1px;
+        }
+
+        &.total {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+
+          h3 {
+            -webkit-text-fill-color: white;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        &.active {
+          background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+          color: white;
+
+          h3 {
+            -webkit-text-fill-color: white;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        &.inactive {
+          background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+          color: white;
+
+          h3 {
+            -webkit-text-fill-color: white;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+
+        &.average {
+          background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+          color: white;
+
+          h3 {
+            -webkit-text-fill-color: white;
+          }
+
+          p {
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+      }
+    }
+
+    .roles-section {
+      margin-top: 2rem;
+
+      h3 {
+        color: #2c3e50;
+        margin-bottom: 1rem;
+      }
+
+      .roles-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+
+        .role-card {
+          background: white;
+          border: 2px solid #e9ecef;
+          padding: 1rem;
+          border-radius: 12px;
+          text-align: center;
+          transition: all 0.3s ease;
+
+          &:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+          }
+
+          .role-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+            display: block;
+          }
+
+          .role-name {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 0.25rem;
+          }
+
+          .role-count {
+            color: #6c757d;
+            font-size: 1.5rem;
+          }
+        }
+      }
+    }
+  }
+
+  .period-selector {
+    background: white;
+    padding: 1rem;
+    border-radius: 12px;
+    margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    button {
+      padding: 0.5rem 1rem;
+      border: 2px solid #dee2e6;
+      background: white;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: #f8f9fa;
+      }
+
+      &.active {
+        background: #667eea;
+        color: white;
+        border-color: #667eea;
+      }
+    }
+  }
+
+  .chart-section {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+      text-align: center;
+    }
+
+    .chart-container {
+      min-height: 300px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 2rem;
+
+      .chart-placeholder {
+        text-align: center;
+        color: #6c757d;
+
+        .chart-icon {
+          font-size: 3rem;
+          margin-bottom: 1rem;
+        }
+
+        p {
+          margin: 0;
+        }
+      }
+    }
+  }
+
+  .department-distribution {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1.5rem;
+    }
+
+    .department-list {
+      .department-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+        transition: background 0.3s ease;
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .department-name {
+          font-weight: 500;
+          color: #2c3e50;
+        }
+
+        .department-count {
+          background: #667eea;
+          color: white;
+          padding: 0.25rem 0.75rem;
+          border-radius: 20px;
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+
+  .migration-info {
+    background: #d4edda;
+    border: 2px solid #28a745;
+    padding: 1.5rem;
+    border-radius: 12px;
+    margin-top: 2rem;
+
+    h3 {
+      color: #155724;
+      margin-bottom: 1rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+
+      li {
+        padding: 0.5rem 0;
+        color: #155724;
+
+        &::before {
+          content: '✅';
+          margin-right: 0.5rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .user-dashboard {
+    padding: 1rem;
+
+    .metrics-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .roles-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+
+    .period-selector {
+      flex-wrap: wrap;
+    }
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+TESTING DE SERVICIOS
+Test para TaskStateService
+Crear archivo src/app/core/services/task-state.service.spec.ts:
+import { TestBed } from '@angular/core/testing';
+import { TaskStateService } from './task-state.service';
+import { TaskStatus, TaskPriority } from '../interfaces/task.interface';
+
+describe('TaskStateService', () => {
+  let service: TaskStateService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(TaskStateService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should add a new task', () => {
+    const initialCount = service.tasks().length;
+    
+    const newTask = service.addTask({
+      title: 'Test Task',
+      description: 'Test Description',
+      priority: TaskPriority.MEDIUM,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: new Date(),
+      estimatedHours: 8
+    });
+
+    expect(newTask).toBeDefined();
+    expect(newTask.id).toBeTruthy();
+    expect(service.tasks().length).toBe(initialCount + 1);
+  });
+
+  it('should update task status', () => {
+    const task = service.addTask({
+      title: 'Test Task',
+      description: 'Test',
+      priority: TaskPriority.HIGH,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: new Date(),
+      estimatedHours: 8
+    });
+
+    service.changeTaskStatus(task.id, TaskStatus.IN_PROGRESS);
+    
+    const updatedTask = service.tasks().find(t => t.id === task.id);
+    expect(updatedTask?.status).toBe(TaskStatus.IN_PROGRESS);
+  });
+
+  it('should filter tasks by status', () => {
+    // Add tasks with different statuses
+    service.addTask({
+      title: 'Pending Task',
+      description: 'Test',
+      priority: TaskPriority.LOW,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: new Date(),
+      estimatedHours: 8
+    });
+
+    const inProgressTask = service.addTask({
+      title: 'In Progress Task',
+      description: 'Test',
+      priority: TaskPriority.MEDIUM,
+      assigneeId: 'user-2',
+      projectId: 'PRY-002',
+      dueDate: new Date(),
+      estimatedHours: 16
+    });
+
+    service.changeTaskStatus(inProgressTask.id, TaskStatus.IN_PROGRESS);
+
+    // Apply filter
+    service.updateFilter({ status: [TaskStatus.IN_PROGRESS] });
+
+    const filtered = service.filteredTasks();
+    expect(filtered.length).toBe(1);
+    expect(filtered[0].status).toBe(TaskStatus.IN_PROGRESS);
+  });
+
+  it('should calculate statistics correctly', () => {
+    // Clear existing tasks
+    localStorage.removeItem('provias_tasks');
+    
+    // Add specific tasks
+    const task1 = service.addTask({
+      title: 'Task 1',
+      description: 'Test',
+      priority: TaskPriority.CRITICAL,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: new Date(),
+      estimatedHours: 10
+    });
+
+    const task2 = service.addTask({
+      title: 'Task 2',
+      description: 'Test',
+      priority: TaskPriority.HIGH,
+      assigneeId: 'user-2',
+      projectId: 'PRY-002',
+      dueDate: new Date(),
+      estimatedHours: 20
+    });
+
+    service.changeTaskStatus(task2.id, TaskStatus.COMPLETED);
+
+    const stats = service.statistics();
+    expect(stats.total).toBeGreaterThanOrEqual(2);
+    expect(stats.byStatus[TaskStatus.COMPLETED]).toBeGreaterThanOrEqual(1);
+    expect(stats.byPriority[TaskPriority.CRITICAL]).toBeGreaterThanOrEqual(1);
+  });
+
+  it('should identify urgent tasks', () => {
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const urgentTask = service.addTask({
+      title: 'Urgent Task',
+      description: 'Due tomorrow',
+      priority: TaskPriority.URGENT,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: tomorrow,
+      estimatedHours: 4
+    });
+
+    const urgent = service.urgentTasks();
+    expect(urgent.length).toBeGreaterThanOrEqual(1);
+    expect(urgent.some(t => t.id === urgentTask.id)).toBeTruthy();
+  });
+
+  it('should delete a task', () => {
+    const task = service.addTask({
+      title: 'Task to Delete',
+      description: 'Test',
+      priority: TaskPriority.LOW,
+      assigneeId: 'user-1',
+      projectId: 'PRY-001',
+      dueDate: new Date(),
+      estimatedHours: 8
+    });
+
+    const countBefore = service.tasks().length;
+    service.deleteTask(task.id);
+    const countAfter = service.tasks().length;
+
+    expect(countAfter).toBe(countBefore - 1);
+    expect(service.tasks().find(t => t.id === task.id)).toBeUndefined();
+  });
+});
+Test para NotificationService
+Crear archivo src/app/shared/services/notification.service.spec.ts:
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
+import { NotificationService } from './notification.service';
+
+describe('NotificationService', () => {
+  let service: NotificationService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(NotificationService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+
+  it('should add success notification', () => {
+    service.success('Success', 'Operation completed');
+    
+    const notifications = service.notifications();
+    expect(notifications.length).toBe(1);
+    expect(notifications[0].type).toBe('success');
+    expect(notifications[0].title).toBe('Success');
+  });
+
+  it('should add error notification without auto-dismiss', () => {
+    service.error('Error', 'Something went wrong');
+    
+    const notifications = service.notifications();
+    expect(notifications.length).toBe(1);
+    expect(notifications[0].type).toBe('error');
+    expect(notifications[0].duration).toBe(0);
+  });
+
+  it('should remove notification after duration', fakeAsync(() => {
+    service.show({
+      type: 'info',
+      title: 'Info',
+      message: 'Test message',
+      duration: 1000
+    });
+
+    expect(service.notifications().length).toBe(1);
+    
+    tick(1000);
+    
+    expect(service.notifications().length).toBe(0);
+  }));
+
+  it('should manually remove notification', () => {
+    service.info('Info', 'Test');
+    const notifications = service.notifications();
+    const id = notifications[0].id;
+
+    service.remove(id);
+    expect(service.notifications().length).toBe(0);
+  });
+
+  it('should clear all notifications', () => {
+    service.success('Success 1');
+    service.warning('Warning 1');
+    service.info('Info 1');
+
+    expect(service.notifications().length).toBe(3);
+
+    service.clear();
+    expect(service.notifications().length).toBe(0);
+  });
+
+  it('should track hasNotifications correctly', () => {
+    expect(service.hasNotifications()).toBe(false);
+
+    service.info('Test');
+    expect(service.hasNotifications()).toBe(true);
+
+    service.clear();
+    expect(service.hasNotifications()).toBe(false);
+  });
+});
+COMANDOS ÚTILES PARA LA SESIÓN
+Scripts de NPM para package.json
+Agregar a package.json:
+{
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "build:prod": "ng build --configuration production",
+    "test": "ng test",
+    "test:coverage": "ng test --code-coverage",
+    "lint": "ng lint",
+    "serve:lab5": "ng serve --open --port 4205",
+    "generate:service": "ng generate service",
+    "generate:component": "ng generate component --standalone",
+    "analyze": "ng build --stats-json && webpack-bundle-analyzer dist/mi-primera-app-angular/stats.json"
+  }
+}
+Comandos de Verificación
+# Verificar servicios creados
+echo "Servicios de la Sesión 5:"
+ls -la src/app/core/services/
+ls -la src/app/shared/services/
+
+# Verificar componentes standalone
+echo "Componentes Standalone:"
+grep -r "standalone: true" src/app/features/
+
+# Verificar uso de inject()
+echo "Uso de inject():"
+grep -r "inject(" src/app/
+
+# Verificar InjectionTokens
+echo "Tokens de Inyección:"
+grep -r "InjectionToken" src/app/core/tokens/
+
+# Ejecutar tests de servicios
+ng test --include='**/services/**/*.spec.ts'
+
+# Build de producción para verificar tree-shaking
+ng build --configuration production --stats-json
+
+# Ver tamaño del bundle
+ls -lh dist/mi-primera-app-angular/*.js
+RESUMEN Y CONCLUSIÓN DE LA SESIÓN 5
+Logros Alcanzados
+✅ Dominio de Inyección de Dependencias Moderna
+•	Implementación completa con inject() en lugar de constructor
+•	Comprensión de la jerarquía de inyectores
+•	Uso efectivo de providedIn: 'root' vs providers locales
+✅ Servicios Reactivos con Signals
+•	Estado global manejado con signals
+•	Computed signals para derivaciones automáticas
+•	Effects para side effects controlados
+•	Persistencia automática en localStorage
+✅ Componentes Standalone
+•	Migración exitosa de NgModules a standalone
+•	Imports explícitos y optimizados
+•	Tree-shaking mejorado
+•	Componentes verdaderamente independientes
+✅ Providers y Tokens Avanzados
+•	InjectionTokens para configuración y servicios no-clase
+•	Multi-providers para extensibilidad
+•	Factory providers para lógica condicional
+•	Estrategias intercambiables con tokens
+✅ Patrones Empresariales
+•	Repository Pattern para abstracción de datos
+•	Unit of Work para transacciones
+•	Global Store con Signals
+•	Logging y caché estratégicos
+Mejores Prácticas Aplicadas
+1.	Inmutabilidad: Todos los updates de signals son inmutables
+2.	Type Safety: Interfaces TypeScript en toda la aplicación
+3.	Separation of Concerns: Lógica de negocio en servicios
+4.	Single Responsibility: Cada servicio con un propósito claro
+5.	Dependency Inversion: Uso de abstracciones (tokens) sobre implementaciones concretas
+Métricas de Mejora
+•	Reducción de Bundle Size: ~20% con standalone components
+•	Mejora en Performance: Signals vs Observables para estado de UI
+•	Reducción de Boilerplate: ~30% menos código con inject()
+•	Testing Simplificado: Inyección más fácil de mockear
+Preparación para la Próxima Sesión
+Sesión 6 - Jueves 14/08: Comunicación HTTP
+•	HttpClient avanzado
+•	Interceptors para auth y logging
+•	Manejo robusto de errores
+•	Estrategias de caché HTTP
+•	Optimistic updates
+•	WebSockets con SignalR
+Tareas Recomendadas
+1.	Migrar un servicio existente a signals en su proyecto actual
+2.	Convertir un módulo completo a componentes standalone
+3.	Implementar un sistema de caché con InjectionToken
+4.	Crear un store global con signals para su aplicación
+5.	Escribir tests para al menos 3 servicios
+Recursos Adicionales
+•	Angular Signals Guide
+•	Standalone Components
+•	Dependency Injection
+•	Testing Services
+MENSAJE FINAL
+¡Felicitaciones! Han completado exitosamente la Sesión 5 del curso Angular v18.
+Hoy han dado un salto significativo en sus habilidades de arquitectura Angular. Ya no son solo desarrolladores que escriben componentes; son arquitectos que diseñan sistemas escalables y mantenibles.
+Los conceptos dominados hoy (inyección de dependencias avanzada, servicios reactivos con signals, componentes standalone) son lo que diferencia a un desarrollador Angular junior de uno senior.
+Recuerden:
+•	La arquitectura correcta desde el inicio ahorra meses de refactoring
+•	Los patterns aprendidos son aplicables a cualquier proyecto Angular
+•	La migración a standalone y signals es el futuro de Angular
+¡Excelente trabajo! Nos vemos el jueves 14 de agosto a las 19:00 para continuar con Comunicación HTTP! 🚀
+
+|
