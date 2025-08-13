@@ -1,1 +1,256 @@
-<p>task-list works!</p>
+<div class="task-list-container">
+  <!-- Header -->
+  <header class="task-header">
+    <h1>📋 Sistema de Gestión de Tareas - PROVIAS</h1>
+    <p class="subtitle">Gestión moderna con Signals e Inject()</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando tareas...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error()) {
+    <div class="error-state">
+      <span class="error-icon">⚠️</span>
+      <p>{{ error() }}</p>
+      <button class="btn btn-primary" (click)="loadTasks()">
+        🔄 Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- Statistics -->
+  @if (showStatistics() && statistics()) {
+    <section class="statistics-section">
+      <h2>📊 Estadísticas</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h3>{{ statistics().total }}</h3>
+          <p>Total Tareas</p>
+        </div>
+        <div class="stat-card pending">
+          <h3>{{ statistics().byStatus[TaskStatus.PENDING] || 0 }}</h3>
+          <p>Pendientes</p>
+        </div>
+        <div class="stat-card progress">
+          <h3>{{ statistics().byStatus[TaskStatus.IN_PROGRESS] || 0 }}</h3>
+          <p>En Progreso</p>
+        </div>
+        <div class="stat-card completed">
+          <h3>{{ statistics().byStatus[TaskStatus.COMPLETED] || 0 }}</h3>
+          <p>Completadas</p>
+        </div>
+        <div class="stat-card overdue">
+          <h3>{{ statistics().overdue }}</h3>
+          <p>Vencidas</p>
+        </div>
+        <div class="stat-card hours">
+          <h3>{{ statistics().totalEstimatedHours }}h</h3>
+          <p>Horas Estimadas</p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Filters -->
+  <section class="filters-section">
+    <div class="filters-header">
+      <h3>🔍 Filtros</h3>
+      <button 
+        class="btn btn-secondary"
+        (click)="showFilters.update(v => !v)">
+        {{ showFilters() ? 'Ocultar' : 'Mostrar' }}
+      </button>
+    </div>
+
+    @if (showFilters()) {
+      <div class="filters-content">
+        <!-- Status Filter -->
+        <div class="filter-group">
+          <label>Estado:</label>
+          <div class="chip-group">
+            @for (status of allStatuses; track status) {
+              <button 
+                class="chip"
+                [class.active]="selectedStatuses().includes(status)"
+                (click)="toggleStatus(status)">
+                {{ status }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Priority Filter -->
+        <div class="filter-group">
+          <label>Prioridad:</label>
+          <div class="chip-group">
+            @for (priority of allPriorities; track priority) {
+              <button 
+                class="chip"
+                [class.active]="selectedPriorities().includes(priority)"
+                [class]="getPriorityClass(priority)"
+                (click)="togglePriority(priority)">
+                {{ getPriorityIcon(priority) }} {{ priority }}
+              </button>
+            }
+          </div>
+        </div>
+
+        <!-- Search -->
+        <div class="filter-group">
+          <label>Buscar:</label>
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            (input)="onSearchTermChange()"
+            placeholder="Buscar por título o descripción..."
+            class="search-input">
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button class="btn btn-warning" (click)="clearFilters()">
+            🧹 Limpiar Filtros
+          </button>
+        }
+      </div>
+    }
+  </section>
+
+  <!-- View Mode Selector -->
+  <section class="view-controls">
+    <div class="view-mode-buttons">
+      <button 
+        [class.active]="viewMode() === 'grid'"
+        (click)="changeViewMode('grid')"
+        class="btn btn-icon">
+        ⚏ Grid
+      </button>
+      <button 
+        [class.active]="viewMode() === 'list'"
+        (click)="changeViewMode('list')"
+        class="btn btn-icon">
+        ☰ Lista
+      </button>
+      <button 
+        [class.active]="viewMode() === 'kanban'"
+        (click)="changeViewMode('kanban')"
+        class="btn btn-icon">
+        ⫿ Kanban
+      </button>
+    </div>
+    <button class="btn btn-primary" (click)="loadTasks()">
+      🔄 Actualizar
+    </button>
+  </section>
+
+  <!-- Urgent Tasks Alert -->
+  @if (urgentTasks().length > 0) {
+    <section class="urgent-tasks">
+      <h3>🚨 Tareas Urgentes</h3>
+      <div class="urgent-list">
+        @for (task of urgentTasks(); track task.id; let i = $index) {
+          @if (i < 3) {
+            <div class="urgent-item">
+              <span class="priority-icon">{{ getPriorityIcon(task.priority) }}</span>
+              <span class="task-title">{{ task.title }}</span>
+              <span class="due-date">Vence: {{ task.dueDate | date:'short' }}</span>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Tasks Grid View -->
+  @if (viewMode() === 'grid') {
+    <div class="tasks-grid">
+      @for (task of tasks(); track task.id) {
+        <div 
+          class="task-card"
+          [class]="getStatusClass(task.status)"
+          (click)="selectTask(task.id)">
+          
+          <div class="task-header">
+            <span class="task-id">{{ task.id }}</span>
+            <span [class]="getPriorityClass(task.priority)">
+              {{ getPriorityIcon(task.priority) }}
+            </span>
+          </div>
+
+          <h3>{{ task.title }}</h3>
+          <p class="task-description">{{ task.description }}</p>
+
+          <div class="task-meta">
+            <span class="status-badge" [class]="getStatusClass(task.status)">
+              {{ task.status }}
+            </span>
+            <span class="due-date">📅 {{ task.dueDate | date:'shortDate' }}</span>
+          </div>
+
+          <div class="task-progress">
+            <label>Progreso: {{ task.completionPercentage }}%</label>
+            <input 
+              type="range"
+              [value]="task.completionPercentage"
+              (change)="updateProgress(task.id, $event)"
+              min="0"
+              max="100"
+              class="progress-slider">
+            <div class="progress-bar">
+              <div 
+                class="progress-fill"
+                [style.width.%]="task.completionPercentage">
+              </div>
+            </div>
+          </div>
+
+          <div class="task-actions">
+            <select 
+              [value]="task.status"
+              (change)="updateTaskStatus(task.id, $any($event.target).value)"
+              class="status-select">
+              @for (status of allStatuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+            <button 
+              class="btn btn-danger btn-sm"
+              (click)="deleteTask(task.id); $event.stopPropagation()">
+              🗑️
+            </button>
+          </div>
+        </div>
+      } @empty {
+        <div class="no-tasks">
+          <h3>📭 No se encontraron tareas</h3>
+          @if (hasActiveFilters()) {
+            <p>No hay tareas que coincidan con los filtros seleccionados</p>
+            <button class="btn btn-primary" (click)="clearFilters()">
+              Limpiar Filtros
+            </button>
+          } @else {
+            <p>No hay tareas registradas en el sistema</p>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Implementation Summary -->
+  <section class="implementation-summary">
+    <h2>✅ Características Implementadas</h2>
+    <ul>
+      <li>✨ Servicios con Signals para estado reactivo</li>
+      <li>💉 Inyección con inject() en lugar de constructor</li>
+      <li>📊 Computed signals para estadísticas automáticas</li>
+      <li>🔄 Effects para persistencia automática</li>
+      <li>🎯 Filtrado reactivo con signals</li>
+      <li>📱 Vista responsiva con múltiples modos</li>
+    </ul>
+  </section>
+</div>
