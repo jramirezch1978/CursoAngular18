@@ -1,0 +1,285 @@
+GUIÓN DETALLADO - SESIÓN 5: MÓDULOS, COMPONENTES Y SERVICIOS
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Portada del Curso (2 minutos)
+Buenos días a todos y bienvenidos a nuestra quinta sesión del curso Angular 18. Es un gusto verlos nuevamente en esta jornada de aprendizaje intensivo.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y hoy, martes 12 de agosto de 2025, vamos a adentrarnos en el corazón arquitectónico de Angular: los módulos, componentes y servicios. Si en sesiones anteriores aprendimos a controlar el DOM con directivas, hoy aprenderemos a arquitectar aplicaciones completas como verdaderos ingenieros de software.
+Imaginen que están construyendo el nuevo sistema de gestión para PROVIAS. No basta con tener paredes bonitas y puertas que se abren; necesitan una arquitectura sólida, sistemas de comunicación entre departamentos, y servicios centralizados que todos puedan usar. Eso es exactamente lo que haremos hoy con Angular.
+La sesión de hoy será completamente práctica, un laboratorio intensivo de 3 horas. Sus manos estarán en el teclado constantemente, construyendo, experimentando, resolviendo problemas reales. Es como un taller de mecánica donde no solo ven cómo funciona el motor, sino que lo desarman y vuelven a armar ustedes mismos.
+Angular 18 ha revolucionado la forma en que estructuramos aplicaciones con los componentes standalone y la nueva función inject(). Ya no necesitamos la complejidad de los NgModules tradicionales. Es como pasar de manejar con caja manual a una automática de última generación: más simple, más eficiente, pero igualmente poderosa.
+Preparen sus entornos de desarrollo, asegúrense de que su proyecto Angular esté funcionando, y prepárense para tres horas de código intensivo que transformarán su forma de pensar sobre arquitectura de aplicaciones.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Hoy no solo van a aprender conceptos; van a convertirse en arquitectos de aplicaciones Angular modernas.
+Dominar la Inyección de Dependencias es como aprender el sistema circulatorio de una aplicación. Los servicios son la sangre que lleva datos y funcionalidad a todos los componentes. Van a entender no solo cómo inyectar servicios, sino por qué Angular usa este patrón y cómo aprovecharlo al máximo.
+Crear y configurar servicios con diferentes alcances es estrategia pura. No todos los servicios deben ser globales. Algunos deben vivir solo en ciertos componentes, otros compartirse en rutas específicas. Es como decidir si un recurso en su empresa debe ser corporativo, departamental o personal.
+Los componentes standalone son el futuro de Angular. Olvídense de los módulos complicados. Cada componente declara exactamente lo que necesita, nada más, nada menos. Es minimalismo aplicado al código: solo lo esencial, pero todo lo necesario.
+Gestionar Providers y Tokens es control fino sobre la inyección. Van a aprender a crear tokens personalizados, a configurar providers de diferentes formas, a tener múltiples implementaciones del mismo servicio. Es como tener diferentes proveedores para el mismo servicio y poder elegir cuál usar según el contexto.
+La migración de NgModules a Standalone no es solo una moda; es evolución necesaria. Van a aprender a modernizar código legacy, a transformar aplicaciones antiguas en arquitecturas modernas. Es como renovar un edificio histórico manteniendo su esencia pero con toda la tecnología moderna.
+Los patrones Singleton y Factory en servicios son patrones de diseño clásicos aplicados a Angular. Van a entender cuándo un servicio debe tener una única instancia global y cuándo necesitan instancias múltiples. Es gestión inteligente de recursos.
+Al final de esta sesión, tendrán una arquitectura modular profesional, servicios reutilizables que pueden llevar a cualquier proyecto, y la confianza para diseñar aplicaciones escalables.
+________________________________________
+Diapositiva 3: Agenda de la Sesión (1 minuto)
+Nuestra agenda está diseñada como un bootcamp intensivo: cada minuto cuenta, cada ejercicio construye sobre el anterior.
+El Lab 1 de 45 minutos es nuestra base. Van a dominar la inyección de dependencias moderna con la función inject() y crear servicios con Signals. Es el fundamento sobre el cual construiremos todo lo demás.
+El Lab 2 también de 45 minutos los llevará al mundo de los componentes standalone. Van a migrar componentes tradicionales, entender las dependencias, y experimentar la libertad de no necesitar módulos.
+Después de 90 minutos de código intenso, nos tomaremos nuestro merecido break de 15 minutos. El cerebro necesita procesar, las manos necesitan descansar. No lo subestimen.
+El Lab 3 de 45 minutos es donde se vuelven arquitectos. Providers personalizados, jerarquía de inyectores, configuración dinámica. Es donde separan a los juniors de los seniors.
+El Lab 4 de 25 minutos es la guinda del pastel: arquitectura empresarial con patrones avanzados. Repository pattern, Unit of Work, gestión de estado global con Signals.
+Los últimos 5 minutos consolidaremos todo lo aprendido y los prepararemos para aplicar estos conocimientos en el mundo real.
+Cada laboratorio tiene código real que pueden usar mañana mismo en sus proyectos. No es teoría académica; es conocimiento práctico aplicable.
+________________________________________
+Diapositiva 4: Evolución de Angular - Modules vs Standalone (3 minutos)
+Lo que van a ver ahora es un cambio de paradigma en Angular. Es como cuando las empresas pasaron de oficinas compartimentadas a espacios abiertos y colaborativos.
+Miren el código de NgModules tradicional. Era como tener que registrar cada componente en una oficina central antes de poder usarlo. Declarations, imports, providers, bootstrap... mucha burocracia para algo que debería ser simple. Era necesario en su momento, pero los tiempos cambian.
+Ahora observen los componentes standalone. Cada componente es independiente, autodescriptivo. El componente mismo dice: "necesito estos imports, uso estos servicios". No hay intermediarios, no hay módulos que mantener. Es comunicación directa y clara.
+El bootstrapApplication simplificado es elegancia pura. En lugar de bootstrap un módulo que contiene componentes, bootstrapean directamente el componente. Es como la diferencia entre llamar a una empresa y que te pasen por cinco departamentos versus tener línea directa con quien necesitas.
+Las ventajas no son solo estéticas. Menos boilerplate significa menos código que mantener, menos lugares donde pueden ocurrir errores. El tree-shaking mejorado significa que su aplicación final es más pequeña. Si no usan algo, no se incluye en el build. Es eficiencia en todos los niveles.
+En un proyecto reciente para una empresa de logística, migrar a standalone redujo el tamaño del bundle en un 20% y el tiempo de desarrollo de nuevos features en un 30%. No es solo una mejora; es una revolución en productividad.
+La mejor parte: pueden migrar gradualmente. No necesitan reescribir toda su aplicación de una vez. Pueden convertir componente por componente, a su ritmo. Es evolución, no revolución forzada.
+________________________________________
+Diapositiva 5: Inyección de Dependencias - Core Concepts (3 minutos)
+La inyección de dependencias es como el sistema de distribución de una ciudad moderna. No cada casa tiene su pozo de agua; hay un sistema centralizado que distribuye agua a quien la necesita.
+El decorador @Injectable con providedIn: 'root' es brillante en su simplicidad. Le dicen a Angular: "este servicio debe estar disponible globalmente, crea una sola instancia y compártela con todos". Es el patrón singleton implementado elegantemente.
+Los signals en el servicio son la nueva forma reactiva. private users = signal<User[]>([]) crea una señal que contiene usuarios. Cuando cambia, todos los que la observan se actualizan automáticamente. Es como tener un canal de noticias donde todos los suscriptores reciben actualizaciones instantáneas.
+El método addUser muestra actualización inmutable. No modifican el array existente; crean uno nuevo con el usuario agregado. Es como hacer una fotocopia modificada en lugar de escribir sobre el documento original. Previene bugs sutiles y hace el código más predecible.
+En el componente, tienen dos formas de inyectar. El constructor injection es el clásico, familiar para quienes vienen de otros frameworks. Pero la función inject() es el futuro. Es más flexible, más clara, funciona en más contextos.
+El computed() que ven es magia reactiva. Cuando el servicio actualiza los usuarios, el computed se recalcula automáticamente. No necesitan suscripciones, no necesitan manejar actualizaciones manualmente. Es reactividad sin esfuerzo.
+Piensen en esto como un sistema de notificaciones automático. Cuando el departamento de recursos humanos actualiza la lista de empleados, todos los departamentos que usan esa lista ven los cambios inmediatamente. No hay que enviar memos, no hay que hacer llamadas. La información fluye automáticamente.
+________________________________________
+Diapositiva 6: LAB 1 - Sistema de Gestión con Servicios (5 minutos)
+Manos a la obra. Vamos a construir un sistema de gestión de tareas que cualquier empresa querría tener.
+El TaskStateService que van a crear es el cerebro de su aplicación. Imaginen que están construyendo el sistema de seguimiento de proyectos para PROVIAS. Necesitan saber qué tareas existen, cuáles están completadas, cuáles pendientes, y mostrar estadísticas en tiempo real.
+Los signals privados (tasks, loading, error) son el estado interno del servicio. Son como las variables de estado de un PLC industrial: contienen la información crítica del sistema. Nadie puede modificarlos directamente desde fuera, solo a través de métodos controlados.
+Los computed signals son derivaciones inteligentes. completedTasks no es una variable que actualizan manualmente; se calcula automáticamente filtrando las tareas completadas. Es como tener un contador digital que siempre muestra el valor correcto sin que nadie lo actualice manualmente.
+El taskStats es análisis en tiempo real. Porcentaje de completitud, totales, pendientes... todo se recalcula automáticamente cuando cambian las tareas. Es como un dashboard que siempre está actualizado sin necesidad de refrescar.
+El método loadTasks simula una carga asíncrona. En el mundo real, esto sería una llamada HTTP. El patrón de setear loading a true, cargar datos, y luego setear a false es estándar en aplicaciones profesionales. Los usuarios ven un spinner mientras esperan, no una pantalla congelada.
+El addTask muestra creación con IDs únicos. Date.now().toString() genera un ID temporal único. En producción, el backend generaría estos IDs, pero para desarrollo y testing, esta técnica es perfecta.
+Durante estos 45 minutos, van a expandir este servicio. Agregarán métodos para editar tareas, eliminarlas, filtrarlas por categoría, buscar por texto. Van a implementar persistencia en localStorage para que los datos sobrevivan recargas de página. Van a agregar validación para asegurar que las tareas tengan los campos requeridos.
+Lo más importante: van a ver cómo este servicio único puede ser usado por múltiples componentes, todos viendo los mismos datos, todos sincronizados automáticamente. Es la belleza de la inyección de dependencias con servicios singleton.
+________________________________________
+Diapositiva 7: Tipos de Providers (3 minutos)
+Los providers son como diferentes formas de contratar servicios en una empresa. A veces contratan empleados fijos, a veces consultores, a veces tercerizán.
+El Class Provider es el estándar. Es como contratar un empleado regular. Angular crea una instancia de la clase y la proporciona. Simple, directo, cubre el 80% de los casos.
+El Value Provider es para valores constantes. API_URL: 'https://api.example.com' es como tener la dirección de la oficina central escrita en un papel. No cambia, todos la usan, no necesita lógica compleja.
+El Factory Provider es poder puro. La función factory puede tomar decisiones. ¿Estamos en producción? Usa este servicio. ¿Estamos en desarrollo? Usa este otro. Es como tener un gerente que decide qué proveedor usar según las circunstancias.
+El Existing Provider es para aliases. A veces tienen un servicio antiguo y uno nuevo, pero quieren que el código que pide el antiguo reciba el nuevo. Es como cuando una empresa cambia de nombre pero mantiene el número de teléfono anterior redirigiendo al nuevo.
+Los InjectionTokens para valores no-clase son fundamentales. No todo es una clase en Angular. A veces necesitan inyectar configuración, constantes, funciones. El InjectionToken les da un identificador único para estos valores. Es como tener un código de barras para cada recurso, aunque no sea un producto físico.
+El ejemplo del APP_CONFIG es real. Cada aplicación necesita configuración: URLs de API, flags de features, versiones. Con InjectionToken, esta configuración es inyectable, testeable, reemplazable. Pueden tener diferentes configuraciones para desarrollo, staging, producción, todo manejado limpiamente.
+________________________________________
+Diapositiva 8: Componentes Standalone - Arquitectura (3 minutos)
+Los componentes standalone son como apartamentos independientes versus vivir en una casa compartida con reglas complejas.
+Miren la estructura del TaskListComponent. El imports array es explícito y claro. CommonModule para directivas básicas, FormsModule para formularios, sus propios componentes y directivas. Es como hacer una lista de compras: solo lo que necesitan, nada más.
+Los providers locales son fascinantes. Pueden tener una versión especial de un servicio solo para este componente y sus hijos. Es como tener un chef privado en lugar de usar el restaurante del edificio. Útil cuando necesitan comportamiento especial en ciertas partes de la aplicación.
+El template muestra la nueva sintaxis @for con @empty. No necesitan un @if separado para mostrar "No hay tareas". Está integrado. Es diseño inteligente que entiende casos de uso reales.
+El track en @for es crítico para listas. Le dice a Angular cómo identificar cada elemento único. Sin esto, Angular recrea todos los elementos cuando la lista cambia. Con track, solo actualiza lo que cambió. En una lista de 100 tareas, puede ser la diferencia entre 10ms y 100ms de renderizado.
+La inyección con inject() en lugar de constructor es moderna y flexible. Pueden usar inject() en campos de clase, en funciones, en computed(). El constructor injection solo funciona en... el constructor. La flexibilidad importa.
+El filteredTasks computed es reactividad pura. No necesitan actualizar manualmente una lista filtrada cuando cambian los filtros o las tareas. Se recalcula automáticamente. Es como tener una vista de base de datos que siempre está actualizada.
+Este patrón de componentes standalone hace que cada componente sea una unidad independiente, reutilizable, testeable. Pueden tomar este componente y usarlo en cualquier aplicación Angular 18+ sin cambios. Es verdadera portabilidad de código.
+________________________________________
+Diapositiva 9: LAB 2 - Migración a Standalone (5 minutos)
+Este laboratorio es como renovar una casa antigua: mantienen la estructura pero modernizan todo el sistema eléctrico y de plomería.
+El código "ANTES" muestra el patrón tradicional. Un componente simple que necesita ser declarado en un módulo, que importa otros módulos, que exporta cosas. Es burocracia innecesaria para la mayoría de casos. Como tener que llenar cinco formularios para pedir un lápiz.
+El proceso de migración empieza agregando standalone: true. Es la declaración de independencia del componente. Ya no necesita un módulo padre que lo declare. Es autosuficiente.
+El siguiente paso es crítico: identificar qué imports necesita realmente el componente. No pueden simplemente importar SharedModule y esperar que funcione. Necesitan ser explícitos. CommonModule para *ngFor y *ngIf, los módulos específicos de Material que usan, ReactiveFormsModule si usan formularios reactivos.
+La migración de servicios con inject() es elegante. En lugar de listar todos los servicios en el constructor (que puede volverse largo y difícil de leer), cada servicio es un campo de clase. Es más claro, más mantenible, y permite inicialización más flexible.
+Los signals para estado reactivo reemplazan las propiedades tradicionales con getters y setters complejos. metrics = signal<Metric[]>([]) es más claro que un BehaviorSubject de RxJS para casos simples. Los signals son sincrónicos, más simples de razonar, perfectos para estado de UI.
+El computed para datos derivados es donde brilla el nuevo paradigma. chartData se recalcula automáticamente cuando cambian metrics o selectedPeriod. No necesitan suscripciones, no necesitan manejar desuscripciones, no hay memory leaks potenciales.
+Durante estos 45 minutos, van a tomar un módulo existente con al menos 5 componentes y convertirlo completamente a standalone. Van a identificar dependencias compartidas, eliminar imports innecesarios, y ver cómo el bundle size se reduce.
+El truco está en migrar de adentro hacia afuera: primero los componentes hoja (que no tienen hijos), luego los componentes padres. Es más fácil y menos propenso a errores.
+________________________________________
+Diapositiva 10: Jerarquía de Inyectores (3 minutos)
+La jerarquía de inyectores es como la estructura organizacional de una empresa. Hay recursos corporativos, departamentales y personales.
+El nivel ROOT es corporativo. Un servicio con providedIn: 'root' es como el departamento de IT central: uno para toda la empresa, todos lo comparten. Es eficiente para servicios que manejan estado global o funcionalidad común.
+El nivel de módulo está deprecándose con standalone, pero es importante entenderlo para código legacy. Era como tener recursos por departamento. Útil en su momento, pero agregaba complejidad.
+El nivel de componente es fascinante. Cuando ponen un servicio en providers de un componente, cada instancia del componente obtiene su propia instancia del servicio. Es como que cada oficina tenga su propia impresora en lugar de compartir una central.
+El nivel de ruta es estratégico. Pueden proveer servicios para toda una sección de su aplicación. Todos los componentes bajo /admin comparten el mismo AdminService. Es como tener recursos compartidos por piso en un edificio.
+ViewProviders versus providers regular es sutil pero importante. ViewProviders hace el servicio disponible solo para la vista del componente, no para el contenido proyectado. Es como tener un recurso que solo los empleados directos pueden usar, no los consultores externos.
+La resolución bottom-up es crucial de entender. Angular busca providers desde el componente actual hacia arriba en el árbol. Si no encuentra en el componente, busca en el padre, luego en el abuelo, hasta llegar a root. Es como escalar un problema: primero al supervisor, luego al gerente, luego al director.
+Esta jerarquía permite flexibilidad increíble. Pueden tener un servicio de logging global pero override para ciertos componentes que necesitan logging especial. Pueden compartir datos entre hermanos usando un servicio en el padre común. Las posibilidades son infinitas.
+________________________________________
+Diapositiva 11: Inject Function - Nuevo Paradigma (3 minutos)
+La función inject() es como pasar de escribir cartas formales a enviar mensajes directos: más rápido, más flexible, igual de efectivo.
+El constructor injection tradicional tiene sus méritos. Es familiar para desarrolladores de otros frameworks, es explícito sobre las dependencias. Pero miren ese constructor con cinco servicios inyectados. Se vuelve difícil de leer, difícil de testear.
+Ahora vean inject() como propiedad de clase. Cada servicio es una línea clara, autodocumentada. private userService = inject(UserService) es inmediatamente comprensible. No hay ambigüedad sobre qué es qué.
+La inyección opcional con inject() es elegante. { optional: true } devuelve null si el servicio no está disponible. Con el operador ?? pueden proveer un valor por defecto. Es manejo de errores proactivo, no reactivo.
+Lo que me encanta es la inyección condicional. Pueden tener lógica que decide qué servicio inyectar. En desarrollo usan un servicio mock, en producción el real. Todo decidido en tiempo de inicialización, no en runtime.
+La inyección en funciones es un caso de uso avanzado. Dentro del contexto de inyección (constructor o inicialización de campo), pueden llamar inject() en funciones. Útil para lazy loading de servicios pesados.
+La integración con computed y effect es natural. Estos son contextos de inyección válidos, así que pueden inyectar servicios directamente. Es composición de funcionalidad sin ceremonias.
+La limitación es importante: inject() solo funciona en contexto de inyección. No pueden llamarlo en cualquier método random. Es durante la construcción del componente o servicio. Una vez construido, las dependencias están fijas.
+Esta nueva forma no es solo sintaxis diferente; permite patrones que antes eran imposibles o muy complejos. Es evolución del lenguaje respondiendo a necesidades reales de desarrolladores.
+________________________________________
+Diapositiva 12: LAB 1 (Continuación) - Servicios con Signals (5 minutos)
+Continuamos construyendo nuestro sistema. Ahora agregamos la capa de API y notificaciones.
+El TaskApiService es la capa de comunicación. En aplicaciones reales, aquí es donde hacen llamadas HTTP al backend. El patrón es consistente: métodos que retornan Observables, URLs construidas dinámicamente, tipos fuertemente tipados.
+El getTasks() retorna un Observable de array de tareas. En el componente, pueden suscribirse o usar el async pipe. La ventaja de Observables es que manejan naturalmente operaciones asíncronas, reintentos, y cancelación.
+El createTask con CreateTaskDto muestra buenas prácticas. No aceptan cualquier objeto; esperan un DTO (Data Transfer Object) específico. Es validación en tiempo de compilación. TypeScript les avisará si intentan enviar datos incorrectos.
+El updateTask con Partial<Task> es flexibilidad inteligente. No necesitan enviar toda la tarea para actualizar un campo. Partial hace todos los campos opcionales. Pueden actualizar solo el título, solo el estado, lo que necesiten.
+El NotificationService es UX profesional. Los usuarios necesitan feedback inmediato sobre sus acciones. "Tarea creada", "Error al guardar", "Cargando...". Sin esto, la aplicación se siente muerta.
+El patrón de auto-remove después de 5 segundos es estándar en notificaciones toast. No quieren que se acumulen infinitamente. setTimeout con remove mantiene la interfaz limpia. Es como los mensajes de WhatsApp que desaparecen.
+La actualización de signals con update() es inmutable. No modifican el array existente; crean uno nuevo. current => [...current, notification] agrega al final, current.filter remueve. Es programación funcional aplicada.
+Durante esta continuación del lab, van a conectar estos servicios. El componente usará TaskApiService para operaciones CRUD, NotificationService para feedback. Van a implementar manejo de errores completo, loading states, y optimistic updates.
+Un patrón importante que implementarán: optimistic updates. Actualizan el UI inmediatamente, luego confirman con el servidor. Si falla, revierten. Es UX moderna que hace la aplicación sentirse instantánea.
+________________________________________
+Diapositiva 13: LAB 2 (Continuación) - Componentes Standalone Complejos (5 minutos)
+Ahora creamos un sistema de componentes que trabajan juntos sin necesidad de un módulo coordinador.
+El TaskFiltersComponent es un ejemplo perfecto de componente standalone especializado. Su único trabajo es manejar filtros y emitir cambios. No sabe nada sobre tareas, no sabe cómo se usan los filtros. Es el principio de responsabilidad única en acción.
+Los imports son mínimos: CommonModule para directivas básicas, FormsModule para ngModel, MatSelectModule para el componente de Material. Nada más. Es eficiencia en imports.
+El EventEmitter filtersChange es la comunicación hacia arriba. El componente hijo no modifica datos del padre directamente; emite eventos. El padre decide qué hacer. Es como un empleado que reporta a su supervisor, no toma decisiones por él.
+El array priorities y los filtros son estado local. No todo necesita estar en un servicio. Estado de UI específico de un componente puede vivir en el componente. Es como tener notas personales en tu escritorio versus documentos compartidos.
+El TaskManagerComponent muestra composición de componentes. Importa tres componentes standalone y los orquesta. Es como un director de orquesta: no toca instrumentos, pero coordina la sinfonía.
+El filters signal con tipo TaskFilters es type safety en acción. No pueden setear filtros inválidos. TypeScript los protegerá. Es prevención de errores en tiempo de compilación, no en producción.
+El filteredTasks computed es donde la magia ocurre. Combina tareas del servicio con filtros locales. Cuando cualquiera cambia, se recalcula. No hay lógica de actualización manual, no hay bugs de sincronización.
+El patrón de filtrado (statusMatch && priorityMatch) es legible y eficiente. Primero verifican el status, si no coincide, ni verifican priority. Es short-circuit evaluation, optimización básica pero importante.
+Durante esta parte del lab, van a crear al menos 5 componentes standalone que se comunican entre sí. Un formulario que crea tareas, una lista que las muestra, filtros que las filtran, estadísticas que las analizan, y un componente principal que los coordina.
+El objetivo es ver cómo componentes independientes pueden trabajar juntos sin acoplamiento fuerte. Cada uno es reutilizable, testeable, mantenible.
+________________________________________
+Diapositiva 14: BREAK (15 minutos)
+Excelente trabajo. Han completado la primera mitad de nuestra sesión y han logrado cosas impresionantes.
+Han implementado servicios con Signals que manejan estado reactivo moderno. No más BehaviorSubjects complejos, no más suscripciones manuales. Los signals han simplificado dramáticamente el manejo de estado.
+Han creado componentes standalone que son verdaderamente independientes. Cada componente declara sus dependencias, no hay módulos misteriosos, no hay imports mágicos. Es transparencia total.
+Han migrado de NgModules a standalone, viendo de primera mano cómo el código se vuelve más simple, más claro, más mantenible. Es como limpiar un armario y darse cuenta de cuántas cosas innecesarias tenían.
+Han aplicado inyección de dependencias moderna con inject(). Más flexible, más clara, más acorde con el paradigma funcional que está adoptando Angular.
+Durante este break, levántense y estiren. El código intensivo puede tensar el cuerpo. Hagan rotaciones de cuello, estiren los brazos, caminen un poco. Su cuerpo se los agradecerá.
+Hidrátense bien. El cerebro necesita agua para funcionar óptimamente. El café está bien para mantenerse alerta, pero el agua es esencial para la concentración sostenida.
+Reflexionen sobre lo aprendido. ¿Cómo pueden aplicar componentes standalone en sus proyectos actuales? ¿Qué servicios podrían beneficiarse de Signals? Conectar el conocimiento nuevo con problemas reales lo solidifica.
+La segunda mitad será aún más intensa. Van a trabajar con providers avanzados, tokens personalizados, jerarquía de inyectores. Van a implementar patrones empresariales como Repository y Unit of Work.
+Prepárense mentalmente. Lo que viene requiere pensamiento arquitectónico además de habilidad técnica. Van a diseñar sistemas, no solo escribir código.
+Nos vemos en exactamente 15 minutos, a las 20:45. Regresen con energía renovada y listos para el siguiente nivel.
+________________________________________
+Diapositiva 15: InjectionToken y Providers Avanzados (3 minutos)
+Los InjectionTokens son como códigos de identificación únicos para recursos que no son clases. Es como tener un ISBN para cada libro, aunque el libro sea digital.
+El APP_CONFIG token es un caso de uso clásico. Toda aplicación necesita configuración: URL del API, versión, features habilitadas. Pero la configuración no es una clase, es un objeto simple. InjectionToken le da identidad inyectable.
+La factory function en el token es brillante. No solo define el token; proporciona un valor por defecto. Si nadie override el token, la factory proporciona el valor. Es como tener un plan B incorporado.
+Los multi-providers son fascinantes. Con multi: true, pueden tener múltiples providers para el mismo token. Angular los combina en un array. Es perfecto para sistemas de plugins o validadores.
+Imaginen validadores de tareas. Tienen RequiredFieldsValidator, DateRangeValidator, PriorityValidator. Todos se registran con el mismo token. El componente recibe un array con todos y los ejecuta secuencialmente. Es el patrón Chain of Responsibility implementado elegantemente.
+El uso en componentes es simple. inject(TASK_VALIDATOR) devuelve el array de validadores. Pueden mapear sobre ellos, filtrar, hacer lo que necesiten. Es composición de comportamiento sin acoplamiento.
+Este patrón permite extensibilidad increíble. Pueden agregar validadores sin tocar código existente. Otros equipos pueden contribuir validadores. Es arquitectura abierta/cerrada: abierta para extensión, cerrada para modificación.
+Los tokens también facilitan el testing. Pueden proveer implementaciones mock fácilmente. En tests, APP_CONFIG puede tener URLs de prueba. Es inyección de dependencias aplicada a configuración.
+________________________________________
+Diapositiva 16: LAB 3 - Providers y Jerarquía (5 minutos)
+Este laboratorio es arquitectura pura. Van a diseñar un sistema de logging multi-nivel que se adapta al contexto.
+La clase abstracta LoggerService define el contrato. Cualquier logger debe implementar log(). Es como definir que todo vehículo debe poder moverse, pero no especificar si usa ruedas, alas o hélices.
+ConsoleLoggerService es la implementación simple. Imprime en consola. Perfecto para desarrollo, terrible para producción. Es como usar papel y lápiz para registrar transacciones: funciona, pero no escala.
+RemoteLoggerService es profesional. Envía logs a un servidor. Pueden analizar patterns, detectar errores recurrentes, monitorear uso. Es como tener un sistema de telemetría en su aplicación.
+El factory provider basado en configuración es inteligencia adaptativa. En desarrollo usan ConsoleLogger (rápido, visible), en producción RemoteLogger (persistente, analizable). La decisión se toma una vez, en bootstrap.
+El LOGGER_CONFIG token permite configuración flexible. Pueden cambiar el nivel de log, el destino, el formato, todo sin tocar el código del logger. Es separación de configuración y comportamiento.
+El override a nivel de componente es poder quirúrgico. El DebugPanelComponent siempre usa ConsoleLogger, sin importar la configuración global. Es útil para debugging en producción sin afectar el logging normal.
+Durante estos 45 minutos, van a implementar este sistema completo. Van a crear diferentes estrategias de logging (archivo, base de datos, servicio externo), configuración por ambiente, y override selectivo.
+Lo más importante: van a ver cómo la jerarquía de inyectores permite flexibilidad sin complejidad. Configuración global con excepciones locales, el santo grial de la arquitectura de software.
+También implementarán un sistema de caché con estrategias intercambiables: memoria, localStorage, sessionStorage. Verán cómo el mismo patrón se aplica a diferentes problemas.
+________________________________________
+Diapositiva 17: Servicios Singleton vs Multi-instancia (3 minutos)
+Decidir entre singleton y multi-instancia es como decidir entre un baño compartido o baños privados en una oficina. Ambos tienen su lugar.
+Los servicios singleton con providedIn: 'root' son el default por buena razón. Estado compartido, una fuente de verdad, eficiencia de memoria. Es como tener una base de datos central: todos ven los mismos datos.
+Los servicios por componente crean nueva instancia para cada componente. Útil cuando el servicio mantiene estado específico del componente. Es como que cada empleado tenga su propia calculadora: no interfieren entre sí.
+Los servicios por ruta son el punto medio. Todos los componentes bajo una ruta comparten la misma instancia. Es perfecto para features modulares. La sección de admin tiene su servicio, la sección pública tiene otro.
+El factory pattern para control total es avanzado. Pueden decidir programáticamente cuántas instancias crear, cuándo crearlas, cómo compartirlas. Es como tener un administrador de recursos que optimiza según demanda.
+El ejemplo del SessionService por usuario es real. En aplicaciones multi-tenant, cada usuario podría necesitar su propia instancia de ciertos servicios. El factory verifica si existe, si no, la crea. Es lazy initialization con cache.
+La decisión no es solo técnica; es arquitectónica. Singleton para configuración y estado global. Instancias para estado local y aislamiento. Factory para casos complejos que requieren lógica.
+Un error común es hacer todo singleton. Funciona hasta que dos componentes necesitan estados diferentes del mismo servicio. Entonces tienen que agregar lógica compleja para manejar múltiples estados en un servicio. Es mejor tener múltiples instancias simples.
+________________________________________
+Diapositiva 18: LAB 3 (Continuación) - Sistema de Caché (5 minutos)
+El sistema de caché que van a implementar es como tener memoria a corto plazo para su aplicación. No todo necesita venir del servidor cada vez.
+La interface CacheStrategy define el contrato. Cualquier estrategia debe poder get, set y clear. Es como definir que todo sistema de almacenamiento debe poder guardar, recuperar y limpiar.
+MemoryCacheStrategy usa un Map en memoria. Es rápido, pero se pierde al recargar la página. Perfecto para datos temporales, sesión actual. Es como notas en un post-it: útiles ahora, no permanentes.
+El manejo de TTL (time to live) es crucial. Datos viejos son peores que no tener datos. Si el caché dice que Juan está en la oficina pero se fue hace 2 horas, es desinformación. TTL asegura frescura.
+LocalStorageCacheStrategy persiste entre sesiones. El usuario cierra el navegador, vuelve mañana, los datos están ahí. Útil para preferencias, datos semi-estáticos. Es como un archivador personal.
+El JSON.stringify/parse es necesario pero costoso. LocalStorage solo guarda strings. Para objetos complejos, la serialización puede ser lenta. Úsenlo sabiamente.
+CacheService es la capa de abstracción. Los componentes no saben qué estrategia se usa; solo piden datos. Si están en caché y frescos, los obtienen. Si no, hace la petición. Es transparencia de caché.
+El operador tap para cachear respuestas es elegante. El Observable fluye normalmente, pero tap guarda una copia en caché. Próximas peticiones pueden evitarse completamente.
+Durante esta parte del lab, van a implementar cache warming (pre-cargar datos anticipadamente), cache invalidation (limpiar caché cuando datos cambian), y cache sharing (múltiples componentes usando el mismo caché).
+El objetivo es reducir llamadas al servidor en 70% sin que el usuario note diferencia. Es optimización invisible pero impactante.
+________________________________________
+Diapositiva 19: LAB 4 - Arquitectura de Servicios (5 minutos)
+Este es el laboratorio más ambicioso. Van a implementar patrones empresariales que se usan en aplicaciones de millones de usuarios.
+El Repository Pattern abstrae el acceso a datos. Los componentes no saben si los datos vienen de HTTP, localStorage, o están hardcodeados. Solo saben que pueden getAll, getById, create, update, delete. Es como tener un bibliotecario: le piden un libro, no les importa de qué estante lo saca.
+La clase abstracta Repository<T> es genérica. Funciona para cualquier entidad con id. Pueden tener UserRepository, ProductRepository, OrderRepository, todos siguiendo el mismo patrón. Es reutilización a través de abstracción.
+TaskRepository implementa con HTTP. Cada método es una llamada al backend. Pero podrían tener TaskMockRepository para desarrollo, TaskCacheRepository para offline-first. Los componentes no cambian; solo cambian el provider.
+Unit of Work es gestión de transacciones. En lugar de guardar cada cambio inmediatamente, los acumulan y guardan todos juntos. Es como escribir una lista de cambios y aplicarlos todos al final en lugar de interrumpir constantemente.
+El tracking de estados (new, modified, deleted) es crucial. Saben exactamente qué cambió y pueden optimizar las operaciones. No re-envían datos que no cambiaron. Es eficiencia en comunicación.
+El commit() es donde la magia ocurre. Todas las operaciones se ejecutan, preferiblemente en una transacción. Si algo falla, pueden hacer rollback. Es atomicidad: todo o nada.
+El rollback() es la red de seguridad. Si algo sale mal, pueden descartar todos los cambios. Los usuarios no ven estados inconsistentes. Es como tener Ctrl+Z para operaciones de datos.
+Durante estos 25 minutos, van a implementar estos patrones para su sistema de tareas. Van a ver cómo simplifican el código de componentes, cómo facilitan testing, cómo permiten optimizaciones imposibles de otra forma.
+________________________________________
+Diapositiva 20: Testing de Servicios y DI (3 minutos)
+Testing de servicios no es opcional en aplicaciones profesionales. Es su seguro contra bugs en producción.
+El setup con TestBed es el framework de testing de Angular. Configuran un módulo de prueba aislado, proporcionan dependencias mock, crean instancias limpias. Es como tener un laboratorio estéril para cada experimento.
+HttpClientTestingModule es crucial para servicios que hacen llamadas HTTP. No quieren que sus tests hagan llamadas reales al servidor. Sería lento, frágil, costoso. El módulo de testing intercepta llamadas y permite controlar respuestas.
+El patrón de expectOne y flush es elegante. Esperan que se haga exactamente una llamada a cierta URL, luego proporcionan la respuesta mock. Es control total sobre el flujo HTTP.
+Los SpyObjects para mocks son espías profesionales. jasmine.createSpyObj crea un objeto que parece el servicio real pero registra todas las interacciones. Pueden verificar qué métodos se llamaron, con qué parámetros, cuántas veces.
+El returnValue en spies controla respuestas. getTasks devuelve un Observable vacío, pero podrían devolver datos de prueba, errores, lo que necesiten probar. Es simulación controlada.
+La verificación toHaveBeenCalled es assertion básica pero poderosa. No solo verifican que el resultado es correcto; verifican que se llegó a él de la forma esperada. Es como verificar no solo que llegaron a destino, sino que tomaron la ruta correcta.
+Los tests aislados son rápidos y confiables. No dependen de servicios externos, no tienen efectos secundarios, pueden correr en paralelo. Es la base de continuous integration.
+________________________________________
+Diapositiva 21: LAB 4 (Continuación) - Estado Global (5 minutos)
+El estado global con Signals es el futuro del manejo de estado en Angular. Es como tener un centro de comando que coordina toda la operación.
+El AppStore con estado privado signal es encapsulación perfecta. Nadie puede modificar el estado directamente; solo a través de métodos controlados. Es como tener una caja fuerte donde solo el banco puede agregar o quitar dinero.
+Los selectores públicos computed son vistas del estado. user() devuelve el usuario actual, tasks() las tareas. Son read-only, siempre actualizados. Es como tener monitores que muestran información en tiempo real.
+Los selectores derivados como tasksByStatus son inteligencia agregada. No solo exponen datos; los procesan, agrupan, analizan. El componente recibe información lista para usar, no datos crudos que debe procesar.
+Las actions son comandos claros. setUser(), addTask(), updateTask() modifican el estado de forma predecible. Cada action es una operación atómica. Es como tener botones claramente etiquetados en un panel de control.
+Los effects son reacciones automáticas. Cuando el usuario cambia, cargan sus datos. Es programación reactiva: definen relaciones, no secuencias. Es como tener sensores que activan acciones automáticamente.
+La persistencia con localStorage es continuidad. El estado sobrevive recargas de página. Los usuarios no pierden su trabajo. Es como autoguardado en Google Docs: transparente pero vital.
+El uso en componentes es simple. inject(AppStore) y tienen acceso a todo. Los computed signals se actualizan automáticamente en la vista. No hay suscripciones que manejar, no hay memory leaks.
+Durante esta parte final del lab, van a expandir el store con más features: undo/redo, sincronización con backend, optimistic updates, conflict resolution. Van a ver cómo un store bien diseñado simplifica dramáticamente los componentes.
+________________________________________
+Diapositiva 22: Optimización y Performance (3 minutos)
+La diferencia entre código que funciona y código profesional está en estos detalles de optimización.
+Lazy loading de servicios es eficiencia pura. No cargan un servicio pesado hasta que realmente lo necesitan. Es como no encender todas las luces de un edificio, solo las de las oficinas ocupadas.
+La memoización automática previene recálculos innecesarios. Si la función expensiveOperation se llama con el mismo parámetro, devuelve el resultado cacheado. Es como recordar la respuesta a una pregunta frecuente en lugar de calcularla cada vez.
+El unsubscribe automático con takeUntil es higiene de memoria. Cuando el componente se destruye, todas las suscripciones se cancelan. No hay observables zombies consumiendo recursos. Es como apagar las luces al salir.
+Tree-shaking con providedIn es optimización en build. Si un servicio no se usa, no se incluye en el bundle final. Su aplicación solo contiene código que realmente se ejecuta. Es como empacar solo la ropa que van a usar, no todo el armario.
+Los anti-patrones que muestro son errores reales que veo constantemente. Estado mutable compartido causa bugs imposibles de debuggear. Dependencias circulares hacen el código imposible de mantener. Lógica pesada en constructores hace el bootstrap lento.
+La regla de oro es simple: inmutabilidad cuando sea posible, lazy loading cuando tenga sentido, cleanup siempre. Es disciplina que previene problemas antes de que ocurran.
+Estos patrones no son optimización prematura; son arquitectura correcta desde el inicio. Es más fácil empezar bien que arreglar después.
+________________________________________
+Diapositiva 23: Patrones Avanzados de Servicios (3 minutos)
+Estos patrones de diseño son como los planos arquitectónicos que usan los mejores ingenieros. Probados, eficientes, elegantes.
+El Facade Pattern simplifica interfaces complejas. UserFacade coordina múltiples servicios para operaciones comunes. Login no es solo autenticación; es autenticación + guardar usuario + notificar + navegación. El facade lo orquesta todo con una llamada simple.
+Es como tener un asistente personal. Le dicen "organiza una reunión" y él coordina calendarios, reserva sala, envía invitaciones. No necesitan saber todos los pasos.
+El Adapter Pattern traduce entre interfaces incompatibles. Su backend devuelve un formato, su frontend espera otro. El adapter transforma. Es como un traductor en una conferencia internacional.
+Los transformResponse y transformRequest son bidireccionales. No solo adaptan respuestas; también preparan peticiones. Es comunicación fluida entre sistemas que hablan diferentes "idiomas".
+El Observer Pattern con EventBus es comunicación desacoplada. Componentes pueden comunicarse sin conocerse. Uno emite "userLoggedIn", otros escuchan y reaccionan. Es como un sistema de megafonía: el que anuncia no sabe quién escucha.
+El filtrado por tipo de evento es crucial. No quieren que todos los componentes reaccionen a todos los eventos. Filter asegura que solo reciben eventos relevantes. Es suscripción selectiva.
+Estos patrones no son académicos; los uso en cada proyecto. Reducen acoplamiento, aumentan cohesión, facilitan testing, permiten evolución. Son inversión en la mantenibilidad futura.
+________________________________________
+Diapositiva 24: Q&A y Cierre (5 minutos)
+Felicitaciones. Han completado una de las sesiones más intensas y transformadoras del curso.
+Hoy han dominado la inyección de dependencias moderna con inject(). Ya no están atados a constructores verbosos; tienen flexibilidad y claridad. Es como pasar de escribir con pluma a escribir con teclado: más rápido, más flexible, más poderoso.
+Han implementado componentes standalone complejos que son verdaderamente independientes. Cada componente es una unidad autosuficiente. Pueden tomarlos y usarlos en cualquier proyecto. Es verdadera reutilización de código.
+Han migrado de NgModules a arquitectura moderna. Han visto cómo el código se simplifica, cómo los bundles se reducen, cómo el desarrollo se acelera. No es moda; es evolución necesaria.
+Han configurado providers y tokens personalizados que permiten flexibilidad increíble. Configuración por ambiente, estrategias intercambiables, plugins dinámicos. Es arquitectura que escala.
+Han aplicado patrones empresariales que se usan en aplicaciones reales. Repository, Unit of Work, Facade, Adapter. No son conceptos teóricos; son herramientas que usarán mañana.
+Han optimizado performance con las mejores prácticas. Lazy loading, memoización, cleanup automático. Es la diferencia entre aplicaciones que se arrastran y aplicaciones que vuelan.
+La próxima sesión, jueves 14 de agosto, exploraremos Comunicación HTTP. Van a dominar HttpClient, interceptores, manejo de errores, caching. Si hoy aprendieron a arquitectar, el jueves aprenderán a comunicar con el mundo exterior.
+Tarea recomendada:
+•	Migren un módulo existente a standalone en su proyecto actual
+•	Implementen un servicio con estado usando Signals
+•	Creen un sistema de caché con InjectionToken para sus llamadas más frecuentes
+Preguntas frecuentes:
+"¿Cuándo usar standalone vs modules?" - Para código nuevo, siempre standalone. Para legacy, migren gradualmente. Los beneficios superan ampliamente el esfuerzo de migración.
+"¿Cómo migrar proyectos grandes?" - Componente por componente, de abajo hacia arriba. Primero los componentes hoja, luego los containers. Es maratón, no sprint.
+"¿Signals vs RxJS en servicios?" - Signals para estado sincrónico de UI, RxJS para operaciones asíncronas complejas. No son excluyentes; son complementarios.
+Recuerden: la arquitectura correcta desde el inicio ahorra meses de refactoring después. Los patrones que aprendieron hoy son inversión en su futuro como desarrolladores.
+________________________________________
+Diapositiva 25: Recursos y Referencias (2 minutos)
+Aquí tienen todo lo necesario para profundizar y practicar lo aprendido hoy.
+La documentación oficial de Angular sobre dependency injection es lectura obligatoria. No es solo referencia; es filosofía de diseño. Entender el "por qué" es tan importante como el "cómo".
+Los enlaces a standalone components y signals son el futuro de Angular. Manténganse actualizados; estas APIs evolucionan rápidamente con feedback de la comunidad.
+Angular DevTools para inspección de inyectores es revelador. Pueden ver exactamente qué servicio viene de dónde, qué instancias existen, cómo fluyen las dependencias. Es rayos X para su aplicación.
+Para state management avanzado, exploren NgRx o Akita. Construyen sobre los conceptos de hoy pero agregan time-travel debugging, devtools integration, efectos complejos. Es el siguiente nivel.
+El repositorio del curso tiene todo el código de hoy funcionando. Cada lab está en una rama separada. Pueden clonar, ejecutar, experimentar. El código está comentado explicando decisiones de diseño.
+Los comandos que listé son los que uso diariamente. ng g service con --skip-tests para desarrollo rápido, ng g component con --standalone para modernidad. Son atajos que ahorran tiempo.
+El comando de migración @angular/core:standalone es mágico. Analiza su código y lo convierte automáticamente. No es perfecto, pero hace 80% del trabajo. Es automatización inteligente.
+Contacto y soporte:
+Mi email está disponible para consultas. No duden en escribir si se atascan con algo. A veces un pequeño empujón es todo lo que necesitan.
+Las office hours de martes y jueves son para ustedes. Traigan problemas reales de sus proyectos. Aplicar estos conceptos a casos reales solidifica el aprendizaje.
+El Slack del curso es comunidad activa. Compartan soluciones, hagan preguntas, ayuden a otros. Enseñar es la mejor forma de aprender.
+Reflexión final:
+Hoy han dado un salto cuántico en sus habilidades de arquitectura Angular. Ya no son solo desarrolladores que escriben componentes; son arquitectos que diseñan sistemas.
+Los conceptos que dominaron hoy son los que separan a desarrolladores junior de senior. No es sobre escribir código que funciona; es sobre escribir código que escala, que se mantiene, que evoluciona.
+Cada servicio que creen, cada componente standalone que implementen, cada token que configuren, es un paso hacia aplicaciones más robustas, más mantenibles, más profesionales.
+Gracias por su dedicación y energía durante estas tres horas intensas.
+¡Nos vemos el jueves 14 de agosto a las 19:00 para continuar este viaje extraordinario!
+¡Excelente trabajo y hasta la próxima sesión! 🚀
+

@@ -1,0 +1,1119 @@
+<!-- Contenedor principal con NgClass y NgStyle dinámicos -->
+<div 
+  class="theme-configurator-container"
+  [ngClass]="containerClasses()"
+  [ngStyle]="containerStyles()">
+  
+  <!-- Header del configurador -->
+  <header class="configurator-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Configurador de Temas</h1>
+        <p class="subtitle">Personaliza la apariencia de PROVIAS Nacional</p>
+      </div>
+      
+      <div class="header-actions">
+        <!-- Indicador de cambios con NgClass -->
+        <div 
+          class="save-indicator"
+          [ngClass]="{
+            'has-changes': isDirty(),
+            'saved': !isDirty(),
+            'pulse': isDirty()
+          }">
+          <span class="material-icons">
+            {{ isDirty() ? 'circle' : 'check_circle' }}
+          </span>
+          <span>{{ isDirty() ? 'Cambios pendientes' : 'Guardado' }}</span>
+        </div>
+        
+        <button 
+          class="btn btn-primary"
+          [disabled]="!isDirty()"
+          (click)="saveConfiguration()">
+          <span class="material-icons">save</span>
+          Guardar
+        </button>
+        
+        <button 
+          class="btn btn-secondary"
+          (click)="resetConfiguration()">
+          <span class="material-icons">refresh</span>
+          Reset
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegación por tabs -->
+  <nav class="tab-navigation">
+    <div class="tab-container">
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('presets')"
+        (click)="setActiveTab('presets')">
+        <span class="material-icons">palette</span>
+        Presets
+      </button>
+      
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('colors')"
+        (click)="setActiveTab('colors')">
+        <span class="material-icons">colorize</span>
+        Colores
+      </button>
+      
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('typography')"
+        (click)="setActiveTab('typography')">
+        <span class="material-icons">font_download</span>
+        Tipografía
+      </button>
+      
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('spacing')"
+        (click)="setActiveTab('spacing')">
+        <span class="material-icons">space_bar</span>
+        Espaciado
+      </button>
+      
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('widgets')"
+        (click)="setActiveTab('widgets')">
+        <span class="material-icons">widgets</span>
+        Widgets
+      </button>
+      
+      <button 
+        class="tab-button"
+        [ngClass]="getTabClasses('advanced')"
+        (click)="setActiveTab('advanced')">
+        <span class="material-icons">settings</span>
+        Avanzado
+      </button>
+      
+      <!-- Indicador visual del tab activo con NgStyle -->
+      <div 
+        class="tab-indicator"
+        [ngStyle]="tabIndicatorStyles()">
+      </div>
+    </div>
+  </nav>
+
+  <!-- Contenido principal del configurador -->
+  <main class="configurator-content">
+    <div class="content-layout">
+      
+      <!-- Panel de configuración -->
+      <aside class="config-panel">
+        
+        <!-- Tab: Presets -->
+        @if (activeTab() === 'presets') {
+          <div class="config-section">
+            <h2>Temas Predefinidos</h2>
+            
+            <!-- Selector de preset con NgModel -->
+            <div class="form-group">
+              <label for="preset-select">Preset Actual:</label>
+              <select 
+                id="preset-select"
+                class="form-control"
+                [value]="currentPreset().id"
+                (change)="onPresetChange($event.target.value)">
+                @for (preset of getPresetOptions(); track preset.value) {
+                  <option [value]="preset.value">{{ preset.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Selector de tipo de tema -->
+            <div class="form-group">
+              <label for="theme-type">Tipo de Tema:</label>
+              <select 
+                id="theme-type"
+                class="form-control"
+                [value]="currentTheme()"
+                (change)="onThemeTypeChange($event.target.value)">
+                @for (theme of getThemeOptions(); track theme.value) {
+                  <option [value]="theme.value">{{ theme.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Selector de esquema de color -->
+            <div class="form-group">
+              <label for="color-scheme">Esquema de Color:</label>
+              <select 
+                id="color-scheme"
+                class="form-control"
+                [value]="currentPreset().colorScheme"
+                (change)="onColorSchemeChange($event.target.value)">
+                @for (scheme of getColorSchemeOptions(); track scheme.value) {
+                  <option [value]="scheme.value">{{ scheme.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Selector de layout -->
+            <div class="form-group">
+              <label for="layout">Layout:</label>
+              <select 
+                id="layout"
+                class="form-control"
+                [value]="currentLayout()"
+                (change)="onLayoutChange($event.target.value)">
+                @for (layout of getLayoutOptions(); track layout.value) {
+                  <option [value]="layout.value">{{ layout.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Preview del preset actual -->
+            <div class="preset-preview">
+              <h3>Vista Previa</h3>
+              <div 
+                class="preview-card"
+                [ngStyle]="{
+                  backgroundColor: computedColors().surface,
+                  color: computedColors().text,
+                  border: '1px solid ' + computedColors().border,
+                  borderRadius: computedSpacing().borderRadius + 'px',
+                  padding: (computedSpacing().scale * 16) + 'px',
+                  fontFamily: computedTypography().fontFamily,
+                  fontSize: computedTypography().fontSize + 'px'
+                }">
+                <h4 [ngStyle]="{ color: computedColors().primary }">
+                  {{ currentPreset().name }}
+                </h4>
+                <p [ngStyle]="{ color: computedColors().textSecondary }">
+                  {{ currentPreset().description }}
+                </p>
+                <button 
+                  class="preview-button"
+                  [ngStyle]="{
+                    backgroundColor: computedColors().primary,
+                    color: 'white',
+                    border: 'none',
+                    borderRadius: computedSpacing().borderRadius + 'px',
+                    padding: '8px 16px',
+                    fontFamily: 'inherit'
+                  }">
+                  Botón de Ejemplo
+                </button>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Tab: Colores -->
+        @if (activeTab() === 'colors') {
+          <div class="config-section">
+            <h2>Personalización de Colores</h2>
+            
+            <div class="colors-grid">
+              <!-- Color primario -->
+              <div class="color-input-group">
+                <label for="color-primary">Color Primario:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-primary"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().primary || computedColors().primary"
+                    (input)="onColorChange('primary', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().primary || computedColors().primary"
+                    (input)="onColorChange('primary', $event.target.value)"
+                    [ngClass]="{
+                      'valid': isValidColor(colorFormData().primary || computedColors().primary),
+                      'invalid': !isValidColor(colorFormData().primary || computedColors().primary)
+                    }">
+                </div>
+                <!-- Vista previa del color -->
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().primary || computedColors().primary,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+
+              <!-- Color secundario -->
+              <div class="color-input-group">
+                <label for="color-secondary">Color Secundario:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-secondary"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().secondary || computedColors().secondary"
+                    (input)="onColorChange('secondary', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().secondary || computedColors().secondary"
+                    (input)="onColorChange('secondary', $event.target.value)"
+                    [ngClass]="{
+                      'valid': isValidColor(colorFormData().secondary || computedColors().secondary),
+                      'invalid': !isValidColor(colorFormData().secondary || computedColors().secondary)
+                    }">
+                </div>
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().secondary || computedColors().secondary,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+
+              <!-- Color de acento -->
+              <div class="color-input-group">
+                <label for="color-accent">Color de Acento:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-accent"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().accent || computedColors().accent"
+                    (input)="onColorChange('accent', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().accent || computedColors().accent"
+                    (input)="onColorChange('accent', $event.target.value)"
+                    [ngClass]="{
+                      'valid': isValidColor(colorFormData().accent || computedColors().accent),
+                      'invalid': !isValidColor(colorFormData().accent || computedColors().accent)
+                    }">
+                </div>
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().accent || computedColors().accent,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+
+              <!-- Color de fondo -->
+              <div class="color-input-group">
+                <label for="color-background">Fondo:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-background"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().background || computedColors().background"
+                    (input)="onColorChange('background', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().background || computedColors().background"
+                    (input)="onColorChange('background', $event.target.value)">
+                </div>
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().background || computedColors().background,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+
+              <!-- Color de superficie -->
+              <div class="color-input-group">
+                <label for="color-surface">Superficie:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-surface"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().surface || computedColors().surface"
+                    (input)="onColorChange('surface', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().surface || computedColors().surface"
+                    (input)="onColorChange('surface', $event.target.value)">
+                </div>
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().surface || computedColors().surface,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+
+              <!-- Color de texto -->
+              <div class="color-input-group">
+                <label for="color-text">Texto:</label>
+                <div class="color-input-wrapper">
+                  <input 
+                    id="color-text"
+                    type="color"
+                    class="color-input"
+                    [value]="colorFormData().text || computedColors().text"
+                    (input)="onColorChange('text', $event.target.value)">
+                  <input 
+                    type="text"
+                    class="text-input"
+                    [value]="colorFormData().text || computedColors().text"
+                    (input)="onColorChange('text', $event.target.value)">
+                </div>
+                <div 
+                  class="color-preview"
+                  [ngStyle]="{
+                    backgroundColor: colorFormData().text || computedColors().text,
+                    border: '2px solid ' + computedColors().border
+                  }">
+                </div>
+              </div>
+            </div>
+
+            <div class="section-actions">
+              <button class="btn btn-secondary" (click)="resetColors()">
+                <span class="material-icons">refresh</span>
+                Restaurar Colores
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Tab: Tipografía -->
+        @if (activeTab() === 'typography') {
+          <div class="config-section">
+            <h2>Configuración de Tipografía</h2>
+            
+            <!-- Familia de fuente con NgModel -->
+            <div class="form-group">
+              <label for="font-family">Familia de Fuente:</label>
+              <select 
+                id="font-family"
+                class="form-control"
+                [(ngModel)]="typographyFormData().fontFamily"
+                (ngModelChange)="onFontFamilyChange($event)">
+                @for (font of getFontFamilyOptions(); track font.value) {
+                  <option [value]="font.value">{{ font.label }}</option>
+                }
+              </select>
+            </div>
+
+            <!-- Tamaño de fuente con NgModel y rango -->
+            <div class="form-group">
+              <label for="font-size">
+                Tamaño de Fuente: {{ typographyFormData().fontSize }}px
+              </label>
+              <input 
+                id="font-size"
+                type="range"
+                class="range-input"
+                min="12"
+                max="24"
+                step="1"
+                [(ngModel)]="typographyFormData().fontSize"
+                (ngModelChange)="onFontSizeChange($event)"
+                [ngClass]="{
+                  'small': typographyFormData().fontSize < 14,
+                  'medium': typographyFormData().fontSize >= 14 && typographyFormData().fontSize <= 18,
+                  'large': typographyFormData().fontSize > 18
+                }">
+              <div class="range-labels">
+                <span>12px</span>
+                <span>18px</span>
+                <span>24px</span>
+              </div>
+            </div>
+
+            <!-- Peso de fuente -->
+            <div class="form-group">
+              <label for="font-weight">
+                Peso de Fuente: {{ typographyFormData().fontWeight }}
+              </label>
+              <input 
+                id="font-weight"
+                type="range"
+                class="range-input"
+                min="100"
+                max="900"
+                step="100"
+                [(ngModel)]="typographyFormData().fontWeight"
+                (ngModelChange)="onFontWeightChange($event)">
+              <div class="range-labels">
+                <span>100 (Thin)</span>
+                <span>400 (Normal)</span>
+                <span>700 (Bold)</span>
+                <span>900 (Black)</span>
+              </div>
+            </div>
+
+            <!-- Altura de línea -->
+            <div class="form-group">
+              <label for="line-height">
+                Altura de Línea: {{ typographyFormData().lineHeight }}
+              </label>
+              <input 
+                id="line-height"
+                type="range"
+                class="range-input"
+                min="1"
+                max="2"
+                step="0.1"
+                [(ngModel)]="typographyFormData().lineHeight"
+                (ngModelChange)="onLineHeightChange($event)">
+              <div class="range-labels">
+                <span>1.0 (Compacto)</span>
+                <span>1.5 (Normal)</span>
+                <span>2.0 (Espacioso)</span>
+              </div>
+            </div>
+
+            <!-- Espaciado de letras -->
+            <div class="form-group">
+              <label for="letter-spacing">
+                Espaciado de Letras: {{ typographyFormData().letterSpacing }}px
+              </label>
+              <input 
+                id="letter-spacing"
+                type="range"
+                class="range-input"
+                min="-2"
+                max="5"
+                step="0.5"
+                [(ngModel)]="typographyFormData().letterSpacing"
+                (ngModelChange)="onLetterSpacingChange($event)">
+              <div class="range-labels">
+                <span>-2px</span>
+                <span>0px</span>
+                <span>5px</span>
+              </div>
+            </div>
+
+            <!-- Vista previa de tipografía -->
+            <div class="typography-preview">
+              <h3>Vista Previa</h3>
+              <div 
+                class="preview-text"
+                [ngStyle]="{
+                  fontFamily: computedTypography().fontFamily,
+                  fontSize: computedTypography().fontSize + 'px',
+                  fontWeight: computedTypography().fontWeight,
+                  lineHeight: computedTypography().lineHeight,
+                  letterSpacing: computedTypography().letterSpacing + 'px',
+                  color: computedColors().text,
+                  backgroundColor: computedColors().surface,
+                  padding: '1rem',
+                  borderRadius: computedSpacing().borderRadius + 'px',
+                  border: '1px solid ' + computedColors().border
+                }">
+                <h1 [ngStyle]="{
+                  fontFamily: computedTypography().headingFontFamily || computedTypography().fontFamily,
+                  fontWeight: computedTypography().headingFontWeight || computedTypography().fontWeight,
+                  color: computedColors().primary
+                }">
+                  Encabezado Principal
+                </h1>
+                <h2 [ngStyle]="{ color: computedColors().secondary }">
+                  Encabezado Secundario
+                </h2>
+                <p>
+                  Este es un párrafo de ejemplo que muestra cómo se verá el texto con 
+                  la configuración tipográfica actual. Incluye diferentes elementos 
+                  para evaluar la legibilidad y apariencia general.
+                </p>
+                <p [ngStyle]="{ color: computedColors().textSecondary }">
+                  Texto secundario con color atenuado para información adicional.
+                </p>
+              </div>
+            </div>
+
+            <div class="section-actions">
+              <button class="btn btn-secondary" (click)="resetTypography()">
+                <span class="material-icons">refresh</span>
+                Restaurar Tipografía
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Tab: Espaciado -->
+        @if (activeTab() === 'spacing') {
+          <div class="config-section">
+            <h2>Configuración de Espaciado</h2>
+            
+            <!-- Escala de espaciado -->
+            <div class="form-group">
+              <label for="spacing-scale">
+                Escala de Espaciado: {{ spacingFormData().scale }}x
+              </label>
+              <input 
+                id="spacing-scale"
+                type="range"
+                class="range-input"
+                min="0.5"
+                max="2"
+                step="0.1"
+                [(ngModel)]="spacingFormData().scale"
+                (ngModelChange)="onSpacingScaleChange($event)"
+                [ngClass]="{
+                  'compact': spacingFormData().scale < 1,
+                  'normal': spacingFormData().scale === 1,
+                  'spacious': spacingFormData().scale > 1
+                }">
+              <div class="range-labels">
+                <span>0.5x (Compacto)</span>
+                <span>1x (Normal)</span>
+                <span>2x (Espacioso)</span>
+              </div>
+            </div>
+
+            <!-- Radio de borde -->
+            <div class="form-group">
+              <label for="border-radius">
+                Radio de Borde: {{ spacingFormData().borderRadius }}px
+              </label>
+              <input 
+                id="border-radius"
+                type="range"
+                class="range-input"
+                min="0"
+                max="32"
+                step="2"
+                [(ngModel)]="spacingFormData().borderRadius"
+                (ngModelChange)="onBorderRadiusChange($event)">
+              <div class="range-labels">
+                <span>0px (Cuadrado)</span>
+                <span>8px (Suave)</span>
+                <span>32px (Redondeado)</span>
+              </div>
+            </div>
+
+            <!-- Ancho máximo del contenedor -->
+            <div class="form-group">
+              <label for="container-width">
+                Ancho Máximo: {{ spacingFormData().containerMaxWidth }}px
+              </label>
+              <input 
+                id="container-width"
+                type="range"
+                class="range-input"
+                min="800"
+                max="1600"
+                step="50"
+                [(ngModel)]="spacingFormData().containerMaxWidth"
+                (ngModelChange)="onContainerMaxWidthChange($event)">
+              <div class="range-labels">
+                <span>800px</span>
+                <span>1200px</span>
+                <span>1600px</span>
+              </div>
+            </div>
+
+            <!-- Espacio entre elementos -->
+            <div class="form-group">
+              <label for="grid-gap">
+                Espacio de Grid: {{ spacingFormData().gridGap }}px
+              </label>
+              <input 
+                id="grid-gap"
+                type="range"
+                class="range-input"
+                min="8"
+                max="64"
+                step="4"
+                [(ngModel)]="spacingFormData().gridGap"
+                (ngModelChange)="onGridGapChange($event)">
+              <div class="range-labels">
+                <span>8px</span>
+                <span>24px</span>
+                <span>64px</span>
+              </div>
+            </div>
+
+            <!-- Vista previa de espaciado -->
+            <div class="spacing-preview">
+              <h3>Vista Previa</h3>
+              <div 
+                class="preview-grid"
+                [ngStyle]="{
+                  gap: computedSpacing().gridGap + 'px',
+                  padding: (computedSpacing().scale * 16) + 'px'
+                }">
+                @for (item of [1, 2, 3, 4]; track item) {
+                  <div 
+                    class="preview-item"
+                    [ngStyle]="{
+                      backgroundColor: computedColors().surface,
+                      border: '1px solid ' + computedColors().border,
+                      borderRadius: computedSpacing().borderRadius + 'px',
+                      padding: (computedSpacing().scale * 12) + 'px',
+                      color: computedColors().text
+                    }">
+                    Item {{ item }}
+                  </div>
+                }
+              </div>
+            </div>
+
+            <div class="section-actions">
+              <button class="btn btn-secondary" (click)="resetSpacing()">
+                <span class="material-icons">refresh</span>
+                Restaurar Espaciado
+              </button>
+            </div>
+          </div>
+        }
+
+        <!-- Tab: Widgets -->
+        @if (activeTab() === 'widgets') {
+          <div class="config-section">
+            <h2>Gestión de Widgets</h2>
+            
+            <div class="widgets-controls">
+              <button class="btn btn-primary" (click)="addNewWidget()">
+                <span class="material-icons">add</span>
+                Agregar Widget
+              </button>
+              
+              <div class="widgets-count">
+                {{ activeWidgets().length }} widgets activos
+              </div>
+            </div>
+
+            <!-- Lista de widgets -->
+            <div class="widgets-list">
+              @for (widget of activeWidgets(); track widget.id) {
+                <div 
+                  class="widget-item"
+                  [ngClass]="{
+                    'selected': selectedWidget() === widget.id,
+                    'disabled': !widget.enabled
+                  }"
+                  (click)="selectWidget(widget.id)">
+                  
+                  <div class="widget-info">
+                    <div class="widget-icon">
+                      <span class="material-icons">{{ widget.content?.icon || 'widgets' }}</span>
+                    </div>
+                    <div class="widget-details">
+                      <h4>{{ widget.label }}</h4>
+                      <p>{{ widget.type }} - {{ widget.size }}</p>
+                    </div>
+                  </div>
+                  
+                  <div class="widget-controls">
+                    <!-- Toggle con NgModel -->
+                    <label class="toggle-switch">
+                      <input 
+                        type="checkbox"
+                        [checked]="widget.enabled"
+                        (change)="toggleWidget(widget.id)">
+                      <span class="toggle-slider"></span>
+                    </label>
+                    
+                    <button 
+                      class="btn-icon danger"
+                      (click)="deleteWidget(widget.id)"
+                      title="Eliminar widget">
+                      <span class="material-icons">delete</span>
+                    </button>
+                  </div>
+                </div>
+              } @empty {
+                <div class="empty-widgets">
+                  <span class="material-icons">widgets</span>
+                  <p>No hay widgets configurados</p>
+                  <button class="btn btn-primary" (click)="addNewWidget()">
+                    Crear Primer Widget
+                  </button>
+                </div>
+              }
+            </div>
+
+            <!-- Editor de widget seleccionado -->
+            @if (showWidgetEditor() && selectedWidget()) {
+              <div class="widget-editor">
+                <h3>Editar Widget</h3>
+                
+                @if (getWidget(selectedWidget()!) as widget) {
+                  <div class="editor-form">
+                    <!-- Posición y tamaño -->
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>X:</label>
+                        <input 
+                          type="number"
+                          class="form-control"
+                          [value]="widget.position.x"
+                          (input)="updateWidgetPosition(widget.id, +$event.target.value, widget.position.y)">
+                      </div>
+                      <div class="form-group">
+                        <label>Y:</label>
+                        <input 
+                          type="number"
+                          class="form-control"
+                          [value]="widget.position.y"
+                          (input)="updateWidgetPosition(widget.id, widget.position.x, +$event.target.value)">
+                      </div>
+                    </div>
+                    
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label>Ancho:</label>
+                        <input 
+                          type="number"
+                          class="form-control"
+                          [value]="widget.position.width"
+                          (input)="updateWidgetSize(widget.id, +$event.target.value, widget.position.height)">
+                      </div>
+                      <div class="form-group">
+                        <label>Alto:</label>
+                        <input 
+                          type="number"
+                          class="form-control"
+                          [value]="widget.position.height"
+                          (input)="updateWidgetSize(widget.id, widget.position.width, +$event.target.value)">
+                      </div>
+                    </div>
+
+                    <!-- Estilos -->
+                    <div class="form-group">
+                      <label>Color de Fondo:</label>
+                      <input 
+                        type="color"
+                        class="color-input"
+                        [value]="widget.style.backgroundColor || '#ffffff'"
+                        (input)="updateWidgetStyle(widget.id, { backgroundColor: $event.target.value })">
+                    </div>
+                    
+                    <div class="form-group">
+                      <label>Color de Texto:</label>
+                      <input 
+                        type="color"
+                        class="color-input"
+                        [value]="widget.style.textColor || '#000000'"
+                        (input)="updateWidgetStyle(widget.id, { textColor: $event.target.value })">
+                    </div>
+                  </div>
+                  
+                  <div class="editor-actions">
+                    <button class="btn btn-secondary" (click)="closeWidgetEditor()">
+                      Cerrar
+                    </button>
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+
+        <!-- Tab: Avanzado -->
+        @if (activeTab() === 'advanced') {
+          <div class="config-section">
+            <h2>Configuración Avanzada</h2>
+            
+            <!-- Opciones de accesibilidad -->
+            <div class="form-group">
+              <h3>Accesibilidad</h3>
+              
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox"
+                  [checked]="configuration().rtlEnabled"
+                  (change)="toggleRTL()">
+                <span>Habilitar RTL (Derecha a Izquierda)</span>
+              </label>
+              
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox"
+                  [checked]="configuration().highContrast"
+                  (change)="toggleHighContrast()">
+                <span>Alto Contraste</span>
+              </label>
+            </div>
+
+            <!-- Opciones de guardado -->
+            <div class="form-group">
+              <h3>Guardado</h3>
+              
+              <label class="checkbox-label">
+                <input 
+                  type="checkbox"
+                  [checked]="configuration().autoSave"
+                  (change)="toggleAutoSave()">
+                <span>Guardado Automático</span>
+              </label>
+            </div>
+
+            <!-- Importar/Exportar -->
+            <div class="form-group">
+              <h3>Importar/Exportar</h3>
+              
+              <div class="action-buttons">
+                <button class="btn btn-secondary" (click)="exportConfiguration()">
+                  <span class="material-icons">download</span>
+                  Exportar Configuración
+                </button>
+                
+                <label class="btn btn-secondary file-input-label">
+                  <span class="material-icons">upload</span>
+                  Importar Configuración
+                  <input 
+                    type="file"
+                    accept=".json"
+                    style="display: none"
+                    (change)="importConfiguration($event)">
+                </label>
+              </div>
+            </div>
+
+            <!-- Información del sistema -->
+            <div class="form-group">
+              <h3>Información</h3>
+              
+              <div class="info-grid">
+                <div class="info-item">
+                  <label>Versión:</label>
+                  <span>{{ configuration().version }}</span>
+                </div>
+                
+                <div class="info-item">
+                  <label>Último Guardado:</label>
+                  <span>{{ configuration().lastSaved | date:'medium' }}</span>
+                </div>
+                
+                <div class="info-item">
+                  <label>Preset Actual:</label>
+                  <span>{{ currentPreset().name }}</span>
+                </div>
+                
+                <div class="info-item">
+                  <label>Widgets Activos:</label>
+                  <span>{{ activeWidgets().length }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        }
+      </aside>
+
+      <!-- Panel de vista previa -->
+      <section class="preview-panel">
+        <div class="preview-header">
+          <h2>Vista Previa en Tiempo Real</h2>
+          <div class="preview-controls">
+            <button 
+              class="btn btn-sm"
+              [ngClass]="{ 'active': !showWidgetEditor() }"
+              (click)="closeWidgetEditor()">
+              Vista General
+            </button>
+            @if (activeTab() === 'widgets') {
+              <button 
+                class="btn btn-sm"
+                [ngClass]="{ 'active': showWidgetEditor() }">
+                Editor de Widgets
+              </button>
+            }
+          </div>
+        </div>
+        
+        <div class="preview-content">
+          <!-- Canvas de vista previa con estilos dinámicos -->
+          <div 
+            class="preview-canvas"
+            [ngStyle]="{
+              backgroundColor: computedColors().background,
+              fontFamily: computedTypography().fontFamily,
+              fontSize: computedTypography().fontSize + 'px'
+            }">
+            
+            <!-- Widgets renderizados -->
+            @if (activeTab() === 'widgets') {
+              <div class="widgets-canvas">
+                @for (widget of activeWidgets(); track widget.id) {
+                  <div 
+                    class="widget-preview"
+                    [ngClass]="getWidgetClasses(widget)"
+                    [ngStyle]="previewWidgetStyles()"
+                    (click)="selectWidget(widget.id)">
+                    
+                    @if (widget.content?.icon) {
+                      <span class="material-icons widget-icon">{{ widget.content.icon }}</span>
+                    }
+                    
+                    @if (widget.content?.title) {
+                      <h4>{{ widget.content.title }}</h4>
+                    }
+                    
+                    @if (widget.content?.description) {
+                      <p>{{ widget.content.description }}</p>
+                    }
+                    
+                    @if (widget.content?.value) {
+                      <span class="widget-value">{{ widget.content.value }}</span>
+                    }
+                  </div>
+                }
+              </div>
+            } @else {
+              <!-- Vista previa general del tema -->
+              <div class="theme-preview">
+                <!-- Header de ejemplo -->
+                <header 
+                  class="preview-header-demo"
+                  [ngStyle]="{
+                    backgroundColor: computedColors().surface,
+                    borderBottom: '1px solid ' + computedColors().border,
+                    padding: (computedSpacing().scale * 16) + 'px'
+                  }">
+                  <h1 [ngStyle]="{ color: computedColors().primary }">
+                    PROVIAS Nacional
+                  </h1>
+                  <p [ngStyle]="{ color: computedColors().textSecondary }">
+                    Sistema de Gestión de Proyectos
+                  </p>
+                </header>
+
+                <!-- Contenido de ejemplo -->
+                <main 
+                  class="preview-main"
+                  [ngStyle]="{ padding: (computedSpacing().scale * 16) + 'px' }">
+                  
+                  <!-- Tarjetas de resumen -->
+                  <div 
+                    class="preview-cards"
+                    [ngStyle]="{ gap: computedSpacing().gridGap + 'px' }">
+                    @for (card of ['Proyectos Activos', 'Presupuesto Total', 'Progreso Promedio']; track card) {
+                      <div 
+                        class="preview-card"
+                        [ngStyle]="{
+                          backgroundColor: computedColors().surface,
+                          border: '1px solid ' + computedColors().border,
+                          borderRadius: computedSpacing().borderRadius + 'px',
+                          padding: (computedSpacing().scale * 16) + 'px',
+                          color: computedColors().text
+                        }">
+                        <h3 [ngStyle]="{ color: computedColors().primary }">
+                          {{ card }}
+                        </h3>
+                        <p [ngStyle]="{ color: computedColors().textSecondary }">
+                          Valor de ejemplo
+                        </p>
+                      </div>
+                    }
+                  </div>
+
+                  <!-- Botones de ejemplo -->
+                  <div 
+                    class="preview-buttons"
+                    [ngStyle]="{ gap: computedSpacing().gridGap + 'px' }">
+                    <button 
+                      class="preview-button primary"
+                      [ngStyle]="{
+                        backgroundColor: computedColors().primary,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: computedSpacing().borderRadius + 'px',
+                        padding: (computedSpacing().scale * 12) + 'px ' + (computedSpacing().scale * 20) + 'px',
+                        fontFamily: 'inherit',
+                        fontSize: 'inherit'
+                      }">
+                      Botón Primario
+                    </button>
+                    
+                    <button 
+                      class="preview-button secondary"
+                      [ngStyle]="{
+                        backgroundColor: computedColors().secondary,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: computedSpacing().borderRadius + 'px',
+                        padding: (computedSpacing().scale * 12) + 'px ' + (computedSpacing().scale * 20) + 'px',
+                        fontFamily: 'inherit',
+                        fontSize: 'inherit'
+                      }">
+                      Botón Secundario
+                    </button>
+                    
+                    <button 
+                      class="preview-button accent"
+                      [ngStyle]="{
+                        backgroundColor: computedColors().accent,
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: computedSpacing().borderRadius + 'px',
+                        padding: (computedSpacing().scale * 12) + 'px ' + (computedSpacing().scale * 20) + 'px',
+                        fontFamily: 'inherit',
+                        fontSize: 'inherit'
+                      }">
+                      Botón de Acento
+                    </button>
+                  </div>
+
+                  <!-- Formulario de ejemplo -->
+                  <div 
+                    class="preview-form"
+                    [ngStyle]="{
+                      backgroundColor: computedColors().surface,
+                      border: '1px solid ' + computedColors().border,
+                      borderRadius: computedSpacing().borderRadius + 'px',
+                      padding: (computedSpacing().scale * 20) + 'px',
+                      marginTop: computedSpacing().gridGap + 'px'
+                    }">
+                    <h3 [ngStyle]="{ color: computedColors().text, marginBottom: (computedSpacing().scale * 16) + 'px' }">
+                      Formulario de Ejemplo
+                    </h3>
+                    
+                    <div 
+                      class="form-grid"
+                      [ngStyle]="{ gap: (computedSpacing().scale * 16) + 'px' }">
+                      <input 
+                        type="text"
+                        placeholder="Nombre del proyecto"
+                        class="preview-input"
+                        [ngStyle]="{
+                          backgroundColor: computedColors().background,
+                          border: '1px solid ' + computedColors().border,
+                          borderRadius: computedSpacing().borderRadius + 'px',
+                          padding: (computedSpacing().scale * 8) + 'px',
+                          color: computedColors().text,
+                          fontFamily: 'inherit',
+                          fontSize: 'inherit'
+                        }">
+                      
+                      <select 
+                        class="preview-select"
+                        [ngStyle]="{
+                          backgroundColor: computedColors().background,
+                          border: '1px solid ' + computedColors().border,
+                          borderRadius: computedSpacing().borderRadius + 'px',
+                          padding: (computedSpacing().scale * 8) + 'px',
+                          color: computedColors().text,
+                          fontFamily: 'inherit',
+                          fontSize: 'inherit'
+                        }">
+                        <option>Seleccionar tipo</option>
+                        <option>Rehabilitación</option>
+                        <option>Construcción</option>
+                      </select>
+                    </div>
+                  </div>
+                </main>
+              </div>
+            }
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</div>

@@ -1,0 +1,246 @@
+<div class="theme-configurator" 
+     [ngClass]="containerClasses()"
+     [ngStyle]="containerStyles()">
+  
+  <!-- Header -->
+  <header class="configurator-header">
+    <h1>🎨 Configurador de Temas Avanzado</h1>
+    <p>Demostración de NgClass, NgStyle y NgModel con binding complejo</p>
+    
+    <!-- Panel Tabs -->
+    <div class="panel-tabs">
+      <button 
+        [ngClass]="{'active': activePanel() === 'themes'}"
+        (click)="setActivePanel('themes')">
+        🎨 Temas
+      </button>
+      <button 
+        [ngClass]="{'active': activePanel() === 'colors'}"
+        (click)="setActivePanel('colors')">
+        🌈 Colores
+      </button>
+      <button 
+        [ngClass]="{'active': activePanel() === 'layout'}"
+        (click)="setActivePanel('layout')">
+        🏗️ Layout
+      </button>
+    </div>
+  </header>
+
+  <!-- Panel de Control -->
+  <div class="control-panel">
+    
+    <!-- Selector de Presets -->
+    @if (activePanel() === 'themes') {
+      <section class="control-section">
+        <h3>📋 Presets de Tema</h3>
+        <div class="presets-grid">
+          @for (preset of themePresets; track preset.id) {
+            <button 
+              class="preset-button"
+              [ngClass]="{
+                'active': selectedTheme().id === preset.id,
+                'dark': preset.id === 'dark',
+                'contrast': preset.id === 'high-contrast'
+              }"
+              [ngStyle]="{
+                'background': preset.backgroundColor,
+                'color': preset.textColor,
+                'border': '2px solid ' + preset.primaryColor
+              }"
+              (click)="selectPreset(preset)">
+              <strong>{{ preset.name }}</strong>
+              <small>{{ preset.description }}</small>
+            </button>
+          }
+        </div>
+        
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+          <button 
+            class="quick-btn"
+            [ngClass]="{'active': layoutConfig().darkMode}"
+            (click)="toggleDarkMode()">
+            {{ layoutConfig().darkMode ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
+          </button>
+          <button 
+            class="quick-btn"
+            (click)="resetToDefault()">
+            🔄 Resetear
+          </button>
+        </div>
+      </section>
+    }
+
+    <!-- Colores Personalizados -->
+    @if (activePanel() === 'colors') {
+      <section class="control-section">
+        <h3>🎨 Colores Personalizados</h3>
+        <div class="color-controls">
+          <div class="color-input-group">
+            <label for="color-primary">Primary:</label>
+            <input 
+              id="color-primary"
+              type="color"
+              [value]="customColors().primary"
+              (input)="onColorChange('primary', $event)">
+            <span class="color-value">{{ customColors().primary }}</span>
+          </div>
+          <div class="color-input-group">
+            <label for="color-secondary">Secondary:</label>
+            <input 
+              id="color-secondary"
+              type="color"
+              [value]="customColors().secondary"
+              (input)="onColorChange('secondary', $event)">
+            <span class="color-value">{{ customColors().secondary }}</span>
+          </div>
+          <div class="color-input-group">
+            <label for="color-accent">Accent:</label>
+            <input 
+              id="color-accent"
+              type="color"
+              [value]="customColors().accent"
+              (input)="onColorChange('accent', $event)">
+            <span class="color-value">{{ customColors().accent }}</span>
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- Configuración de Layout -->
+    @if (activePanel() === 'layout') {
+      <section class="control-section">
+        <h3>🏗️ Layout</h3>
+        <div class="layout-controls">
+          <div class="switch-group">
+            <label>
+              <input 
+                type="checkbox"
+                [checked]="layoutConfig().darkMode"
+                (change)="toggleDarkMode()">
+              <span [ngClass]="{'active': layoutConfig().darkMode}">
+                {{ layoutConfig().darkMode ? '🌙' : '☀️' }} Modo Oscuro
+              </span>
+            </label>
+          </div>
+          
+          <div class="switch-group">
+            <label>
+              <input 
+                type="checkbox"
+                [checked]="layoutConfig().compactMode"
+                (change)="toggleCompactMode()">
+              <span [ngClass]="{'active': layoutConfig().compactMode}">
+                📐 Modo Compacto
+              </span>
+            </label>
+          </div>
+          
+          <div class="switch-group">
+            <label>
+              <input 
+                type="checkbox"
+                [checked]="layoutConfig().animationsEnabled"
+                (change)="toggleAnimations()">
+              <span [ngClass]="{'active': layoutConfig().animationsEnabled}">
+                ✨ Animaciones
+              </span>
+            </label>
+          </div>
+        </div>
+      </section>
+    }
+  </div>
+
+  <!-- Vista Previa Simplificada -->
+  <div class="preview-section">
+    <h2>👁️ Vista Previa</h2>
+    
+    <div class="widgets-container"
+         [ngStyle]="{
+           'display': 'grid',
+           'grid-template-columns': 'repeat(auto-fit, minmax(250px, 1fr))',
+           'gap': spacingConfig().gap + 'px',
+           'padding': spacingConfig().padding + 'px'
+         }">
+      
+      @for (widget of widgets(); track widget.id) {
+        <div [ngClass]="getWidgetClasses(widget)"
+             [ngStyle]="getWidgetStyles(widget)">
+          
+          <div class="widget-header">
+            <span class="widget-icon">{{ widget.icon }}</span>
+            <h4>{{ widget.title }}</h4>
+            <button 
+              class="widget-close"
+              (click)="removeWidget(widget.id)">
+              ×
+            </button>
+          </div>
+          
+          <div class="widget-content">
+            <p>{{ widget.content }}</p>
+          </div>
+          
+          <div class="widget-controls">
+            <select 
+              [value]="widget.size"
+              (change)="onWidgetSizeChange(widget.id, $event)">
+              <option value="small">Pequeño</option>
+              <option value="medium">Mediano</option>
+              <option value="large">Grande</option>
+            </select>
+            
+            <input 
+              type="color"
+              [value]="widget.color"
+              (input)="onWidgetColorChange(widget.id, $event)">
+            
+            <label>
+              <input 
+                type="checkbox"
+                [checked]="widget.visible"
+                (change)="onWidgetVisibilityChange(widget.id, $event)">
+              Visible
+            </label>
+          </div>
+        </div>
+      }
+      
+      <button 
+        class="add-widget-button"
+        (click)="addWidget()"
+        [ngStyle]="{
+          'background': customColors().primary,
+          'color': layoutConfig().darkMode ? '#fff' : '#000',
+          'border-radius': spacingConfig().borderRadius + 'px',
+          'padding': spacingConfig().padding + 'px'
+        }">
+        + Agregar Widget
+      </button>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="actions-section">
+    <button 
+      class="action-button"
+      (click)="exportConfiguration()"
+      [ngStyle]="{
+        'background': customColors().success,
+        'color': '#fff'
+      }">
+      📥 Exportar
+    </button>
+    <button 
+      class="action-button"
+      (click)="resetToDefault()"
+      [ngStyle]="{
+        'background': customColors().warning,
+        'color': '#fff'
+      }">
+      🔄 Resetear
+    </button>
+  </div>
+</div>

@@ -1,0 +1,513 @@
+<!-- Header del Dashboard -->
+<div class="dashboard-header">
+  <div class="title-section">
+    <h1>Dashboard de Proyectos PROVIAS</h1>
+    <p class="subtitle">Gestión integral de proyectos de infraestructura vial</p>
+  </div>
+  
+  <div class="header-actions">
+    <button 
+      class="btn btn-secondary"
+      (click)="refreshProjects()"
+      [disabled]="loading()">
+      <span class="material-icons">refresh</span>
+      Actualizar
+    </button>
+    
+    <button 
+      class="btn btn-primary"
+      (click)="toggleFilters()">
+      <span class="material-icons">filter_list</span>
+      Filtros
+      @if (hasActiveFilters()) {
+        <span class="filter-badge">{{ filteredProjectsCount() }}</span>
+      }
+    </button>
+  </div>
+</div>
+
+<!-- Estados de carga y error usando @if -->
+@if (loading()) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <p>Cargando proyectos...</p>
+  </div>
+} @else if (error(); as errorMessage) {
+  <div class="error-container">
+    <span class="material-icons error-icon">error</span>
+    <h3>Error al cargar proyectos</h3>
+    <p>{{ errorMessage }}</p>
+    <button class="btn btn-primary" (click)="refreshProjects()">
+      Reintentar
+    </button>
+  </div>
+} @else {
+  <!-- Resumen estadístico -->
+  <div class="summary-cards">
+    <div class="summary-card">
+      <div class="card-icon">
+        <span class="material-icons">assessment</span>
+      </div>
+      <div class="card-content">
+        <h3>{{ summary().totalProjects }}</h3>
+        <p>Total Proyectos</p>
+      </div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="card-icon">
+        <span class="material-icons">attach_money</span>
+      </div>
+      <div class="card-content">
+        <h3>{{ formatBudget(summary().totalBudget) }}</h3>
+        <p>Presupuesto Total</p>
+      </div>
+    </div>
+    
+    <div class="summary-card">
+      <div class="card-icon">
+        <span class="material-icons">trending_up</span>
+      </div>
+      <div class="card-content">
+        <h3>{{ summary().averageProgress.toFixed(1) }}%</h3>
+        <p>Progreso Promedio</p>
+      </div>
+    </div>
+    
+    <div class="summary-card warning">
+      <div class="card-icon">
+        <span class="material-icons">warning</span>
+      </div>
+      <div class="card-content">
+        <h3>{{ summary().criticalProjects }}</h3>
+        <p>Proyectos Críticos</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel de filtros usando @if -->
+  @if (showFilters()) {
+    <div class="filters-panel">
+      <div class="filters-header">
+        <h3>Filtros Avanzados</h3>
+        @if (hasActiveFilters()) {
+          <button class="btn btn-link" (click)="clearFilters()">
+            Limpiar filtros
+          </button>
+        }
+      </div>
+      
+      <div class="filters-content">
+        <!-- Búsqueda de texto -->
+        <div class="filter-group">
+          <label for="search">Búsqueda:</label>
+          <input
+            id="search"
+            type="text"
+            class="form-control"
+            placeholder="Buscar por título, código o descripción..."
+            [value]="searchTerm()"
+            (input)="onSearchChange($event.target.value)">
+        </div>
+        
+        <!-- Filtro por tipo usando @for -->
+        <div class="filter-group">
+          <label>Tipos de Proyecto:</label>
+          <div class="checkbox-grid">
+            @for (type of [ProjectType.REHABILITACION, ProjectType.MEJORAMIENTO, ProjectType.CONSTRUCCION, ProjectType.MANTENIMIENTO, ProjectType.ESTUDIOS]; track type) {
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="isTypeSelected(type)"
+                  (change)="onTypeFilterChange(type, $event.target.checked)">
+                <span>{{ getTypeLabel(type) }}</span>
+              </label>
+            }
+          </div>
+        </div>
+        
+        <!-- Filtro por estado usando @for -->
+        <div class="filter-group">
+          <label>Estados:</label>
+          <div class="checkbox-grid">
+            @for (status of [ProjectStatus.PLANIFICACION, ProjectStatus.EN_LICITACION, ProjectStatus.EN_EJECUCION, ProjectStatus.SUPERVISION, ProjectStatus.FINALIZADO]; track status) {
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="isStatusSelected(status)"
+                  (change)="onStatusFilterChange(status, $event.target.checked)">
+                <span>{{ getStatusLabel(status) }}</span>
+              </label>
+            }
+          </div>
+        </div>
+        
+        <!-- Filtro por prioridad usando @for -->
+        <div class="filter-group">
+          <label>Prioridades:</label>
+          <div class="checkbox-grid">
+            @for (priority of [Priority.BAJA, Priority.MEDIA, Priority.ALTA, Priority.CRITICA, Priority.URGENTE]; track priority) {
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  [checked]="isPrioritySelected(priority)"
+                  (change)="onPriorityFilterChange(priority, $event.target.checked)">
+                <span>{{ getPriorityLabel(priority) }}</span>
+              </label>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Controles de vista -->
+  <div class="view-controls">
+    <div class="view-modes">
+      <button 
+        class="view-btn"
+        [class.active]="viewMode() === 'grid'"
+        (click)="setViewMode('grid')">
+        <span class="material-icons">grid_view</span>
+        Grid
+      </button>
+      <button 
+        class="view-btn"
+        [class.active]="viewMode() === 'list'"
+        (click)="setViewMode('list')">
+        <span class="material-icons">view_list</span>
+        Lista
+      </button>
+      <button 
+        class="view-btn"
+        [class.active]="viewMode() === 'kanban'"
+        (click)="setViewMode('kanban')">
+        <span class="material-icons">view_kanban</span>
+        Kanban
+      </button>
+    </div>
+    
+    <div class="results-info">
+      <span>{{ filteredProjectsCount() }} proyectos encontrados</span>
+    </div>
+  </div>
+
+  <!-- Contenido principal usando @switch -->
+  <div class="dashboard-content">
+    @switch (viewMode()) {
+      @case ('grid') {
+        <!-- Vista en Grid usando @for -->
+        <div class="projects-grid">
+          @for (project of projects(); track project.id; let i = $index; let even = $even; let odd = $odd) {
+            <div class="project-card" [class.even]="even" [class.odd]="odd">
+              <div class="card-header">
+                <div class="project-info">
+                  <h3 class="project-title">{{ project.title }}</h3>
+                  <p class="project-code">{{ project.code }}</p>
+                </div>
+                <div class="project-actions">
+                  <button class="btn-icon" (click)="viewProjectDetails(project)">
+                    <span class="material-icons">visibility</span>
+                  </button>
+                  <button class="btn-icon" (click)="editProject(project)">
+                    <span class="material-icons">edit</span>
+                  </button>
+                </div>
+              </div>
+              
+              <div class="card-content">
+                <p class="project-description">{{ project.description }}</p>
+                
+                <div class="project-metadata">
+                  <div class="metadata-item">
+                    <span class="label">Tipo:</span>
+                    <span class="badge badge-type">{{ getTypeLabel(project.type) }}</span>
+                  </div>
+                  
+                  <div class="metadata-item">
+                    <span class="label">Estado:</span>
+                    <span class="badge" [class]="getStatusClass(project.status)">
+                      {{ getStatusLabel(project.status) }}
+                    </span>
+                  </div>
+                  
+                  <div class="metadata-item">
+                    <span class="label">Prioridad:</span>
+                    <span class="badge" [class]="getPriorityClass(project.priority)">
+                      {{ getPriorityLabel(project.priority) }}
+                    </span>
+                  </div>
+                </div>
+                
+                <div class="project-progress">
+                  <div class="progress-header">
+                    <span>Progreso</span>
+                    <span class="progress-value">{{ project.progress }}%</span>
+                  </div>
+                  <div class="progress-bar">
+                    <div 
+                      class="progress-fill" 
+                      [class]="getProgressClass(project.progress)"
+                      [style.width.%]="project.progress">
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="project-stats">
+                  <div class="stat-item">
+                    <span class="material-icons">attach_money</span>
+                    <span>{{ formatBudget(project.budget.total) }}</span>
+                  </div>
+                  
+                  @if (project.roadLength && project.roadLength > 0) {
+                    <div class="stat-item">
+                      <span class="material-icons">straighten</span>
+                      <span>{{ project.roadLength }} km</span>
+                    </div>
+                  }
+                  
+                  @if (project.beneficiaries && project.beneficiaries > 0) {
+                    <div class="stat-item">
+                      <span class="material-icons">people</span>
+                      <span>{{ project.beneficiaries.toLocaleString() }}</span>
+                    </div>
+                  }
+                  
+                  <div class="stat-item">
+                    <span class="material-icons">location_on</span>
+                    <span>{{ project.location.department }}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-icons empty-icon">search_off</span>
+              <h3>No se encontraron proyectos</h3>
+              <p>Intenta ajustar los filtros de búsqueda</p>
+              @if (hasActiveFilters()) {
+                <button class="btn btn-primary" (click)="clearFilters()">
+                  Limpiar filtros
+                </button>
+              }
+            </div>
+          }
+        </div>
+      }
+
+      @case ('list') {
+        <!-- Vista en Lista usando @for -->
+        <div class="projects-list">
+          <div class="list-header">
+            <div class="col-title">Título</div>
+            <div class="col-type">Tipo</div>
+            <div class="col-status">Estado</div>
+            <div class="col-priority">Prioridad</div>
+            <div class="col-progress">Progreso</div>
+            <div class="col-budget">Presupuesto</div>
+            <div class="col-actions">Acciones</div>
+          </div>
+          
+          @for (project of projects(); track project.id; let i = $index) {
+            <div class="list-row" [class.alternate]="i % 2 === 1">
+              <div class="col-title">
+                <div class="project-main-info">
+                  <h4>{{ project.title }}</h4>
+                  <small>{{ project.code }}</small>
+                </div>
+              </div>
+              
+              <div class="col-type">
+                <span class="badge badge-type">{{ getTypeLabel(project.type) }}</span>
+              </div>
+              
+              <div class="col-status">
+                <span class="badge" [class]="getStatusClass(project.status)">
+                  {{ getStatusLabel(project.status) }}
+                </span>
+              </div>
+              
+              <div class="col-priority">
+                <span class="badge" [class]="getPriorityClass(project.priority)">
+                  {{ getPriorityLabel(project.priority) }}
+                </span>
+              </div>
+              
+              <div class="col-progress">
+                <div class="progress-mini">
+                  <div 
+                    class="progress-fill" 
+                    [class]="getProgressClass(project.progress)"
+                    [style.width.%]="project.progress">
+                  </div>
+                </div>
+                <span class="progress-text">{{ project.progress }}%</span>
+              </div>
+              
+              <div class="col-budget">
+                <span class="budget-amount">{{ formatBudget(project.budget.total) }}</span>
+              </div>
+              
+              <div class="col-actions">
+                <button class="btn-icon" (click)="viewProjectDetails(project)">
+                  <span class="material-icons">visibility</span>
+                </button>
+                <button class="btn-icon" (click)="editProject(project)">
+                  <span class="material-icons">edit</span>
+                </button>
+              </div>
+            </div>
+          } @empty {
+            <div class="empty-state">
+              <span class="material-icons empty-icon">search_off</span>
+              <h3>No se encontraron proyectos</h3>
+              <p>Intenta ajustar los filtros de búsqueda</p>
+            </div>
+          }
+        </div>
+      }
+
+      @case ('kanban') {
+        <!-- Vista Kanban usando @for con datos agrupados -->
+        <div class="kanban-board">
+          @for (statusEntry of Object.entries(projectsForCurrentView() as Record<string, any[]>); track statusEntry[0]) {
+            <div class="kanban-column">
+              <div class="column-header">
+                <h3>{{ getStatusLabel(statusEntry[0] as ProjectStatus) }}</h3>
+                <span class="project-count">{{ statusEntry[1].length }}</span>
+              </div>
+              
+              <div class="column-content">
+                @for (project of statusEntry[1]; track project.id) {
+                  <div class="kanban-card">
+                    <div class="card-header">
+                      <h4>{{ project.title }}</h4>
+                      <span class="badge" [class]="getPriorityClass(project.priority)">
+                        {{ getPriorityLabel(project.priority) }}
+                      </span>
+                    </div>
+                    
+                    <p class="card-description">{{ project.description }}</p>
+                    
+                    <div class="card-metadata">
+                      <div class="metadata-row">
+                        <span class="material-icons">code</span>
+                        <span>{{ project.code }}</span>
+                      </div>
+                      
+                      <div class="metadata-row">
+                        <span class="material-icons">category</span>
+                        <span>{{ getTypeLabel(project.type) }}</span>
+                      </div>
+                      
+                      <div class="metadata-row">
+                        <span class="material-icons">attach_money</span>
+                        <span>{{ formatBudget(project.budget.total) }}</span>
+                      </div>
+                      
+                      <div class="metadata-row">
+                        <span class="material-icons">location_on</span>
+                        <span>{{ project.location.department }}</span>
+                      </div>
+                    </div>
+                    
+                    <div class="card-progress">
+                      <div class="progress-header">
+                        <span>Progreso</span>
+                        <span>{{ project.progress }}%</span>
+                      </div>
+                      <div class="progress-bar">
+                        <div 
+                          class="progress-fill" 
+                          [class]="getProgressClass(project.progress)"
+                          [style.width.%]="project.progress">
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div class="card-actions">
+                      <button class="btn-icon" (click)="viewProjectDetails(project)">
+                        <span class="material-icons">visibility</span>
+                      </button>
+                      <button class="btn-icon" (click)="editProject(project)">
+                        <span class="material-icons">edit</span>
+                      </button>
+                    </div>
+                  </div>
+                } @empty {
+                  <div class="column-empty">
+                    <span class="material-icons">inbox</span>
+                    <p>No hay proyectos en este estado</p>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @default {
+        <div class="error-state">
+          <span class="material-icons">error</span>
+          <h3>Vista no disponible</h3>
+          <p>La vista seleccionada no está implementada</p>
+        </div>
+      }
+    }
+  }
+}
+
+<!-- Proyectos críticos destacados -->
+@if (criticalProjects().length > 0) {
+  <div class="critical-projects-section">
+    <h2>
+      <span class="material-icons">priority_high</span>
+      Proyectos Críticos ({{ criticalProjects().length }})
+    </h2>
+    
+    <div class="critical-projects-list">
+      @for (project of criticalProjects(); track project.id) {
+        <div class="critical-project-card">
+          <div class="critical-header">
+            <h4>{{ project.title }}</h4>
+            <span class="badge" [class]="getPriorityClass(project.priority)">
+              {{ getPriorityLabel(project.priority) }}
+            </span>
+          </div>
+          
+          <div class="critical-details">
+            <div class="detail-item">
+              <span class="material-icons">code</span>
+              <span>{{ project.code }}</span>
+            </div>
+            
+            <div class="detail-item">
+              <span class="material-icons">trending_up</span>
+              <span>{{ project.progress }}% completado</span>
+            </div>
+            
+            @if (project.plannedEndDate) {
+              <div class="detail-item">
+                <span class="material-icons">event</span>
+                <span>Vence: {{ formatDate(project.plannedEndDate) }}</span>
+              </div>
+            }
+            
+            @if (project.risks.length > 0) {
+              <div class="detail-item">
+                <span class="material-icons">warning</span>
+                <span>{{ project.risks.length }} riesgos identificados</span>
+              </div>
+            }
+          </div>
+          
+          <div class="critical-actions">
+            <button class="btn btn-primary btn-sm" (click)="viewProjectDetails(project)">
+              Ver Detalles
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+}
