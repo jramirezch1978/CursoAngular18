@@ -1,0 +1,248 @@
+<div class="notifications-container">
+  <!-- Header -->
+  <header class="notifications-header">
+    <h1>🔔 Centro de Notificaciones - PROVIAS</h1>
+    <p class="subtitle">Demostración de Notification Service con Signals</p>
+    
+    <div class="header-actions">
+      <button class="btn btn-primary" (click)="showDemoNotifications()">
+        🎯 Mostrar Demos
+      </button>
+      @if (hasNotifications()) {
+        <button class="btn btn-warning" (click)="clearAll()">
+          🧹 Limpiar Todo
+        </button>
+      }
+    </div>
+  </header>
+
+  <!-- Estado sin notificaciones -->
+  @if (!hasNotifications()) {
+    <div class="empty-state">
+      <div class="empty-icon">🔔</div>
+      <h2>No hay notificaciones</h2>
+      <p>Cuando recibas notificaciones del sistema, aparecerán aquí</p>
+      <button class="btn btn-primary" (click)="showDemoNotifications()">
+        🎯 Ver Notificaciones de Ejemplo
+      </button>
+    </div>
+  } @else {
+    <!-- Lista de notificaciones -->
+    <div class="notifications-list">
+      <div class="list-header">
+        <h2>📋 Notificaciones Activas ({{ notifications().length }})</h2>
+        <button class="btn btn-secondary btn-sm" (click)="clearAll()">
+          🗑️ Limpiar Todo
+        </button>
+      </div>
+
+      <div class="notifications-grid">
+        @for (notification of notifications(); track notification.id) {
+          <div 
+            class="notification-card"
+            [class]="getNotificationClass(notification.type)"
+            [attr.data-type]="notification.type">
+            
+            <!-- Header de la notificación -->
+            <div class="notification-header">
+              <div class="notification-icon">
+                {{ getNotificationIcon(notification.type) }}
+              </div>
+              <div class="notification-title">
+                {{ notification.title }}
+              </div>
+              <button 
+                class="notification-close"
+                (click)="removeNotification(notification.id)"
+                title="Cerrar notificación">
+                ×
+              </button>
+            </div>
+
+            <!-- Contenido de la notificación -->
+            @if (notification.message) {
+              <div class="notification-content">
+                {{ notification.message }}
+              </div>
+            }
+
+            <!-- Metadatos -->
+            <div class="notification-meta">
+              <span class="notification-time">
+                🕒 {{ getTimeAgo(notification.timestamp) }}
+              </span>
+              @if (notification.duration && notification.duration > 0) {
+                <span class="notification-duration">
+                  ⏱️ Auto-cierre: {{ notification.duration / 1000 }}s
+                </span>
+              } @else {
+                <span class="notification-persistent">
+                  📌 Persistente
+                </span>
+              }
+            </div>
+
+            <!-- Acción (si existe) -->
+            @if (notification.action) {
+              <div class="notification-action">
+                <button 
+                  class="action-button"
+                  (click)="executeAction(notification)">
+                  {{ notification.action.label }}
+                </button>
+              </div>
+            }
+
+            <!-- Indicador de tipo -->
+            <div class="notification-type-indicator" [attr.data-type]="notification.type">
+              {{ notification.type.toUpperCase() }}
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <!-- Estadísticas en tiempo real -->
+  <section class="notification-stats">
+    <h2>📊 Estadísticas de Notificaciones</h2>
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon">🔔</div>
+        <div class="stat-content">
+          <h3>{{ notifications().length }}</h3>
+          <p>Total Activas</p>
+        </div>
+      </div>
+
+      <div class="stat-card success">
+        <div class="stat-icon">✅</div>
+        <div class="stat-content">
+          <h3>{{ notifications().filter(n => n.type === 'success').length }}</h3>
+          <p>Éxito</p>
+        </div>
+      </div>
+
+      <div class="stat-card error">
+        <div class="stat-icon">❌</div>
+        <div class="stat-content">
+          <h3>{{ notifications().filter(n => n.type === 'error').length }}</h3>
+          <p>Errores</p>
+        </div>
+      </div>
+
+      <div class="stat-card warning">
+        <div class="stat-icon">⚠️</div>
+        <div class="stat-content">
+          <h3>{{ notifications().filter(n => n.type === 'warning').length }}</h3>
+          <p>Advertencias</p>
+        </div>
+      </div>
+
+      <div class="stat-card info">
+        <div class="stat-icon">ℹ️</div>
+        <div class="stat-content">
+          <h3>{{ notifications().filter(n => n.type === 'info').length }}</h3>
+          <p>Información</p>
+        </div>
+      </div>
+
+      <div class="stat-card persistent">
+        <div class="stat-icon">📌</div>
+        <div class="stat-content">
+          <h3>{{ notifications().filter(n => !n.duration || n.duration === 0).length }}</h3>
+          <p>Persistentes</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección Educativa -->
+  <section class="educational-section">
+    <h2>🎓 Conceptos Demostrados</h2>
+    <div class="concepts-grid">
+      
+      <div class="concept-card">
+        <h3>🔔 Notification Service</h3>
+        <p>Servicio centralizado para mostrar notificaciones del sistema</p>
+        <code>@Injectable({ providedIn: 'root' })</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>📊 Signals Reactivos</h3>
+        <p>Estado que se actualiza automáticamente en la UI</p>
+        <code>notifications = this.notificationService.notifications;</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>💉 inject() Function</h3>
+        <p>Inyección moderna de dependencias sin constructor</p>
+        <code>private readonly service = inject(NotificationService);</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>⏱️ Auto-Dismiss</h3>
+        <p>Notificaciones que se cierran automáticamente después de un tiempo</p>
+        <code>duration: 5000 // 5 segundos</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>🎯 Acciones Interactivas</h3>
+        <p>Notificaciones con botones de acción personalizados</p>
+        <code>action: { label: 'Ejecutar', callback: () => {} }</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>🔄 Estado Compartido</h3>
+        <p>Estado del servicio compartido entre múltiples componentes</p>
+        <code>// Automático con signals! 🎉</code>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Guía de uso -->
+  <section class="usage-guide">
+    <h2>📚 Guía de Uso del Notification Service</h2>
+    <div class="guide-content">
+      
+      <div class="guide-section">
+        <h3>🟢 Notificaciones de Éxito</h3>
+        <code>this.notificationService.success('¡Operación exitosa!', 'Mensaje descriptivo');</code>
+        <p>Úsalas para confirmar acciones completadas exitosamente</p>
+      </div>
+
+      <div class="guide-section">
+        <h3>🔴 Notificaciones de Error</h3>
+        <code>this.notificationService.error('Error del sistema', 'Descripción del error');</code>
+        <p>Úsalas para informar sobre errores que requieren atención</p>
+      </div>
+
+      <div class="guide-section">
+        <h3>🟡 Notificaciones de Advertencia</h3>
+        <code>this.notificationService.warning('Advertencia', 'Información importante');</code>
+        <p>Úsalas para alertar sobre situaciones que requieren precaución</p>
+      </div>
+
+      <div class="guide-section">
+        <h3>🔵 Notificaciones Informativas</h3>
+        <code>this.notificationService.info('Información', 'Datos relevantes');</code>
+        <p>Úsalas para proporcionar información general al usuario</p>
+      </div>
+
+      <div class="guide-section">
+        <h3>⚙️ Notificaciones Personalizadas</h3>
+        <code>this.notificationService.show({ type: 'info', title: 'Custom', action: {...} });</code>
+        <p>Úsalas para casos específicos con configuraciones avanzadas</p>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="notifications-footer">
+    <p>💡 <strong>Nota para estudiantes:</strong> Este sistema de notificaciones demuestra cómo crear 
+       servicios reutilizables con Signals, gestión de estado reactivo, y comunicación entre componentes 
+       de manera desacoplada. Observa cómo las notificaciones se sincronizan automáticamente en toda la aplicación.</p>
+  </footer>
+</div>
