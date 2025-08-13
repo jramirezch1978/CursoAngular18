@@ -13,6 +13,7 @@ import { TaskStatus, TaskPriority, TaskFilter } from '../../../core/interfaces/t
   styleUrl: './task-list.component.scss'
 })
 export class TaskListComponent implements OnInit {
+  
   // Inyección con inject() en lugar de constructor
   private readonly taskService = inject(TaskStateService);
   private readonly notificationService = inject(NotificationService);
