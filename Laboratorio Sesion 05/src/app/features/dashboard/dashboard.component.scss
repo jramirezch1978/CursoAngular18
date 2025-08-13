@@ -72,6 +72,26 @@
             box-shadow: 0 6px 20px rgba(255, 193, 7, 0.4);
           }
         }
+
+        &.btn-success {
+          background: linear-gradient(45deg, #28a745, #20c997);
+          color: white;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+          }
+        }
+
+        &.btn-info {
+          background: linear-gradient(45deg, #17a2b8, #6f42c1);
+          color: white;
+          
+          &:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(23, 162, 184, 0.4);
+          }
+        }
       }
     }
   }

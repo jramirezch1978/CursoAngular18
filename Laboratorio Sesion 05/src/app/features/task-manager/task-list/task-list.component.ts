@@ -106,6 +106,16 @@ export class TaskListComponent implements OnInit {
   onSearchTermChange(): void {
     this.applyFilters();
   }
+
+  toggleFilters(): void {
+    this.showFilters.update(v => !v);
+  }
+
+  updateSearchTerm(event: Event): void {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm.set(target.value);
+    this.applyFilters();
+  }
   
   changeViewMode(mode: 'grid' | 'list' | 'kanban'): void {
     this.viewMode.set(mode);

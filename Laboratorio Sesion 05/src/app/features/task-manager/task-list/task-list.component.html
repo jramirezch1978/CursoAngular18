@@ -63,7 +63,7 @@
       <h3>🔍 Filtros</h3>
       <button 
         class="btn btn-secondary"
-        (click)="showFilters.update(v => !v)">
+        (click)="toggleFilters()">
         {{ showFilters() ? 'Ocultar' : 'Mostrar' }}
       </button>
     </div>
@@ -106,8 +106,8 @@
           <label>Buscar:</label>
           <input 
             type="text"
-            [(ngModel)]="searchTerm"
-            (input)="onSearchTermChange()"
+            [value]="searchTerm()"
+            (input)="updateSearchTerm($event)"
             placeholder="Buscar por título o descripción..."
             class="search-input">
         </div>

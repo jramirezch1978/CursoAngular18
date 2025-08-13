@@ -13,6 +13,15 @@
       <button class="btn btn-warning" (click)="simulateChanges()">
         🎯 Simular Cambios
       </button>
+      <button class="btn btn-success" (click)="loadTasksFromApi()">
+        🌐 Cargar desde API
+      </button>
+      <button class="btn btn-info" (click)="searchTasksWithApi()">
+        🔍 Buscar con API
+      </button>
+      <button class="btn btn-primary" (click)="getApiStatistics()">
+        📊 Stats API
+      </button>
     </div>
   </header>
 
@@ -223,6 +232,18 @@
         <h3>📈 Real-time Updates</h3>
         <p>Actualizaciones en tiempo real sin subscripciones manuales</p>
         <code>// Automático con signals! 🎉</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>🌐 TaskApiService</h3>
+        <p>Servicio HTTP para comunicación con APIs externas</p>
+        <code>private readonly taskApiService = inject(TaskApiService);</code>
+      </div>
+
+      <div class="concept-card">
+        <h3>📡 HTTP Client</h3>
+        <p>Integración con HttpClient para operaciones CRUD</p>
+        <code>this.http.get&lt;Task[]&gt;(this.apiUrl).pipe(retry(3))</code>
       </div>
 
     </div>

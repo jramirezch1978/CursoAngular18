@@ -1,6 +1,7 @@
 import { Component, inject, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TaskStateService } from '../../core/services/task-state.service';
+import { TaskApiService } from '../../core/services/task-api.service';
 import { NotificationService } from '../../shared/services/notification.service';
 import { TaskStatus, TaskPriority } from '../../core/interfaces/task.interface';
 
@@ -14,6 +15,7 @@ import { TaskStatus, TaskPriority } from '../../core/interfaces/task.interface';
 export class DashboardComponent {
   // Demostración de inject() - Nueva forma de inyección en Angular
   private readonly taskService = inject(TaskStateService);
+  private readonly taskApiService = inject(TaskApiService);
   private readonly notificationService = inject(NotificationService);
 
   // Signals del servicio - Estado reactivo
@@ -117,6 +119,62 @@ export class DashboardComponent {
       });
       this.notificationService.success('Tarea agregada', 'Observa cómo se actualizaron las estadísticas automáticamente');
     }, 1000);
+  }
+
+  // Método para demostrar TaskApiService
+  loadTasksFromApi() {
+    this.notificationService.info('🌐 Cargando desde API', 'Demonstrando TaskApiService con HttpClient');
+    
+    this.taskApiService.getTasks().subscribe({
+      next: (apiTasks) => {
+        console.log('📦 Tareas cargadas desde API:', apiTasks);
+        this.notificationService.success(
+          '✅ API Response',
+          `Se cargaron ${apiTasks.length} tareas desde TaskApiService`
+        );
+      },
+      error: (error) => {
+        console.error('💥 Error de API:', error);
+        this.notificationService.error('❌ Error de API', error.message);
+      }
+    });
+  }
+
+  // Método para demostrar búsqueda con API
+  searchTasksWithApi() {
+    const searchTerm = 'OAuth';
+    this.notificationService.info('🔍 Buscando tareas', `Buscando: "${searchTerm}"`);
+    
+    this.taskApiService.searchTasks(searchTerm).subscribe({
+      next: (foundTasks) => {
+        console.log('🔍 Resultados de búsqueda:', foundTasks);
+        this.notificationService.success(
+          '🔍 Búsqueda completada',
+          `Se encontraron ${foundTasks.length} tareas con "${searchTerm}"`
+        );
+      },
+      error: (error) => {
+        this.notificationService.error('❌ Error en búsqueda', error.message);
+      }
+    });
+  }
+
+  // Método para demostrar estadísticas de API
+  getApiStatistics() {
+    this.notificationService.info('📊 Obteniendo estadísticas', 'Consultando estadísticas desde API');
+    
+    this.taskApiService.getTaskStatistics().subscribe({
+      next: (stats) => {
+        console.log('📊 Estadísticas de API:', stats);
+        this.notificationService.success(
+          '📊 Estadísticas obtenidas',
+          `Total: ${stats.total}, Completadas: ${stats.completed}`
+        );
+      },
+      error: (error) => {
+        this.notificationService.error('❌ Error en estadísticas', error.message);
+      }
+    });
   }
 
   getStatusColor(status: TaskStatus): string {
