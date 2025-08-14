@@ -1,21 +1,11 @@
 :root {
-  --primary-color: #2563eb;
-  --primary-dark: #1d4ed8;
-  --secondary-color: #64748b;
+  --primary: #2563eb;
   --gray-50: #f8fafc;
   --gray-100: #f1f5f9;
   --gray-200: #e2e8f0;
   --gray-600: #475569;
-  --gray-700: #334155;
   --gray-800: #1e293b;
   --gray-900: #0f172a;
-  --spacing-sm: 0.5rem;
-  --spacing-md: 1rem;
-  --spacing-lg: 1.5rem;
-  --spacing-xl: 2rem;
-  --border-radius-md: 0.5rem;
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
 * {
@@ -25,7 +15,7 @@
 }
 
 body {
-  font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   line-height: 1.6;
   color: var(--gray-800);
   background: var(--gray-50);
@@ -40,7 +30,7 @@ body {
 .app-header {
   background: white;
   border-bottom: 1px solid var(--gray-200);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
   position: sticky;
   top: 0;
   z-index: 100;
@@ -48,7 +38,7 @@ body {
   .header-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 1rem 1.5rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -57,41 +47,39 @@ body {
   .logo-section {
     display: flex;
     align-items: center;
-    gap: var(--spacing-md);
+    gap: 1rem;
 
     .logo-icon {
       font-size: 2.5rem;
-      color: var(--primary-color);
+      color: var(--primary);
     }
 
-    .logo-text {
-      h1 {
-        font-size: 1.5rem;
-        font-weight: 700;
-        color: var(--gray-900);
-        margin: 0;
-      }
+    .logo-text h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--gray-900);
+      margin: 0;
+    }
 
-      p {
-        font-size: 0.875rem;
-        color: var(--gray-600);
-        margin: 0;
-      }
+    .logo-text p {
+      font-size: 0.875rem;
+      color: var(--gray-600);
+      margin: 0;
     }
   }
 
   .main-nav {
     display: flex;
-    gap: var(--spacing-lg);
+    gap: 1.5rem;
 
     a {
       display: flex;
       align-items: center;
-      gap: var(--spacing-sm);
-      padding: var(--spacing-sm) var(--spacing-md);
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
       text-decoration: none;
       color: var(--gray-600);
-      border-radius: var(--border-radius-md);
+      border-radius: 0.5rem;
       transition: all 0.2s ease;
       font-weight: 500;
 
@@ -101,7 +89,7 @@ body {
       }
 
       &.active {
-        background: var(--primary-color);
+        background: var(--primary);
         color: white;
       }
 
@@ -116,7 +104,7 @@ body {
   flex: 1;
   max-width: 1200px;
   margin: 0 auto;
-  padding: var(--spacing-xl) var(--spacing-lg);
+  padding: 2rem 1.5rem;
   width: 100%;
 }
 
@@ -128,7 +116,7 @@ body {
   .footer-content {
     max-width: 1200px;
     margin: 0 auto;
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
     text-align: center;
 
     p {
@@ -136,7 +124,7 @@ body {
       font-size: 0.875rem;
 
       &.version {
-        margin-top: var(--spacing-sm);
+        margin-top: 0.5rem;
         color: var(--gray-200);
       }
     }
@@ -144,19 +132,17 @@ body {
 }
 
 @media (max-width: 768px) {
-  .app-header {
-    .header-content {
-      flex-direction: column;
-      gap: var(--spacing-lg);
-    }
+  .app-header .header-content {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
 
-    .main-nav {
-      width: 100%;
-      justify-content: center;
-    }
+  .app-header .main-nav {
+    width: 100%;
+    justify-content: center;
   }
 
   .app-main {
-    padding: var(--spacing-lg);
+    padding: 1.5rem;
   }
 }

@@ -107,7 +107,7 @@
             class="form-control"
             placeholder="Buscar por título, código o descripción..."
             [value]="searchTerm()"
-            (input)="onSearchChange(($event.target as HTMLInputElement).value)">
+            (input)="onSearchChange($any($event.target).value)">
         </div>
         
         <!-- Filtro por tipo usando @for -->
@@ -119,7 +119,7 @@
                 <input
                   type="checkbox"
                   [checked]="isTypeSelected(type)"
-                  (change)="onTypeFilterChange(type, ($event.target as HTMLInputElement).checked)">
+                  (change)="onTypeFilterChange(type, $any($event.target).checked)">
                 <span>{{ getTypeLabel(type) }}</span>
               </label>
             }
@@ -135,7 +135,7 @@
                 <input
                   type="checkbox"
                   [checked]="isStatusSelected(status)"
-                  (change)="onStatusFilterChange(status, ($event.target as HTMLInputElement).checked)">
+                  (change)="onStatusFilterChange(status, $any($event.target).checked)">
                 <span>{{ getStatusLabel(status) }}</span>
               </label>
             }
@@ -151,7 +151,7 @@
                 <input
                   type="checkbox"
                   [checked]="isPrioritySelected(priority)"
-                  (change)="onPriorityFilterChange(priority, ($event.target as HTMLInputElement).checked)">
+                  (change)="onPriorityFilterChange(priority, $any($event.target).checked)">
                 <span>{{ getPriorityLabel(priority) }}</span>
               </label>
             }
@@ -373,7 +373,7 @@
           @for (statusEntry of Object.entries(projectsForCurrentView()); track statusEntry[0]) {
             <div class="kanban-column">
               <div class="column-header">
-                <h3>{{ getStatusLabel(statusEntry[0] as ProjectStatus) }}</h3>
+                <h3>{{ getStatusLabel($any(statusEntry[0])) }}</h3>
                 <span class="project-count">{{ statusEntry[1].length }}</span>
               </div>
               

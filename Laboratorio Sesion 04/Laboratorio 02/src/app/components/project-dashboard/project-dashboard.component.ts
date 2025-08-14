@@ -22,6 +22,7 @@ export class ProjectDashboardComponent {
   readonly ProjectType = ProjectType;
   readonly ProjectStatus = ProjectStatus;
   readonly Priority = Priority;
+  readonly Object = Object; // Para usar Object.entries en el template
 
   // Signals para el estado local del componente
   readonly viewMode = signal<'grid' | 'list' | 'kanban'>('grid');
