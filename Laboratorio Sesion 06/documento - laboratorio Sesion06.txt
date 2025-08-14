@@ -1,0 +1,3042 @@
+LABORATORIOS PRÁCTICOS - SESIÓN 6: COMUNICACIÓN HTTP
+PROVIAS DESCENTRALIZADO
+INFORMACIÓN GENERAL
+Curso: Angular v18 - 30 horas académicas
+Modalidad: 100% Online Live - Formato Laboratorio Intensivo
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Sesión: 6 - Comunicación HTTP
+Fecha: Jueves, 14 de Agosto 2025
+Duración Total: 180 minutos (3 horas)
+Laboratorios: 5 laboratorios (Lab 0: 15 min, Lab 1-4: 165 min)
+________________________________________
+REQUISITOS PREVIOS DE SESIONES ANTERIORES
+✅ Verificación del Proyecto Base (Sesiones 1-5)
+Los participantes deben tener completado de las sesiones anteriores:
+1.	Proyecto Angular v18 con nombre mi-primera-app-angular
+2.	Componentes básicos (Header, Footer, Home) funcionando
+3.	Router configurado con rutas y guards
+4.	Servicios con Signals implementados (Sesión 5)
+5.	Componentes Standalone migrados
+6.	Sistema de tareas con drag & drop (Kanban)
+📋 Verificación Rápida del Proyecto
+# Verificar versión de Angular
+ng version
+# Debe mostrar: Angular CLI: 18.x.x
+
+# Verificar que el proyecto compile
+ng build
+
+# Verificar estructura de carpetas necesaria
+ls -la src/app/core/services/
+ls -la src/app/shared/services/
+Si algún participante no completó las sesiones anteriores:
+# Clonar repositorio con código de sesiones anteriores
+git clone https://github.com/provias/angular-curso-sesion5-completo.git
+cd angular-curso-sesion5-completo
+npm install
+ng serve --open
+________________________________________
+LAB 0: CONFIGURACIÓN DEL ENTORNO Y HERRAMIENTAS
+Duración: 15 minutos
+Objetivo: Preparar el entorno específico para trabajar con HttpClient y APIs REST
+HERRAMIENTAS Y SOFTWARE NECESARIO
+🛠️ Software Principal
+Herramienta	Versión Mínima	Verificación	Instalación
+Node.js	v18.19.0	node --version	https://nodejs.org
+npm	v9.0.0	npm --version	Incluido con Node.js
+Angular CLI	v18.x	ng version	npm install -g @angular/cli@18
+Visual Studio Code	Última	-	https://code.visualstudio.com
+Git	v2.x	git --version	https://git-scm.com
+Postman/Insomnia	Última	-	https://postman.com / https://insomnia.rest
+JSON Server	Última	json-server --version	npm install -g json-server
+📦 Extensiones VS Code Requeridas
+1.	Thunder Client - Cliente REST integrado en VS Code
+2.	Angular Language Service - IntelliSense para Angular
+3.	REST Client - Archivos .http para testing
+4.	Prettier - Formateo automático
+5.	Error Lens - Errores inline
+PASO 1: Instalación de JSON Server (5 minutos)
+1.1 Instalar JSON Server globalmente
+# Instalar JSON Server
+npm install -g json-server
+
+# Verificar instalación
+json-server --version
+1.2 Crear base de datos mock
+Crear archivo db.json en la raíz del proyecto:
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Laptop Dell XPS 13",
+      "price": 1299.99,
+      "description": "Ultrabook premium con procesador Intel Core i7",
+      "category": "laptops",
+      "stock": 15,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-01T10:00:00Z",
+      "updatedAt": "2025-08-14T15:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Monitor LG 27\" 4K",
+      "price": 449.99,
+      "description": "Monitor IPS 4K con HDR10",
+      "category": "monitors",
+      "stock": 23,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-02T11:00:00Z",
+      "updatedAt": "2025-08-14T16:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Teclado Mecánico RGB",
+      "price": 129.99,
+      "description": "Teclado gaming con switches Cherry MX",
+      "category": "accessories",
+      "stock": 45,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-03T09:00:00Z",
+      "updatedAt": "2025-08-14T14:00:00Z"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@provias.gob.pe",
+      "password": "admin123",
+      "role": "admin",
+      "name": "Administrador PROVIAS"
+    },
+    {
+      "id": 2,
+      "email": "user@provias.gob.pe",
+      "password": "user123",
+      "role": "user",
+      "name": "Usuario PROVIAS"
+    }
+  ],
+  "orders": [],
+  "categories": [
+    { "id": 1, "name": "laptops", "description": "Laptops y notebooks" },
+    { "id": 2, "name": "monitors", "description": "Monitores y pantallas" },
+    { "id": 3, "name": "accessories", "description": "Accesorios de computadora" }
+  ]
+}
+1.3 Crear configuración de JSON Server
+Crear archivo json-server.json:
+{
+  "port": 3000,
+  "watch": true,
+  "delay": 500,
+  "routes": "routes.json"
+}
+Crear archivo routes.json:
+{
+  "/api/*": "/$1"
+}
+1.4 Agregar scripts al package.json
+{
+  "scripts": {
+    "server": "json-server --watch db.json --port 3000 --delay 500",
+    "dev": "concurrently \"npm run server\" \"ng serve\"",
+    "test:http": "ng test --include='**/services/**/*.spec.ts'"
+  }
+}
+Instalar concurrently:
+npm install --save-dev concurrently
+PASO 2: Configuración de HttpClient en Angular (5 minutos)
+2.1 Actualizar app.config.ts
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([])  // Aquí agregaremos interceptors más tarde
+    ),
+    provideAnimations()
+  ]
+};
+2.2 Crear estructura de carpetas para HTTP
+# Crear estructura necesaria
+mkdir -p src/app/core/services/http
+mkdir -p src/app/core/interceptors
+mkdir -p src/app/core/models
+mkdir -p src/app/core/utils
+mkdir -p src/app/shared/components/loading
+mkdir -p src/app/features/products
+PASO 3: Configurar Variables de Entorno (3 minutos)
+3.1 Actualizar environment.development.ts
+export const environment = {
+  production: false,
+  apiUrl: 'http://localhost:3000/api',
+  appName: 'PROVIAS Angular App - DEV',
+  version: '1.0.0',
+  features: {
+    enableLogging: true,
+    enableDebugMode: true,
+    enableCache: true,
+    cacheTimeout: 300000 // 5 minutos
+  },
+  retry: {
+    count: 3,
+    delay: 1000,
+    maxDelay: 5000
+  }
+};
+3.2 Actualizar environment.ts (producción)
+export const environment = {
+  production: true,
+  apiUrl: 'https://api.provias.gob.pe/v1',
+  appName: 'PROVIAS Angular App',
+  version: '1.0.0',
+  features: {
+    enableLogging: false,
+    enableDebugMode: false,
+    enableCache: true,
+    cacheTimeout: 600000 // 10 minutos
+  },
+  retry: {
+    count: 3,
+    delay: 1000,
+    maxDelay: 5000
+  }
+};
+PASO 4: Verificación del Entorno (2 minutos)
+4.1 Iniciar JSON Server
+# En una terminal
+npm run server
+
+# Verificar en navegador
+# http://localhost:3000/api/products
+4.2 Probar API con curl o Postman
+# GET todos los productos
+curl http://localhost:3000/api/products
+
+# GET un producto específico
+curl http://localhost:3000/api/products/1
+
+# POST nuevo producto
+curl -X POST http://localhost:3000/api/products \
+  -H "Content-Type: application/json" \
+  -d '{"name":"Mouse Logitech","price":29.99,"category":"accessories","stock":100}'
+✅ CHECKLIST DE VERIFICACIÓN LAB 0
+•	[ ] Node.js v18+ instalado y funcionando
+•	[ ] Angular CLI v18 instalado globalmente
+•	[ ] JSON Server instalado y configurado
+•	[ ] Base de datos mock (db.json) creada
+•	[ ] HttpClient configurado en app.config.ts
+•	[ ] Estructura de carpetas HTTP creada
+•	[ ] Variables de entorno configuradas
+•	[ ] API mock respondiendo en http://localhost:3000
+•	[ ] VS Code con extensiones instaladas
+•	[ ] Proyecto compilando sin errores
+________________________________________
+LAB 1: IMPLEMENTACIÓN DE HTTPCLIENT Y CRUD COMPLETO
+Duración: 45 minutos
+Objetivo: Implementar un servicio HTTP completo con todas las operaciones CRUD
+PASO 1: Crear Interfaces y Modelos (5 minutos)
+1.1 Crear interface Product
+Crear archivo src/app/core/models/product.model.ts:
+// Modelo de Producto
+export interface Product {
+  id?: number;
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  stock: number;
+  imageUrl?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+// DTO para crear producto
+export interface CreateProductDto {
+  name: string;
+  price: number;
+  description: string;
+  category: string;
+  stock: number;
+  imageUrl?: string;
+}
+
+// DTO para actualizar producto
+export interface UpdateProductDto extends Partial<CreateProductDto> {
+  id: number;
+}
+
+// Respuesta paginada
+export interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+// Filtros de búsqueda
+export interface ProductFilters {
+  category?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  search?: string;
+  inStock?: boolean;
+  sortBy?: 'name' | 'price' | 'stock' | 'createdAt';
+  sortOrder?: 'asc' | 'desc';
+}
+
+// Respuesta de la API
+export interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  error?: string;
+  timestamp: string;
+}
+1.2 Crear interface User
+Crear archivo src/app/core/models/user.model.ts:
+export interface User {
+  id: number;
+  email: string;
+  name: string;
+  role: 'admin' | 'user' | 'guest';
+  token?: string;
+}
+
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  user: User;
+  token: string;
+  expiresIn: number;
+}
+
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name: string;
+}
+PASO 2: Implementar ProductService (15 minutos)
+2.1 Crear servicio base de productos
+ng generate service core/services/http/product --skip-tests
+Actualizar src/app/core/services/http/product.service.ts:
+import { Injectable, inject, signal, computed } from '@angular/core';
+import { HttpClient, HttpParams, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError, map, tap, retry, delay, shareReplay } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { 
+  Product, 
+  CreateProductDto, 
+  UpdateProductDto, 
+  ProductFilters,
+  PaginatedResponse,
+  ApiResponse 
+} from '../../models/product.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ProductService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/products`;
+  
+  // Signals para estado reactivo
+  private productsSignal = signal<Product[]>([]);
+  private loadingSignal = signal<boolean>(false);
+  private errorSignal = signal<string | null>(null);
+  private selectedProductSignal = signal<Product | null>(null);
+  
+  // Computed signals públicos
+  products = computed(() => this.productsSignal());
+  loading = computed(() => this.loadingSignal());
+  error = computed(() => this.errorSignal());
+  selectedProduct = computed(() => this.selectedProductSignal());
+  
+  // Estadísticas computadas
+  statistics = computed(() => {
+    const products = this.productsSignal();
+    return {
+      total: products.length,
+      totalValue: products.reduce((sum, p) => sum + (p.price * p.stock), 0),
+      categories: [...new Set(products.map(p => p.category))].length,
+      outOfStock: products.filter(p => p.stock === 0).length,
+      lowStock: products.filter(p => p.stock > 0 && p.stock < 10).length
+    };
+  });
+
+  // Headers comunes
+  private getHttpOptions() {
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest'
+      })
+    };
+  }
+
+  /**
+   * Obtener todos los productos con filtros opcionales
+   */
+  getProducts(filters?: ProductFilters): Observable<Product[]> {
+    this.loadingSignal.set(true);
+    this.errorSignal.set(null);
+    
+    let params = new HttpParams();
+    
+    if (filters) {
+      Object.keys(filters).forEach(key => {
+        const value = filters[key as keyof ProductFilters];
+        if (value !== undefined && value !== null) {
+          params = params.set(key, value.toString());
+        }
+      });
+    }
+    
+    return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
+      tap(products => {
+        this.productsSignal.set(products);
+        this.loadingSignal.set(false);
+        console.log(`✅ Loaded ${products.length} products`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      }),
+      shareReplay(1) // Cache la última emisión
+    );
+  }
+
+  /**
+   * Obtener un producto por ID
+   */
+  getProduct(id: number): Observable<Product> {
+    this.loadingSignal.set(true);
+    
+    return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
+      tap(product => {
+        this.selectedProductSignal.set(product);
+        this.loadingSignal.set(false);
+        console.log(`✅ Loaded product: ${product.name}`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Crear nuevo producto
+   */
+  createProduct(dto: CreateProductDto): Observable<Product> {
+    this.loadingSignal.set(true);
+    
+    const newProduct = {
+      ...dto,
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString()
+    };
+    
+    return this.http.post<Product>(this.apiUrl, newProduct, this.getHttpOptions()).pipe(
+      tap(product => {
+        // Actualizar lista local
+        this.productsSignal.update(products => [...products, product]);
+        this.loadingSignal.set(false);
+        console.log(`✅ Created product: ${product.name}`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Actualizar producto (reemplazo completo)
+   */
+  updateProduct(id: number, dto: UpdateProductDto): Observable<Product> {
+    this.loadingSignal.set(true);
+    
+    const updatedProduct = {
+      ...dto,
+      updatedAt: new Date().toISOString()
+    };
+    
+    return this.http.put<Product>(
+      `${this.apiUrl}/${id}`, 
+      updatedProduct, 
+      this.getHttpOptions()
+    ).pipe(
+      tap(product => {
+        // Actualizar lista local
+        this.productsSignal.update(products => 
+          products.map(p => p.id === id ? product : p)
+        );
+        this.loadingSignal.set(false);
+        console.log(`✅ Updated product: ${product.name}`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Actualizar parcialmente un producto
+   */
+  patchProduct(id: number, changes: Partial<Product>): Observable<Product> {
+    this.loadingSignal.set(true);
+    
+    const patch = {
+      ...changes,
+      updatedAt: new Date().toISOString()
+    };
+    
+    return this.http.patch<Product>(
+      `${this.apiUrl}/${id}`,
+      patch,
+      this.getHttpOptions()
+    ).pipe(
+      tap(product => {
+        this.productsSignal.update(products => 
+          products.map(p => p.id === id ? product : p)
+        );
+        this.loadingSignal.set(false);
+        console.log(`✅ Patched product: ${product.name}`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Eliminar producto
+   */
+  deleteProduct(id: number): Observable<void> {
+    this.loadingSignal.set(true);
+    
+    return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
+      tap(() => {
+        // Actualizar lista local
+        this.productsSignal.update(products => 
+          products.filter(p => p.id !== id)
+        );
+        this.loadingSignal.set(false);
+        console.log(`✅ Deleted product with ID: ${id}`);
+      }),
+      catchError(error => {
+        this.handleError(error);
+        return throwError(() => error);
+      })
+    );
+  }
+
+  /**
+   * Buscar productos
+   */
+  searchProducts(term: string, filters?: ProductFilters): Observable<Product[]> {
+    if (!term || term.length < 2) {
+      return of([]);
+    }
+    
+    const searchFilters: ProductFilters = {
+      ...filters,
+      search: term
+    };
+    
+    return this.getProducts(searchFilters);
+  }
+
+  /**
+   * Actualizar stock de un producto
+   */
+  updateStock(id: number, quantity: number): Observable<Product> {
+    return this.patchProduct(id, { stock: quantity });
+  }
+
+  /**
+   * Manejo de errores centralizado
+   */
+  private handleError(error: HttpErrorResponse): void {
+    let errorMessage = 'Ha ocurrido un error desconocido';
+    
+    if (error.error instanceof ErrorEvent) {
+      // Error del cliente
+      errorMessage = `Error: ${error.error.message}`;
+    } else {
+      // Error del servidor
+      errorMessage = this.getServerErrorMessage(error);
+    }
+    
+    this.errorSignal.set(errorMessage);
+    this.loadingSignal.set(false);
+    console.error('🔴 ProductService Error:', errorMessage);
+  }
+
+  private getServerErrorMessage(error: HttpErrorResponse): string {
+    switch (error.status) {
+      case 400:
+        return 'Solicitud incorrecta. Verifique los datos enviados.';
+      case 401:
+        return 'No autorizado. Por favor inicie sesión.';
+      case 403:
+        return 'Acceso denegado. No tiene permisos para esta operación.';
+      case 404:
+        return 'Recurso no encontrado.';
+      case 409:
+        return 'Conflicto. El recurso ya existe.';
+      case 500:
+        return 'Error interno del servidor. Intente más tarde.';
+      case 503:
+        return 'Servicio no disponible. Intente más tarde.';
+      default:
+        return `Error ${error.status}: ${error.message}`;
+    }
+  }
+
+  /**
+   * Limpiar selección
+   */
+  clearSelection(): void {
+    this.selectedProductSignal.set(null);
+  }
+
+  /**
+   * Resetear estado de error
+   */
+  clearError(): void {
+    this.errorSignal.set(null);
+  }
+}
+PASO 3: Crear Componente de Lista de Productos (15 minutos)
+3.1 Generar componente
+ng generate component features/products/product-list --standalone
+3.2 Implementar product-list.component.ts
+import { Component, OnInit, inject, signal, computed } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ProductService } from '../../../core/services/http/product.service';
+import { Product, ProductFilters } from '../../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-list',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  templateUrl: './product-list.component.html',
+  styleUrl: './product-list.component.scss'
+})
+export class ProductListComponent implements OnInit {
+  private productService = inject(ProductService);
+  
+  // Signals del servicio
+  products = this.productService.products;
+  loading = this.productService.loading;
+  error = this.productService.error;
+  statistics = this.productService.statistics;
+  
+  // Signals locales para UI
+  searchTerm = signal('');
+  selectedCategory = signal<string>('');
+  sortBy = signal<string>('name');
+  showCreateForm = signal(false);
+  editingProduct = signal<Product | null>(null);
+  
+  // Formulario para nuevo producto
+  newProduct = signal({
+    name: '',
+    price: 0,
+    description: '',
+    category: '',
+    stock: 0
+  });
+  
+  categories = ['laptops', 'monitors', 'accessories', 'components', 'software'];
+  
+  ngOnInit(): void {
+    this.loadProducts();
+  }
+  
+  loadProducts(): void {
+    const filters: ProductFilters = {};
+    
+    if (this.selectedCategory()) {
+      filters.category = this.selectedCategory();
+    }
+    
+    if (this.searchTerm()) {
+      filters.search = this.searchTerm();
+    }
+    
+    if (this.sortBy()) {
+      filters.sortBy = this.sortBy() as any;
+      filters.sortOrder = 'asc';
+    }
+    
+    this.productService.getProducts(filters).subscribe({
+      next: () => console.log('Products loaded'),
+      error: (err) => console.error('Error loading products:', err)
+    });
+  }
+  
+  onSearch(): void {
+    this.loadProducts();
+  }
+  
+  onCategoryChange(): void {
+    this.loadProducts();
+  }
+  
+  onSortChange(): void {
+    this.loadProducts();
+  }
+  
+  createProduct(): void {
+    const product = this.newProduct();
+    
+    if (!product.name || product.price <= 0) {
+      alert('Por favor complete todos los campos requeridos');
+      return;
+    }
+    
+    this.productService.createProduct(product).subscribe({
+      next: (created) => {
+        console.log('Product created:', created);
+        this.showCreateForm.set(false);
+        this.resetForm();
+      },
+      error: (err) => console.error('Error creating product:', err)
+    });
+  }
+  
+  editProduct(product: Product): void {
+    this.editingProduct.set(product);
+    this.newProduct.set({
+      name: product.name,
+      price: product.price,
+      description: product.description,
+      category: product.category,
+      stock: product.stock
+    });
+    this.showCreateForm.set(true);
+  }
+  
+  updateProduct(): void {
+    const editing = this.editingProduct();
+    if (!editing || !editing.id) return;
+    
+    const updates = this.newProduct();
+    
+    this.productService.updateProduct(editing.id, updates).subscribe({
+      next: (updated) => {
+        console.log('Product updated:', updated);
+        this.cancelEdit();
+      },
+      error: (err) => console.error('Error updating product:', err)
+    });
+  }
+  
+  deleteProduct(id: number): void {
+    if (!confirm('¿Está seguro de eliminar este producto?')) return;
+    
+    this.productService.deleteProduct(id).subscribe({
+      next: () => console.log('Product deleted'),
+      error: (err) => console.error('Error deleting product:', err)
+    });
+  }
+  
+  updateStock(product: Product, quantity: number): void {
+    if (!product.id) return;
+    
+    this.productService.updateStock(product.id, quantity).subscribe({
+      next: (updated) => console.log('Stock updated:', updated),
+      error: (err) => console.error('Error updating stock:', err)
+    });
+  }
+  
+  cancelEdit(): void {
+    this.editingProduct.set(null);
+    this.showCreateForm.set(false);
+    this.resetForm();
+  }
+  
+  resetForm(): void {
+    this.newProduct.set({
+      name: '',
+      price: 0,
+      description: '',
+      category: '',
+      stock: 0
+    });
+  }
+  
+  clearError(): void {
+    this.productService.clearError();
+  }
+}
+3.3 Implementar product-list.component.html
+<div class="product-list-container">
+  <header class="list-header">
+    <h1>🛒 Gestión de Productos - PROVIAS</h1>
+    <p class="subtitle">HttpClient CRUD con Angular v18</p>
+  </header>
+
+  <!-- Error Display -->
+  @if (error()) {
+    <div class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <span>{{ error() }}</span>
+      <button (click)="clearError()" class="btn-close">✕</button>
+    </div>
+  }
+
+  <!-- Statistics -->
+  @if (statistics(); as stats) {
+    <section class="statistics">
+      <div class="stat-card">
+        <h3>{{ stats.total }}</h3>
+        <p>Productos</p>
+      </div>
+      <div class="stat-card">
+        <h3>${{ stats.totalValue | number:'1.2-2' }}</h3>
+        <p>Valor Total</p>
+      </div>
+      <div class="stat-card">
+        <h3>{{ stats.categories }}</h3>
+        <p>Categorías</p>
+      </div>
+      <div class="stat-card warning">
+        <h3>{{ stats.lowStock }}</h3>
+        <p>Stock Bajo</p>
+      </div>
+      <div class="stat-card danger">
+        <h3>{{ stats.outOfStock }}</h3>
+        <p>Sin Stock</p>
+      </div>
+    </section>
+  }
+
+  <!-- Filters and Controls -->
+  <section class="controls">
+    <div class="search-box">
+      <input 
+        type="text" 
+        [(ngModel)]="searchTerm"
+        (keyup.enter)="onSearch()"
+        placeholder="Buscar productos..."
+        class="search-input">
+      <button (click)="onSearch()" class="btn btn-primary">🔍 Buscar</button>
+    </div>
+
+    <select 
+      [(ngModel)]="selectedCategory"
+      (change)="onCategoryChange()"
+      class="select-control">
+      <option value="">Todas las categorías</option>
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat | titlecase }}</option>
+      }
+    </select>
+
+    <select 
+      [(ngModel)]="sortBy"
+      (change)="onSortChange()"
+      class="select-control">
+      <option value="name">Nombre</option>
+      <option value="price">Precio</option>
+      <option value="stock">Stock</option>
+      <option value="createdAt">Fecha</option>
+    </select>
+
+    <button 
+      (click)="showCreateForm.set(true)" 
+      class="btn btn-success">
+      ➕ Nuevo Producto
+    </button>
+  </section>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando productos...</p>
+    </div>
+  }
+
+  <!-- Product Grid -->
+  <div class="products-grid">
+    @for (product of products(); track product.id) {
+      <div class="product-card" [class.low-stock]="product.stock < 10">
+        <div class="product-header">
+          <span class="product-id">#{{ product.id }}</span>
+          <span class="product-category">{{ product.category }}</span>
+        </div>
+        
+        <h3>{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        
+        <div class="product-details">
+          <div class="price">${{ product.price | number:'1.2-2' }}</div>
+          <div class="stock" [class.danger]="product.stock === 0">
+            Stock: {{ product.stock }}
+          </div>
+        </div>
+        
+        <div class="product-actions">
+          <button (click)="editProduct(product)" class="btn btn-sm btn-primary">
+            ✏️ Editar
+          </button>
+          <button (click)="deleteProduct(product.id!)" class="btn btn-sm btn-danger">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    } @empty {
+      @if (!loading()) {
+        <div class="no-products">
+          <h3>📦 No se encontraron productos</h3>
+          <p>Intente con otros filtros o agregue nuevos productos</p>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Create/Edit Form Modal -->
+  @if (showCreateForm()) {
+    <div class="modal-overlay" (click)="cancelEdit()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <h2>{{ editingProduct() ? 'Editar' : 'Nuevo' }} Producto</h2>
+        
+        <form (submit)="editingProduct() ? updateProduct() : createProduct(); $event.preventDefault()">
+          <div class="form-group">
+            <label>Nombre *</label>
+            <input 
+              type="text" 
+              [(ngModel)]="newProduct().name"
+              name="name"
+              required
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Precio *</label>
+            <input 
+              type="number" 
+              [(ngModel)]="newProduct().price"
+              name="price"
+              step="0.01"
+              min="0"
+              required
+              class="form-control">
+          </div>
+
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea 
+              [(ngModel)]="newProduct().description"
+              name="description"
+              rows="3"
+              class="form-control">
+            </textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Categoría *</label>
+            <select 
+              [(ngModel)]="newProduct().category"
+              name="category"
+              required
+              class="form-control">
+              <option value="">Seleccionar...</option>
+              @for (cat of categories; track cat) {
+                <option [value]="cat">{{ cat | titlecase }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Stock *</label>
+            <input 
+              type="number" 
+              [(ngModel)]="newProduct().stock"
+              name="stock"
+              min="0"
+              required
+              class="form-control">
+          </div>
+
+          <div class="form-actions">
+            <button type="button" (click)="cancelEdit()" class="btn btn-secondary">
+              Cancelar
+            </button>
+            <button type="submit" class="btn btn-primary">
+              {{ editingProduct() ? 'Actualizar' : 'Crear' }}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  }
+</div>
+PASO 4: Comparación Observables vs Promises (10 minutos)
+4.1 Crear servicio de ejemplo comparativo
+Crear archivo src/app/core/services/http/example-comparison.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, from, of, throwError } from 'rxjs';
+import { 
+  map, 
+  filter, 
+  catchError, 
+  retry, 
+  delay, 
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  shareReplay,
+  tap,
+  finalize
+} from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
+import { Product } from '../../models/product.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ExampleComparisonService {
+  private http = inject(HttpClient);
+  private apiUrl = `${environment.apiUrl}/products`;
+
+  /**
+   * Ejemplo con Promises - Limitado
+   */
+  async getProductsWithPromise(): Promise<Product[]> {
+    try {
+      const response = await fetch(this.apiUrl);
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const products = await response.json();
+      
+      // Limitación: No hay forma elegante de:
+      // - Cancelar la petición
+      // - Reintentar automáticamente
+      // - Transformar el stream
+      // - Compartir el resultado con múltiples consumidores
+      
+      return products;
+    } catch (error) {
+      console.error('Promise error:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Ejemplo con Observables - Poderoso y Flexible
+   */
+  getProductsWithObservable(): Observable<Product[]> {
+    return this.http.get<Product[]>(this.apiUrl).pipe(
+      // Reintentar 3 veces con delay exponencial
+      retry({
+        count: 3,
+        delay: (error, retryCount) => {
+          console.log(`Retry attempt ${retryCount}`);
+          return of(error).pipe(delay(Math.min(1000 * Math.pow(2, retryCount), 5000)));
+        }
+      }),
+      
+      // Transformar datos
+      map(products => products.filter(p => p.stock > 0)),
+      
+      // Log sin afectar el flujo
+      tap(products => console.log(`Filtered ${products.length} products in stock`)),
+      
+      // Cachear resultado
+      shareReplay(1),
+      
+      // Manejo de errores
+      catchError(error => {
+        console.error('Observable error:', error);
+        return throwError(() => error);
+      }),
+      
+      // Cleanup
+      finalize(() => console.log('Observable completed'))
+    );
+  }
+
+  /**
+   * Búsqueda con debounce - Solo con Observables
+   */
+  searchProducts(searchTerm$: Observable<string>): Observable<Product[]> {
+    return searchTerm$.pipe(
+      // Esperar 300ms después de que el usuario deje de escribir
+      debounceTime(300),
+      
+      // Ignorar si el término no cambió
+      distinctUntilChanged(),
+      
+      // Mínimo 2 caracteres
+      filter(term => term.length >= 2),
+      
+      // Cancelar petición anterior y hacer nueva
+      switchMap(term => 
+        this.http.get<Product[]>(`${this.apiUrl}?search=${term}`).pipe(
+          catchError(() => of([]))
+        )
+      ),
+      
+      // Compartir resultados con múltiples suscriptores
+      shareReplay(1)
+    );
+  }
+
+  /**
+   * Múltiples valores en el tiempo - Imposible con Promises
+   */
+  getProductUpdates(): Observable<Product> {
+    // Simular stream de actualizaciones en tiempo real
+    return new Observable(observer => {
+      const products: Product[] = [
+        { id: 1, name: 'Product 1', price: 100, category: 'test', stock: 10, description: '' },
+        { id: 2, name: 'Product 2', price: 200, category: 'test', stock: 20, description: '' },
+        { id: 3, name: 'Product 3', price: 300, category: 'test', stock: 30, description: '' }
+      ];
+      
+      let index = 0;
+      const interval = setInterval(() => {
+        if (index < products.length) {
+          observer.next(products[index++]);
+        } else {
+          observer.complete();
+          clearInterval(interval);
+        }
+      }, 1000);
+      
+      // Cleanup cuando se cancela la suscripción
+      return () => {
+        clearInterval(interval);
+        console.log('Subscription cancelled');
+      };
+    });
+  }
+
+  /**
+   * Demostración de características únicas de Observables
+   */
+  demonstrateObservableFeatures(): void {
+    console.log('=== OBSERVABLE FEATURES DEMO ===');
+    
+    // 1. Lazy execution - No se ejecuta hasta suscribirse
+    const lazy$ = new Observable(observer => {
+      console.log('Observable ejecutado');
+      observer.next('Valor');
+      observer.complete();
+    });
+    
+    console.log('Observable creado pero no ejecutado');
+    // Nada se imprime hasta aquí
+    
+    const subscription = lazy$.subscribe(value => {
+      console.log('Recibido:', value);
+    });
+    
+    // 2. Cancelación
+    const cancellable$ = this.getProductUpdates();
+    const sub = cancellable$.subscribe(product => {
+      console.log('Producto recibido:', product.name);
+    });
+    
+    // Cancelar después de 2.5 segundos
+    setTimeout(() => {
+      sub.unsubscribe();
+      console.log('Suscripción cancelada');
+    }, 2500);
+    
+    // 3. Múltiples valores
+    const multiValue$ = from([1, 2, 3, 4, 5]).pipe(
+      map(n => n * 2),
+      filter(n => n > 5)
+    );
+    
+    multiValue$.subscribe(value => {
+      console.log('Valor transformado:', value);
+    });
+  }
+}
+________________________________________
+LAB 2: MANEJO PROFESIONAL DE ERRORES Y ESTADOS
+Duración: 45 minutos
+Objetivo: Implementar manejo robusto de errores, loading states y retry strategies
+PASO 1: Crear Error Handler Service (10 minutos)
+1.1 Crear servicio de manejo de errores
+ng generate service core/services/error-handler --skip-tests
+Actualizar src/app/core/services/error-handler.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError, timer } from 'rxjs';
+import { retry, retryWhen, delayWhen, tap, finalize } from 'rxjs/operators';
+import { NotificationService } from '../../shared/services/notification.service';
+
+export interface ApiError {
+  message: string;
+  code: string;
+  status: number;
+  timestamp: string;
+  path?: string;
+  details?: any;
+}
+
+export interface ValidationError {
+  field: string;
+  message: string;
+  value?: any;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class ErrorHandlerService {
+  private notificationService = inject(NotificationService);
+
+  /**
+   * Manejo centralizado de errores HTTP
+   */
+  handleError(error: HttpErrorResponse): Observable<never> {
+    let errorMessage: string;
+    let apiError: ApiError;
+
+    if (error.error instanceof ErrorEvent) {
+      // Error del cliente o de red
+      errorMessage = this.handleClientError(error.error);
+      apiError = {
+        message: errorMessage,
+        code: 'CLIENT_ERROR',
+        status: 0,
+        timestamp: new Date().toISOString()
+      };
+    } else {
+      // Error del servidor
+      errorMessage = this.handleServerError(error);
+      apiError = {
+        message: errorMessage,
+        code: `HTTP_${error.status}`,
+        status: error.status,
+        timestamp: new Date().toISOString(),
+        path: error.url || undefined,
+        details: error.error
+      };
+    }
+
+    // Mostrar notificación al usuario
+    this.showErrorNotification(errorMessage, error.status);
+
+    // Log para desarrollo
+    if (!environment.production) {
+      console.error('🔴 Error Details:', {
+        timestamp: new Date().toISOString(),
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        message: errorMessage,
+        error: error.error
+      });
+    }
+
+    return throwError(() => apiError);
+  }
+
+  /**
+   * Manejo de errores del cliente
+   */
+  private handleClientError(error: ErrorEvent): string {
+    const errorMessages: Record<string, string> = {
+      'Failed to fetch': 'No se pudo conectar con el servidor. Verifique su conexión a internet.',
+      'Network request failed': 'Error de red. Por favor intente nuevamente.',
+      'CORS': 'Error de configuración del servidor (CORS).',
+      'Timeout': 'La solicitud tardó demasiado tiempo. Intente nuevamente.'
+    };
+
+    for (const [key, message] of Object.entries(errorMessages)) {
+      if (error.message.includes(key)) {
+        return message;
+      }
+    }
+
+    return `Error: ${error.message}`;
+  }
+
+  /**
+   * Manejo de errores del servidor
+   */
+  private handleServerError(error: HttpErrorResponse): string {
+    // Verificar si el servidor envió un mensaje personalizado
+    if (error.error?.message) {
+      return error.error.message;
+    }
+
+    // Mensajes por código de estado
+    const statusMessages: Record<number, string> = {
+      0: 'No se pudo conectar con el servidor',
+      400: 'Solicitud incorrecta. Verifique los datos enviados.',
+      401: 'No autorizado. Por favor inicie sesión nuevamente.',
+      403: 'Acceso denegado. No tiene permisos para esta operación.',
+      404: 'El recurso solicitado no fue encontrado.',
+      409: 'Conflicto. El recurso ya existe o hay un conflicto con el estado actual.',
+      422: 'Los datos enviados no son válidos.',
+      429: 'Demasiadas solicitudes. Por favor espere un momento.',
+      500: 'Error interno del servidor. El equipo técnico ha sido notificado.',
+      502: 'Error de puerta de enlace. El servidor no está disponible.',
+      503: 'Servicio no disponible. Por favor intente más tarde.',
+      504: 'Tiempo de espera agotado. El servidor tardó demasiado en responder.'
+    };
+
+    return statusMessages[error.status] || `Error ${error.status}: ${error.statusText}`;
+  }
+
+  /**
+   * Mostrar notificación de error al usuario
+   */
+  private showErrorNotification(message: string, status: number): void {
+    const severity = this.getErrorSeverity(status);
+    
+    switch (severity) {
+      case 'warning':
+        this.notificationService.warning('Advertencia', message);
+        break;
+      case 'error':
+        this.notificationService.error('Error', message);
+        break;
+      case 'critical':
+        this.notificationService.error('Error Crítico', message);
+        break;
+      default:
+        this.notificationService.info('Información', message);
+    }
+  }
+
+  /**
+   * Determinar severidad del error
+   */
+  private getErrorSeverity(status: number): 'info' | 'warning' | 'error' | 'critical' {
+    if (status === 0 || status >= 500) return 'critical';
+    if (status >= 400 && status < 500) return 'error';
+    if (status >= 300 && status < 400) return 'warning';
+    return 'info';
+  }
+
+  /**
+   * Extraer errores de validación
+   */
+  extractValidationErrors(error: HttpErrorResponse): ValidationError[] {
+    if (error.status === 422 && error.error?.errors) {
+      return Object.entries(error.error.errors).map(([field, message]) => ({
+        field,
+        message: message as string
+      }));
+    }
+    return [];
+  }
+
+  /**
+   * Retry strategy con backoff exponencial
+   */
+  retryWithBackoff<T>(
+    maxRetries: number = 3,
+    initialDelay: number = 1000,
+    maxDelay: number = 10000
+  ) {
+    return (source: Observable<T>) => {
+      return source.pipe(
+        retryWhen(errors =>
+          errors.pipe(
+            tap((error, index) => {
+              console.log(`Retry attempt ${index + 1} after error:`, error);
+            }),
+            delayWhen((error, index) => {
+              const delay = Math.min(
+                initialDelay * Math.pow(2, index),
+                maxDelay
+              );
+              console.log(`Waiting ${delay}ms before retry...`);
+              return timer(delay);
+            }),
+            tap((error, index) => {
+              if (index >= maxRetries - 1) {
+                throw error;
+              }
+            })
+          )
+        )
+      );
+    };
+  }
+}
+PASO 2: Crear Loading Service (10 minutos)
+2.1 Crear servicio de loading
+ng generate service core/services/loading --skip-tests
+Actualizar src/app/core/services/loading.service.ts:
+import { Injectable, signal, computed } from '@angular/core';
+
+interface LoadingState {
+  url: string;
+  message?: string;
+  progress?: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoadingService {
+  // Map de requests activas
+  private activeRequests = new Map<string, LoadingState>();
+  
+  // Signal para estado de loading
+  private loadingStatesSignal = signal<LoadingState[]>([]);
+  
+  // Computed signals
+  isLoading = computed(() => this.loadingStatesSignal().length > 0);
+  loadingStates = computed(() => this.loadingStatesSignal());
+  loadingCount = computed(() => this.loadingStatesSignal().length);
+  
+  // Mensaje de loading global
+  globalMessage = computed(() => {
+    const states = this.loadingStatesSignal();
+    if (states.length === 0) return '';
+    if (states.length === 1) return states[0].message || 'Cargando...';
+    return `Procesando ${states.length} operaciones...`;
+  });
+  
+  /**
+   * Iniciar loading para una URL
+   */
+  setLoading(url: string, loading: boolean, message?: string, progress?: number): void {
+    if (loading) {
+      this.activeRequests.set(url, { url, message, progress });
+    } else {
+      this.activeRequests.delete(url);
+    }
+    
+    this.updateLoadingSignal();
+  }
+  
+  /**
+   * Actualizar progreso de una operación
+   */
+  updateProgress(url: string, progress: number, message?: string): void {
+    const state = this.activeRequests.get(url);
+    if (state) {
+      state.progress = progress;
+      if (message) state.message = message;
+      this.updateLoadingSignal();
+    }
+  }
+  
+  /**
+   * Limpiar todas las operaciones de loading
+   */
+  clear(): void {
+    this.activeRequests.clear();
+    this.updateLoadingSignal();
+  }
+  
+  /**
+   * Verificar si una URL específica está cargando
+   */
+  isLoadingUrl(url: string): boolean {
+    return this.activeRequests.has(url);
+  }
+  
+  /**
+   * Obtener mensaje para una URL específica
+   */
+  getMessageForUrl(url: string): string | undefined {
+    return this.activeRequests.get(url)?.message;
+  }
+  
+  /**
+   * Obtener progreso para una URL específica
+   */
+  getProgressForUrl(url: string): number | undefined {
+    return this.activeRequests.get(url)?.progress;
+  }
+  
+  /**
+   * Actualizar signal con estados actuales
+   */
+  private updateLoadingSignal(): void {
+    this.loadingStatesSignal.set(Array.from(this.activeRequests.values()));
+  }
+}
+2.2 Crear componente de loading global
+ng generate component shared/components/loading/global-loading --standalone
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { LoadingService } from '../../../core/services/loading.service';
+
+@Component({
+  selector: 'app-global-loading',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    @if (loadingService.isLoading()) {
+      <div class="loading-overlay">
+        <div class="loading-content">
+          <div class="spinner"></div>
+          <p class="loading-message">{{ loadingService.globalMessage() }}</p>
+          
+          @if (loadingService.loadingCount() > 1) {
+            <div class="loading-details">
+              @for (state of loadingService.loadingStates(); track state.url) {
+                <div class="loading-item">
+                  @if (state.progress !== undefined) {
+                    <div class="progress-bar">
+                      <div 
+                        class="progress-fill" 
+                        [style.width.%]="state.progress">
+                      </div>
+                    </div>
+                  }
+                  <span class="loading-text">{{ state.message || state.url }}</span>
+                </div>
+              }
+            </div>
+          }
+        </div>
+      </div>
+    }
+  `,
+  styles: [`
+    .loading-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    
+    .loading-content {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      min-width: 250px;
+      max-width: 400px;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 4px solid #f3f3f3;
+      border-top: 4px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin: 0 auto 1rem;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .loading-message {
+      margin: 0 0 1rem 0;
+      color: #333;
+      font-size: 1.1rem;
+    }
+    
+    .loading-details {
+      margin-top: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+    }
+    
+    .loading-item {
+      margin-bottom: 0.5rem;
+      text-align: left;
+    }
+    
+    .progress-bar {
+      height: 4px;
+      background: #e0e0e0;
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 0.25rem;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #667eea, #764ba2);
+      transition: width 0.3s ease;
+    }
+    
+    .loading-text {
+      font-size: 0.85rem;
+      color: #666;
+    }
+  `]
+})
+export class GlobalLoadingComponent {
+  loadingService = inject(LoadingService);
+}
+PASO 3: Implementar Retry Strategies (15 minutos)
+3.1 Crear utilidad de retry con backoff
+Crear archivo src/app/core/utils/retry-strategies.ts:
+import { Observable, timer, throwError, of } from 'rxjs';
+import { 
+  retry, 
+  retryWhen, 
+  delay, 
+  take, 
+  concatMap, 
+  tap,
+  catchError,
+  finalize
+} from 'rxjs/operators';
+
+export interface RetryConfig {
+  maxAttempts: number;
+  initialDelay: number;
+  maxDelay: number;
+  backoffFactor: number;
+  excludedStatusCodes?: number[];
+  onRetry?: (attempt: number, error: any) => void;
+}
+
+/**
+ * Retry con backoff exponencial configurable
+ */
+export function retryWithBackoff<T>(config: Partial<RetryConfig> = {}) {
+  const defaultConfig: RetryConfig = {
+    maxAttempts: 3,
+    initialDelay: 1000,
+    maxDelay: 10000,
+    backoffFactor: 2,
+    excludedStatusCodes: [401, 403, 404],
+    ...config
+  };
+
+  return (source: Observable<T>) => {
+    let retryCount = 0;
+
+    return source.pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          concatMap((error, index) => {
+            retryCount = index + 1;
+
+            // Verificar si debemos reintentar
+            if (shouldRetry(error, retryCount, defaultConfig)) {
+              const delayTime = calculateDelay(retryCount, defaultConfig);
+              
+              // Callback opcional
+              if (defaultConfig.onRetry) {
+                defaultConfig.onRetry(retryCount, error);
+              }
+
+              console.log(`🔄 Retry attempt ${retryCount}/${defaultConfig.maxAttempts} after ${delayTime}ms`);
+              
+              return timer(delayTime);
+            }
+
+            // No reintentar
+            return throwError(() => error);
+          })
+        )
+      ),
+      catchError(error => {
+        console.error(`❌ All ${defaultConfig.maxAttempts} retry attempts failed`);
+        return throwError(() => error);
+      })
+    );
+  };
+}
+
+/**
+ * Determinar si se debe reintentar
+ */
+function shouldRetry(error: any, attempt: number, config: RetryConfig): boolean {
+  // Verificar número máximo de intentos
+  if (attempt >= config.maxAttempts) {
+    return false;
+  }
+
+  // Verificar códigos de estado excluidos
+  if (error?.status && config.excludedStatusCodes?.includes(error.status)) {
+    console.log(`⚠️ Status code ${error.status} is excluded from retry`);
+    return false;
+  }
+
+  // Verificar si es un error de red
+  if (error?.status === 0) {
+    return true; // Siempre reintentar errores de red
+  }
+
+  // Por defecto, reintentar
+  return true;
+}
+
+/**
+ * Calcular delay con backoff exponencial
+ */
+function calculateDelay(attempt: number, config: RetryConfig): number {
+  const exponentialDelay = config.initialDelay * Math.pow(config.backoffFactor, attempt - 1);
+  const jitteredDelay = exponentialDelay * (0.8 + Math.random() * 0.4); // Añadir jitter
+  return Math.min(jitteredDelay, config.maxDelay);
+}
+
+/**
+ * Retry simple con delay fijo
+ */
+export function retryWithDelay<T>(count: number = 3, delayMs: number = 1000) {
+  return (source: Observable<T>) => {
+    return source.pipe(
+      retry({
+        count,
+        delay: delayMs
+      })
+    );
+  };
+}
+
+/**
+ * Retry inteligente basado en el tipo de error
+ */
+export function intelligentRetry<T>() {
+  return (source: Observable<T>) => {
+    return source.pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          concatMap((error, index) => {
+            const attempt = index + 1;
+
+            // Error de red - retry rápido
+            if (error?.status === 0) {
+              if (attempt <= 5) {
+                console.log(`🌐 Network error - Quick retry ${attempt}/5`);
+                return timer(500 * attempt);
+              }
+            }
+
+            // Error 5xx del servidor - retry con backoff
+            if (error?.status >= 500 && error?.status < 600) {
+              if (attempt <= 3) {
+                const delay = 1000 * Math.pow(2, attempt);
+                console.log(`🖥️ Server error ${error.status} - Retry ${attempt}/3 after ${delay}ms`);
+                return timer(delay);
+              }
+            }
+
+            // Error 429 (Too Many Requests) - esperar más tiempo
+            if (error?.status === 429) {
+              const retryAfter = error.headers?.get('Retry-After');
+              const delay = retryAfter ? parseInt(retryAfter) * 1000 : 60000;
+              console.log(`⏱️ Rate limited - Waiting ${delay}ms`);
+              return timer(delay);
+            }
+
+            // No reintentar
+            return throwError(() => error);
+          })
+        )
+      )
+    );
+  };
+}
+3.2 Actualizar ProductService con retry strategies
+Agregar a product.service.ts:
+import { retryWithBackoff, intelligentRetry } from '../../utils/retry-strategies';
+
+// Dentro de la clase ProductService:
+
+/**
+ * Obtener productos con retry inteligente
+ */
+getProductsWithRetry(filters?: ProductFilters): Observable<Product[]> {
+  this.loadingSignal.set(true);
+  this.errorSignal.set(null);
+  
+  return this.http.get<Product[]>(this.apiUrl).pipe(
+    // Retry inteligente basado en tipo de error
+    intelligentRetry(),
+    
+    // O usar retry con backoff configurable
+    // retryWithBackoff({
+    //   maxAttempts: 3,
+    //   initialDelay: 1000,
+    //   onRetry: (attempt, error) => {
+    //     console.log(`Retry attempt ${attempt}:`, error);
+    //   }
+    // }),
+LABORATORIOS SESIÓN 6 - PARTE 2: INTERCEPTORS Y OPTIMIZACIÓN
+LAB 3: IMPLEMENTACIÓN DE HTTP INTERCEPTORS
+Duración: 45 minutos
+Objetivo: Implementar interceptors para autenticación, logging y transformación de datos
+PASO 1: Crear Auth Interceptor (15 minutos)
+1.1 Crear servicio de autenticación
+ng generate service core/services/auth --skip-tests
+Actualizar src/app/core/services/auth.service.ts:
+import { Injectable, signal, computed, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of, throwError } from 'rxjs';
+import { tap, catchError, delay } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
+import { User, LoginRequest, LoginResponse } from '../models/user.model';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+  private readonly http = inject(HttpClient);
+  private readonly apiUrl = `${environment.apiUrl}/auth`;
+  
+  // Signals para estado de autenticación
+  private tokenSignal = signal<string | null>(this.getStoredToken());
+  private userSignal = signal<User | null>(this.getStoredUser());
+  private isAuthenticatedSignal = signal<boolean>(!!this.getStoredToken());
+  
+  // Computed signals públicos
+  token = computed(() => this.tokenSignal());
+  user = computed(() => this.userSignal());
+  isAuthenticated = computed(() => this.isAuthenticatedSignal());
+  
+  // URLs públicas que no requieren autenticación
+  public readonly publicUrls = [
+    '/auth/login',
+    '/auth/register',
+    '/auth/forgot-password',
+    '/public'
+  ];
+  
+  constructor() {
+    // Verificar token al iniciar
+    this.verifyStoredToken();
+  }
+  
+  /**
+   * Login de usuario
+   */
+  login(credentials: LoginRequest): Observable<LoginResponse> {
+    // Simulación para desarrollo
+    if (environment.features.enableDebugMode) {
+      return this.mockLogin(credentials);
+    }
+    
+    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, credentials).pipe(
+      tap(response => {
+        this.setAuthData(response);
+      }),
+      catchError(error => {
+        console.error('Login failed:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  
+  /**
+   * Logout de usuario
+   */
+  logout(): void {
+    this.clearAuthData();
+    console.log('User logged out');
+  }
+  
+  /**
+   * Refrescar token
+   */
+  refreshToken(): Observable<LoginResponse> {
+    const currentToken = this.tokenSignal();
+    if (!currentToken) {
+      return throwError(() => new Error('No token available'));
+    }
+    
+    return this.http.post<LoginResponse>(`${this.apiUrl}/refresh`, { token: currentToken }).pipe(
+      tap(response => {
+        this.setAuthData(response);
+      })
+    );
+  }
+  
+  /**
+   * Verificar si una URL requiere autenticación
+   */
+  isPublicUrl(url: string): boolean {
+    return this.publicUrls.some(publicUrl => url.includes(publicUrl));
+  }
+  
+  /**
+   * Guardar datos de autenticación
+   */
+  private setAuthData(response: LoginResponse): void {
+    this.tokenSignal.set(response.token);
+    this.userSignal.set(response.user);
+    this.isAuthenticatedSignal.set(true);
+    
+    // Persistir en localStorage
+    localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('auth_user', JSON.stringify(response.user));
+    localStorage.setItem('token_expires', String(Date.now() + response.expiresIn * 1000));
+  }
+  
+  /**
+   * Limpiar datos de autenticación
+   */
+  private clearAuthData(): void {
+    this.tokenSignal.set(null);
+    this.userSignal.set(null);
+    this.isAuthenticatedSignal.set(false);
+    
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+    localStorage.removeItem('token_expires');
+  }
+  
+  /**
+   * Obtener token almacenado
+   */
+  private getStoredToken(): string | null {
+    const token = localStorage.getItem('auth_token');
+    const expires = localStorage.getItem('token_expires');
+    
+    if (token && expires && Date.now() < parseInt(expires)) {
+      return token;
+    }
+    
+    return null;
+  }
+  
+  /**
+   * Obtener usuario almacenado
+   */
+  private getStoredUser(): User | null {
+    const userStr = localStorage.getItem('auth_user');
+    if (userStr) {
+      try {
+        return JSON.parse(userStr);
+      } catch {
+        return null;
+      }
+    }
+    return null;
+  }
+  
+  /**
+   * Verificar token almacenado
+   */
+  private verifyStoredToken(): void {
+    const token = this.getStoredToken();
+    if (!token) {
+      this.clearAuthData();
+    }
+  }
+  
+  /**
+   * Mock login para desarrollo
+   */
+  private mockLogin(credentials: LoginRequest): Observable<LoginResponse> {
+    // Simular delay de red
+    return of({
+      user: {
+        id: 1,
+        email: credentials.email,
+        name: 'Usuario PROVIAS',
+        role: credentials.email.includes('admin') ? 'admin' : 'user'
+      },
+      token: 'mock-jwt-token-' + Date.now(),
+      expiresIn: 3600
+    }).pipe(
+      delay(1000),
+      tap(response => {
+        console.log('🔐 Mock login successful:', response.user.email);
+      })
+    );
+  }
+}
+1.2 Crear Auth Interceptor
+Crear archivo src/app/core/interceptors/auth.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Observable, throwError } from 'rxjs';
+import { catchError, switchMap } from 'rxjs/operators';
+import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
+
+/**
+ * Interceptor funcional para autenticación
+ */
+export const authInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  
+  // Verificar si es una URL pública
+  if (authService.isPublicUrl(req.url)) {
+    console.log(`📂 Public URL, skipping auth: ${req.url}`);
+    return next(req);
+  }
+  
+  // Obtener token
+  const token = authService.token();
+  
+  // Si hay token, agregarlo a los headers
+  if (token) {
+    const authReq = req.clone({
+      setHeaders: {
+        Authorization: `Bearer ${token}`,
+        'X-Auth-Token': token
+      }
+    });
+    
+    console.log(`🔐 Auth header added to: ${req.url}`);
+    
+    return next(authReq).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // Si es error 401, intentar refrescar token
+        if (error.status === 401) {
+          console.warn('⚠️ 401 Unauthorized - Attempting token refresh');
+          
+          return authService.refreshToken().pipe(
+            switchMap(() => {
+              // Reintentar request con nuevo token
+              const newToken = authService.token();
+              const retryReq = req.clone({
+                setHeaders: {
+                  Authorization: `Bearer ${newToken}`
+                }
+              });
+              return next(retryReq);
+            }),
+            catchError(refreshError => {
+              // Si el refresh falla, logout y redirigir
+              console.error('❌ Token refresh failed:', refreshError);
+              authService.logout();
+              router.navigate(['/login']);
+              return throwError(() => refreshError);
+            })
+          );
+        }
+        
+        // Para otros errores, propagar
+        return throwError(() => error);
+      })
+    );
+  }
+  
+  // Si no hay token y se requiere, redirigir a login
+  console.warn('⚠️ No auth token available');
+  router.navigate(['/login']);
+  return throwError(() => new Error('Authentication required'));
+};
+PASO 2: Crear Logging Interceptor (10 minutos)
+2.1 Crear servicio de logging
+ng generate service core/services/logging --skip-tests
+Actualizar src/app/core/services/logging.service.ts:
+import { Injectable } from '@angular/core';
+import { environment } from '../../../environments/environment';
+
+export interface LogEntry {
+  timestamp: string;
+  level: 'debug' | 'info' | 'warn' | 'error';
+  message: string;
+  data?: any;
+  url?: string;
+  method?: string;
+  duration?: number;
+  status?: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class LoggingService {
+  private logs: LogEntry[] = [];
+  private maxLogs = 100;
+  
+  /**
+   * Log de información
+   */
+  info(message: string, data?: any): void {
+    this.log('info', message, data);
+  }
+  
+  /**
+   * Log de advertencia
+   */
+  warn(message: string, data?: any): void {
+    this.log('warn', message, data);
+  }
+  
+  /**
+   * Log de error
+   */
+  error(message: string, data?: any): void {
+    this.log('error', message, data);
+  }
+  
+  /**
+   * Log de debug (solo en desarrollo)
+   */
+  debug(message: string, data?: any): void {
+    if (environment.features.enableDebugMode) {
+      this.log('debug', message, data);
+    }
+  }
+  
+  /**
+   * Log HTTP request
+   */
+  logHttpRequest(method: string, url: string, body?: any): void {
+    this.log('info', `HTTP ${method} ${url}`, { method, url, body });
+  }
+  
+  /**
+   * Log HTTP response
+   */
+  logHttpResponse(method: string, url: string, status: number, duration: number, body?: any): void {
+    const message = `HTTP ${method} ${url} - ${status} (${duration}ms)`;
+    this.log('info', message, { method, url, status, duration, body });
+  }
+  
+  /**
+   * Log HTTP error
+   */
+  logHttpError(method: string, url: string, status: number, error: any): void {
+    const message = `HTTP ${method} ${url} - Error ${status}`;
+    this.log('error', message, { method, url, status, error });
+  }
+  
+  /**
+   * Obtener todos los logs
+   */
+  getLogs(): LogEntry[] {
+    return [...this.logs];
+  }
+  
+  /**
+   * Limpiar logs
+   */
+  clearLogs(): void {
+    this.logs = [];
+  }
+  
+  /**
+   * Exportar logs a JSON
+   */
+  exportLogs(): string {
+    return JSON.stringify(this.logs, null, 2);
+  }
+  
+  /**
+   * Log interno
+   */
+  private log(level: LogEntry['level'], message: string, data?: any): void {
+    const entry: LogEntry = {
+      timestamp: new Date().toISOString(),
+      level,
+      message,
+      data
+    };
+    
+    // Agregar al array
+    this.logs.push(entry);
+    
+    // Mantener tamaño máximo
+    if (this.logs.length > this.maxLogs) {
+      this.logs.shift();
+    }
+    
+    // Console output en desarrollo
+    if (environment.features.enableLogging) {
+      const style = this.getConsoleStyle(level);
+      console.log(`%c[${entry.timestamp}] ${message}`, style, data || '');
+    }
+    
+    // En producción, enviar a servidor
+    if (environment.production && level === 'error') {
+      this.sendToServer(entry);
+    }
+  }
+  
+  /**
+   * Obtener estilo para console
+   */
+  private getConsoleStyle(level: LogEntry['level']): string {
+    const styles = {
+      debug: 'color: #gray',
+      info: 'color: #2196F3',
+      warn: 'color: #FF9800; font-weight: bold',
+      error: 'color: #F44336; font-weight: bold'
+    };
+    return styles[level];
+  }
+  
+  /**
+   * Enviar logs al servidor (para producción)
+   */
+  private sendToServer(entry: LogEntry): void {
+    // Implementar envío a servidor de logs
+    // Por ahora solo simulamos
+    if (environment.features.enableDebugMode) {
+      console.log('📤 Sending log to server:', entry);
+    }
+  }
+}
+2.2 Crear Logging Interceptor
+Crear archivo src/app/core/interceptors/logging.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Observable } from 'rxjs';
+import { tap, finalize } from 'rxjs/operators';
+import { LoggingService } from '../services/logging.service';
+
+/**
+ * Interceptor para logging de HTTP requests/responses
+ */
+export const loggingInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> => {
+  const loggingService = inject(LoggingService);
+  
+  const started = Date.now();
+  const method = req.method;
+  const url = req.urlWithParams;
+  
+  // Log request
+  console.group(`🚀 ${method} ${url}`);
+  console.log('Headers:', req.headers.keys().map(key => `${key}: ${req.headers.get(key)}`));
+  if (req.body) {
+    console.log('Body:', req.body);
+  }
+  
+  loggingService.logHttpRequest(method, url, req.body);
+  
+  return next(req).pipe(
+    tap({
+      next: (event) => {
+        if (event instanceof HttpResponse) {
+          const elapsed = Date.now() - started;
+          const status = event.status;
+          const statusText = event.statusText;
+          
+          console.log(`✅ Response ${status} ${statusText} in ${elapsed}ms`);
+          console.log('Response body:', event.body);
+          console.groupEnd();
+          
+          loggingService.logHttpResponse(method, url, status, elapsed, event.body);
+        }
+      },
+      error: (error: HttpErrorResponse) => {
+        const elapsed = Date.now() - started;
+        const status = error.status;
+        
+        console.error(`❌ Error ${status} in ${elapsed}ms`);
+        console.error('Error details:', error);
+        console.groupEnd();
+        
+        loggingService.logHttpError(method, url, status, error);
+      }
+    }),
+    finalize(() => {
+      const elapsed = Date.now() - started;
+      console.log(`⏱️ Total time: ${elapsed}ms`);
+    })
+  );
+};
+PASO 3: Crear Transform Interceptor (10 minutos)
+3.1 Crear Transform Interceptor
+Crear archivo src/app/core/interceptors/transform.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+/**
+ * Interface para respuesta estandarizada del backend
+ */
+interface BackendResponse<T> {
+  success: boolean;
+  data?: T;
+  message?: string;
+  timestamp?: string;
+  meta?: {
+    page?: number;
+    limit?: number;
+    total?: number;
+    version?: string;
+  };
+}
+
+/**
+ * Interceptor para transformar respuestas
+ */
+export const transformInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> => {
+  
+  return next(req).pipe(
+    map(event => {
+      if (event instanceof HttpResponse) {
+        // Transformar respuesta
+        const transformed = transformResponse(event);
+        return transformed;
+      }
+      return event;
+    })
+  );
+};
+
+/**
+ * Transformar respuesta del backend
+ */
+function transformResponse<T>(response: HttpResponse<T>): HttpResponse<T> {
+  let body = response.body;
+  
+  // Si el body es un objeto con estructura específica del backend
+  if (body && typeof body === 'object' && 'data' in body) {
+    const backendResponse = body as BackendResponse<any>;
+    
+    // Extraer solo los datos si la respuesta fue exitosa
+    if (backendResponse.success && backendResponse.data !== undefined) {
+      body = backendResponse.data;
+    }
+  }
+  
+  // Transformar fechas string a Date objects
+  body = transformDates(body);
+  
+  // Clonar respuesta con body transformado
+  return response.clone({ body });
+}
+
+/**
+ * Convertir strings de fecha a objetos Date
+ */
+function transformDates(obj: any): any {
+  if (obj === null || obj === undefined) {
+    return obj;
+  }
+  
+  if (obj instanceof Date) {
+    return obj;
+  }
+  
+  if (typeof obj === 'string') {
+    // Verificar si es una fecha ISO
+    if (isIsoDateString(obj)) {
+      return new Date(obj);
+    }
+    return obj;
+  }
+  
+  if (Array.isArray(obj)) {
+    return obj.map(item => transformDates(item));
+  }
+  
+  if (typeof obj === 'object') {
+    const transformed: any = {};
+    for (const key in obj) {
+      if (obj.hasOwnProperty(key)) {
+        transformed[key] = transformDates(obj[key]);
+      }
+    }
+    return transformed;
+  }
+  
+  return obj;
+}
+
+/**
+ * Verificar si un string es una fecha ISO
+ */
+function isIsoDateString(value: string): boolean {
+  if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(value)) {
+    return false;
+  }
+  const date = new Date(value);
+  return !isNaN(date.getTime());
+}
+3.2 Crear Date Interceptor específico
+Crear archivo src/app/core/interceptors/date.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+
+/**
+ * Interceptor para convertir fechas automáticamente
+ */
+export const dateInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> => {
+  
+  return next(req).pipe(
+    map(event => {
+      if (event instanceof HttpResponse && event.body) {
+        return event.clone({
+          body: convertDates(event.body)
+        });
+      }
+      return event;
+    })
+  );
+};
+
+/**
+ * Convertir recursivamente strings de fecha a Date objects
+ */
+function convertDates(body: any): any {
+  if (body === null || body === undefined) {
+    return body;
+  }
+
+  if (typeof body !== 'object') {
+    return body;
+  }
+
+  for (const key of Object.keys(body)) {
+    const value = body[key];
+    
+    if (isIsoDateString(value)) {
+      body[key] = new Date(value);
+    } else if (typeof value === 'object') {
+      convertDates(value);
+    }
+  }
+
+  return body;
+}
+
+/**
+ * Patrón para detectar fechas ISO
+ */
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d{3})?Z?$/;
+
+function isIsoDateString(value: any): boolean {
+  return typeof value === 'string' && ISO_DATE_PATTERN.test(value);
+}
+PASO 4: Registrar Interceptors (10 minutos)
+4.1 Actualizar app.config.ts
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { routes } from './app.routes';
+import { authInterceptor } from './core/interceptors/auth.interceptor';
+import { loggingInterceptor } from './core/interceptors/logging.interceptor';
+import { transformInterceptor } from './core/interceptors/transform.interceptor';
+import { dateInterceptor } from './core/interceptors/date.interceptor';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(
+      withInterceptors([
+        authInterceptor,      // 1. Autenticación
+        loggingInterceptor,   // 2. Logging
+        transformInterceptor, // 3. Transformación de respuestas
+        dateInterceptor      // 4. Conversión de fechas
+      ])
+    ),
+    provideAnimations()
+  ]
+};
+________________________________________
+LAB 4: CACHING Y OPTIMIZACIÓN
+Duración: 25 minutos
+Objetivo: Implementar estrategias de caching y optimización de peticiones
+PASO 1: Crear Cache Service (10 minutos)
+1.1 Crear servicio de cache
+ng generate service core/services/cache --skip-tests
+Actualizar src/app/core/services/cache.service.ts:
+import { Injectable } from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+
+interface CacheEntry {
+  response: HttpResponse<any>;
+  timestamp: number;
+  ttl: number;
+  hits: number;
+}
+
+@Injectable({
+  providedIn: 'root'
+})
+export class CacheService {
+  private cache = new Map<string, CacheEntry>();
+  private maxCacheSize = 100;
+  private defaultTTL = environment.features.cacheTimeout || 300000; // 5 minutos
+  
+  /**
+   * Obtener respuesta del cache
+   */
+  get(key: string): HttpResponse<any> | null {
+    const entry = this.cache.get(key);
+    
+    if (!entry) {
+      return null;
+    }
+    
+    // Verificar si expiró
+    if (this.isExpired(entry)) {
+      this.cache.delete(key);
+      console.log(`🗑️ Cache expired for: ${key}`);
+      return null;
+    }
+    
+    // Incrementar contador de hits
+    entry.hits++;
+    
+    console.log(`✅ Cache hit for: ${key} (${entry.hits} hits)`);
+    return entry.response;
+  }
+  
+  /**
+   * Guardar respuesta en cache
+   */
+  set(key: string, response: HttpResponse<any>, ttl?: number): void {
+    // Verificar tamaño del cache
+    if (this.cache.size >= this.maxCacheSize) {
+      this.evictOldest();
+    }
+    
+    const entry: CacheEntry = {
+      response: response.clone(),
+      timestamp: Date.now(),
+      ttl: ttl || this.defaultTTL,
+      hits: 0
+    };
+    
+    this.cache.set(key, entry);
+    console.log(`💾 Cached: ${key} (TTL: ${entry.ttl}ms)`);
+  }
+  
+  /**
+   * Verificar si existe en cache
+   */
+  has(key: string): boolean {
+    const entry = this.cache.get(key);
+    return entry ? !this.isExpired(entry) : false;
+  }
+  
+  /**
+   * Limpiar entrada del cache
+   */
+  delete(key: string): void {
+    this.cache.delete(key);
+    console.log(`🗑️ Cache cleared for: ${key}`);
+  }
+  
+  /**
+   * Limpiar todo el cache
+   */
+  clear(): void {
+    this.cache.clear();
+    console.log('🗑️ Cache cleared completely');
+  }
+  
+  /**
+   * Limpiar cache por patrón
+   */
+  clearPattern(pattern: string | RegExp): void {
+    const regex = typeof pattern === 'string' ? new RegExp(pattern) : pattern;
+    const keysToDelete: string[] = [];
+    
+    this.cache.forEach((_, key) => {
+      if (regex.test(key)) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+    console.log(`🗑️ Cleared ${keysToDelete.length} cache entries matching pattern`);
+  }
+  
+  /**
+   * Obtener estadísticas del cache
+   */
+  getStats(): {
+    size: number;
+    entries: Array<{
+      key: string;
+      hits: number;
+      age: number;
+      ttl: number;
+    }>;
+  } {
+    const now = Date.now();
+    const entries = Array.from(this.cache.entries()).map(([key, entry]) => ({
+      key,
+      hits: entry.hits,
+      age: now - entry.timestamp,
+      ttl: entry.ttl
+    }));
+    
+    return {
+      size: this.cache.size,
+      entries: entries.sort((a, b) => b.hits - a.hits)
+    };
+  }
+  
+  /**
+   * Verificar si una entrada expiró
+   */
+  private isExpired(entry: CacheEntry): boolean {
+    return Date.now() - entry.timestamp > entry.ttl;
+  }
+  
+  /**
+   * Eliminar entrada más antigua
+   */
+  private evictOldest(): void {
+    let oldestKey: string | null = null;
+    let oldestTime = Date.now();
+    
+    this.cache.forEach((entry, key) => {
+      if (entry.timestamp < oldestTime) {
+        oldestTime = entry.timestamp;
+        oldestKey = key;
+      }
+    });
+    
+    if (oldestKey) {
+      this.cache.delete(oldestKey);
+      console.log(`🗑️ Evicted oldest cache entry: ${oldestKey}`);
+    }
+  }
+  
+  /**
+   * Limpiar entradas expiradas
+   */
+  cleanupExpired(): void {
+    const keysToDelete: string[] = [];
+    
+    this.cache.forEach((entry, key) => {
+      if (this.isExpired(entry)) {
+        keysToDelete.push(key);
+      }
+    });
+    
+    keysToDelete.forEach(key => this.cache.delete(key));
+    
+    if (keysToDelete.length > 0) {
+      console.log(`🗑️ Cleaned up ${keysToDelete.length} expired cache entries`);
+    }
+  }
+}
+PASO 2: Crear Cache Interceptor (10 minutos)
+2.1 Crear Cache Interceptor
+Crear archivo src/app/core/interceptors/cache.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { tap, shareReplay } from 'rxjs/operators';
+import { CacheService } from '../services/cache.service';
+
+/**
+ * URLs que NO deben ser cacheadas
+ */
+const CACHE_EXCLUDE_PATTERNS = [
+  /\/auth\//,
+  /\/login/,
+  /\/logout/,
+  /\/refresh/
+];
+
+/**
+ * Interceptor para caching de respuestas HTTP
+ */
+export const cacheInterceptor: HttpInterceptorFn = (
+  req: HttpRequest<unknown>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<unknown>> => {
+  const cacheService = inject(CacheService);
+  
+  // Solo cachear GET requests
+  if (req.method !== 'GET') {
+    return next(req);
+  }
+  
+  // Verificar si la URL debe ser excluida del cache
+  if (shouldExcludeFromCache(req.url)) {
+    return next(req);
+  }
+  
+  // Verificar header para skip cache
+  if (req.headers.has('x-skip-cache')) {
+    console.log(`⏭️ Skipping cache for: ${req.url}`);
+    return next(req);
+  }
+  
+  // Generar clave de cache
+  const cacheKey = generateCacheKey(req);
+  
+  // Verificar si existe en cache
+  const cachedResponse = cacheService.get(cacheKey);
+  if (cachedResponse) {
+    console.log(`📦 Cache hit: ${req.url}`);
+    return of(cachedResponse);
+  }
+  
+  // Si no está en cache, hacer la petición
+  console.log(`🌐 Cache miss: ${req.url}`);
+  
+  return next(req).pipe(
+    tap(event => {
+      // Cachear solo respuestas exitosas
+      if (event instanceof HttpResponse && event.status === 200) {
+        // Obtener TTL del header si existe
+        const ttl = extractTTLFromHeaders(event);
+        cacheService.set(cacheKey, event, ttl);
+      }
+    }),
+    shareReplay(1) // Compartir respuesta con múltiples suscriptores
+  );
+};
+
+/**
+ * Generar clave única para cache
+ */
+function generateCacheKey(req: HttpRequest<any>): string {
+  const url = req.urlWithParams;
+  const method = req.method;
+  return `${method}:${url}`;
+}
+
+/**
+ * Verificar si URL debe ser excluida del cache
+ */
+function shouldExcludeFromCache(url: string): boolean {
+  return CACHE_EXCLUDE_PATTERNS.some(pattern => pattern.test(url));
+}
+
+/**
+ * Extraer TTL de los headers de respuesta
+ */
+function extractTTLFromHeaders(response: HttpResponse<any>): number | undefined {
+  const cacheControl = response.headers.get('cache-control');
+  
+  if (cacheControl) {
+    const maxAge = cacheControl.match(/max-age=(\d+)/);
+    if (maxAge && maxAge[1]) {
+      return parseInt(maxAge[1]) * 1000; // Convertir a milisegundos
+    }
+  }
+  
+  return undefined;
+}
+PASO 3: Optimización de Búsquedas (5 minutos)
+3.1 Crear componente de búsqueda optimizada
+ng generate component features/products/product-search --standalone
+import { Component, inject, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, filter } from 'rxjs/operators';
+import { ProductService } from '../../../core/services/http/product.service';
+import { Product } from '../../../core/models/product.model';
+
+@Component({
+  selector: 'app-product-search',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="search-container">
+      <div class="search-box">
+        <input 
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchInput()"
+          placeholder="Buscar productos..."
+          class="search-input">
+        <span class="search-icon">🔍</span>
+      </div>
+      
+      @if (isSearching()) {
+        <div class="searching">
+          <span class="spinner-small"></span>
+          Buscando...
+        </div>
+      }
+      
+      @if (searchResults().length > 0) {
+        <div class="search-results">
+          @for (product of searchResults(); track product.id) {
+            <div class="result-item">
+              <strong>{{ product.name }}</strong>
+              <span class="price">${{ product.price }}</span>
+              <small class="category">{{ product.category }}</small>
+            </div>
+          }
+        </div>
+      }
+      
+      @if (hasSearched() && searchResults().length === 0 && !isSearching()) {
+        <div class="no-results">
+          No se encontraron productos
+        </div>
+      }
+    </div>
+  `,
+  styles: [`
+    .search-container {
+      position: relative;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .search-box {
+      position: relative;
+    }
+    
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 2.5rem 0.75rem 1rem;
+      border: 2px solid #dee2e6;
+      border-radius: 8px;
+      font-size: 1rem;
+    }
+    
+    .search-icon {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .searching {
+      padding: 0.5rem;
+      text-align: center;
+      color: #6c757d;
+    }
+    
+    .search-results {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      margin-top: 0.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+    }
+    
+    .result-item {
+      padding: 0.75rem;
+      border-bottom: 1px solid #f0f0f0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      
+      &:hover {
+        background: #f8f9fa;
+      }
+      
+      &:last-child {
+        border-bottom: none;
+      }
+    }
+    
+    .price {
+      color: #28a745;
+      font-weight: bold;
+    }
+    
+    .category {
+      color: #6c757d;
+      font-style: italic;
+    }
+    
+    .no-results {
+      padding: 1rem;
+      text-align: center;
+      color: #6c757d;
+    }
+    
+    .spinner-small {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid #f3f3f3;
+      border-top: 2px solid #667eea;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-right: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  `]
+})
+export class ProductSearchComponent {
+  private productService = inject(ProductService);
+  
+  searchTerm = '';
+  searchResults = signal<Product[]>([]);
+  isSearching = signal(false);
+  hasSearched = signal(false);
+  
+  private searchSubject = new Subject<string>();
+  
+  constructor() {
+    // Configurar búsqueda optimizada
+    this.searchSubject.pipe(
+      // Esperar 300ms después de que el usuario deje de escribir
+      debounceTime(300),
+      
+      // Solo si el valor cambió
+      distinctUntilChanged(),
+      
+      // Mínimo 2 caracteres
+      filter(term => term.length >= 2 || term.length === 0),
+      
+      // Indicar que está buscando
+      tap(() => {
+        this.isSearching.set(true);
+        this.hasSearched.set(true);
+      }),
+      
+      // Cancelar búsqueda anterior y hacer nueva
+      switchMap(term => {
+        if (term.length === 0) {
+          return of([]);
+        }
+        return this.productService.searchProducts(term).pipe(
+          catchError(() => of([]))
+        );
+      })
+    ).subscribe(results => {
+      this.searchResults.set(results);
+      this.isSearching.set(false);
+    });
+  }
+  
+  onSearchInput(): void {
+    this.searchSubject.next(this.searchTerm);
+  }
+}
+________________________________________
+INTEGRACIÓN FINAL Y TESTING
+Actualizar Rutas
+Actualizar src/app/app.routes.ts:
+import { Routes } from '@angular/router';
+import { ProductListComponent } from './features/products/product-list/product-list.component';
+import { ProductSearchComponent } from './features/products/product-search/product-search.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/products', pathMatch: 'full' },
+  { path: 'products', component: ProductListComponent },
+  { path: 'search', component: ProductSearchComponent },
+  // Rutas de sesiones anteriores...
+  { path: '**', redirectTo: '/products' }
+];
+Scripts de NPM
+Actualizar package.json:
+{
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "server": "json-server --watch db.json --port 3000 --delay 500",
+    "dev": "concurrently \"npm run server\" \"ng serve\"",
+    "test": "ng test",
+    "test:http": "ng test --include='**/http/**/*.spec.ts'",
+    "lint": "ng lint",
+    "analyze": "webpack-bundle-analyzer dist/*/stats.json"
+  }
+}
+Comandos de Verificación
+# Iniciar servidor mock y aplicación
+npm run dev
+
+# Verificar endpoints
+curl http://localhost:3000/api/products
+curl http://localhost:3000/api/users
+
+# Verificar aplicación
+# http://localhost:4200/products
+# http://localhost:4200/search
+
+# Ver logs en consola del navegador
+# Abrir DevTools (F12) y verificar:
+# - Network tab para peticiones HTTP
+# - Console para logs de interceptors
+# - Application > Local Storage para tokens
+________________________________________
+RESUMEN Y CONCLUSIÓN
+✅ Logros de la Sesión 6
+LAB 0: Configuración
+•	JSON Server instalado y configurado
+•	Base de datos mock funcionando
+•	HttpClient configurado en Angular
+•	Variables de entorno preparadas
+LAB 1: HttpClient y CRUD
+•	Servicio completo con todas las operaciones CRUD
+•	Manejo de estado con Signals
+•	Componente de lista de productos funcional
+•	Comparación Observables vs Promises
+LAB 2: Manejo de Errores
+•	ErrorHandlerService robusto
+•	LoadingService con estados múltiples
+•	Retry strategies con backoff exponencial
+•	Notificaciones al usuario
+LAB 3: Interceptors
+•	Auth Interceptor con refresh token
+•	Logging Interceptor para debugging
+•	Transform Interceptor para respuestas
+•	Date Interceptor para conversión automática
+LAB 4: Optimización
+•	CacheService con TTL y eviction
+•	Cache Interceptor inteligente
+•	Búsqueda optimizada con debounce
+•	Compartir respuestas con shareReplay
+📚 Mejores Prácticas Aplicadas
+1.	Separación de responsabilidades: Cada servicio e interceptor con un propósito claro
+2.	Manejo robusto de errores: Nunca dejar errores sin manejar
+3.	Optimización de red: Caching, retry, y cancelación de peticiones
+4.	Debugging facilitado: Logging completo de todas las operaciones
+5.	Seguridad: Tokens automáticos y refresh cuando expiran
+6.	UX mejorada: Loading states y notificaciones claras
+🚀 Próximos Pasos
+Para la Sesión 7 (Martes 19/08): Asincronía y RxJS
+•	Operadores avanzados de RxJS
+•	Signals vs Observables
+•	Patrones reactivos complejos
+•	Estado global con RxJS
+📝 Tareas Recomendadas
+1.	Implementar paginación en el ProductService
+2.	Agregar upload de imágenes para productos
+3.	Crear tests para los interceptors
+4.	Implementar WebSocket para actualizaciones en tiempo real
+5.	Agregar IndexedDB para cache persistente
+¡Excelente trabajo! Han dominado la comunicación HTTP profesional en Angular v18 🎉
+
