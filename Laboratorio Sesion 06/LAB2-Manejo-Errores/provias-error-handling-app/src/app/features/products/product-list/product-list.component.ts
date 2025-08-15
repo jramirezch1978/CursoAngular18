@@ -22,7 +22,7 @@ import { NotificationComponent } from '../../../shared/components/notification/n
 })
 export class ProductListComponent implements OnInit {
   
-  private productService = inject(ProductService);
+  productService = inject(ProductService);
   private notificationService = inject(NotificationService);
   
   // Signals del servicio

@@ -214,14 +214,14 @@ export class ProductService {
     
     return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
       // Retry con backoff exponencial
-      this.createRetryStrategy(context),
+      this.createRetryStrategy<Product[]>(context),
       
-      tap(products => {
+      tap((products: Product[]) => {
         this.productsSignal.set(products);
         console.log(`✅ [LAB2] Cargados ${products.length} productos con manejo de errores`);
       }),
       
-      catchError(error => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
       
       finalize(() => this.setLoadingState('list', false)),
       
@@ -242,14 +242,14 @@ export class ProductService {
     };
     
     return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
-      this.createRetryStrategy(context),
+      this.createRetryStrategy<Product>(context),
       
-      tap(product => {
+      tap((product: Product) => {
         this.selectedProductSignal.set(product);
         console.log(`✅ [LAB2] Producto cargado: ${product.name}`);
       }),
       
-      catchError(error => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
       
       finalize(() => this.setLoadingState('individual', false))
     );
@@ -288,12 +288,12 @@ export class ProductService {
         delay: 1000
       }),
       
-      tap(product => {
-        this.productsSignal.update(products => [...products, product]);
+      tap((product: Product) => {
+        this.productsSignal.update((products: Product[]) => [...products, product]);
         console.log(`✅ [LAB2] Producto creado con manejo de errores: ${product.name}`);
       }),
       
-      catchError(error => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
       
       finalize(() => this.setLoadingState('create', false))
     );
@@ -324,10 +324,10 @@ export class ProductService {
     };
     
     return this.http.put<Product>(`${this.apiUrl}/${id}`, updatedProduct, this.getHttpOptions()).pipe(
-      this.createRetryStrategy(context),
+      this.createRetryStrategy<Product>(context),
       
-      tap(product => {
-        this.productsSignal.update(products => 
+      tap((product: Product) => {
+        this.productsSignal.update((products: Product[]) => 
           products.map(p => String(p.id) === String(id) ? product : p)
         );
         
@@ -338,7 +338,7 @@ export class ProductService {
         console.log(`✅ [LAB2] Producto actualizado: ${product.name}`);
       }),
       
-      catchError(error => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
       
       finalize(() => this.setLoadingState('update', false))
     );
@@ -360,7 +360,7 @@ export class ProductService {
       retry(2), // Retry simple para delete
       
       tap(() => {
-        this.productsSignal.update(products => 
+        this.productsSignal.update((products: Product[]) => 
           products.filter(p => String(p.id) !== String(id))
         );
         
@@ -371,7 +371,7 @@ export class ProductService {
         console.log(`✅ [LAB2] Producto eliminado con ID: ${id}`);
       }),
       
-      catchError(error => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
       
       finalize(() => this.setLoadingState('delete', false))
     );
@@ -438,8 +438,8 @@ export class ProductService {
   /**
    * Crear estrategia de retry con backoff exponencial
    */
-  private createRetryStrategy(context: ErrorContext) {
-    return retryWhen((errors: Observable<HttpErrorResponse>) =>
+  private createRetryStrategy<T>(context: ErrorContext) {
+    return retryWhen<T>((errors: Observable<HttpErrorResponse>) =>
       errors.pipe(
         concatMap((error, index) => {
           const retryAttempt = index + 1;
