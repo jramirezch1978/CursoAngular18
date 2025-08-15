@@ -55,5 +55,38 @@
     { "id": 1, "name": "laptops", "description": "Laptops y notebooks" },
     { "id": 2, "name": "monitors", "description": "Monitores y pantallas" },
     { "id": 3, "name": "accessories", "description": "Accesorios de computadora" }
+  ],
+  "stores": [
+    {
+      "id": 1,
+      "name": "Tienda Central",
+      "location": "Av. Principal 123, Lima",
+      "phone": "+51 1 2345678",
+      "email": "jramirez@npssac.com.pe"
+    },
+    {
+      "id": 2,
+      "name": "Tienda Norte",
+      "location": "Av. Norte 456, Lima",
+      "phone": "+51 1 8765432",
+      "email": "admin@provias.gob.pe"
+      }
+  ],
+  "StoreProducts": [
+    {
+      "storeId": 1,
+      "productId": 1,
+      "stock": 10
+    },
+    {
+      "storeId": 1,
+      "productId": 2,
+      "stock": 5
+    },
+    {
+      "storeId": 2,
+      "productId": 3,
+      "stock": 20
+    }
   ]
 }
