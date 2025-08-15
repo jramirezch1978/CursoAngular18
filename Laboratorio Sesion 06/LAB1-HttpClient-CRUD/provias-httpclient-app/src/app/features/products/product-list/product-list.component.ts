@@ -133,8 +133,8 @@ export class ProductListComponent implements OnInit {
     this.showCreateForm.set(true);
   }
 
-  showCreateForm(): void {
-    this.showCreateProductForm();
+  showForm(): boolean {
+    return this.showCreateForm();
   }
   
   createProduct(): void {
@@ -246,10 +246,6 @@ export class ProductListComponent implements OnInit {
     this.editingProduct.set(null);
     this.formProduct.set(createEmptyProduct());
     console.log('👎 Formulario ocultado');
-  }
-
-  showForm(): boolean {
-    return this.showCreateForm();
   }
 
   saveProduct(): void {
@@ -364,7 +360,7 @@ export class ProductListComponent implements OnInit {
   // ❌ Confirmar eliminación de producto
   confirmDelete(product: Product): void {
     if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
-      this.deleteProduct(product.id);
+      this.deleteProduct(product.id!);
     }
   }
   
