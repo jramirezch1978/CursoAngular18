@@ -132,6 +132,10 @@ export class ProductListComponent implements OnInit {
     this.formProduct.set(createEmptyProduct());
     this.showCreateForm.set(true);
   }
+
+  showCreateForm(): void {
+    this.showCreateProductForm();
+  }
   
   createProduct(): void {
     const product = this.formProduct();
@@ -237,10 +241,23 @@ export class ProductListComponent implements OnInit {
     this.hideForm();
   }
   
-  private hideForm(): void {
+  hideForm(): void {
     this.showCreateForm.set(false);
     this.editingProduct.set(null);
     this.formProduct.set(createEmptyProduct());
+    console.log('👎 Formulario ocultado');
+  }
+
+  showForm(): boolean {
+    return this.showCreateForm();
+  }
+
+  saveProduct(): void {
+    if (this.editingProduct()) {
+      this.updateProduct();
+    } else {
+      this.createProduct();
+    }
   }
   
   selectProduct(product: Product): void {
@@ -311,35 +328,24 @@ export class ProductListComponent implements OnInit {
 
   // 🔍 Verificar si hay filtros activos
   hasActiveFilters(): boolean {
-    return !!(this.searchTerm || this.selectedCategory || this.minPrice || this.maxPrice || this.stockFilter);
-  }
-
-  // 🧹 Limpiar todos los filtros
-  clearFilters(): void {
-    this.searchTerm = '';
-    this.selectedCategory = '';
-    this.minPrice = null;
-    this.maxPrice = null;
-    this.stockFilter = '';
-    this.sortBy = 'name';
-    this.onFilterChange();
+    return !!(this.searchTerm() || this.selectedCategory() || this.minPrice || this.maxPrice || this.stockFilter);
   }
 
   // 🔄 Manejar cambios en los filtros
   onFilterChange(): void {
     console.log('🔍 Aplicando filtros:', {
-      searchTerm: this.searchTerm,
-      category: this.selectedCategory,
+      searchTerm: this.searchTerm(),
+      category: this.selectedCategory(),
       minPrice: this.minPrice,
       maxPrice: this.maxPrice,
       stockFilter: this.stockFilter,
-      sortBy: this.sortBy
+      sortBy: this.sortBy()
     });
   }
 
   // 🔍 Manejar cambios en la búsqueda
   onSearchChange(): void {
-    console.log('🔍 Búsqueda:', this.searchTerm);
+    console.log('🔍 Búsqueda:', this.searchTerm());
     this.onFilterChange();
   }
 
