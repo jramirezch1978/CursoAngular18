@@ -299,8 +299,61 @@ export class ProductListComponent implements OnInit {
   
   getStockClass(stock: number): string {
     if (stock === 0) return 'out-of-stock';
-    if (stock < 10) return 'low-stock';
+    if (stock <= 5) return 'low-stock';
     return 'in-stock';
+  }
+
+  // 🔍 Verificar si hay filtros activos
+  hasActiveFilters(): boolean {
+    return !!(this.searchTerm || this.selectedCategory || this.minPrice || this.maxPrice || this.stockFilter);
+  }
+
+  // 🧹 Limpiar todos los filtros
+  clearFilters(): void {
+    this.searchTerm = '';
+    this.selectedCategory = '';
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.stockFilter = '';
+    this.sortBy = 'name';
+    this.onFilterChange();
+  }
+
+  // 🔄 Manejar cambios en los filtros
+  onFilterChange(): void {
+    console.log('🔍 Aplicando filtros:', {
+      searchTerm: this.searchTerm,
+      category: this.selectedCategory,
+      minPrice: this.minPrice,
+      maxPrice: this.maxPrice,
+      stockFilter: this.stockFilter,
+      sortBy: this.sortBy
+    });
+  }
+
+  // 🔍 Manejar cambios en la búsqueda
+  onSearchChange(): void {
+    console.log('🔍 Búsqueda:', this.searchTerm);
+    this.onFilterChange();
+  }
+
+  // 🚪 Cerrar modal al hacer click en el overlay
+  closeModalOnOverlay(event: Event): void {
+    if (event.target === event.currentTarget) {
+      this.hideForm();
+    }
+  }
+
+  // 🔄 Mostrar loading global
+  showGlobalLoading(): boolean {
+    return false; // Deshabilitado por defecto para evitar doble loading
+  }
+
+  // ❌ Confirmar eliminación de producto
+  confirmDelete(product: Product): void {
+    if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
+      this.deleteProduct(product.id);
+    }
   }
   
   getStockMessage(stock: number): string {
