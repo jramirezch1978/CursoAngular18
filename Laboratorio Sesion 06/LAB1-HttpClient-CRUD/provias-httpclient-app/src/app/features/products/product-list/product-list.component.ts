@@ -360,7 +360,7 @@ export class ProductListComponent implements OnInit {
   // ❌ Confirmar eliminación de producto
   confirmDelete(product: Product): void {
     if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
-      this.deleteProduct(product.id!);
+      this.deleteProduct(product);
     }
   }
   
