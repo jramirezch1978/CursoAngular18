@@ -210,26 +210,33 @@ export class ProductListComponent implements OnInit {
   deleteProduct(product: Product): void {
     if (!product.id) return;
     
-    const confirmed = confirm(
-      `¿Está seguro de eliminar el producto "${product.name}"?\n\nEsta acción no se puede deshacer.`
-    );
-    
-    if (!confirmed) {
-      console.log('🚫 Eliminación cancelada por el usuario');
-      return;
-    }
-    
     console.log('🗑️ Eliminando producto:', product);
     
     this.productService.deleteProduct(product.id).subscribe({
       next: () => {
         console.log('✅ Producto eliminado exitosamente');
-        alert(`Producto "${product.name}" eliminado exitosamente`);
+        // Mostrar notificación de éxito más elegante
+        this.showSuccessNotification(`Producto "${product.name}" eliminado exitosamente`);
       },
       error: (err) => {
         console.error('❌ Error al eliminar producto:', err);
+        this.showErrorNotification('Error al eliminar el producto. Inténtalo nuevamente.');
       }
     });
+  }
+
+  // 🎉 Mostrar notificación de éxito (reemplaza alert)
+  private showSuccessNotification(message: string): void {
+    // Por ahora usamos console.log, pero se puede implementar un sistema de notificaciones más elegante
+    console.log(`✅ ${message}`);
+    // Temporal: usar alert hasta implementar notificaciones toast
+    alert(message);
+  }
+
+  // ❌ Mostrar notificación de error
+  private showErrorNotification(message: string): void {
+    console.error(`❌ ${message}`);
+    alert(message);
   }
   
   onFormSubmit(): void {

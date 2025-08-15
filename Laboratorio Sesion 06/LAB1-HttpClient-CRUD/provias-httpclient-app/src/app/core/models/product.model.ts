@@ -21,7 +21,7 @@
  * - Esta flexibilidad permite usar la misma interface para ambos casos
  */
 export interface Product {
-  id?: number;                    // ID único del producto (opcional para creación)
+  id?: string | number;           // ID único del producto (string para JSON Server, number para APIs reales)
   name: string;                   // Nombre del producto (requerido)
   price: number;                  // Precio en formato decimal (requerido)
   description: string;            // Descripción detallada (requerida)
@@ -58,7 +58,7 @@ export interface CreateProductDto {
  * - Más eficiente en ancho de banda (no envías datos innecesarios)
  */
 export interface UpdateProductDto extends Partial<CreateProductDto> {
-  id: number;                     // ID es requerido para saber qué actualizar
+  id: string | number;            // ID es requerido para saber qué actualizar (string o number para compatibilidad)
 }
 
 /**
