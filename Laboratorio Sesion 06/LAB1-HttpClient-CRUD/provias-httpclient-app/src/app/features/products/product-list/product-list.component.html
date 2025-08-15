@@ -58,7 +58,7 @@
         <div class="stat-icon stat-total">📦</div>
         <div class="stat-label">Total Productos</div>
         <div class="stat-number">{{ stats.total }}</div>
-        <div class="stat-change">+{{ stats.total > 0 ? Math.round((stats.total / (stats.total + 1)) * 100) : 0 }}% este mes</div>
+        <div class="stat-change">Inventario completo</div>
       </div>
       
       <div class="stat-card">
@@ -408,7 +408,7 @@
                 type="number"
                 id="productPrice"
                 name="price"
-                [(ngModel)]="formProduct.price"
+                [(ngModel)]="formProduct().price"
                 #priceField="ngModel"
                 required
                 min="0.01"
@@ -432,7 +432,7 @@
                 type="number"
                 id="productStock"
                 name="stock"
-                [(ngModel)]="formProduct.stock"
+                [(ngModel)]="formProduct().stock"
                 #stockField="ngModel"
                 required
                 min="0"
@@ -455,7 +455,7 @@
             <textarea 
               id="productDescription"
               name="description"
-              [(ngModel)]="formProduct.description"
+              [(ngModel)]="formProduct().description"
               #descriptionField="ngModel"
               required
               minlength="10"
@@ -473,7 +473,7 @@
               </div>
             }
             <div class="field-help">
-              {{ formProduct.description?.length || 0 }}/500 caracteres
+              {{ formProduct().description?.length || 0 }}/500 caracteres
             </div>
           </div>
         </form>
