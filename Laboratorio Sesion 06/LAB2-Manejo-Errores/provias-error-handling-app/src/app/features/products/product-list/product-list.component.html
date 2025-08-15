@@ -1,0 +1,478 @@
+<!-- LAB2: Manejo Profesional de Errores - Product List Component -->
+<div class="product-list-container">
+  
+  <!-- Header con información de estados -->
+  <header class="header">
+    <h1>🛡️ LAB2: Manejo de Errores</h1>
+    <p class="subtitle">Dashboard de productos con manejo robusto de errores, loading states y retry strategies</p>
+    
+    <!-- Indicadores de estado en tiempo real -->
+    <div class="status-indicators">
+      @if (isLoadingList()) {
+        <div class="status loading">
+          <span class="indicator"></span>
+          Cargando productos...
+        </div>
+      }
+      @if (isCreating()) {
+        <div class="status creating">
+          <span class="indicator"></span>
+          Creando producto...
+        </div>
+      }
+      @if (isUpdating()) {
+        <div class="status updating">
+          <span class="indicator"></span>
+          Actualizando producto...
+        </div>
+      }
+      @if (isDeleting()) {
+        <div class="status deleting">
+          <span class="indicator"></span>
+          Eliminando producto...
+        </div>
+      }
+      @if (error()) {
+        <div class="status error">
+          <span class="indicator"></span>
+          Error: {{ error() }}
+          <button class="btn-clear-error" (click)="productService.clearError()">✕</button>
+        </div>
+      }
+    </div>
+  </header>
+
+  <!-- Estadísticas con manejo de errores -->
+  <section class="statistics">
+    <div class="stat-card">
+      <h3>{{ statistics().total }}</h3>
+      <p>Total Productos</p>
+    </div>
+    <div class="stat-card">
+      <h3>${{ statistics().totalValue | number:'1.2-2' }}</h3>
+      <p>Valor Inventario</p>
+    </div>
+    <div class="stat-card">
+      <h3>{{ statistics().categories }}</h3>
+      <p>Categorías</p>
+    </div>
+    <div class="stat-card error-aware">
+      <h3>{{ statistics().outOfStock }}</h3>
+      <p>Sin Stock</p>
+      @if (statistics().outOfStock > 0) {
+        <span class="alert-badge">⚠️</span>
+      }
+    </div>
+    <div class="stat-card error-aware">
+      <h3>{{ statistics().lowStock }}</h3>
+      <p>Stock Bajo</p>
+      @if (statistics().lowStock > 0) {
+        <span class="alert-badge">⚠️</span>
+      }
+    </div>
+  </section>
+
+  <!-- Controles y filtros -->
+  <section class="controls">
+    <div class="controls-row">
+      <!-- Búsqueda con debounce -->
+      <div class="search-group">
+        <input 
+          type="text" 
+          placeholder="🔍 Buscar productos..." 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+          class="search-input"
+          [disabled]="isLoadingList()"
+        >
+      </div>
+
+      <!-- Filtros avanzados -->
+      <div class="filter-group">
+        <select [(ngModel)]="selectedCategory" (change)="onFilterChange()" [disabled]="isLoadingList()">
+          <option value="">Todas las categorías</option>
+          @for (category of categories; track category) {
+            <option [value]="category">{{ category }}</option>
+          }
+        </select>
+
+        <select [(ngModel)]="sortBy" (change)="onFilterChange()" [disabled]="isLoadingList()">
+          <option value="name">Ordenar por Nombre</option>
+          <option value="price">Ordenar por Precio</option>
+          <option value="stock">Ordenar por Stock</option>
+        </select>
+
+        <select [(ngModel)]="stockFilter" (change)="onFilterChange()" [disabled]="isLoadingList()">
+          <option value="">Todo el stock</option>
+          <option value="inStock">En stock</option>
+          <option value="outOfStock">Sin stock</option>
+          <option value="lowStock">Stock bajo</option>
+        </select>
+      </div>
+
+      <!-- Acciones principales -->
+      <div class="action-group">
+        <button 
+          class="btn btn-primary" 
+          (click)="showCreateProductForm()"
+          [disabled]="isCreating() || isUpdating()"
+        >
+          ➕ Nuevo Producto
+        </button>
+        
+        <button 
+          class="btn btn-secondary" 
+          (click)="refreshProducts()"
+          [disabled]="isLoadingList()"
+        >
+          🔄 Refrescar
+        </button>
+        
+        <!-- Botones de debug para LAB2 -->
+        <button class="btn btn-debug" (click)="showErrorDetails()">
+          🔍 Ver Errores
+        </button>
+        
+        <button class="btn btn-debug" (click)="simulateError()">
+          🧪 Simular Error
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtros de precio -->
+    <div class="price-filters">
+      <div class="form-group">
+        <label>Precio mínimo:</label>
+        <input 
+          type="number" 
+          [(ngModel)]="minPrice" 
+          (change)="onFilterChange()"
+          min="0" 
+          step="0.01"
+          [disabled]="isLoadingList()"
+        >
+      </div>
+      <div class="form-group">
+        <label>Precio máximo:</label>
+        <input 
+          type="number" 
+          [(ngModel)]="maxPrice" 
+          (change)="onFilterChange()"
+          min="0" 
+          step="0.01"
+          [disabled]="isLoadingList()"
+        >
+      </div>
+      
+      @if (hasActiveFilters()) {
+        <button class="btn btn-clear" (click)="clearFilters()">
+          🧹 Limpiar Filtros
+        </button>
+      }
+    </div>
+  </section>
+
+  <!-- Grid de productos -->
+  <section class="products-grid">
+    
+    <!-- Loading state -->
+    @if (isLoadingList()) {
+      <div class="loading-container">
+        <div class="loading-spinner"></div>
+        <p>Cargando productos con manejo robusto de errores...</p>
+        <small>Implementando retry automático en caso de fallos</small>
+      </div>
+    }
+    
+    <!-- Error state -->
+    @else if (error()) {
+      <div class="error-container">
+        <div class="error-icon">❌</div>
+        <h3>Error al cargar productos</h3>
+        <p>{{ error() }}</p>
+        <div class="error-actions">
+          <button class="btn btn-primary" (click)="refreshProducts()">
+            🔄 Reintentar
+          </button>
+          <button class="btn btn-secondary" (click)="showErrorDetails()">
+            ℹ️ Más detalles
+          </button>
+        </div>
+      </div>
+    }
+    
+    <!-- Empty state -->
+    @else if (filteredProducts().length === 0 && products().length === 0) {
+      <div class="empty-container">
+        <div class="empty-icon">📦</div>
+        <h3>No hay productos</h3>
+        <p>Comience agregando su primer producto</p>
+        <button class="btn btn-primary" (click)="showCreateProductForm()">
+          ➕ Crear Primer Producto
+        </button>
+      </div>
+    }
+    
+    <!-- No results state -->
+    @else if (filteredProducts().length === 0) {
+      <div class="empty-container">
+        <div class="empty-icon">🔍</div>
+        <h3>No se encontraron resultados</h3>
+        <p>Intente ajustar los filtros de búsqueda</p>
+        <button class="btn btn-secondary" (click)="clearFilters()">
+          🧹 Limpiar Filtros
+        </button>
+      </div>
+    }
+    
+    <!-- Products list -->
+    @else {
+      @for (product of filteredProducts(); track product.id) {
+        <div class="product-card" [class.out-of-stock]="product.stock === 0">
+          
+          <!-- Imagen del producto -->
+          <div class="product-image">
+            @if (product.imageUrl) {
+              <img [src]="product.imageUrl" [alt]="product.name" loading="lazy">
+            } @else {
+              <div class="placeholder-image">📦</div>
+            }
+            
+            <!-- Badge de estado -->
+            @if (product.stock === 0) {
+              <span class="stock-badge out-of-stock">Sin Stock</span>
+            } @else if (product.stock < 10) {
+              <span class="stock-badge low-stock">Stock Bajo</span>
+            }
+          </div>
+
+          <!-- Información del producto -->
+          <div class="product-info">
+            <h3 class="product-name">{{ product.name }}</h3>
+            <p class="product-description">{{ product.description }}</p>
+            
+            <div class="product-details">
+              <span class="product-price">${{ product.price | number:'1.2-2' }}</span>
+              <span class="product-category">{{ product.category }}</span>
+              <span class="product-stock">Stock: {{ product.stock }}</span>
+            </div>
+          </div>
+
+          <!-- Acciones del producto -->
+          <div class="product-actions">
+            <button 
+              class="btn btn-secondary btn-sm" 
+              (click)="editProduct(product)"
+              [disabled]="isUpdating() || isDeleting()"
+            >
+              ✏️ Editar
+            </button>
+            <button 
+              class="btn btn-danger btn-sm" 
+              (click)="showDeleteConfirmation(product)"
+              [disabled]="isDeleting() || isUpdating()"
+            >
+              🗑️ Eliminar
+            </button>
+          </div>
+        </div>
+      }
+    }
+  </section>
+
+</div>
+
+<!-- Modal de formulario -->
+@if (showForm()) {
+  <div class="modal-overlay" (click)="closeModalOnOverlay($event)">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>
+          @if (editingProduct()) {
+            ✏️ Editar Producto
+          } @else {
+            ➕ Nuevo Producto
+          }
+        </h2>
+        <button class="btn-close" (click)="hideForm()">✕</button>
+      </div>
+
+      <form (ngSubmit)="onFormSubmit()" class="product-form">
+        
+        <!-- Loading overlay del formulario -->
+        @if (isCreating() || isUpdating()) {
+          <div class="form-loading-overlay">
+            <div class="loading-spinner"></div>
+            <p>
+              @if (isCreating()) {
+                Creando producto con validación robusta...
+              }
+              @if (isUpdating()) {
+                Actualizando producto con retry automático...
+              }
+            </p>
+          </div>
+        }
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="name">Nombre del producto *</label>
+            <input 
+              id="name"
+              type="text" 
+              [(ngModel)]="formProduct().name"
+              name="name"
+              required
+              maxlength="100"
+              [disabled]="isCreating() || isUpdating()"
+            >
+          </div>
+
+          <div class="form-group">
+            <label for="price">Precio *</label>
+            <input 
+              id="price"
+              type="number" 
+              [(ngModel)]="formProduct().price"
+              name="price"
+              required
+              min="0.01"
+              step="0.01"
+              max="999999"
+              [disabled]="isCreating() || isUpdating()"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="description">Descripción *</label>
+          <textarea 
+            id="description"
+            [(ngModel)]="formProduct().description"
+            name="description"
+            required
+            maxlength="500"
+            rows="3"
+            [disabled]="isCreating() || isUpdating()"
+          ></textarea>
+          <small>{{ formProduct().description.length }}/500 caracteres</small>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="category">Categoría *</label>
+            <select 
+              id="category"
+              [(ngModel)]="formProduct().category"
+              name="category"
+              required
+              [disabled]="isCreating() || isUpdating()"
+            >
+              @for (category of categories; track category) {
+                <option [value]="category">{{ category }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="stock">Stock *</label>
+            <input 
+              id="stock"
+              type="number" 
+              [(ngModel)]="formProduct().stock"
+              name="stock"
+              required
+              min="0"
+              max="9999"
+              [disabled]="isCreating() || isUpdating()"
+            >
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="imageUrl">URL de imagen (opcional)</label>
+          <input 
+            id="imageUrl"
+            type="url" 
+            [(ngModel)]="formProduct().imageUrl"
+            name="imageUrl"
+            [disabled]="isCreating() || isUpdating()"
+          >
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary" 
+            (click)="hideForm()"
+            [disabled]="isCreating() || isUpdating()"
+          >
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="isCreating() || isUpdating()"
+          >
+            @if (editingProduct()) {
+              @if (isUpdating()) {
+                🔄 Actualizando...
+              } @else {
+                💾 Actualizar
+              }
+            } @else {
+              @if (isCreating()) {
+                🔄 Creando...
+              } @else {
+                💾 Crear Producto
+              }
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}
+
+<!-- Modal de confirmación de eliminación -->
+@if (showDeleteModal()) {
+  <div class="modal-overlay">
+    <div class="modal-content modal-confirm">
+      <div class="modal-header">
+        <h2>🗑️ Confirmar Eliminación</h2>
+      </div>
+      
+      <div class="modal-body">
+        <p>¿Está seguro que desea eliminar el producto?</p>
+        <div class="product-preview">
+          <strong>{{ productToDelete()?.name }}</strong>
+          <small>Esta acción no se puede deshacer</small>
+        </div>
+      </div>
+      
+      <div class="modal-actions">
+        <button 
+          class="btn btn-secondary" 
+          (click)="closeDeleteModal()"
+          [disabled]="isDeleting()"
+        >
+          Cancelar
+        </button>
+        <button 
+          class="btn btn-danger" 
+          (click)="confirmDeleteProduct()"
+          [disabled]="isDeleting()"
+        >
+          @if (isDeleting()) {
+            🔄 Eliminando...
+          } @else {
+            🗑️ Eliminar
+          }
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Componente de notificaciones -->
+<app-notification></app-notification>
