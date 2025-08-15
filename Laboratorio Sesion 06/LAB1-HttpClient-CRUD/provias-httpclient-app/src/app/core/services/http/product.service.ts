@@ -235,7 +235,7 @@ export class ProductService {
    * - Menos propenso a errores
    * - Mejor performance (optimizado por JS engine)
    */
-  getProduct(id: number): Observable<Product> {
+  getProduct(id: string | number): Observable<Product> {
     this.loadingSignal.set(true);
     
     return this.http.get<Product>(`${this.apiUrl}/${id}`).pipe(
@@ -334,7 +334,7 @@ export class ProductService {
    * - PATCH: actualiza solo campos específicos
    * - PUT es idempotente (misma operación = mismo resultado)
    */
-  updateProduct(id: number, dto: UpdateProductDto): Observable<Product> {
+  updateProduct(id: string | number, dto: UpdateProductDto): Observable<Product> {
     const validationErrors = validateUpdateProduct(dto);
     if (validationErrors.length > 0) {
       const errorMessage = 'Datos inválidos: ' + validationErrors.join(', ');
@@ -354,11 +354,11 @@ export class ProductService {
       tap(product => {
         // Actualizar en la lista local
         this.productsSignal.update(products => 
-          products.map(p => p.id === id ? product : p)
+          products.map(p => String(p.id) === String(id) ? product : p)
         );
         
         // Si es el producto seleccionado, actualizarlo también
-        if (this.selectedProductSignal()?.id === id) {
+        if (String(this.selectedProductSignal()?.id) === String(id)) {
           this.selectedProductSignal.set(product);
         }
         
@@ -383,7 +383,7 @@ export class ProductService {
    * - Más eficiente en ancho de banda
    * - Menos riesgo de conflictos concurrentes
    */
-  patchProduct(id: number, changes: Partial<Product>): Observable<Product> {
+  patchProduct(id: string | number, changes: Partial<Product>): Observable<Product> {
     this.loadingSignal.set(true);
     
     const patch = {
@@ -394,10 +394,10 @@ export class ProductService {
     return this.http.patch<Product>(`${this.apiUrl}/${id}`, patch, this.getHttpOptions()).pipe(
       tap(product => {
         this.productsSignal.update(products => 
-          products.map(p => p.id === id ? product : p)
+          products.map(p => String(p.id) === String(id) ? product : p)
         );
         
-        if (this.selectedProductSignal()?.id === id) {
+        if (String(this.selectedProductSignal()?.id) === String(id)) {
           this.selectedProductSignal.set(product);
         }
         
@@ -421,7 +421,7 @@ export class ProductService {
    * - API más clara: updateStock(id, 50)
    * - Posibilidad de lógica específica (validaciones, logs)
    */
-  updateStock(id: number, quantity: number): Observable<Product> {
+  updateStock(id: string | number, quantity: number): Observable<Product> {
     if (quantity < 0) {
       const errorMessage = 'El stock no puede ser negativo';
       this.errorSignal.set(errorMessage);
@@ -443,18 +443,18 @@ export class ProductService {
    * - Solo necesitamos confirmación de que se eliminó
    * - Menos ancho de banda
    */
-  deleteProduct(id: number): Observable<void> {
+  deleteProduct(id: string | number): Observable<void> {
     this.loadingSignal.set(true);
     
     return this.http.delete<void>(`${this.apiUrl}/${id}`).pipe(
       tap(() => {
         // Remover de la lista local
         this.productsSignal.update(products => 
-          products.filter(p => p.id !== id)
+          products.filter(p => String(p.id) !== String(id))
         );
         
         // Si era el producto seleccionado, limpiar selección
-        if (this.selectedProductSignal()?.id === id) {
+        if (String(this.selectedProductSignal()?.id) === String(id)) {
           this.selectedProductSignal.set(null);
         }
         
