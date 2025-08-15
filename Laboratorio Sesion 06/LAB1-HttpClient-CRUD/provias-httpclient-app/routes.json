@@ -1,14 +1,3 @@
 {
-  "/api/products": "/products",
-  "/api/products/:id": "/products/:id",
-  "/api/users": "/users", 
-  "/api/users/:id": "/users/:id",
-  "/api/orders": "/orders",
-  "/api/orders/:id": "/orders/:id",
-  "/api/categories": "/categories",
-  "/api/categories/:id": "/categories/:id",
-  "/api/stores": "/stores",
-  "/api/stores/:id": "/stores/:id",
-  "/api/storeproducts": "/StoreProducts",
-  "/api/storeproducts/:id": "/StoreProducts/:id"
+  "/api/*": "/$1"
 }

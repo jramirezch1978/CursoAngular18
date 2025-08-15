@@ -532,7 +532,25 @@ export class ProductService {
     
     Object.entries(filters).forEach(([key, value]) => {
       if (value !== undefined && value !== null && value !== '') {
-        params = params.set(key, value.toString());
+        // Mapear parámetros de Angular a JSON Server
+        let paramKey = key;
+        
+        // JSON Server usa _sort en lugar de sortBy
+        if (key === 'sortBy') {
+          paramKey = '_sort';
+        }
+        
+        // JSON Server usa _order en lugar de sortOrder
+        if (key === 'sortOrder') {
+          paramKey = '_order';
+        }
+        
+        // JSON Server usa q en lugar de search
+        if (key === 'search') {
+          paramKey = 'q';
+        }
+        
+        params = params.set(paramKey, value.toString());
       }
     });
     
@@ -616,9 +634,10 @@ export class ProductService {
   private handleError(context: string, error: HttpErrorResponse): void {
     let errorMessage = 'Ha ocurrido un error desconocido';
     
-    if (error.error instanceof ErrorEvent) {
-      // Error del cliente (red, etc.)
-      errorMessage = `Error de conexión: ${error.error.message}`;
+    // Verificar si es error del cliente o servidor
+    if (error.status === 0 || !error.status) {
+      // Error del cliente (red, sin conexión, etc.)
+      errorMessage = `Error de conexión: No se pudo conectar con el servidor`;
     } else {
       // Error del servidor
       errorMessage = this.getServerErrorMessage(error.status, error.message);

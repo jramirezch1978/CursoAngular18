@@ -44,15 +44,14 @@
       "stock": 100
     },
     {
-      "id": "6",
-      "name": "Teclado Mecánico RGB Dieléctrico",
-      "price": 129.99,
-      "description": "Teclado gaming con switches Cherry MX",
-      "category": "accessories",
-      "stock": 45,
-      "imageUrl": "https://via.placeholder.com/300x200",
-      "createdAt": "2025-08-03T09:00:00Z",
-      "updatedAt": "2025-08-14T14:00:00Z"
+      "id": "1fsvd3o",
+      "name": "Prueba producto",
+      "price": 100,
+      "description": "asdas asd dasd asdasd asdad asd",
+      "category": "laptops",
+      "stock": 100,
+      "imageUrl": "",
+      "updatedAt": "2025-08-15T04:11:38.405Z"
     }
   ],
   "users": [

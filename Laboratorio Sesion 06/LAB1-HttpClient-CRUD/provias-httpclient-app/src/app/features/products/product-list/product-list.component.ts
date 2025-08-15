@@ -10,17 +10,20 @@ import {
   ProductCategory,
   createEmptyProduct
 } from '../../../core/models/product.model';
+import { NotificationService } from '../../../shared/services/notification.service';
+import { NotificationComponent } from '../../../shared/components/notification/notification.component';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, NotificationComponent],
   templateUrl: './product-list.component.html',
   styleUrl: './product-list.component.scss'
 })
 export class ProductListComponent implements OnInit {
   
   private productService = inject(ProductService);
+  private notificationService = inject(NotificationService);
   
   // Signals del servicio
   products = this.productService.products;
@@ -146,12 +149,12 @@ export class ProductListComponent implements OnInit {
     console.log('🏗️ Creando producto:', product);
     
     if (!product.name.trim()) {
-      alert('El nombre del producto es requerido');
+      this.notificationService.warning('Campo requerido', 'El nombre del producto es requerido');
       return;
     }
     
     if (product.price <= 0) {
-      alert('El precio debe ser mayor a 0');
+      this.notificationService.warning('Precio inválido', 'El precio debe ser mayor a 0');
       return;
     }
     
@@ -159,7 +162,7 @@ export class ProductListComponent implements OnInit {
       next: (createdProduct) => {
         console.log('✅ Producto creado:', createdProduct);
         this.hideForm();
-        alert(`Producto "${createdProduct.name}" creado exitosamente`);
+        this.notificationService.success('¡Producto creado!', 'Los cambios se han grabado satisfactoriamente');
       },
       error: (err) => {
         console.error('❌ Error al crear producto:', err);
@@ -199,7 +202,7 @@ export class ProductListComponent implements OnInit {
       next: (updatedProduct) => {
         console.log('✅ Producto actualizado:', updatedProduct);
         this.hideForm();
-        alert(`Producto "${updatedProduct.name}" actualizado exitosamente`);
+        this.notificationService.success('¡Producto actualizado!', 'Los cambios se han grabado satisfactoriamente');
       },
       error: (err) => {
         console.error('❌ Error al actualizar producto:', err);
