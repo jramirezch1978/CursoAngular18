@@ -195,28 +195,71 @@ export function createEmptyProduct(): CreateProductDto {
  * - Mejor UX que esperar respuesta del servidor
  * - El servidor aún debe validar (nunca confiar solo en frontend)
  */
-export function validateProduct(product: CreateProductDto): string[] {
+// ========================================
+// FUNCIONES DE VALIDACIÓN
+// ========================================
+
+/**
+ * Validar datos para crear producto
+ */
+export function validateCreateProduct(product: CreateProductDto): string[] {
   const errors: string[] = [];
   
-  if (!product.name.trim()) {
+  if (!product.name?.trim()) {
     errors.push('El nombre del producto es requerido');
   }
   
-  if (product.price <= 0) {
+  if (!product.price || product.price <= 0) {
     errors.push('El precio debe ser mayor a 0');
   }
   
-  if (!product.description.trim()) {
+  if (!product.description?.trim()) {
     errors.push('La descripción del producto es requerida');
   }
   
-  if (!product.category.trim()) {
+  if (!product.category?.trim()) {
     errors.push('La categoría del producto es requerida');
   }
   
-  if (product.stock < 0) {
+  if (product.stock !== undefined && product.stock < 0) {
     errors.push('El stock no puede ser negativo');
   }
   
   return errors;
+}
+
+/**
+ * Validar datos para actualizar producto
+ */
+export function validateUpdateProduct(product: UpdateProductDto): string[] {
+  const errors: string[] = [];
+  
+  if (product.name !== undefined && !product.name.trim()) {
+    errors.push('El nombre del producto no puede estar vacío');
+  }
+  
+  if (product.price !== undefined && product.price <= 0) {
+    errors.push('El precio debe ser mayor a 0');
+  }
+  
+  if (product.description !== undefined && !product.description.trim()) {
+    errors.push('La descripción no puede estar vacía');
+  }
+  
+  if (product.category !== undefined && !product.category.trim()) {
+    errors.push('La categoría no puede estar vacía');
+  }
+  
+  if (product.stock !== undefined && product.stock < 0) {
+    errors.push('El stock no puede ser negativo');
+  }
+  
+  return errors;
+}
+
+/**
+ * Validar datos genéricos de producto (compatibilidad)
+ */
+export function validateProduct(product: CreateProductDto): string[] {
+  return validateCreateProduct(product);
 }

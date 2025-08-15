@@ -5,6 +5,7 @@ import { ProductService } from '../../../core/services/http/product.service';
 import { 
   Product, 
   CreateProductDto, 
+  UpdateProductDto,
   ProductFilters, 
   ProductCategory,
   createEmptyProduct
@@ -173,7 +174,11 @@ export class ProductListComponent implements OnInit {
       return;
     }
     
-    const updates = this.formProduct();
+    const formData = this.formProduct();
+    const updates: UpdateProductDto = {
+      id: editing.id,
+      ...formData
+    };
     console.log('🔄 Actualizando producto:', editing.id, updates);
     
     this.productService.updateProduct(editing.id, updates).subscribe({

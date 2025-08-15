@@ -41,7 +41,9 @@ import {
   PaginatedResponse,
   ApiResponse,
   ProductStatistics,
-  validateProduct
+  validateProduct,
+  validateCreateProduct,
+  validateUpdateProduct
 } from '../../models/product.model';
 
 /**
@@ -333,7 +335,7 @@ export class ProductService {
    * - PUT es idempotente (misma operación = mismo resultado)
    */
   updateProduct(id: number, dto: UpdateProductDto): Observable<Product> {
-    const validationErrors = validateProduct(dto);
+    const validationErrors = validateUpdateProduct(dto);
     if (validationErrors.length > 0) {
       const errorMessage = 'Datos inválidos: ' + validationErrors.join(', ');
       this.errorSignal.set(errorMessage);
@@ -509,7 +511,7 @@ export class ProductService {
    * - Menos carga al servidor
    * - Permite filtros complejos sin modificar API
    */
-  applyFilters(filters: ProductFilters): void {
+  setFilters(filters: ProductFilters): void {
     this.currentFiltersSignal.set(filters);
   }
   
