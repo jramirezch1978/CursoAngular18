@@ -361,7 +361,7 @@
                 type="text"
                 id="productName"
                 name="name"
-                [(ngModel)]="formProduct.name"
+                [(ngModel)]="formProduct().name"
                 #nameField="ngModel"
                 required
                 minlength="3"
@@ -384,7 +384,7 @@
               <select 
                 id="productCategory"
                 name="category"
-                [(ngModel)]="formProduct.category"
+                [(ngModel)]="formProduct().category"
                 #categoryField="ngModel"
                 required>
                 <option value="">Seleccionar categoría</option>
