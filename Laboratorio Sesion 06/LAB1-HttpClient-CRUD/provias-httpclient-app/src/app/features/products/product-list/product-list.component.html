@@ -1,1 +1,360 @@
-<p>product-list works!</p>
+<!-- 
+  COMPONENTE LISTA DE PRODUCTOS - LAB 1
+  Interface completa para gestión CRUD de productos con todas las funcionalidades
+-->
+
+<div class="product-list-container">
+  <!-- Header Principal -->
+  <header class="list-header">
+    <h1>🛒 Gestión de Productos - PROVIAS</h1>
+    <p class="subtitle">HttpClient CRUD con Angular v18 - Laboratorio Sesión 6</p>
+  </header>
+
+  <!-- Error Display Global -->
+  @if (error()) {
+    <div class="error-banner">
+      <span class="error-icon">⚠️</span>
+      <span class="error-message">{{ error() }}</span>
+      <button (click)="clearError()" class="btn-close" title="Cerrar error">✕</button>
+    </div>
+  }
+
+  <!-- Estadísticas de Productos -->
+  @if (statistics(); as stats) {
+    <section class="statistics-grid">
+      <div class="stat-card primary">
+        <div class="stat-icon">📦</div>
+        <h3>{{ stats.total }}</h3>
+        <p>Productos Total</p>
+      </div>
+      <div class="stat-card success">
+        <div class="stat-icon">💰</div>
+        <h3>S/{{ stats.totalValue | number:'1.2-2' }}</h3>
+        <p>Valor Inventario</p>
+      </div>
+      <div class="stat-card info">
+        <div class="stat-icon">📂</div>
+        <h3>{{ stats.categories }}</h3>
+        <p>Categorías</p>
+      </div>
+      <div class="stat-card warning">
+        <div class="stat-icon">⚠️</div>
+        <h3>{{ stats.lowStock }}</h3>
+        <p>Stock Bajo</p>
+      </div>
+      <div class="stat-card danger">
+        <div class="stat-icon">🚫</div>
+        <h3>{{ stats.outOfStock }}</h3>
+        <p>Sin Stock</p>
+      </div>
+    </section>
+  }
+
+  <!-- Controles de Filtrado y Búsqueda -->
+  <section class="controls-section">
+    <div class="search-controls">
+      <!-- Búsqueda de texto -->
+      <div class="search-box">
+        <input 
+          type="text" 
+          [(ngModel)]="searchTerm"
+          (input)="onSearchInput()"
+          placeholder="🔍 Buscar productos por nombre o descripción..."
+          class="search-input">
+      </div>
+
+      <!-- Filtro por categoría -->
+      <select 
+        [(ngModel)]="selectedCategory"
+        (change)="onCategoryChange()"
+        class="filter-select">
+        <option value="">📂 Todas las categorías</option>
+        @for (category of availableCategories(); track category) {
+          <option [value]="category">{{ category | titlecase }}</option>
+        }
+      </select>
+
+      <!-- Ordenamiento -->
+      <select 
+        [(ngModel)]="sortBy"
+        (change)="onSortChange()"
+        class="sort-select">
+        <option value="name">📝 Nombre</option>
+        <option value="price">💰 Precio</option>
+        <option value="stock">📦 Stock</option>
+        <option value="createdAt">📅 Fecha</option>
+      </select>
+
+      <!-- Dirección de ordenamiento -->
+      <button 
+        (click)="sortOrder.set(sortOrder() === 'asc' ? 'desc' : 'asc'); onSortChange()"
+        class="sort-direction-btn"
+        [title]="'Ordenar ' + (sortOrder() === 'asc' ? 'descendente' : 'ascendente')">
+        {{ sortOrder() === 'asc' ? '⬆️' : '⬇️' }}
+      </button>
+    </div>
+
+    <div class="action-controls">
+      <!-- Botón limpiar filtros -->
+      <button 
+        (click)="clearFilters()" 
+        class="btn btn-secondary"
+        title="Limpiar todos los filtros">
+        🗑️ Limpiar
+      </button>
+
+      <!-- Botón refresh -->
+      <button 
+        (click)="refreshProducts()" 
+        class="btn btn-info"
+        [disabled]="loading()"
+        title="Recargar productos">
+        🔄 Actualizar
+      </button>
+
+      <!-- Botón nuevo producto -->
+      <button 
+        (click)="showCreateProductForm()" 
+        class="btn btn-primary"
+        title="Crear nuevo producto">
+        ➕ Nuevo Producto
+      </button>
+    </div>
+  </section>
+
+  <!-- Estado de Carga Global -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando productos...</p>
+    </div>
+  }
+
+  <!-- Grid de Productos -->
+  <div class="products-grid">
+    @for (product of filteredProducts(); track product.id) {
+      <div class="product-card" 
+           [class.selected]="selectedProduct()?.id === product.id"
+           [class.low-stock]="product.stock < 10"
+           [class.out-of-stock]="product.stock === 0">
+        
+        <!-- Header del producto -->
+        <div class="product-header">
+          <span class="product-id">#{{ product.id }}</span>
+          <span class="product-category">{{ product.category | titlecase }}</span>
+          <span class="stock-badge" [ngClass]="getStockClass(product.stock)">
+            {{ getStockMessage(product.stock) }}
+          </span>
+        </div>
+        
+        <!-- Imagen del producto -->
+        <div class="product-image">
+          <img [src]="product.imageUrl || 'https://via.placeholder.com/300x200/CCCCCC/FFFFFF?text=Sin+Imagen'" 
+               [alt]="product.name"
+               loading="lazy">
+        </div>
+        
+        <!-- Información del producto -->
+        <div class="product-info">
+          <h3 class="product-name" (click)="selectProduct(product)">{{ product.name }}</h3>
+          <p class="product-description">{{ product.description }}</p>
+          
+          <div class="product-details">
+            <div class="price-info">
+              <span class="price">{{ formatPrice(product.price) }}</span>
+              <span class="stock">Stock: {{ product.stock }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Acciones del producto -->
+        <div class="product-actions">
+          <button 
+            (click)="selectProduct(product)" 
+            class="btn btn-sm btn-outline"
+            [class.active]="selectedProduct()?.id === product.id"
+            title="Ver detalles">
+            👁️ Ver
+          </button>
+          <button 
+            (click)="editProduct(product)" 
+            class="btn btn-sm btn-warning"
+            title="Editar producto">
+            ✏️ Editar
+          </button>
+          <button 
+            (click)="deleteProduct(product)" 
+            class="btn btn-sm btn-danger"
+            title="Eliminar producto">
+            🗑️ Eliminar
+          </button>
+        </div>
+      </div>
+    } @empty {
+      @if (!loading()) {
+        <div class="no-products">
+          <div class="no-products-icon">📦</div>
+          <h3>No se encontraron productos</h3>
+          <p>Intente con otros filtros o agregue nuevos productos</p>
+          <button (click)="showCreateProductForm()" class="btn btn-primary">
+            ➕ Crear Primer Producto
+          </button>
+        </div>
+      }
+    }
+  </div>
+
+  <!-- Producto Seleccionado (Detalles) -->
+  @if (selectedProduct(); as selected) {
+    <section class="selected-product-details">
+      <h3>📋 Detalles del Producto Seleccionado</h3>
+      <div class="details-grid">
+        <div class="detail-item">
+          <strong>ID:</strong> {{ selected.id }}
+        </div>
+        <div class="detail-item">
+          <strong>Nombre:</strong> {{ selected.name }}
+        </div>
+        <div class="detail-item">
+          <strong>Precio:</strong> {{ formatPrice(selected.price) }}
+        </div>
+        <div class="detail-item">
+          <strong>Categoría:</strong> {{ selected.category | titlecase }}
+        </div>
+        <div class="detail-item">
+          <strong>Stock:</strong> {{ selected.stock }} unidades
+        </div>
+        <div class="detail-item">
+          <strong>Descripción:</strong> {{ selected.description }}
+        </div>
+        @if (selected.createdAt) {
+          <div class="detail-item">
+            <strong>Creado:</strong> {{ selected.createdAt | date:'medium' }}
+          </div>
+        }
+        @if (selected.updatedAt) {
+          <div class="detail-item">
+            <strong>Actualizado:</strong> {{ selected.updatedAt | date:'medium' }}
+          </div>
+        }
+      </div>
+      <button (click)="clearSelection()" class="btn btn-secondary">Cerrar Detalles</button>
+    </section>
+  }
+</div>
+
+<!-- Modal de Formulario (Crear/Editar) -->
+@if (showCreateForm()) {
+  <div class="modal-overlay" (click)="cancelForm()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>{{ formTitle() }}</h2>
+        <button (click)="cancelForm()" class="btn-close">✕</button>
+      </div>
+      
+      <form (submit)="onFormSubmit(); $event.preventDefault()" class="product-form">
+        <!-- Nombre del producto -->
+        <div class="form-group">
+          <label for="product-name">Nombre del Producto *</label>
+          <input 
+            id="product-name"
+            type="text" 
+            [(ngModel)]="formProduct().name"
+            name="name"
+            required
+            placeholder="Ej: Laptop Dell XPS 13"
+            class="form-control">
+        </div>
+
+        <!-- Precio -->
+        <div class="form-group">
+          <label for="product-price">Precio (S/) *</label>
+          <input 
+            id="product-price"
+            type="number" 
+            [(ngModel)]="formProduct().price"
+            name="price"
+            step="0.01"
+            min="0"
+            required
+            placeholder="0.00"
+            class="form-control">
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group">
+          <label for="product-description">Descripción</label>
+          <textarea 
+            id="product-description"
+            [(ngModel)]="formProduct().description"
+            name="description"
+            rows="3"
+            placeholder="Descripción detallada del producto..."
+            class="form-control">
+          </textarea>
+        </div>
+
+        <!-- Categoría -->
+        <div class="form-group">
+          <label for="product-category">Categoría *</label>
+          <select 
+            id="product-category"
+            [(ngModel)]="formProduct().category"
+            name="category"
+            required
+            class="form-control">
+            <option value="">Seleccionar categoría...</option>
+            @for (option of categoryOptions; track option.value) {
+              <option [value]="option.value">{{ option.label }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Stock -->
+        <div class="form-group">
+          <label for="product-stock">Stock Inicial *</label>
+          <input 
+            id="product-stock"
+            type="number" 
+            [(ngModel)]="formProduct().stock"
+            name="stock"
+            min="0"
+            required
+            placeholder="0"
+            class="form-control">
+        </div>
+
+        <!-- URL de imagen (opcional) -->
+        <div class="form-group">
+          <label for="product-image">URL de Imagen (opcional)</label>
+          <input 
+            id="product-image"
+            type="url" 
+            [(ngModel)]="formProduct().imageUrl"
+            name="imageUrl"
+            placeholder="https://ejemplo.com/imagen.jpg"
+            class="form-control">
+        </div>
+
+        <!-- Botones del formulario -->
+        <div class="form-actions">
+          <button 
+            type="button" 
+            (click)="cancelForm()" 
+            class="btn btn-secondary">
+            Cancelar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="loading()">
+            @if (loading()) {
+              <span class="spinner-small"></span>
+            }
+            {{ formButtonText() }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

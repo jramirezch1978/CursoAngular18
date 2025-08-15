@@ -92,19 +92,31 @@
       "storeId": 1,
       "productId": 1,
       "stock": 10,
+<<<<<<< HEAD
       "id": "19f8"
+=======
+      "id": "2e93"
+>>>>>>> d178f80cc1910a72e216a029577a4eb93c606422
     },
     {
       "storeId": 1,
       "productId": 2,
       "stock": 5,
+<<<<<<< HEAD
       "id": "f816"
+=======
+      "id": "8e0d"
+>>>>>>> d178f80cc1910a72e216a029577a4eb93c606422
     },
     {
       "storeId": 2,
       "productId": 3,
       "stock": 20,
+<<<<<<< HEAD
       "id": "b390"
+=======
+      "id": "5c97"
+>>>>>>> d178f80cc1910a72e216a029577a4eb93c606422
     }
   ]
 }
