@@ -230,16 +230,14 @@ export class ProductListComponent implements OnInit {
 
   // 🎉 Mostrar notificación de éxito (reemplaza alert)
   private showSuccessNotification(message: string): void {
-    // Por ahora usamos console.log, pero se puede implementar un sistema de notificaciones más elegante
     console.log(`✅ ${message}`);
-    // Temporal: usar alert hasta implementar notificaciones toast
-    alert(message);
+    this.notificationService.success('¡Operación exitosa!', message);
   }
 
   // ❌ Mostrar notificación de error
   private showErrorNotification(message: string): void {
     console.error(`❌ ${message}`);
-    alert(message);
+    this.notificationService.error('Error', message);
   }
   
   onFormSubmit(): void {
