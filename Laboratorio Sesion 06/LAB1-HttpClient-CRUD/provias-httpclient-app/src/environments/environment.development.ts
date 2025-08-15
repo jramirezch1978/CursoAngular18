@@ -28,7 +28,7 @@ export const environment = {
    * - Permite trabajar sin backend real
    * - Fácil cambio entre APIs locales y remotas
    */
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: 'http://localhost:3000/',
   
   /**
    * Información de la aplicación
