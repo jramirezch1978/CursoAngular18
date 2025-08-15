@@ -41,6 +41,10 @@ export class ProductListComponent implements OnInit {
   editingProduct = signal<Product | null>(null);
   formProduct = signal<CreateProductDto>(createEmptyProduct());
   
+  // Signals para modal de confirmación de eliminación
+  showDeleteModal = signal(false);
+  productToDelete = signal<Product | null>(null);
+  
   // Computed signals
   availableCategories = computed(() => {
     const products = this.products();
@@ -357,10 +361,27 @@ export class ProductListComponent implements OnInit {
     return false; // Deshabilitado por defecto para evitar doble loading
   }
 
-  // ❌ Confirmar eliminación de producto
-  confirmDelete(product: Product): void {
-    if (confirm(`¿Estás seguro de que quieres eliminar "${product.name}"?`)) {
+  // 🗑️ Mostrar modal de confirmación de eliminación
+  showDeleteConfirmation(product: Product): void {
+    console.log('🗑️ Mostrando confirmación de eliminación para:', product.name);
+    this.productToDelete.set(product);
+    this.showDeleteModal.set(true);
+  }
+
+  // ❌ Cerrar modal de confirmación
+  closeDeleteModal(): void {
+    console.log('✕ Cerrando modal de confirmación');
+    this.showDeleteModal.set(false);
+    this.productToDelete.set(null);
+  }
+
+  // ⚠️ Confirmar eliminación definitiva
+  confirmDeleteProduct(): void {
+    const product = this.productToDelete();
+    if (product) {
+      console.log('💀 Eliminando producto:', product.name);
       this.deleteProduct(product);
+      this.closeDeleteModal();
     }
   }
   

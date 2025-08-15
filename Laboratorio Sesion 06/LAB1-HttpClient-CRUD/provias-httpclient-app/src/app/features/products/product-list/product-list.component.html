@@ -16,7 +16,7 @@
       <div class="header-actions">
         <button 
           class="btn btn-primary btn-lg"
-          (click)="showCreateForm()"
+          (click)="showCreateProductForm()"
           [disabled]="loading()">
           <span>✨</span>
           Nuevo Producto
@@ -248,7 +248,7 @@
           Comienza agregando tu primer producto al inventario. 
           Es fácil y rápido con nuestro formulario intuitivo.
         </p>
-        <button class="btn btn-primary btn-lg" (click)="showCreateForm()">
+        <button class="btn btn-primary btn-lg" (click)="showCreateProductForm()">
           <span>✨</span>
           Crear Primer Producto
         </button>
@@ -323,7 +323,7 @@
                 </button>
                 <button 
                   class="btn btn-error btn-sm"
-                  (click)="confirmDelete(product)"
+                  (click)="showDeleteConfirmation(product)"
                   title="Eliminar producto">
                   <span>🗑️</span>
                   Eliminar
@@ -506,6 +506,58 @@
   }
 
   <!-- ========================================
+       MODAL DE CONFIRMACIÓN DE ELIMINACIÓN
+       ======================================== -->
+  @if (showDeleteModal()) {
+    <div class="modal-overlay" (click)="closeDeleteModal()">
+      <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>🗑️ Confirmar Eliminación</h2>
+          <button class="close-button" (click)="closeDeleteModal()">✕</button>
+        </div>
+
+        <div class="modal-body">
+          <div class="delete-warning">
+            <div class="warning-icon">⚠️</div>
+            <div class="warning-content">
+              <h3>¿Estás seguro de que quieres eliminar este producto?</h3>
+              @if (productToDelete()) {
+                <p><strong>{{ productToDelete()!.name }}</strong></p>
+                <p class="warning-text">
+                  Esta acción no se puede deshacer. El producto será eliminado permanentemente
+                  del inventario junto con toda su información.
+                </p>
+              }
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button 
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeDeleteModal()">
+            <span>✕</span>
+            Cancelar
+          </button>
+          <button 
+            type="button"
+            class="btn btn-error"
+            (click)="confirmDeleteProduct()"
+            [disabled]="loading()">
+            @if (loading()) {
+              <span class="loading-spinner"></span>
+            } @else {
+              <span>🗑️</span>
+            }
+            Eliminar Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- ========================================
        LOADING GLOBAL
        ======================================== -->
   @if (loading() && showGlobalLoading()) {
@@ -535,7 +587,55 @@
   text-align: right;
 }
 
-.Math {
-  display: none; /* Ocultar referencia de Math ya que no es accesible en templates */
+/* Modal de confirmación de eliminación */
+.delete-modal {
+  max-width: 500px;
+}
+
+.delete-warning {
+  display: flex;
+  gap: var(--spacing-4);
+  padding: var(--spacing-4);
+  background-color: var(--error-light);
+  border-radius: var(--border-radius-base);
+  border: 1px solid #fecaca;
+}
+
+.warning-icon {
+  font-size: 48px;
+  flex-shrink: 0;
+}
+
+.warning-content h3 {
+  color: var(--error-color);
+  font-size: var(--font-size-lg);
+  margin-bottom: var(--spacing-3);
+  font-weight: 600;
+}
+
+.warning-content p {
+  margin: var(--spacing-2) 0;
+  color: #7f1d1d;
+}
+
+.warning-content strong {
+  color: var(--error-color);
+  font-weight: 600;
+}
+
+.warning-text {
+  font-size: var(--font-size-sm);
+  line-height: 1.5;
+  color: #991b1b !important;
+}
+
+.delete-modal .modal-footer {
+  background-color: #fef2f2;
+  border-top-color: #fecaca;
+}
+
+.delete-modal .btn-error:not(:disabled):hover {
+  background-color: #b91c1c;
+  transform: translateY(-1px);
 }
 </style>
