@@ -1,0 +1,59 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Laptop Dell XPS 13",
+      "price": 1299.99,
+      "description": "Ultrabook premium con procesador Intel Core i7",
+      "category": "laptops",
+      "stock": 15,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-01T10:00:00Z",
+      "updatedAt": "2025-08-14T15:30:00Z"
+    },
+    {
+      "id": 2,
+      "name": "Monitor LG 27\" 4K",
+      "price": 449.99,
+      "description": "Monitor IPS 4K con HDR10",
+      "category": "monitors",
+      "stock": 23,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-02T11:00:00Z",
+      "updatedAt": "2025-08-14T16:00:00Z"
+    },
+    {
+      "id": 3,
+      "name": "Teclado Mecánico RGB",
+      "price": 129.99,
+      "description": "Teclado gaming con switches Cherry MX",
+      "category": "accessories",
+      "stock": 45,
+      "imageUrl": "https://via.placeholder.com/300x200",
+      "createdAt": "2025-08-03T09:00:00Z",
+      "updatedAt": "2025-08-14T14:00:00Z"
+    }
+  ],
+  "users": [
+    {
+      "id": 1,
+      "email": "admin@provias.gob.pe",
+      "password": "admin123",
+      "role": "admin",
+      "name": "Administrador PROVIAS"
+    },
+    {
+      "id": 2,
+      "email": "user@provias.gob.pe",
+      "password": "user123",
+      "role": "user",
+      "name": "Usuario PROVIAS"
+    }
+  ],
+  "orders": [],
+  "categories": [
+    { "id": 1, "name": "laptops", "description": "Laptops y notebooks" },
+    { "id": 2, "name": "monitors", "description": "Monitores y pantallas" },
+    { "id": 3, "name": "accessories", "description": "Accesorios de computadora" }
+  ]
+}
