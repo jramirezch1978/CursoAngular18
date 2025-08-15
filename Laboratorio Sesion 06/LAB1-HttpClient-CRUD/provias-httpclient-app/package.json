@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:provias-httpclient-app": "node dist/provias-httpclient-app/server/server.mjs",
-    "server": "json-server --watch db.json --port 3000 --delay 500",
+    "server": "json-server --watch db.json --port 3000",
     "dev": "concurrently \"npm run server\" \"ng serve\"",
     "test:http": "ng test --include='**/services/**/*.spec.ts'",
     "lint": "ng lint"
