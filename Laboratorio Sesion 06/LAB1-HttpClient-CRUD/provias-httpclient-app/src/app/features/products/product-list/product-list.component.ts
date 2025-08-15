@@ -32,6 +32,9 @@ export class ProductListComponent implements OnInit {
   // Signals locales
   searchTerm = signal('');
   selectedCategory = signal<string>('');
+  minPrice: number | null = null;
+  maxPrice: number | null = null;
+  stockFilter = '';
   sortBy = signal<string>('name');
   sortOrder = signal<'asc' | 'desc'>('asc');
   showCreateForm = signal(false);
@@ -116,6 +119,9 @@ export class ProductListComponent implements OnInit {
     console.log('🗑️ Limpiando filtros...');
     this.searchTerm.set('');
     this.selectedCategory.set('');
+    this.minPrice = null;
+    this.maxPrice = null;
+    this.stockFilter = '';
     this.sortBy.set('name');
     this.sortOrder.set('asc');
   }
