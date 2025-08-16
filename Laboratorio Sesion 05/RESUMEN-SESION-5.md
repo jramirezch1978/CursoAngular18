@@ -1,8 +1,15 @@
 # RESUMEN SESIÓN 5 - LABORATORIOS COMPLETADOS
 
-## ✅ TAREA COMPLETADA
+## ✅ TAREAS COMPLETADAS
 
+### 1. Eliminación de Template Angular
 Se ha eliminado exitosamente el template predeterminado de Angular en todos los proyectos donde aplicaba.
+
+### 2. Corrección del Sistema de Cache (LAB 3)
+Se corrigió el problema donde no se guardaban los datos en cache. El método `onFormChange()` ahora se ejecuta correctamente.
+
+### 3. Visualización de Datos en Cache (LAB 3) - NUEVO
+Se agregó una sección visual que muestra en tiempo real los datos guardados en cache (memoria o localStorage).
 
 ### Estado Final:
 
@@ -17,6 +24,9 @@ Se ha eliminado exitosamente el template predeterminado de Angular en todos los 
 
 3. **LAB 3 - Providers y Jerarquía**
    - ✅ Ya usaba template inline (no tenía template Angular)
+   - ✅ **CORREGIDO**: Sistema de cache ahora funciona correctamente
+   - ✅ Se agregó `(ngModelChange)` a todos los campos del formulario
+   - ✅ **NUEVO**: Sección visual que muestra los datos del cache en tiempo real
    - ✅ Compilando sin errores
 
 4. **LAB 4 - Patrones Empresariales**

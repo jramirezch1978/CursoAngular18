@@ -1,5 +1,5 @@
 .task-form-container {
-  max-width: 600px;
+  max-width: 800px;
   margin: 0 auto;
 
   .validation-errors {
@@ -149,6 +149,110 @@
         li {
           color: #6c757d;
           padding: 0.25rem 0;
+        }
+      }
+    }
+  }
+  
+  .cache-viewer {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
+    
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    
+    .cache-content {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 1.5rem;
+      
+      h4 {
+        color: #495057;
+        margin: 0 0 1rem 0;
+        font-size: 1rem;
+      }
+      
+      .cached-data {
+        background: white;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        
+        pre {
+          margin: 0;
+          padding: 0.5rem;
+          background: #f4f4f4;
+          border-radius: 4px;
+          overflow-x: auto;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9rem;
+          color: #2d3748;
+          white-space: pre-wrap;
+          word-wrap: break-word;
+        }
+        
+        small {
+          display: block;
+          margin-top: 0.5rem;
+          color: #6c757d;
+          font-style: italic;
+        }
+      }
+      
+      .no-cache {
+        background: #fff3cd;
+        border: 1px solid #ffeeba;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        
+        p {
+          margin: 0;
+          color: #856404;
+          text-align: center;
+        }
+      }
+      
+      .cache-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+        
+        .btn {
+          padding: 0.5rem 1rem;
+          font-size: 0.9rem;
+          font-weight: 500;
+          border: none;
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          &.btn-secondary {
+            background: #6c757d;
+            color: white;
+            
+            &:hover {
+              background: #5a6268;
+              transform: translateY(-1px);
+            }
+          }
+          
+          &.btn-danger {
+            background: #dc3545;
+            color: white;
+            
+            &:hover {
+              background: #c82333;
+              transform: translateY(-1px);
+            }
+          }
         }
       }
     }

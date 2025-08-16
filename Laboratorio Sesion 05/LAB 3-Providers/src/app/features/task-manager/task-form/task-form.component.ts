@@ -1,5 +1,5 @@
 import { Component, OnInit, inject, signal } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { 
   LOGGER_TOKEN, 
@@ -218,6 +218,33 @@ interface Task {
           </ul>
         </div>
       </section>
+      
+      <!-- Cache Viewer -->
+      <section class="cache-viewer">
+        <h3>💾 Datos en Cache ({{ config.cache.strategy }})</h3>
+        <div class="cache-content">
+          <h4>📝 Borrador del Formulario (draft-task):</h4>
+          @if (cachedData()) {
+            <div class="cached-data">
+              <pre>{{ cachedData() | json }}</pre>
+              <small>Última actualización: {{ lastCacheUpdate() | date:'HH:mm:ss' }}</small>
+            </div>
+          } @else {
+            <div class="no-cache">
+              <p>No hay datos en cache todavía. Empieza a escribir en el formulario.</p>
+            </div>
+          }
+          
+          <div class="cache-actions">
+            <button type="button" (click)="refreshCacheView()" class="btn btn-secondary">
+              🔄 Actualizar Vista
+            </button>
+            <button type="button" (click)="clearCacheData()" class="btn btn-danger">
+              🗑️ Limpiar Cache
+            </button>
+          </div>
+        </div>
+      </section>
     </div>
   `,
   styleUrl: './task-form.component.scss'
@@ -231,6 +258,8 @@ export class TaskFormComponent implements OnInit {
   
   validationErrors = signal<string[]>([]);
   successMessage = signal<string>('');
+  cachedData = signal<Task | null>(null);
+  lastCacheUpdate = signal<Date | null>(null);
   
   task: Task = {
     title: '',
@@ -252,6 +281,8 @@ export class TaskFormComponent implements OnInit {
     const cachedTask = this.cache.get<Task>('draft-task');
     if (cachedTask) {
       this.task = cachedTask;
+      this.cachedData.set(cachedTask);
+      this.lastCacheUpdate.set(new Date());
       this.logger.info('Loaded draft task from cache');
     }
   }
@@ -307,6 +338,31 @@ export class TaskFormComponent implements OnInit {
   // Guardar borrador en caché cuando cambia el formulario
   onFormChange(): void {
     this.cache.set('draft-task', this.task, 600000); // 10 minutos
+    this.cachedData.set(this.task);
+    this.lastCacheUpdate.set(new Date());
     this.logger.debug('Draft saved to cache');
+  }
+  
+  // Actualizar vista del cache
+  refreshCacheView(): void {
+    const cached = this.cache.get<Task>('draft-task');
+    this.cachedData.set(cached);
+    if (cached) {
+      this.lastCacheUpdate.set(new Date());
+    }
+    this.logger.info('Cache view refreshed');
+  }
+  
+  // Limpiar datos del cache
+  clearCacheData(): void {
+    this.cache.remove('draft-task');
+    this.cachedData.set(null);
+    this.lastCacheUpdate.set(null);
+    this.logger.info('Cache cleared');
+    this.successMessage.set('✅ Cache limpiado exitosamente');
+    
+    setTimeout(() => {
+      this.successMessage.set('');
+    }, 2000);
   }
 }
