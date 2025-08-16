@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "lab2-standalone": {
+    "lab3-providers": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -18,7 +18,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/lab2-standalone",
+            "outputPath": "dist/lab3-providers",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -65,10 +65,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "lab2-standalone:build:production"
+              "buildTarget": "lab3-providers:build:production"
             },
             "development": {
-              "buildTarget": "lab2-standalone:build:development"
+              "buildTarget": "lab3-providers:build:development"
             }
           },
           "defaultConfiguration": "development"

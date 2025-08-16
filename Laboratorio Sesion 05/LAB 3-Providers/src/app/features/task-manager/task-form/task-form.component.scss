@@ -1,0 +1,166 @@
+.task-form-container {
+  max-width: 600px;
+  margin: 0 auto;
+
+  .validation-errors {
+    background: #f8d7da;
+    border: 1px solid #f5c6cb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+
+    h4 {
+      color: #721c24;
+      margin: 0 0 0.5rem 0;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 1.5rem;
+      color: #721c24;
+    }
+  }
+
+  .success-message {
+    background: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    color: #155724;
+    font-weight: 500;
+  }
+
+  form {
+    .form-group {
+      margin-bottom: 1.5rem;
+
+      label {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 0.5rem;
+      }
+
+      .form-control {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid #dee2e6;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+
+        &:focus {
+          outline: none;
+          border-color: #667eea;
+          box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        &[type="date"] {
+          cursor: pointer;
+        }
+      }
+
+      textarea.form-control {
+        resize: vertical;
+        min-height: 80px;
+      }
+
+      select.form-control {
+        cursor: pointer;
+      }
+    }
+
+    .btn {
+      width: 100%;
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+
+      &.btn-primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  .provider-info {
+    margin-top: 2rem;
+    padding-top: 2rem;
+    border-top: 2px solid #e9ecef;
+
+    h3 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+
+      .info-item {
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        strong {
+          color: #495057;
+          display: block;
+          margin-bottom: 0.25rem;
+        }
+
+        span {
+          color: #667eea;
+          font-weight: 500;
+        }
+      }
+    }
+
+    .validators-list {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: #495057;
+        font-size: 0.9rem;
+      }
+
+      ul {
+        margin: 0;
+        padding-left: 1.5rem;
+
+        li {
+          color: #6c757d;
+          padding: 0.25rem 0;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .task-form-container {
+    .provider-info {
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
