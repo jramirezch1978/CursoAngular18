@@ -39,14 +39,16 @@
   - Multi-providers para validadores
   - Factory providers con lógica condicional
 
-### 📋 LAB 4 - Patrones Empresariales
-- **Estado**: SOLO INSTRUCCIONES
-- **Implementación**: Pendiente
-- **Contenido planeado**:
-  - Repository Pattern
-  - Unit of Work Pattern
-  - Global Store con Signals
-  - Arquitectura empresarial
+### ✅ LAB 4 - Patrones Empresariales
+- **Estado**: COMPLETADO Y FUNCIONANDO
+- **Compilación**: ✅ Sin errores
+- **Características**:
+  - Repository Pattern con abstracción de datos
+  - Unit of Work con tracking de cambios
+  - Global Store con Signals reactivos
+  - Dashboard completo de gestión de tareas
+  - Transacciones con Commit/Rollback
+  - Filtros y búsqueda reactiva
 
 ## Comandos de Verificación
 
@@ -63,10 +65,15 @@ ng serve
 cd "LAB 3-Providers"
 npm install
 ng serve
+
+cd "LAB 4-Patterns"
+npm install
+ng serve
 ```
 
 ## Notas
-- Los laboratorios 1, 2 y 3 están completamente funcionales
+- **TODOS los laboratorios (1, 2, 3 y 4) están completamente funcionales**
 - El template de Angular fue eliminado del LAB 1
-- LAB 2 y LAB 3 usan templates inline en sus componentes
-- LAB 4 contiene solo las instrucciones, no está implementado
+- LAB 2, LAB 3 y LAB 4 usan templates inline en sus componentes
+- LAB 3 incluye visualización en tiempo real del cache
+- LAB 4 implementa patrones empresariales completos y funcionales
