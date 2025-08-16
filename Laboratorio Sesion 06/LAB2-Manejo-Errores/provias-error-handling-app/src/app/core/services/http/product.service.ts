@@ -52,6 +52,8 @@ import {
   validateCreateProduct,
   validateUpdateProduct
 } from '../../models/product.model';
+import { ErrorHandlerService } from '../error-handler.service';
+import { LoadingService, LoadingConfig } from '../loading.service';
 
 /**
  * Configuración para retry strategies
@@ -96,6 +98,8 @@ export class ProductService {
   // ========================================
   
   private readonly http = inject(HttpClient);
+  private readonly errorHandler = inject(ErrorHandlerService);
+  private readonly loadingService = inject(LoadingService);
   private readonly apiUrl = `${environment.apiUrl}/products`;
   
   // ========================================
@@ -196,6 +200,15 @@ export class ProductService {
    * OBTENER TODOS LOS PRODUCTOS con manejo robusto de errores
    */
   getProducts(filters?: ProductFilters): Observable<Product[]> {
+    const url = this.apiUrl;
+    const loadingConfig: LoadingConfig = {
+      message: filters?.search ? `Buscando "${filters.search}"...` : 'Cargando productos...',
+      operation: 'loading',
+      showProgress: false
+    };
+    
+    // Iniciar loading con servicios integrados
+    this.loadingService.setLoading(url, true, loadingConfig);
     this.setLoadingState('list', true);
     this.clearError();
     
@@ -206,24 +219,30 @@ export class ProductService {
       params = this.buildHttpParams(filters);
     }
     
-    const context: ErrorContext = {
-      operation: 'getProducts',
-      url: this.apiUrl,
-      timestamp: new Date().toISOString()
-    };
-    
     return this.http.get<Product[]>(this.apiUrl, { params }).pipe(
-      // Retry con backoff exponencial
-      this.createRetryStrategy<Product[]>(context),
+      // Usar retry inteligente del ErrorHandlerService
+      this.errorHandler.retryWithBackoff({
+        maxAttempts: 3,
+        initialDelay: 1000,
+        onRetry: (attempt, error) => {
+          this.loadingService.updateMessage(url, `Reintentando... (${attempt}/3)`);
+          console.log(`🔄 [LAB2] Retrying getProducts - Attempt ${attempt}:`, error);
+        }
+      }),
       
       tap((products: Product[]) => {
         this.productsSignal.set(products);
-        console.log(`✅ [LAB2] Cargados ${products.length} productos con manejo de errores`);
+        console.log(`✅ [LAB2] Cargados ${products.length} productos con manejo de errores robusto`);
       }),
       
-      catchError((error: HttpErrorResponse) => this.handleError(context, error)),
+      catchError((error: HttpErrorResponse) => {
+        return this.errorHandler.handleError(error, 'getProducts');
+      }),
       
-      finalize(() => this.setLoadingState('list', false)),
+      finalize(() => {
+        this.loadingService.setLoading(url, false);
+        this.setLoadingState('list', false);
+      }),
       
       shareReplay(1)
     );

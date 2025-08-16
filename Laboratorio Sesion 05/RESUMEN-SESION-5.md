@@ -14,6 +14,9 @@ Se agregó una sección visual que muestra en tiempo real los datos guardados en
 ### 4. Implementación completa del LAB 4 - NUEVO
 Se creó desde cero todo el proyecto con implementación funcional de Repository Pattern, Unit of Work y Global Store.
 
+### 5. Validación de Angular v18 - CONFIRMADO
+Se verificó que TODOS los laboratorios están correctamente implementados en Angular v18, sin uso de características de versiones superiores ni código obsoleto.
+
 ### Estado Final:
 
 1. **LAB 1 - Servicios y Signals**
