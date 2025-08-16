@@ -1,0 +1,285 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="dashboard-header">
+    <h2>Dashboard de Usuarios</h2>
+    <p class="subtitle">Gestión de usuarios con componentes standalone y signals</p>
+  </header>
+
+  <!-- Loading State -->
+  @if (loading()) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando usuarios...</p>
+    </div>
+  }
+
+  <!-- Metrics Section -->
+  @if (!loading() && metrics()) {
+    <section class="metrics-section">
+      <h3>📊 Métricas Generales</h3>
+      <div class="metrics-grid">
+        <div class="metric-card total">
+          <h4>{{ metrics().totalUsers }}</h4>
+          <p>Total Usuarios</p>
+        </div>
+        <div class="metric-card active">
+          <h4>{{ metrics().activeUsers }}</h4>
+          <p>Activos</p>
+        </div>
+        <div class="metric-card inactive">
+          <h4>{{ metrics().inactiveUsers }}</h4>
+          <p>Inactivos</p>
+        </div>
+        <div class="metric-card recent">
+          <h4>{{ metrics().recentlyActive }}</h4>
+          <p>Activos Recientes</p>
+        </div>
+        <div class="metric-card projects">
+          <h4>{{ metrics().averageProjectsPerUser | number:'1.1-1' }}</h4>
+          <p>Promedio Proyectos</p>
+        </div>
+        <div class="metric-card growth">
+          <h4>{{ metrics().growthRate }}%</h4>
+          <p>Crecimiento</p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Trends Section -->
+  @if (trends()) {
+    <section class="trends-section">
+      <h3>📈 Tendencias</h3>
+      <div class="trends-row">
+        <div class="trend-item">
+          <span class="trend-value">{{ trends().lastWeekLogins }}</span>
+          <span class="trend-label">Logins última semana</span>
+        </div>
+        <div class="trend-item">
+          <span class="trend-value">{{ trends().lastMonthLogins }}</span>
+          <span class="trend-label">Logins último mes</span>
+        </div>
+        <div class="trend-item">
+          <span class="trend-value">{{ trends().activePercentage }}%</span>
+          <span class="trend-label">Porcentaje activos</span>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- Department Metrics -->
+  @if (departmentMetrics() && departmentMetrics().size > 0) {
+    <section class="department-section">
+      <h3>🏢 Métricas por Departamento</h3>
+      <div class="department-grid">
+        @for (dept of departments(); track dept) {
+          <div class="department-card" 
+               [style.border-color]="getDepartmentColor(dept)"
+               (click)="selectDepartment(dept)">
+            <h4>{{ dept }}</h4>
+            <div class="dept-metrics">
+              <p>Total: {{ departmentMetrics().get(dept)?.total || 0 }}</p>
+              <p>Activos: {{ departmentMetrics().get(dept)?.active || 0 }}</p>
+              <p>Proyectos: {{ departmentMetrics().get(dept)?.averageProjects || 0 }}</p>
+            </div>
+          </div>
+        }
+      </div>
+    </section>
+  }
+
+  <!-- Controls Section -->
+  <section class="controls-section">
+    <div class="filter-controls">
+      <h3>🔍 Filtros y Controles</h3>
+      
+      <!-- Department Filter -->
+      <div class="control-group">
+        <label>Departamento:</label>
+        <select [value]="selectedDepartment() || ''" 
+                (change)="selectDepartment($any($event.target).value || null)">
+          <option value="">Todos los departamentos</option>
+          @for (dept of departments(); track dept) {
+            <option [value]="dept">{{ dept }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Period Selector -->
+      <div class="control-group">
+        <label>Período:</label>
+        <div class="period-buttons">
+          @for (period of ['day', 'week', 'month', 'year']; track period) {
+            <button 
+              class="period-btn"
+              [class.active]="selectedPeriod() === period"
+              (click)="changePeriod($any(period))">
+              {{ period }}
+            </button>
+          }
+        </div>
+      </div>
+
+      <!-- View Mode -->
+      <div class="control-group">
+        <label>Vista:</label>
+        <div class="view-buttons">
+          <button 
+            [class.active]="viewMode() === 'grid'"
+            (click)="changeViewMode('grid')">
+            ⚏ Grid
+          </button>
+          <button 
+            [class.active]="viewMode() === 'table'"
+            (click)="changeViewMode('table')">
+            ☰ Tabla
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" (click)="loadData()">
+      🔄 Actualizar Datos
+    </button>
+  </section>
+
+  <!-- Users Section -->
+  <section class="users-section">
+    <h3>👥 Usuarios {{ selectedDepartment() ? '- ' + selectedDepartment() : '' }}</h3>
+    
+    @if (viewMode() === 'grid') {
+      <div class="users-grid">
+        @for (user of filteredUsers(); track user.id) {
+          <div class="user-card" 
+               [class.inactive]="!user.active"
+               (click)="selectUser(user.id)">
+            
+            <div class="user-header">
+              <img [src]="user.avatar" [alt]="user.name" class="user-avatar">
+              <span class="role-icon" [style.color]="getRoleColor(user.role)">
+                {{ getRoleIcon(user.role) }}
+              </span>
+            </div>
+            
+            <h4>{{ user.name }}</h4>
+            <p class="user-email">{{ user.email }}</p>
+            
+            <div class="user-info">
+              <span class="department" [style.background]="getDepartmentColor(user.department)">
+                {{ user.department }}
+              </span>
+              <span class="role" [style.color]="getRoleColor(user.role)">
+                {{ user.role }}
+              </span>
+            </div>
+            
+            <div class="user-meta">
+              <p>Proyectos: {{ user.projects.length }}</p>
+              <p>Último login: {{ user.lastLogin | date:'short' }}</p>
+            </div>
+            
+            <div class="user-actions">
+              <button 
+                class="btn-small"
+                [class.btn-success]="!user.active"
+                [class.btn-warning]="user.active"
+                (click)="toggleUserStatus(user.id); $event.stopPropagation()">
+                {{ user.active ? 'Desactivar' : 'Activar' }}
+              </button>
+              <button 
+                class="btn-small btn-danger"
+                (click)="deleteUser(user.id); $event.stopPropagation()">
+                🗑️
+              </button>
+            </div>
+          </div>
+        } @empty {
+          <div class="no-users">
+            <p>No se encontraron usuarios</p>
+            @if (selectedDepartment()) {
+              <button class="btn btn-primary" (click)="selectDepartment(null)">
+                Ver todos los usuarios
+              </button>
+            }
+          </div>
+        }
+      </div>
+    }
+    
+    @if (viewMode() === 'table') {
+      <div class="users-table-container">
+        <table class="users-table">
+          <thead>
+            <tr>
+              <th>Avatar</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Rol</th>
+              <th>Departamento</th>
+              <th>Proyectos</th>
+              <th>Estado</th>
+              <th>Último Login</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of filteredUsers(); track user.id) {
+              <tr [class.inactive]="!user.active" (click)="selectUser(user.id)">
+                <td>
+                  <img [src]="user.avatar" [alt]="user.name" class="table-avatar">
+                </td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.email }}</td>
+                <td>
+                  <span [style.color]="getRoleColor(user.role)">
+                    {{ getRoleIcon(user.role) }} {{ user.role }}
+                  </span>
+                </td>
+                <td>
+                  <span class="department-badge" [style.background]="getDepartmentColor(user.department)">
+                    {{ user.department }}
+                  </span>
+                </td>
+                <td>{{ user.projects.length }}</td>
+                <td>
+                  <span class="status-badge" [class.active]="user.active" [class.inactive]="!user.active">
+                    {{ user.active ? 'Activo' : 'Inactivo' }}
+                  </span>
+                </td>
+                <td>{{ user.lastLogin | date:'short' }}</td>
+                <td>
+                  <button 
+                    class="btn-small"
+                    [class.btn-success]="!user.active"
+                    [class.btn-warning]="user.active"
+                    (click)="toggleUserStatus(user.id); $event.stopPropagation()">
+                    {{ user.active ? 'Desactivar' : 'Activar' }}
+                  </button>
+                  <button 
+                    class="btn-small btn-danger"
+                    (click)="deleteUser(user.id); $event.stopPropagation()">
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </section>
+
+  <!-- Implementation Summary -->
+  <section class="implementation-summary">
+    <h3>✅ Características Implementadas</h3>
+    <ul>
+      <li>✨ Componente Standalone con imports explícitos</li>
+      <li>💉 Inyección con inject() en lugar de constructor</li>
+      <li>📊 Computed signals para métricas automáticas</li>
+      <li>🔄 Effects para notificaciones reactivas</li>
+      <li>🎯 Filtrado por departamento con signals</li>
+      <li>📱 Vista Grid/Tabla responsiva</li>
+      <li>🚀 Migración exitosa de NgModule a Standalone</li>
+    </ul>
+  </section>
+</div>
