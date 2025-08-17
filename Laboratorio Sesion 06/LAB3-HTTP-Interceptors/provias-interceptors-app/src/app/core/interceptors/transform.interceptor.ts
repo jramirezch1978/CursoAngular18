@@ -25,6 +25,7 @@
 import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 /**
  * Interface para respuesta estandarizada del backend
@@ -192,7 +193,7 @@ function transformResponse<T>(response: HttpResponse<T>): HttpResponse<T> {
 function normalizeResponseStructure<T>(body: T): T {
   // Si el body tiene estructura de BackendResponse, extraer los datos
   if (body && typeof body === 'object' && 'data' in body) {
-    const backendResponse = body as BackendResponse<any>;
+    const backendResponse = body as unknown as BackendResponse<any>;
     
     // Si la respuesta fue exitosa y tiene datos, retornar solo los datos
     if (backendResponse.success && backendResponse.data !== undefined) {
@@ -218,24 +219,24 @@ function transformResponseData<T>(body: T): T {
   }
   
   const config = DEFAULT_CONFIG;
-  let transformed = body;
+  let transformed: any = body;
   
   // Transformar fechas string a Date objects
   if (config.transformDates) {
-    transformed = transformDatesInObject(transformed, 'toDate') as T;
+    transformed = transformDatesInObject(transformed, 'toDate');
   }
   
   // Transformar strings numéricos a números
   if (config.transformNumbers) {
-    transformed = transformNumbersInObject(transformed) as T;
+    transformed = transformNumbersInObject(transformed);
   }
   
   // Limpiar strings
   if (config.trimStrings) {
-    transformed = trimStringsInObject(transformed) as T;
+    transformed = trimStringsInObject(transformed);
   }
   
-  return transformed;
+  return transformed as T;
 }
 
 // ========================================
@@ -453,5 +454,4 @@ function logTransformation(type: 'request' | 'response', url: string, changes: s
   }
 }
 
-// Declaración de environment
-declare const environment: any;
+

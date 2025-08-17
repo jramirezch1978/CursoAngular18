@@ -26,6 +26,7 @@ import { HttpInterceptorFn, HttpRequest, HttpHandlerFn, HttpEvent, HttpResponse,
 import { inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { tap, finalize, catchError } from 'rxjs/operators';
+import { environment } from '../../../environments/environment';
 
 /**
  * Interface para información de request
@@ -447,5 +448,4 @@ function sendMetrics(metrics: PerformanceMetrics): void {
   // }).catch(error => console.warn('Failed to send metrics:', error));
 }
 
-// Declaración de environment
-declare const environment: any;
+

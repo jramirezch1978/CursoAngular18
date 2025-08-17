@@ -28,6 +28,7 @@ import { Observable, throwError } from 'rxjs';
 import { catchError, switchMap, tap } from 'rxjs/operators';
 import { AuthService } from '../services/auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 
 /**
  * Interceptor funcional para autenticación automática
@@ -253,6 +254,3 @@ function debugLog(message: string, data?: any): void {
     console.log(`🔍 [AuthInterceptor Debug] ${message}`, data || '');
   }
 }
-
-// Declaración de environment (debería importarse correctamente)
-declare const environment: any;

@@ -7,7 +7,7 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "server": "json-server db.json --port 3000",
+    "server": "json-server --config json-server.json db.json",
     "dev": "concurrently \"npm run server\" \"ng serve\"",
     "test:http": "ng test --include='**/services/**/*.spec.ts'"
   },

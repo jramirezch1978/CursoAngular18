@@ -93,6 +93,9 @@ export class ProductListComponent implements OnInit {
   
   ngOnInit(): void {
     console.log('🚀 [LAB2] ProductListComponent inicializado con manejo de errores');
+    console.log('🔍 [DEBUG] Estado inicial - productos:', this.products());
+    console.log('🔍 [DEBUG] Estado inicial - loading:', this.loading());
+    console.log('🔍 [DEBUG] Estado inicial - error:', this.error());
     this.loadProducts();
   }
   
@@ -112,15 +115,19 @@ export class ProductListComponent implements OnInit {
       filters.sortOrder = 'asc';
     }
     
+    console.log('🔍 [DEBUG] Llamando getProducts con filtros:', filters);
     this.productService.getProducts(filters).subscribe({
-      next: () => {
+      next: (products) => {
         console.log('✅ [LAB2] Productos cargados con manejo de errores');
+        console.log('🔍 [DEBUG] Productos recibidos:', products);
+        console.log('🔍 [DEBUG] Estado del signal después de cargar:', this.products());
         if (this.error()) {
           this.productService.clearError();
         }
       },
       error: (err) => {
         console.error('❌ [LAB2] Error al cargar productos:', err);
+        console.log('🔍 [DEBUG] Error completo:', err);
         this.notificationService.error(
           'Error al cargar productos',
           'No se pudieron cargar los productos. Por favor, inténtelo nuevamente.'

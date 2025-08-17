@@ -22,11 +22,12 @@
  *    - Logout automático en caso de errores de auth
  */
 
-import { Injectable, signal, computed, inject } from '@angular/core';
+import { Injectable, signal, computed, inject, effect } from '@angular/core';
 import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Observable, of, throwError, BehaviorSubject } from 'rxjs';
 import { tap, catchError, delay, map } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { 
   User, 
   LoginRequest, 
@@ -152,8 +153,9 @@ export class AuthService {
   constructor() {
     this.initializeAuth();
     
-    // Observar cambios en isAuthenticated y emitir en el subject
-    this.isAuthenticated.subscribe(isAuth => {
+    // Observar cambios en isAuthenticated y emitir en el subject usando effect
+    effect(() => {
+      const isAuth = this.isAuthenticated();
       this.authChange$.next(isAuth);
     });
     
@@ -508,6 +510,3 @@ export class AuthService {
     return this.authChange$.asObservable();
   }
 }
-
-// Importar environment (esto debería estar al inicio del archivo)
-declare const environment: any;
