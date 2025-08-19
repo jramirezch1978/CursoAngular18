@@ -1,477 +1,418 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, signal, computed, effect, untracked } from '@angular/core';
+import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterOutlet } from '@angular/router';
-import { Subject, Subscription, BehaviorSubject, ReplaySubject, AsyncSubject } from 'rxjs';
-import { takeUntil, map, filter, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import { HttpClient } from '@angular/common/http';
 
-interface User {
+interface Todo {
   id: number;
-  name: string;
-  email: string;
-  role: string;
-  isActive: boolean;
+  text: string;
+  completed: boolean;
+  createdAt: Date;
+}
+
+interface HistoryEntry {
+  id: number;
+  value: number;
+  timestamp: string;
 }
 
 @Component({
   selector: 'app-root',
-  imports: [CommonModule, RouterOutlet, FormsModule],
+  imports: [CommonModule, RouterOutlet, FormsModule, DatePipe],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit, OnDestroy {
-  title = 'PROVIAS LAB 2 - RxJS y Observables';
+export class AppComponent {
+  title = 'PROVIAS LAB 3 - Angular Signals';
   
-  // Servicios inyectados
-  private http = inject(HttpClient);
+  // ====================================
+  // 📱 NAVEGACIÓN
+  // ====================================
   
-  // 🧹 Cleanup
-  private destroy$ = new Subject<void>();
-  private subscriptions: Subscription[] = [];
+  activeTab = signal<string>('intro');
   
-  // 🎭 Subjects para demostraciones
-  private userSubject = new BehaviorSubject<User | null>(null);
-  private messagesSubject = new ReplaySubject<string>(3); // Últimos 3 mensajes
-  private dataSubject = new Subject<any>();
-  private searchSubject = new Subject<string>();
+  // ====================================
+  // 🔢 COUNTER DEMO - Signals Básicos
+  // ====================================
   
-  // 📱 Estado de UI
-  activeTab: string = 'intro';
+  // Signals básicos
+  count = signal(0);
+  history = signal<HistoryEntry[]>([]);
   
-  // 👤 Usuario actual
-  currentUser: User | null = null;
+  // Computed values - derivaciones automáticas
+  doubled = computed(() => this.count() * 2);
+  isEven = computed(() => this.count() % 2 === 0);
+  squared = computed(() => this.count() * this.count());
   
-  // 💬 Mensajes
-  messages: string[] = [];
-  newMessage = '';
+  // ====================================
+  // 👤 USER FORM DEMO - Signals Granulares
+  // ====================================
   
-  // 🔍 Búsqueda
-  searchTerm = '';
-  searchStatus = 'Escribe al menos 2 caracteres para buscar...';
-  searchResults: User[] = [];
+  // Signals granulares (recomendado)
+  firstName = signal('Ana');
+  lastName = signal('García');
+  email = signal('ana@provias.gob.pe');
+  role = signal<'user' | 'admin' | 'manager'>('user');
   
-  // 🔄 Resultados de transformaciones
-  transformResults: Array<{operator: string, data: any}> = [];
+  // Computed values derivados
+  fullName = computed(() => `${this.firstName()} ${this.lastName()}`);
+  initials = computed(() => `${this.firstName()[0]}${this.lastName()[0]}`);
+  isEmailValid = computed(() => {
+    const email = this.email();
+    return email.includes('@') && email.includes('.') && email.length > 5;
+  });
+  emailDomain = computed(() => {
+    const email = this.email();
+    return email.includes('@') ? email.split('@')[1] : 'sin dominio';
+  });
+  isProviasUser = computed(() => this.email().includes('@provias.gob.pe'));
+  accessLevel = computed(() => {
+    const role = this.role();
+    switch (role) {
+      case 'admin': return 'Administrador Total';
+      case 'manager': return 'Gerente de Área';
+      default: return 'Usuario Estándar';
+    }
+  });
   
-  // 🔗 Resultados de combinaciones
-  combinationResults: Array<{type: string, data: any}> = [];
+  // ====================================
+  // 🔍 SEARCH DEMO - Effects en Acción
+  // ====================================
   
-  // 📋 Log de errores
-  errorLogs: Array<{time: string, message: string, type: 'info' | 'error'}> = [];
+  searchTerm = signal('');
+  isSearching = signal(false);
+  searchResults = signal<any[]>([]);
+  lastSaved = signal<string | null>(null);
+  isAnimating = signal(false);
+  effectsExecuted = signal(0);
   
-  // 📊 Métricas
-  activeSubscriptions = 0;
-  eventsEmitted = 0;
-  errorsHandled = 0;
+  // ====================================
+  // 📝 TODO APP - Aplicación Completa
+  // ====================================
+  
+  todos = signal<Todo[]>([]);
+  currentFilter = signal<'all' | 'active' | 'completed'>('all');
+  newTodo = '';
+  
+  // Computed todos
+  activeTodos = computed(() => 
+    this.todos().filter(todo => !todo.completed)
+  );
+  
+  completedTodos = computed(() => 
+    this.todos().filter(todo => todo.completed)
+  );
+  
+  filteredTodos = computed(() => {
+    const filter = this.currentFilter();
+    const todos = this.todos();
+    
+    switch (filter) {
+      case 'active': return this.activeTodos();
+      case 'completed': return this.completedTodos();
+      default: return todos;
+    }
+  });
+  
+  completionPercentage = computed(() => {
+    const total = this.todos().length;
+    if (total === 0) return 0;
+    const completed = this.completedTodos().length;
+    return Math.round((completed / total) * 100);
+  });
+  
+  // Filtros con contadores dinámicos
+  filters = [
+    { 
+      value: 'all' as const, 
+      label: 'Todos', 
+      count: computed(() => this.todos().length) 
+    },
+    { 
+      value: 'active' as const, 
+      label: 'Activos', 
+      count: computed(() => this.activeTodos().length) 
+    },
+    { 
+      value: 'completed' as const, 
+      label: 'Completados', 
+      count: computed(() => this.completedTodos().length) 
+    }
+  ];
 
-  ngOnInit() {
-    console.log('🌊 LAB 2: RxJS y Observables - Iniciado');
+  constructor() {
+    console.log('🔮 LAB 3: Angular Signals - La Revolución Silenciosa');
     console.log('👨‍🏫 Instructor: Ing. Jhonny Alexander Ramirez Chiroque');
-    this.setupSubscriptions();
-  }
-
-  ngOnDestroy() {
-    console.log('🧹 Limpiando suscripciones...');
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.subscriptions.forEach(sub => sub.unsubscribe());
+    
+    this.setupEffects();
+    this.loadInitialData();
   }
 
   // ====================================
-  // CONFIGURACIÓN DE SUSCRIPCIONES
+  // ⚡ EFFECTS - CONFIGURACIÓN
   // ====================================
 
-  private setupSubscriptions(): void {
-    // 👤 Suscripción a cambios de usuario (BehaviorSubject)
-    const userSub = this.userSubject
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(user => {
-        this.currentUser = user;
-        this.eventsEmitted++;
-        if (user) {
-          this.logEvent(`👤 Usuario actualizado: ${user.name}`);
-        }
-      });
-    this.subscriptions.push(userSub);
+  private setupEffects(): void {
+    // 📚 Effect: Actualizar historial cuando count cambie
+    effect(() => {
+      const currentCount = this.count();
+      const timestamp = new Date().toLocaleTimeString();
+      
+      this.history.update(prev => [
+        { id: Date.now(), value: currentCount, timestamp },
+        ...prev.slice(0, 9) // Mantener solo últimos 10
+      ]);
+      
+      this.effectsExecuted.update(v => v + 1);
+      console.log(`📊 Count cambió a: ${currentCount}`);
+    });
 
-    // 💬 Suscripción a mensajes (ReplaySubject)  
-    const messagesSub = this.messagesSubject
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(message => {
-        this.messages = [...this.messages, message];
-        if (this.messages.length > 3) {
-          this.messages = this.messages.slice(-3); // Mantener solo últimos 3
-        }
-        this.eventsEmitted++;
-        this.logEvent(`💬 Mensaje agregado: ${message.substring(0, 30)}...`);
-      });
-    this.subscriptions.push(messagesSub);
+    // 🔍 Effect: Auto-búsqueda cuando searchTerm cambie
+    effect(() => {
+      const term = this.searchTerm();
+      
+      if (term.length > 2) {
+        // untracked previene dependencia circular
+        untracked(() => {
+          this.isSearching.set(true);
+          this.performSearch(term);
+        });
+      } else {
+        this.searchResults.set([]);
+        this.isSearching.set(false);
+      }
+    });
 
-    // 🔍 Búsqueda reactiva con switchMap
-    const searchSub = this.searchSubject
-      .pipe(
-        debounceTime(300), // Esperar 300ms después de escribir
-        distinctUntilChanged(), // Solo buscar si cambió
-        switchMap(term => {
-          if (term.length < 2) {
-            this.searchStatus = 'Escribe al menos 2 caracteres...';
-            return [];
-          }
-          
-          this.searchStatus = '🔍 Buscando...';
-          
-          // Simular búsqueda en API
-          return this.http.get<User[]>('/api/users').pipe(
-            map(users => users.filter(user => 
-              user.name.toLowerCase().includes(term.toLowerCase()) ||
-              user.email.toLowerCase().includes(term.toLowerCase())
-            )),
-            map(results => {
-              this.searchStatus = `📋 ${results.length} resultados encontrados`;
-              return results;
-            })
-          );
-        }),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (results) => {
-          this.searchResults = results;
-          this.eventsEmitted++;
-          this.logEvent(`🔍 Búsqueda completada: ${results.length} resultados`);
-        },
-        error: (error) => {
-          console.error('Error en búsqueda:', error);
-          this.searchResults = [];
-          this.searchStatus = '❌ Error en búsqueda';
-          this.errorsHandled++;
-          this.logEvent(`❌ Error en búsqueda: ${error.message}`, 'error');
-        }
-      });
-    this.subscriptions.push(searchSub);
+    // 💾 Effect: Persistencia automática de todos
+    effect(() => {
+      const todos = this.todos();
+      localStorage.setItem('provias-todos', JSON.stringify(todos));
+      
+      if (todos.length > 0) {
+        this.lastSaved.set(new Date().toLocaleTimeString());
+        console.log(`💾 ${todos.length} todos guardados automáticamente`);
+      }
+    });
 
-    this.activeSubscriptions = this.subscriptions.length;
+    // 📊 Effect: Logging de estadísticas
+    effect(() => {
+      const stats = {
+        total: this.todos().length,
+        active: this.activeTodos().length,
+        completed: this.completedTodos().length,
+        percentage: this.completionPercentage()
+      };
+      console.log('📊 Todo Stats:', stats);
+    });
+
+    // 🎨 Effect con cleanup para animaciones
+    effect((onCleanup) => {
+      const isAnimating = this.isAnimating();
+      
+      if (isAnimating) {
+        const animationClass = 'signals-animation-active';
+        document.body.classList.add(animationClass);
+        
+        const timeout = setTimeout(() => {
+          this.isAnimating.set(false);
+        }, 3000);
+        
+        // 🧹 Cleanup cuando effect se re-ejecuta
+        onCleanup(() => {
+          document.body.classList.remove(animationClass);
+          clearTimeout(timeout);
+        });
+      }
+    });
   }
 
   // ====================================
-  // NAVEGACIÓN
+  // 🎮 MÉTODOS DE INTERACCIÓN
   // ====================================
 
   setActiveTab(tab: string): void {
-    this.activeTab = tab;
+    this.activeTab.set(tab);
     console.log(`📑 Cambiando a pestaña: ${tab}`);
   }
 
-  // ====================================
-  // SUBJECTS DEMO
-  // ====================================
-
-  setRandomUser(): void {
-    const users: User[] = [
-      { id: 1, name: 'Ana García', email: 'ana@provias.gob.pe', role: 'admin', isActive: true },
-      { id: 2, name: 'Carlos López', email: 'carlos@provias.gob.pe', role: 'user', isActive: true },
-      { id: 3, name: 'María Rodriguez', email: 'maria@provias.gob.pe', role: 'user', isActive: false },
-      { id: 4, name: 'Juan Pérez', email: 'juan@provias.gob.pe', role: 'manager', isActive: true },
-      { id: 5, name: 'Lucia Fernandez', email: 'lucia@provias.gob.pe', role: 'user', isActive: true }
-    ];
-    
-    const randomUser = users[Math.floor(Math.random() * users.length)];
-    this.userSubject.next(randomUser);
-    console.log('👤 Usuario actualizado mediante BehaviorSubject:', randomUser.name);
+  // Counter methods
+  increment(): void {
+    this.count.update(v => v + 1);
   }
 
-  addMessage(): void {
-    if (this.newMessage.trim()) {
-      const timestamp = new Date().toLocaleTimeString();
-      const message = `[${timestamp}] ${this.newMessage}`;
-      this.messagesSubject.next(message);
-      this.newMessage = '';
-      console.log('💬 Mensaje agregado al ReplaySubject');
+  decrement(): void {
+    this.count.update(v => v - 1);
+  }
+
+  reset(): void {
+    this.count.set(0);
+  }
+
+  // User form methods
+  updateFirstName(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.firstName.set(value);
+  }
+
+  updateLastName(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.lastName.set(value);
+  }
+
+  updateEmail(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.email.set(value);
+  }
+
+  updateRole(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value as 'user' | 'admin' | 'manager';
+    this.role.set(value);
+  }
+
+  // Search methods
+  updateSearchTerm(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.searchTerm.set(value);
+  }
+
+  private async performSearch(term: string): Promise<void> {
+    try {
+      // Simular búsqueda asíncrona
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      const mockUsers = [
+        { id: 1, name: 'Ana García', email: 'ana@provias.gob.pe' },
+        { id: 2, name: 'Carlos López', email: 'carlos@provias.gob.pe' },
+        { id: 3, name: 'María Rodriguez', email: 'maria@provias.gob.pe' },
+        { id: 4, name: 'Juan Pérez', email: 'juan@provias.gob.pe' },
+        { id: 5, name: 'Lucia Fernandez', email: 'lucia@provias.gob.pe' }
+      ];
+      
+      const results = mockUsers.filter(user => 
+        user.name.toLowerCase().includes(term.toLowerCase()) ||
+        user.email.toLowerCase().includes(term.toLowerCase())
+      );
+      
+      this.searchResults.set(results);
+      this.isSearching.set(false);
+      console.log(`🔍 Búsqueda completada: ${results.length} resultados para "${term}"`);
+    } catch (error) {
+      console.error('❌ Error en búsqueda:', error);
+      this.searchResults.set([]);
+      this.isSearching.set(false);
     }
   }
 
-  broadcastData(): void {
-    const data = {
-      timestamp: new Date().toISOString(),
-      message: 'Broadcast desde Subject simple',
-      random: Math.floor(Math.random() * 1000)
-    };
-    
-    this.dataSubject.next(data);
-    this.logEvent(`📡 Broadcasting data: ${data.message}`);
-    console.log('📡 Data broadcast a todos los suscriptores');
+  // Animation method
+  triggerAnimation(): void {
+    this.isAnimating.set(true);
+    console.log('🎨 Animación activada por 3 segundos');
   }
 
   // ====================================
-  // BÚSQUEDA REACTIVA
+  // 📝 TODO APP METHODS
   // ====================================
 
-  onSearch(term: string): void {
-    this.searchTerm = term;
-    this.searchSubject.next(term);
-  }
-
-  // ====================================
-  // OPERADORES DE TRANSFORMACIÓN
-  // ====================================
-
-  testTransformOperators(): void {
-    this.transformResults = [];
-    this.logEvent('🔄 Iniciando test de operadores de transformación');
-
-    // MAP - Transformar nombres a mayúsculas
-    const mapSub = this.http.get<User[]>('/api/users')
-      .pipe(
-        map(users => users.map(user => user.name.toUpperCase())),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (names) => {
-          this.transformResults.push({ 
-            operator: '🗺️ MAP - Nombres en mayúsculas', 
-            data: names 
-          });
-          this.eventsEmitted++;
-          this.logEvent('✅ MAP: Transformación completada');
-        },
-        error: (error) => {
-          this.errorsHandled++;
-          this.logEvent(`❌ Error en MAP: ${error.message}`, 'error');
-        }
-      });
-    this.subscriptions.push(mapSub);
-
-    // FILTER - Solo usuarios activos
-    const filterSub = this.http.get<User[]>('/api/users')
-      .pipe(
-        map(users => users.filter(user => user.isActive)),
-        takeUntil(this.destroy$)
-      )
-      .subscribe({
-        next: (activeUsers) => {
-          this.transformResults.push({ 
-            operator: '🚪 FILTER - Solo usuarios activos', 
-            data: activeUsers 
-          });
-          this.eventsEmitted++;
-          this.logEvent(`✅ FILTER: ${activeUsers.length} usuarios activos`);
-        },
-        error: (error) => {
-          this.errorsHandled++;
-          this.logEvent(`❌ Error en FILTER: ${error.message}`, 'error');
-        }
-      });
-    this.subscriptions.push(filterSub);
-  }
-
-  // ====================================
-  // OPERADORES DE COMBINACIÓN
-  // ====================================
-
-  testCombineLatest(): void {
-    this.logEvent('🔄 Iniciando CombineLatest...');
-    // Simulación de combineLatest con datos mock
-    const mockData = {
-      users: ['Ana', 'Carlos', 'María'],
-      products: ['Laptop', 'Mouse', 'Teclado'],
-      timestamp: new Date().toISOString()
-    };
-    
-    this.combinationResults.unshift({ 
-      type: '🔄 CombineLatest - Dashboard en tiempo real', 
-      data: mockData 
-    });
-    this.eventsEmitted++;
-    this.logEvent('✅ CombineLatest: Dashboard actualizado');
-  }
-
-  testForkJoin(): void {
-    this.logEvent('🍴 Iniciando ForkJoin - esperando todos...');
-    
-    // Simular ForkJoin esperando múltiples APIs
-    setTimeout(() => {
-      const allData = {
-        users: 5,
-        products: 3, 
-        orders: 4,
-        completedAt: new Date().toISOString()
+  addTodo(): void {
+    if (this.newTodo.trim()) {
+      const newTodoItem: Todo = {
+        id: Date.now(),
+        text: this.newTodo.trim(),
+        completed: false,
+        createdAt: new Date()
       };
       
-      this.combinationResults.unshift({ 
-        type: '🍴 ForkJoin - Todo listo definitivo', 
-        data: allData 
-      });
-      this.eventsEmitted++;
-      this.logEvent('✅ ForkJoin: Todos los datos cargados');
-    }, 1500);
-  }
-
-  testMerge(): void {
-    this.logEvent('🌊 Iniciando Merge - múltiples streams...');
-    
-    // Simular múltiples streams convergiendo
-    const notifications = [
-      'Nuevo usuario registrado',
-      'Producto actualizado', 
-      'Orden procesada'
-    ];
-    
-    notifications.forEach((notification, index) => {
-      setTimeout(() => {
-        const existing = this.combinationResults.find(r => r.type.includes('Merge'));
-        if (existing) {
-          if (!Array.isArray(existing.data)) {
-            existing.data = [];
-          }
-          existing.data.push({
-            id: Date.now() + index,
-            message: notification,
-            timestamp: new Date().toISOString()
-          });
-        } else {
-          this.combinationResults.unshift({ 
-            type: '🌊 Merge - Múltiples mangueras', 
-            data: [{
-              id: Date.now() + index,
-              message: notification,
-              timestamp: new Date().toISOString()
-            }]
-          });
-        }
-        this.eventsEmitted++;
-        this.logEvent(`🌊 Merge: ${notification}`);
-      }, index * 500);
-    });
-  }
-
-  testZip(): void {
-    this.logEvent('🤐 Iniciando Zip - emparejamiento estricto...');
-    
-    // Simular ZIP con emparejamiento por índice
-    const pairs = [
-      { user: 'Ana García', project: 'Carretera Norte' },
-      { user: 'Carlos López', project: 'Puente Central' },
-      { user: 'María Rodriguez', project: 'Túnel Sur' }
-    ];
-    
-    this.combinationResults.unshift({ 
-      type: '🤐 Zip - Parejas de baile', 
-      data: pairs 
-    });
-    this.eventsEmitted++;
-    this.logEvent('✅ Zip: Emparejamiento completado');
-  }
-
-  // ====================================
-  // MANEJO DE ERRORES
-  // ====================================
-
-  testRetry(): void {
-    this.logEvent('🔄 Iniciando test de retry...');
-    
-    // Simular operación que falla las primeras veces
-    let attempts = 0;
-    const flakyOperation = () => {
-      attempts++;
-      return new Promise<User[]>((resolve, reject) => {
-        setTimeout(() => {
-          if (attempts < 3) {
-            reject(new Error(`Intento ${attempts} falló - error transitorio`));
-          } else {
-            resolve([
-              { id: 1, name: 'Ana García', email: 'ana@provias.gob.pe', role: 'admin', isActive: true }
-            ]);
-          }
-        }, 300);
-      });
-    };
-
-    // Simular retry pattern
-    this.simulateRetry(flakyOperation);
-  }
-
-  private simulateRetry(operation: () => Promise<User[]>): void {
-    operation()
-      .then(users => {
-        this.logEvent(`✅ Retry exitoso: ${users.length} usuarios cargados`);
-        this.eventsEmitted++;
-      })
-      .catch(error => {
-        this.logEvent(`⏳ Reintentando después de: ${error.message}`);
-        setTimeout(() => {
-          this.simulateRetry(operation);
-        }, 1000);
-      });
-  }
-
-  testTimeout(): void {
-    this.logEvent('⏰ Testing timeout con fallback...');
-    
-    // Simular operación lenta
-    const slowOperation = new Promise<User[]>(resolve => {
-      setTimeout(() => {
-        resolve([
-          { id: 1, name: 'Ana García (timeout test)', email: 'ana@provias.gob.pe', role: 'admin', isActive: true }
-        ]);
-      }, 2000);
-    });
-    
-    // Simular timeout después de 1.5 segundos
-    const timeoutPromise = new Promise<never>((_, reject) => {
-      setTimeout(() => {
-        reject(new Error('Timeout después de 1.5s'));
-      }, 1500);
-    });
-    
-    Promise.race([slowOperation, timeoutPromise])
-      .then(users => {
-        this.logEvent(`✅ Datos cargados: ${users.length} usuarios`);
-        this.eventsEmitted++;
-      })
-      .catch(error => {
-        this.logEvent(`⏰ Timeout ejecutado: ${error.message}`, 'error');
-        this.errorsHandled++;
-      });
-  }
-
-  testCachedData(): void {
-    this.logEvent('💾 Cargando datos cacheados...');
-    
-    // Primera llamada - del servidor
-    this.http.get<User[]>('/api/users')
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (users) => {
-          this.logEvent(`📥 Primera llamada: ${users.length} usuarios del servidor`);
-          this.eventsEmitted++;
-          
-          // Segunda llamada - simular caché
-          setTimeout(() => {
-            this.logEvent(`💾 Segunda llamada: datos desde caché (instantáneo)`);
-            this.eventsEmitted++;
-          }, 500);
-        },
-        error: (error) => {
-          this.logEvent(`❌ Error cargando datos: ${error.message}`, 'error');
-          this.errorsHandled++;
-        }
-      });
-  }
-
-  // ====================================
-  // UTILIDADES
-  // ====================================
-
-  private logEvent(message: string, type: 'info' | 'error' = 'info'): void {
-    const time = new Date().toLocaleTimeString();
-    this.errorLogs.unshift({ time, message, type });
-    
-    // Mantener solo últimos 15 logs
-    if (this.errorLogs.length > 15) {
-      this.errorLogs = this.errorLogs.slice(0, 15);
+      this.todos.update(todos => [...todos, newTodoItem]);
+      this.newTodo = '';
+      console.log(`✅ Todo agregado: ${newTodoItem.text}`);
     }
-    
-    console.log(`[${time}] ${message}`);
+  }
+
+  toggleTodo(id: number): void {
+    this.todos.update(todos =>
+      todos.map(todo =>
+        todo.id === id 
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      )
+    );
+    console.log(`🔄 Todo ${id} toggled`);
+  }
+
+  removeTodo(id: number): void {
+    this.todos.update(todos => todos.filter(todo => todo.id !== id));
+    console.log(`❌ Todo ${id} eliminado`);
+  }
+
+  clearCompleted(): void {
+    const completedCount = this.completedTodos().length;
+    this.todos.update(todos => todos.filter(todo => !todo.completed));
+    console.log(`🧹 ${completedCount} todos completados eliminados`);
+  }
+
+  clearAll(): void {
+    const totalCount = this.todos().length;
+    this.todos.set([]);
+    console.log(`🗑️ ${totalCount} todos eliminados completamente`);
+  }
+
+  setFilter(filter: 'all' | 'active' | 'completed'): void {
+    this.currentFilter.set(filter);
+    console.log(`🔽 Filtro cambiado a: ${filter}`);
+  }
+
+  // ====================================
+  // 📊 MÉTRICAS Y UTILIDADES
+  // ====================================
+
+  getSignalCount(): number {
+    // Contar signals principales
+    return 8; // count, history, firstName, lastName, email, role, searchTerm, todos, etc.
+  }
+
+  getComputedCount(): number {
+    // Contar computed values
+    return 12; // doubled, isEven, squared, fullName, initials, etc.
+  }
+
+  private loadInitialData(): void {
+    // Cargar todos desde localStorage
+    const stored = localStorage.getItem('provias-todos');
+    if (stored) {
+      try {
+        const todos = JSON.parse(stored);
+        this.todos.set(todos);
+        console.log(`🔄 ${todos.length} todos cargados desde localStorage`);
+      } catch (error) {
+        console.error('❌ Error cargando todos:', error);
+      }
+    }
+
+    // Datos de ejemplo si no hay todos guardados
+    if (this.todos().length === 0) {
+      const exampleTodos: Todo[] = [
+        {
+          id: 1,
+          text: 'Revisar proyecto de carretera Norte',
+          completed: false,
+          createdAt: new Date()
+        },
+        {
+          id: 2,
+          text: 'Aprobar presupuesto Q4',
+          completed: true,
+          createdAt: new Date()
+        },
+        {
+          id: 3,
+          text: 'Reunión con ingenieros de puentes',
+          completed: false,
+          createdAt: new Date()
+        }
+      ];
+      
+      this.todos.set(exampleTodos);
+      console.log('📝 Datos de ejemplo cargados');
+    }
   }
 }

@@ -1,8 +1,9 @@
-<div class="lab2-container">
+<div class="lab3-container">
   <header class="lab-header">
-    <h1>🌊 LAB 2: RXJS Y OBSERVABLES</h1>
+    <h1>🔮 LAB 3: ANGULAR SIGNALS</h1>
     <p class="subtitle">PROVIAS DESCENTRALIZADO - Angular v18</p>
     <p class="instructor">Instructor: Ing. Jhonny Alexander Ramirez Chiroque</p>
+    <div class="revolution-badge">✨ La Revolución Silenciosa ✨</div>
   </header>
 
   <nav class="navigation-tabs">
@@ -10,385 +11,509 @@
       class="tab-button" 
       [class.active]="activeTab === 'intro'"
       (click)="setActiveTab('intro')">
-      📚 Introducción RxJS
+      🌟 Introducción Signals
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'subjects'"
-      (click)="setActiveTab('subjects')">
-      🎭 Subjects Demo
+      [class.active]="activeTab === 'basic'"
+      (click)="setActiveTab('basic')">
+      🔢 Signals Básicos
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'transform'"
-      (click)="setActiveTab('transform')">
-      🔄 Operadores Transformación
+      [class.active]="activeTab === 'computed'"
+      (click)="setActiveTab('computed')">
+      🧮 Computed Values
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'combination'"
-      (click)="setActiveTab('combination')">
-      🔗 Operadores Combinación
+      [class.active]="activeTab === 'effects'"
+      (click)="setActiveTab('effects')">
+      ⚡ Effects
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'errors'"
-      (click)="setActiveTab('errors')">
-      🛡️ Manejo de Errores
+      [class.active]="activeTab === 'vs-rxjs'"
+      (click)="setActiveTab('vs-rxjs')">
+      ⚔️ Signals vs RxJS
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'search'"
-      (click)="setActiveTab('search')">
-      🔍 Búsqueda Reactiva
+      [class.active]="activeTab === 'todo'"
+      (click)="setActiveTab('todo')">
+      📝 Todo App Integrador
     </button>
   </nav>
 
   <main class="lab-content">
-    <!-- Introducción a RxJS -->
+    <!-- Introducción -->
     <section *ngIf="activeTab === 'intro'" class="content-section">
       <div class="theory-box">
-        <h2>🎯 Bienvenidos al Mundo RxJS</h2>
+        <h2>🎯 Bienvenidos a la Nueva Era</h2>
         <blockquote>
-          "Bienvenidos al mundo de RxJS, donde los datos fluyen como ríos que podemos controlar con precisión."
+          "Signals es la respuesta de Angular a una pregunta que la comunidad ha estado haciendo por años: ¿puede el manejo de estado ser más simple? RxJS es poderoso pero complejo. Para estado local de componentes, a menudo es excesivo. Signals llena ese vacío perfectamente."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
         
-        <div class="comparison-table-container">
-          <h3>📊 Observable vs Promise</h3>
-          <table class="comparison-table">
-            <thead>
-              <tr>
-                <th>Característica</th>
-                <th>Promise</th>
-                <th>Observable</th>
-                <th>Ventaja Observable</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td><strong>Valores</strong></td>
-                <td>Uno solo</td>
-                <td class="highlight">Múltiples en el tiempo</td>
-                <td>Streams de datos</td>
-              </tr>
-              <tr>
-                <td><strong>Cancelable</strong></td>
-                <td class="no">❌ No</td>
-                <td class="yes">✅ Sí</td>
-                <td>Eficiencia pura</td>
-              </tr>
-              <tr>
-                <td><strong>Lazy</strong></td>
-                <td class="no">❌ Ejecuta inmediatamente</td>
-                <td class="yes">✅ Solo al suscribirse</td>
-                <td>Como Netflix</td>
-              </tr>
-              <tr>
-                <td><strong>Operadores</strong></td>
-                <td>then/catch básicos</td>
-                <td class="highlight">100+ especializados</td>
-                <td>Superpoder total</td>
-              </tr>
-            </tbody>
-          </table>
+        <div class="excel-analogy">
+          <h3>📊 La Analogía de Excel</h3>
+          <div class="analogy-box">
+            <p><strong>Un signal es como una celda en Excel:</strong></p>
+            <p>Cambias una celda → Todas las fórmulas que la usan se recalculan instantáneamente</p>
+            <div class="excel-demo">
+              <div class="cell">A1: {{ count() }}</div>
+              <div class="arrow">→</div>
+              <div class="cell">B1: {{ doubled() }} (=A1*2)</div>
+              <div class="arrow">→</div>
+              <div class="cell">C1: {{ isEven() ? 'PAR' : 'IMPAR' }} (=IF(A1%2=0,"PAR","IMPAR"))</div>
+            </div>
+          </div>
         </div>
 
-        <div class="concept-box">
-          <h3>🧠 Conceptos Fundamentales</h3>
-          <div class="concept-grid">
-            <div class="concept-card">
-              <h4>🔥 Hot vs Cold</h4>
-              <p><strong>Cold:</strong> Se ejecuta al suscribirse (HTTP)<br>
-              <strong>Hot:</strong> Ya ejecutándose (eventos)</p>
+        <div class="advantages-grid">
+          <div class="advantage-card">
+            <h4>🚀 Performance Superior</h4>
+            <p>No requiere Zone.js para detección de cambios</p>
+          </div>
+          <div class="advantage-card">
+            <h4>🎯 Simplicidad</h4>
+            <p>No hay Observables que gestionar para estado local</p>
+          </div>
+          <div class="advantage-card">
+            <h4>🔒 Type-Safe</h4>
+            <p>Por defecto sin gimnasia de tipos</p>
+          </div>
+          <div class="advantage-card">
+            <h4>🧹 Sin Memory Leaks</h4>
+            <p>Prácticamente imposibles con Signals</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signals Básicos -->
+    <section *ngIf="activeTab === 'basic'" class="content-section">
+      <div class="theory-box">
+        <h2>🔢 Counter Component - Simplicidad Cristalina</h2>
+        <blockquote>
+          "El CounterComponent es simplicidad cristalina. No hay Subjects, no hay Observables, no hay suscripciones. Solo signals que contienen valores y se actualizan reactivamente."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="counter-demo">
+        <div class="counter-display">
+          <div class="main-counter">
+            <span class="counter-label">Contador:</span>
+            <span class="counter-value">{{ count() }}</span>
+          </div>
+          
+          <div class="counter-controls">
+            <button class="counter-btn decrement" (click)="decrement()">-1</button>
+            <button class="counter-btn reset" (click)="reset()">Reset</button>
+            <button class="counter-btn increment" (click)="increment()">+1</button>
+          </div>
+        </div>
+
+        <div class="derived-values">
+          <div class="derived-card">
+            <h4>🔄 Computed Values</h4>
+            <div class="values-grid">
+              <div class="value-item">
+                <span class="label">Doble:</span>
+                <span class="value">{{ doubled() }}</span>
+              </div>
+              <div class="value-item">
+                <span class="label">Es Par:</span>
+                <span class="value" [class.even]="isEven()" [class.odd]="!isEven()">
+                  {{ isEven() ? '✅ PAR' : '❌ IMPAR' }}
+                </span>
+              </div>
+              <div class="value-item">
+                <span class="label">Cuadrado:</span>
+                <span class="value">{{ squared() }}</span>
+              </div>
             </div>
-            <div class="concept-card">
-              <h4>🎼 Event Loop</h4>
-              <p>Director de orquesta que coordina todos los streams</p>
+          </div>
+        </div>
+
+        <div class="history-section">
+          <h4>📚 Historial Automático (Effect)</h4>
+          <div class="history-list">
+            @for (entry of history(); track entry.id) {
+              <div class="history-item">
+                <span class="timestamp">{{ entry.timestamp }}</span>
+                <span class="value">{{ entry.value }}</span>
+              </div>
+            }
+          </div>
+        </div>
+
+        <div class="syntax-explanation">
+          <h3>💡 Sintaxis Deliciosamente Simple</h3>
+          <div class="syntax-examples">
+            <div class="syntax-item">
+              <strong>Crear:</strong>
+              <code>count = signal(0)</code>
             </div>
-            <div class="concept-card">
-              <h4>🌊 Streams</h4>
-              <p>Flujos continuos de datos que se pueden transformar</p>
+            <div class="syntax-item">
+              <strong>Leer:</strong>
+              <code>count()</code>
+            </div>
+            <div class="syntax-item">
+              <strong>Escribir:</strong>
+              <code>count.set(5)</code>
+            </div>
+            <div class="syntax-item">
+              <strong>Actualizar:</strong>
+              <code>count.update(v => v + 1)</code>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Subjects Demo -->
-    <section *ngIf="activeTab === 'subjects'" class="content-section">
+    <!-- Computed Values -->
+    <section *ngIf="activeTab === 'computed'" class="content-section">
       <div class="theory-box">
-        <h2>🎭 Patrón Observer - Subjects Demo</h2>
+        <h2>🧮 Computed - Magia Derivada</h2>
         <blockquote>
-          "Un Subject es fascinante porque es Observable y Observer simultáneamente. Es como ser locutor y oyente de radio al mismo tiempo."
+          "computed es magia derivada. doubled siempre será el doble de count, automáticamente. No necesitan actualizar doubled manualmente cuando count cambia. Es declarativo: describen la relación una vez, Angular la mantiene por siempre."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
       </div>
 
-      <div class="subjects-grid">
-        <!-- BehaviorSubject -->
-        <div class="subject-demo-card">
-          <h3>🧠 BehaviorSubject (Usuario Actual)</h3>
-          <p><strong>Con memoria:</strong> Nuevas suscripciones reciben el último valor</p>
-          <button class="demo-button primary" (click)="setRandomUser()">
-            Cambiar Usuario
-          </button>
-          <div class="result-box" *ngIf="currentUser">
-            <strong>Usuario actual:</strong>
-            <pre>{{ currentUser | json }}</pre>
-          </div>
-        </div>
-
-        <!-- ReplaySubject -->
-        <div class="subject-demo-card">
-          <h3>📚 ReplaySubject (Historial)</h3>
-          <p><strong>Memoria múltiple:</strong> Mantiene los últimos 3 mensajes</p>
-          <div class="message-input">
+      <div class="computed-demo">
+        <div class="user-form">
+          <h3>👤 Demo: Usuario Complejo</h3>
+          <div class="form-row">
             <input 
-              [(ngModel)]="newMessage" 
-              placeholder="Nuevo mensaje"
-              (keydown.enter)="addMessage()">
-            <button class="demo-button secondary" (click)="addMessage()">
-              Enviar
-            </button>
+              type="text" 
+              [value]="firstName()" 
+              (input)="updateFirstName($event)"
+              placeholder="Nombre">
+            <input 
+              type="text" 
+              [value]="lastName()" 
+              (input)="updateLastName($event)"
+              placeholder="Apellido">
           </div>
-          <div class="messages-list">
-            <div *ngFor="let msg of messages" class="message-item">
-              {{ msg }}
-            </div>
-          </div>
-        </div>
-
-        <!-- Subject Simple -->
-        <div class="subject-demo-card">
-          <h3>📡 Subject Simple (Broadcasting)</h3>
-          <p><strong>Multicast:</strong> Emite a todos los suscriptores</p>
-          <button class="demo-button broadcast" (click)="broadcastData()">
-            Broadcast Data
-          </button>
-          <div class="broadcast-status">
-            Suscriptores activos: {{ activeSubscriptions }}
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Operadores de Transformación -->
-    <section *ngIf="activeTab === 'transform'" class="content-section">
-      <div class="theory-box">
-        <h2>🔄 Operadores de Transformación</h2>
-        <blockquote>
-          "Los operadores de transformación son donde RxJS muestra su verdadero poder. Son sus pinceles para pintar con datos."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="transform-demo">
-        <button class="demo-button transform" (click)="testTransformOperators()">
-          🎨 Ejecutar Transformaciones
-        </button>
-        
-        <div class="operators-results">
-          <div *ngFor="let result of transformResults" class="operator-result">
-            <h4>{{ result.operator }}</h4>
-            <pre>{{ result.data | json }}</pre>
+          <div class="form-row">
+            <input 
+              type="email" 
+              [value]="email()" 
+              (input)="updateEmail($event)"
+              placeholder="Email">
+            <select [value]="role()" (change)="updateRole($event)">
+              <option value="user">Usuario</option>
+              <option value="admin">Administrador</option>
+              <option value="manager">Gerente</option>
+            </select>
           </div>
         </div>
 
-        <div class="operators-explanation">
-          <h3>🧰 Operadores Explicados</h3>
-          <div class="operators-grid">
-            <div class="operator-card">
-              <h4>🗺️ MAP</h4>
-              <p><strong>Transformación pura:</strong> Como línea de ensamblaje, cada elemento pasa por transformación específica</p>
+        <div class="computed-results">
+          <h4>🔮 Valores Computados Automáticamente</h4>
+          <div class="computed-grid">
+            <div class="computed-card">
+              <strong>Nombre Completo:</strong>
+              <span>{{ fullName() }}</span>
             </div>
-            <div class="operator-card">
-              <h4>🚪 FILTER</h4>
-              <p><strong>Guardián de calidad:</strong> Como portero de club exclusivo, solo entran los que cumplen criterios</p>
+            <div class="computed-card">
+              <strong>Iniciales:</strong>
+              <span>{{ initials() }}</span>
             </div>
-            <div class="operator-card">
-              <h4>🔍 TAP</h4>
-              <p><strong>Efectos secundarios:</strong> Como cámaras de seguridad, observan sin interferir</p>
+            <div class="computed-card">
+              <strong>Email Válido:</strong>
+              <span [class.valid]="isEmailValid()" [class.invalid]="!isEmailValid()">
+                {{ isEmailValid() ? '✅ Válido' : '❌ Inválido' }}
+              </span>
             </div>
-            <div class="operator-card">
-              <h4>🔄 SWITCHMAP</h4>
-              <p><strong>Magia para búsquedas:</strong> Cancela anterior y comienza nueva automáticamente</p>
+            <div class="computed-card">
+              <strong>Dominio Email:</strong>
+              <span>{{ emailDomain() }}</span>
+            </div>
+            <div class="computed-card">
+              <strong>Usuario PROVIAS:</strong>
+              <span [class.provias]="isProviasUser()">
+                {{ isProviasUser() ? '🏛️ Sí' : '🏢 No' }}
+              </span>
+            </div>
+            <div class="computed-card">
+              <strong>Nivel Acceso:</strong>
+              <span [class]="accessLevel()">{{ accessLevel() }}</span>
             </div>
           </div>
         </div>
-      </div>
-    </section>
 
-    <!-- Operadores de Combinación -->
-    <section *ngIf="activeTab === 'combination'" class="content-section">
-      <div class="theory-box">
-        <h2>🔗 Operadores de Combinación</h2>
-        <blockquote>
-          "Los operadores de combinación son sus herramientas para orquestar múltiples flujos de datos."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="combination-demo">
-        <div class="combination-buttons">
-          <button class="demo-button combine" (click)="testCombineLatest()">
-            🔄 CombineLatest
-          </button>
-          <button class="demo-button fork" (click)="testForkJoin()">
-            🍴 ForkJoin
-          </button>
-          <button class="demo-button merge" (click)="testMerge()">
-            🌊 Merge
-          </button>
-          <button class="demo-button zip" (click)="testZip()">
-            🤐 Zip
-          </button>
-        </div>
-        
-        <div class="combination-results">
-          <div *ngFor="let result of combinationResults" class="combination-result">
-            <h4>{{ result.type }}</h4>
-            <pre>{{ result.data | json }}</pre>
-          </div>
-        </div>
-
-        <div class="operators-explanation">
-          <h3>🎼 Combinaciones Explicadas</h3>
-          <div class="operators-grid">
-            <div class="operator-card">
-              <h4>🔄 COMBINELATEST</h4>
-              <p><strong>Sincronización continua:</strong> Dashboard en tiempo real que se actualiza cuando cualquier fuente cambia</p>
+        <div class="granular-explanation">
+          <h3>🎯 Signals Granulares vs Monolíticos</h3>
+          <div class="comparison-cards">
+            <div class="comparison-card good">
+              <h4>✅ GRANULAR (Recomendado)</h4>
+              <pre>firstName = signal('Ana');
+lastName = signal('García');</pre>
+              <p>Solo se actualiza lo que realmente cambió</p>
             </div>
-            <div class="operator-card">
-              <h4>🍴 FORKJOIN</h4>
-              <p><strong>Todo listo definitivo:</strong> Espera a que todos lleguen antes de empezar la reunión</p>
-            </div>
-            <div class="operator-card">
-              <h4>🌊 MERGE</h4>
-              <p><strong>Combinador simple:</strong> Múltiples mangueras vertiendo en el mismo tanque</p>
-            </div>
-            <div class="operator-card">
-              <h4>🤐 ZIP</h4>
-              <p><strong>Emparejamiento estricto:</strong> Como parejas de baile, cada uno con su pareja correspondiente</p>
+            <div class="comparison-card bad">
+              <h4>❌ MONOLÍTICO (Evitar)</h4>
+              <pre>user = signal({
+  firstName: 'Ana', 
+  lastName: 'García'
+});</pre>
+              <p>Actualiza todo aunque solo cambie una propiedad</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Manejo de Errores -->
-    <section *ngIf="activeTab === 'errors'" class="content-section">
+    <!-- Effects -->
+    <section *ngIf="activeTab === 'effects'" class="content-section">
       <div class="theory-box">
-        <h2>🛡️ Manejo de Errores Profesional</h2>
+        <h2>⚡ Effects - El Puente Mágico</h2>
         <blockquote>
-          "El manejo de errores en RxJS es sofisticado y poderoso. Este manejo robusto de errores es lo que separa aplicaciones hobby de aplicaciones profesionales."
+          "Los effects son el puente entre el mundo reactivo de Signals y el mundo imperativo de side effects. effect es para efectos secundarios. Cada vez que un signal que usa cambia, el effect se re-ejecuta."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
       </div>
 
-      <div class="error-demo">
-        <div class="error-buttons">
-          <button class="demo-button retry" (click)="testRetry()">
-            🔄 Test Retry
-          </button>
-          <button class="demo-button timeout" (click)="testTimeout()">
-            ⏰ Test Timeout
-          </button>
-          <button class="demo-button cache" (click)="testCachedData()">
-            💾 Test Cache
-          </button>
-        </div>
-        
-        <div class="error-log">
-          <h4>📋 Log de Operaciones</h4>
-          <div class="log-container">
-            <div *ngFor="let log of errorLogs" 
-                 class="log-entry" 
-                 [class.error]="log.type === 'error'">
-              [{{ log.time }}] {{ log.message }}
-            </div>
-          </div>
-        </div>
-
-        <div class="error-patterns">
-          <h3>🧰 Patrones de Error</h3>
-          <div class="patterns-grid">
-            <div class="pattern-card">
-              <h4>🪤 CATCHERROR</h4>
-              <p><strong>Red de seguridad:</strong> A veces fallar silenciosamente es mejor que fallar ruidosamente</p>
-            </div>
-            <div class="pattern-card">
-              <h4>🔄 RETRY</h4>
-              <p><strong>Persistencia simple:</strong> Como llamar a una puerta varias veces antes de irse</p>
-            </div>
-            <div class="pattern-card">
-              <h4>⚡ RETRYWHEN</h4>
-              <p><strong>Inteligencia aplicada:</strong> Backoff exponencial como protocolo diplomático</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Búsqueda Reactiva -->
-    <section *ngIf="activeTab === 'search'" class="content-section">
-      <div class="theory-box">
-        <h2>🔍 Búsqueda Reactiva Inteligente</h2>
-        <blockquote>
-          "switchMap es magia para búsquedas. Cada vez que el usuario escribe, cancela la búsqueda anterior y comienza una nueva. Con debounceTime esperan 300ms después de que el usuario deja de escribir."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="search-demo">
-        <div class="search-container">
+      <div class="effects-demo">
+        <div class="search-effects">
+          <h3>🔍 Auto-Búsqueda con Effects</h3>
           <input 
             class="search-input"
-            [(ngModel)]="searchTerm"
-            (ngModelChange)="onSearch($event)"
-            placeholder="🔍 Buscar usuarios de PROVIAS... (min 2 caracteres)"
-            autocomplete="off">
+            type="text"
+            [value]="searchTerm()"
+            (input)="updateSearchTerm($event)"
+            placeholder="🔍 Buscar usuarios... (min 3 caracteres)">
           
-          <div class="search-status">
-            {{ searchStatus }}
+          <div class="search-status" *ngIf="isSearching()">
+            🔄 Buscando automáticamente...
           </div>
-        </div>
-        
-        <div class="search-results" *ngIf="searchResults.length > 0">
-          <h4>📋 Resultados de búsqueda:</h4>
-          <div class="results-grid">
-            <div *ngFor="let user of searchResults" class="user-card">
-              <div class="user-info">
-                <strong>{{ user.name }}</strong>
-                <span class="email">{{ user.email }}</span>
-                <span class="role" [class]="user.role">{{ user.role }}</span>
-              </div>
-              <div class="user-status" [class.active]="user.isActive">
-                {{ user.isActive ? '🟢 Activo' : '🔴 Inactivo' }}
-              </div>
+          
+          <div class="search-results" *ngIf="searchResults().length > 0">
+            <h4>📋 Resultados ({{ searchResults().length }}):</h4>
+            <div class="results-grid">
+              @for (user of searchResults(); track user.id) {
+                <div class="user-result">
+                  <strong>{{ user.name }}</strong>
+                  <span>{{ user.email }}</span>
+                </div>
+              }
             </div>
           </div>
         </div>
 
-        <div class="search-explanation">
-          <h3>🧠 Cómo Funciona la Magia</h3>
-          <div class="flow-steps">
-            <div class="step">
-              <span class="step-number">1</span>
-              <strong>debounceTime(300)</strong>
-              <p>Espera 300ms después de escribir</p>
+        <div class="persistence-demo">
+          <h3>💾 Persistencia Automática</h3>
+          <div class="persistence-status">
+            <div class="status-indicator" [class.saved]="lastSaved()">
+              {{ lastSaved() ? '💾 Guardado automáticamente' : '⏳ Sin guardar' }}
             </div>
-            <div class="arrow">→</div>
-            <div class="step">
-              <span class="step-number">2</span>
-              <strong>distinctUntilChanged()</strong>
-              <p>Solo busca si el término cambió</p>
+            <div class="save-timestamp" *ngIf="lastSaved()">
+              Último guardado: {{ lastSaved() }}
             </div>
-            <div class="arrow">→</div>
-            <div class="step">
-              <span class="step-number">3</span>
-              <strong>switchMap()</strong>
-              <p>Cancela búsqueda anterior automáticamente</p>
+          </div>
+        </div>
+
+        <div class="animation-demo">
+          <h3>🎨 Effects con Cleanup</h3>
+          <button class="demo-button animate" (click)="triggerAnimation()">
+            Activar Animación
+          </button>
+          <div class="animation-box" [class.animated]="isAnimating()">
+            <div class="floating-element">
+              ✨ Elemento Animado ✨
+            </div>
+          </div>
+        </div>
+
+        <div class="untracked-explanation">
+          <h3>🚫 UnTracked - Evitando Dependencias Circulares</h3>
+          <div class="code-example">
+            <pre><code>effect(() => {
+  const term = searchTerm();
+  
+  if (term.length > 3) {
+    untracked(() => {
+      isLoading.set(true);  // No crea dependencia
+      performSearch(term);
+    });
+  }
+});</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Signals vs RxJS -->
+    <section *ngIf="activeTab === 'vs-rxjs'" class="content-section">
+      <div class="theory-box">
+        <h2>⚔️ Signals vs Observables - La Decisión Sabia</h2>
+        <blockquote>
+          "Esta comparación es crucial. No es sobre cuál es mejor, sino sobre cuándo usar cada uno. La regla de oro: si pueden resolverlo con Signals, úsenlo. Es más simple. Si necesitan operadores RxJS, timing complejo, o manejan streams de eventos, usen Observables."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="comparison-demo">
+        <div class="decision-matrix">
+          <h3>🎯 Matriz de Decisión</h3>
+          <div class="matrix-grid">
+            <div class="matrix-section use-signals">
+              <h4>✅ Usa SIGNALS para:</h4>
+              <ul>
+                <li>🏠 Estado local del componente</li>
+                <li>🔢 Valores síncronos</li>
+                <li>📊 Derivaciones simples</li>
+                <li>🎨 UI reactiva sin async pipe</li>
+                <li>🧮 Contadores, flags, objetos simples</li>
+              </ul>
+            </div>
+            
+            <div class="matrix-section use-observables">
+              <h4>✅ Usa OBSERVABLES para:</h4>
+              <ul>
+                <li>🌐 HTTP requests complejos</li>
+                <li>🎪 Eventos del DOM con transformación</li>
+                <li>⏰ Streams temporales</li>
+                <li>🔧 Cuando necesitas operadores RxJS</li>
+                <li>🔍 Búsquedas con debounce complejo</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="code-comparison">
+          <h3>📝 Comparación de Código</h3>
+          <div class="code-grid">
+            <div class="code-example rxjs-example">
+              <h4>🌊 Con RxJS (Ceremonioso)</h4>
+              <pre><code>// BehaviorSubject pattern
+private countSubject = new BehaviorSubject(0);
+count$ = this.countSubject.asObservable();
+
+doubled$ = this.count$.pipe(
+  map(count => count * 2)
+);
+
+// En template
+{{ count$ | async }}
+{{ doubled$ | async }}</code></pre>
+            </div>
+            
+            <div class="code-example signals-example">
+              <h4>✨ Con Signals (Elegante)</h4>
+              <pre><code>// Signal pattern
+count = signal(0);
+
+doubled = computed(() => this.count() * 2);
+
+// En template
+{{ count() }}
+{{ doubled() }}</code></pre>
+            </div>
+          </div>
+        </div>
+
+        <div class="interoperability-demo">
+          <h3>🌉 Puentes de Interoperabilidad</h3>
+          <div class="bridge-examples">
+            <div class="bridge-card">
+              <h4>Signal → Observable</h4>
+              <code>userObservable$ = toObservable(userSignal)</code>
+            </div>
+            <div class="bridge-card">
+              <h4>Observable → Signal</h4>
+              <code>dataSignal = toSignal(data$, { initialValue: [] })</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Todo App Integrador -->
+    <section *ngIf="activeTab === 'todo'" class="content-section">
+      <div class="theory-box">
+        <h2>📝 Todo App - Arquitectura Profesional</h2>
+        <blockquote>
+          "Esta aplicación, aunque simple en concepto, demuestra arquitectura profesional. Estado centralizado, derivaciones automáticas, persistencia transparente, UI reactiva."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="todo-app">
+        <div class="todo-header">
+          <h3>📝 PROVIAS Todo Manager</h3>
+          <div class="add-todo">
+            <input 
+              class="todo-input"
+              type="text"
+              [(ngModel)]="newTodo"
+              (keydown.enter)="addTodo()"
+              placeholder="¿Qué necesitas hacer para PROVIAS?">
+            <button class="add-btn" (click)="addTodo()" [disabled]="!newTodo.trim()">
+              ➕ Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="todo-filters">
+          <button 
+            *ngFor="let filter of filters" 
+            class="filter-btn"
+            [class.active]="currentFilter() === filter.value"
+            (click)="setFilter(filter.value)">
+            {{ filter.label }} <span class="count">({{ filter.count() }})</span>
+          </button>
+        </div>
+
+        <div class="todo-list" *ngIf="filteredTodos().length > 0">
+          @for (todo of filteredTodos(); track todo.id) {
+            <div class="todo-item" [class.completed]="todo.completed">
+              <input 
+                type="checkbox"
+                [checked]="todo.completed"
+                (change)="toggleTodo(todo.id)"
+                class="todo-checkbox">
+              <span class="todo-text">{{ todo.text }}</span>
+              <span class="todo-date">{{ todo.createdAt | date:'short' }}</span>
+              <button class="remove-btn" (click)="removeTodo(todo.id)">🗑️</button>
+            </div>
+          }
+        </div>
+
+        <div class="todo-actions" *ngIf="todos().length > 0">
+          <button 
+            class="action-btn clear"
+            (click)="clearCompleted()"
+            [disabled]="completedTodos().length === 0">
+            🧹 Limpiar Completados ({{ completedTodos().length }})
+          </button>
+          <button class="action-btn clear-all" (click)="clearAll()">
+            🗑️ Limpiar Todo
+          </button>
+        </div>
+
+        <div class="todo-stats">
+          <h4>📊 Estadísticas Automáticas</h4>
+          <div class="stats-grid">
+            <div class="stat-card">
+              <span class="stat-value">{{ todos().length }}</span>
+              <span class="stat-label">Total</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ activeTodos().length }}</span>
+              <span class="stat-label">Activos</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ completedTodos().length }}</span>
+              <span class="stat-label">Completados</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-value">{{ completionPercentage() }}%</span>
+              <span class="stat-label">Progreso</span>
             </div>
           </div>
         </div>
@@ -396,32 +521,27 @@
     </section>
   </main>
 
-  <!-- Panel de Métricas RxJS -->
-  <aside class="metrics-panel">
-    <h3>📊 Métricas de RxJS</h3>
-    <div class="metrics-grid">
-      <div class="metric-card">
-        <span class="metric-label">Suscripciones Activas</span>
-        <span class="metric-value active">{{ activeSubscriptions }}</span>
+  <!-- Panel de Info Técnica -->
+  <aside class="tech-panel">
+    <h3>⚙️ Información Técnica</h3>
+    <div class="tech-stats">
+      <div class="tech-item">
+        <span class="tech-label">Signals Activos:</span>
+        <span class="tech-value">{{ getSignalCount() }}</span>
       </div>
-      <div class="metric-card">
-        <span class="metric-label">Eventos Emitidos</span>
-        <span class="metric-value events">{{ eventsEmitted }}</span>
+      <div class="tech-item">
+        <span class="tech-label">Computed Values:</span>
+        <span class="tech-value">{{ getComputedCount() }}</span>
       </div>
-      <div class="metric-card">
-        <span class="metric-label">Errores Manejados</span>
-        <span class="metric-value errors">{{ errorsHandled }}</span>
+      <div class="tech-item">
+        <span class="tech-label">Effects Ejecutados:</span>
+        <span class="tech-value">{{ effectsExecuted() }}</span>
       </div>
     </div>
     
-    <div class="memory-info">
-      <h4>🧹 Gestión de Memoria</h4>
-      <p>Auto-cleanup con takeUntil(destroy$)</p>
-      <div class="cleanup-status">
-        <span class="status-indicator" [class.safe]="activeSubscriptions > 0">
-          {{ activeSubscriptions > 0 ? '✅ Gestionado' : '⚠️ Sin suscripciones' }}
-        </span>
-      </div>
+    <div class="performance-note">
+      <h4>🚀 Performance</h4>
+      <p>Signals es síncrono e inmediato. No requiere scheduling como Observables.</p>
     </div>
   </aside>
 </div>

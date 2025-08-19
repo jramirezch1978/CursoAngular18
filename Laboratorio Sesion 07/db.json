@@ -5,24 +5,5 @@
     { "id": 3, "name": "María Rodriguez", "email": "maria@provias.gob.pe", "role": "user", "isActive": false },
     { "id": 4, "name": "Juan Pérez", "email": "juan@provias.gob.pe", "role": "manager", "isActive": true },
     { "id": 5, "name": "Lucia Fernandez", "email": "lucia@provias.gob.pe", "role": "user", "isActive": true }
-  ],
-  "products": [
-    { "id": 1, "name": "Laptop Dell", "price": 2500, "stock": 10, "category": "electronics" },
-    { "id": 2, "name": "Mouse Logitech", "price": 50, "stock": 100, "category": "electronics" },
-    { "id": 3, "name": "Teclado Mecánico", "price": 150, "stock": 50, "category": "electronics" },
-    { "id": 4, "name": "Monitor 24''", "price": 300, "stock": 25, "category": "electronics" },
-    { "id": 5, "name": "WebCam HD", "price": 80, "stock": 75, "category": "electronics" }
-  ],
-  "orders": [
-    { "id": 1, "userId": 1, "products": [1, 2], "total": 2550, "status": "pending" },
-    { "id": 2, "userId": 2, "products": [2, 3], "total": 200, "status": "completed" },
-    { "id": 3, "userId": 1, "products": [4], "total": 300, "status": "processing" },
-    { "id": 4, "userId": 3, "products": [1, 5], "total": 2580, "status": "completed" }
-  ],
-  "notifications": [
-    { "id": 1, "userId": 1, "message": "Nueva orden recibida", "read": false, "type": "info" },
-    { "id": 2, "userId": 1, "message": "Pago procesado correctamente", "read": false, "type": "success" },
-    { "id": 3, "userId": 2, "message": "Producto enviado", "read": true, "type": "info" },
-    { "id": 4, "userId": 3, "message": "Orden completada", "read": false, "type": "success" }
   ]
 }
