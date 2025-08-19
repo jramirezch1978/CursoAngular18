@@ -1,0 +1,5109 @@
+LABORATORIO COMPLETO - SESIÓN 7: ASINCRONÍA Y RXJS
+PROVIAS DESCENTRALIZADO - ANGULAR v18
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Fecha: Martes, 19 de Agosto 2025
+Horario: 19:00 - 22:00 (3 horas)
+Modalidad: 100% Online Live - Laboratorio Práctico
+________________________________________
+📋 INFORMACIÓN IMPORTANTE
+Pre-requisitos de Sesiones Anteriores
+Para realizar este laboratorio necesitas tener completado:
+•	✅ Sesión 1: Proyecto Angular base configurado
+•	✅ Sesión 6: HttpClient configurado y funcionando
+•	✅ Node.js v18.19.0+ y Angular CLI v18 instalados
+•	✅ Visual Studio Code con extensiones Angular
+Si NO tienes el proyecto de sesiones anteriores:
+# Crear proyecto base rápido
+ng new provias-reactive-lab --routing --style=scss --standalone
+cd provias-reactive-lab
+
+# Instalar dependencias necesarias
+npm install rxjs@7.8.1
+npm install --save-dev @types/node
+
+# Configurar HttpClient
+ng generate service services/api --skip-tests
+________________________________________
+🛠️ LAB 0: CONFIGURACIÓN DEL ENTORNO Y HERRAMIENTAS
+Duración: 15 minutos
+HERRAMIENTAS NECESARIAS
+1. Extensiones VS Code Requeridas
+# Verificar que tengas instaladas estas extensiones:
+•	Angular Language Service (Angular)
+•	RxJS Snippets (vin-e)
+•	TypeScript Hero (rbbit)
+•	Error Lens (usernamehw)
+•	Thunder Client (para probar APIs)
+2. Configuración del Proyecto Base
+2.1 Actualizar tsconfig.json:
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@services/*": ["src/app/services/*"],
+      "@models/*": ["src/app/models/*"],
+      "@components/*": ["src/app/components/*"]
+    },
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "dom"],
+    "target": "ES2022"
+  }
+}
+2.2 Configurar HttpClient en app.config.ts:
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([])),
+    provideAnimations()
+  ]
+};
+2.3 Instalar JSON Server para API Mock:
+# Instalar globalmente
+npm install -g json-server
+
+# Crear archivo db.json en la raíz del proyecto
+2.4 Crear db.json con datos de prueba:
+{
+  "users": [
+    { "id": 1, "name": "Ana García", "email": "ana@provias.gob.pe", "role": "admin", "isActive": true },
+    { "id": 2, "name": "Carlos López", "email": "carlos@provias.gob.pe", "role": "user", "isActive": true },
+    { "id": 3, "name": "María Rodriguez", "email": "maria@provias.gob.pe", "role": "user", "isActive": false }
+  ],
+  "products": [
+    { "id": 1, "name": "Laptop Dell", "price": 2500, "stock": 10, "category": "electronics" },
+    { "id": 2, "name": "Mouse Logitech", "price": 50, "stock": 100, "category": "electronics" },
+    { "id": 3, "name": "Teclado Mecánico", "price": 150, "stock": 50, "category": "electronics" }
+  ],
+  "orders": [
+    { "id": 1, "userId": 1, "products": [1, 2], "total": 2550, "status": "pending" },
+    { "id": 2, "userId": 2, "products": [2, 3], "total": 200, "status": "completed" }
+  ],
+  "notifications": [
+    { "id": 1, "userId": 1, "message": "Nueva orden recibida", "read": false, "type": "info" },
+    { "id": 2, "userId": 1, "message": "Pago procesado", "read": false, "type": "success" }
+  ]
+}
+2.5 Agregar scripts al package.json:
+{
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "api": "json-server --watch db.json --port 3000 --delay 500",
+    "dev": "concurrently \"npm run api\" \"npm start\"",
+    "test": "ng test",
+    "test:coverage": "ng test --no-watch --code-coverage"
+  }
+}
+2.6 Instalar Concurrently:
+npm install --save-dev concurrently
+2.7 Crear Proxy Configuration proxy.conf.json:
+{
+  "/api/*": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}
+2.8 Actualizar angular.json para usar proxy:
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "configurations": {
+    "development": {
+      "buildTarget": "provias-reactive-lab:build:development",
+      "proxyConfig": "proxy.conf.json"
+    }
+  }
+}
+3. Verificación del Entorno
+# Terminal 1: Iniciar JSON Server
+npm run api
+
+# Terminal 2: Iniciar Angular con proxy
+ng serve --proxy-config proxy.conf.json
+
+# Verificar en navegador
+# Angular: http://localhost:4200
+# API: http://localhost:3000
+Test de conectividad:
+// test-connection.component.ts
+import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Component({
+  selector: 'app-test',
+  template: `<button (click)="test()">Test API</button>`
+})
+export class TestComponent {
+  private http = inject(HttpClient);
+  
+  test() {
+    this.http.get('/api/users').subscribe(console.log);
+  }
+}
+________________________________________
+🔬 LAB 1: FUNDAMENTOS DE ASINCRONÍA (45 minutos)
+PARTE 1: Callbacks, Promises y Async/Await
+Paso 1.1: Crear el Servicio Base de Asincronía
+ng generate service services/async-fundamentals --skip-tests
+services/async-fundamentals.service.ts:
+import { Injectable } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class AsyncFundamentalsService {
+  
+  // 1. SIMULACIÓN DE OPERACIÓN SÍNCRONA (BLOQUEANTE)
+  fetchDataSync(): string {
+    const startTime = Date.now();
+    // Simular operación pesada (NO HACER EN PRODUCCIÓN)
+    while (Date.now() - startTime < 3000) {
+      // Bloquea el hilo principal por 3 segundos
+    }
+    return 'Datos obtenidos de forma síncrona';
+  }
+
+  // 2. CALLBACK TRADICIONAL
+  fetchDataWithCallback(callback: (data: string) => void, errorCallback?: (error: Error) => void): void {
+    setTimeout(() => {
+      const random = Math.random();
+      if (random > 0.2) {
+        callback('Datos obtenidos con callback');
+      } else {
+        errorCallback?.(new Error('Error simulado en callback'));
+      }
+    }, 1000);
+  }
+
+  // 3. CALLBACK HELL - Ejemplo del problema
+  getUserDataNested(
+    userId: number,
+    callback: (result: any) => void
+  ): void {
+    // Obtener usuario
+    this.fetchUser(userId, (user) => {
+      // Obtener órdenes del usuario
+      this.fetchUserOrders(user.id, (orders) => {
+        // Obtener detalles de la primera orden
+        if (orders.length > 0) {
+          this.fetchOrderDetails(orders[0].id, (details) => {
+            // Obtener información de envío
+            this.fetchShippingInfo(details.shippingId, (shipping) => {
+              callback({
+                user,
+                orders,
+                orderDetails: details,
+                shipping
+              });
+            });
+          });
+        }
+      });
+    });
+  }
+
+  // 4. PROMISES - Solución elegante
+  fetchDataWithPromise(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      setTimeout(() => {
+        const random = Math.random();
+        if (random > 0.2) {
+          resolve('Datos obtenidos con Promise');
+        } else {
+          reject(new Error('Error simulado en Promise'));
+        }
+      }, 1000);
+    });
+  }
+
+  // 5. PROMISE CHAIN - Evitando el callback hell
+  getUserDataChained(userId: number): Promise<any> {
+    return this.fetchUserPromise(userId)
+      .then(user => {
+        return this.fetchUserOrdersPromise(user.id)
+          .then(orders => ({ user, orders }));
+      })
+      .then(({ user, orders }) => {
+        if (orders.length > 0) {
+          return this.fetchOrderDetailsPromise(orders[0].id)
+            .then(details => ({ user, orders, details }));
+        }
+        return { user, orders, details: null };
+      })
+      .then(({ user, orders, details }) => {
+        if (details) {
+          return this.fetchShippingInfoPromise(details.shippingId)
+            .then(shipping => ({ user, orders, details, shipping }));
+        }
+        return { user, orders, details, shipping: null };
+      });
+  }
+
+  // 6. ASYNC/AWAIT - Máxima claridad
+  async getUserDataAsync(userId: number): Promise<any> {
+    try {
+      const user = await this.fetchUserPromise(userId);
+      const orders = await this.fetchUserOrdersPromise(user.id);
+      
+      let details = null;
+      let shipping = null;
+      
+      if (orders.length > 0) {
+        details = await this.fetchOrderDetailsPromise(orders[0].id);
+        if (details) {
+          shipping = await this.fetchShippingInfoPromise(details.shippingId);
+        }
+      }
+      
+      return { user, orders, details, shipping };
+    } catch (error) {
+      console.error('Error en getUserDataAsync:', error);
+      throw error;
+    }
+  }
+
+  // Métodos auxiliares para simular operaciones asíncronas
+  private fetchUser(id: number, callback: (user: any) => void): void {
+    setTimeout(() => callback({ id, name: 'Usuario ' + id }), 500);
+  }
+
+  private fetchUserOrders(userId: number, callback: (orders: any[]) => void): void {
+    setTimeout(() => callback([{ id: 1, userId, total: 100 }]), 500);
+  }
+
+  private fetchOrderDetails(orderId: number, callback: (details: any) => void): void {
+    setTimeout(() => callback({ id: orderId, shippingId: 123 }), 500);
+  }
+
+  private fetchShippingInfo(shippingId: number, callback: (shipping: any) => void): void {
+    setTimeout(() => callback({ id: shippingId, address: 'Lima, Perú' }), 500);
+  }
+
+  private fetchUserPromise(id: number): Promise<any> {
+    return new Promise(resolve => {
+      setTimeout(() => resolve({ id, name: 'Usuario ' + id }), 500);
+    });
+  }
+
+  private fetchUserOrdersPromise(userId: number): Promise<any[]> {
+    return new Promise(resolve => {
+      setTimeout(() => resolve([{ id: 1, userId, total: 100 }]), 500);
+    });
+  }
+
+  private fetchOrderDetailsPromise(orderId: number): Promise<any> {
+    return new Promise(resolve => {
+      setTimeout(() => resolve({ id: orderId, shippingId: 123 }), 500);
+    });
+  }
+
+  private fetchShippingInfoPromise(shippingId: number): Promise<any> {
+    return new Promise(resolve => {
+      setTimeout(() => resolve({ id: shippingId, address: 'Lima, Perú' }), 500);
+    });
+  }
+}
+Paso 1.2: Crear Componente de Demostración
+ng generate component components/async-demo --standalone --skip-tests
+components/async-demo/async-demo.component.ts:
+import { Component, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { AsyncFundamentalsService } from '../../services/async-fundamentals.service';
+
+@Component({
+  selector: 'app-async-demo',
+  standalone: true,
+  imports: [CommonModule],
+  template: `
+    <div class="async-demo-container">
+      <h2>🔄 Laboratorio de Asincronía</h2>
+      
+      <div class="demo-section">
+        <h3>1. Operación Síncrona (Bloqueante)</h3>
+        <button (click)="testSync()" [disabled]="loading.sync">
+          Test Síncrono (Bloquea 3s)
+        </button>
+        <div class="result">{{ results.sync }}</div>
+      </div>
+
+      <div class="demo-section">
+        <h3>2. Callbacks</h3>
+        <button (click)="testCallback()" [disabled]="loading.callback">
+          Test Callback
+        </button>
+        <div class="result">{{ results.callback }}</div>
+      </div>
+
+      <div class="demo-section">
+        <h3>3. Callback Hell</h3>
+        <button (click)="testCallbackHell()" [disabled]="loading.callbackHell">
+          Test Callback Hell
+        </button>
+        <div class="result">
+          <pre>{{ results.callbackHell | json }}</pre>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>4. Promises</h3>
+        <button (click)="testPromise()" [disabled]="loading.promise">
+          Test Promise
+        </button>
+        <div class="result">{{ results.promise }}</div>
+      </div>
+
+      <div class="demo-section">
+        <h3>5. Promise Chain</h3>
+        <button (click)="testPromiseChain()" [disabled]="loading.promiseChain">
+          Test Promise Chain
+        </button>
+        <div class="result">
+          <pre>{{ results.promiseChain | json }}</pre>
+        </div>
+      </div>
+
+      <div class="demo-section">
+        <h3>6. Async/Await</h3>
+        <button (click)="testAsyncAwait()" [disabled]="loading.asyncAwait">
+          Test Async/Await
+        </button>
+        <div class="result">
+          <pre>{{ results.asyncAwait | json }}</pre>
+        </div>
+      </div>
+
+      <div class="performance-metrics">
+        <h3>⚡ Métricas de Performance</h3>
+        <div class="metric" *ngFor="let metric of performanceMetrics">
+          <span class="label">{{ metric.operation }}:</span>
+          <span class="value">{{ metric.time }}ms</span>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .async-demo-container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .demo-section {
+      background: #f5f5f5;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 8px;
+      border-left: 4px solid #3f51b5;
+    }
+
+    h3 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    button {
+      background: #3f51b5;
+      color: white;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    button:hover:not(:disabled) {
+      background: #303f9f;
+      transform: translateY(-2px);
+    }
+
+    button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .result {
+      margin-top: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 4px;
+      min-height: 50px;
+      font-family: 'Courier New', monospace;
+    }
+
+    pre {
+      margin: 0;
+      white-space: pre-wrap;
+    }
+
+    .performance-metrics {
+      background: #2c3e50;
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .metric:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      font-weight: bold;
+    }
+
+    .value {
+      color: #4caf50;
+      font-family: 'Courier New', monospace;
+    }
+  `]
+})
+export class AsyncDemoComponent {
+  private asyncService = inject(AsyncFundamentalsService);
+
+  loading = {
+    sync: false,
+    callback: false,
+    callbackHell: false,
+    promise: false,
+    promiseChain: false,
+    asyncAwait: false
+  };
+
+  results: any = {
+    sync: '',
+    callback: '',
+    callbackHell: null,
+    promise: '',
+    promiseChain: null,
+    asyncAwait: null
+  };
+
+  performanceMetrics: any[] = [];
+
+  testSync() {
+    this.loading.sync = true;
+    this.results.sync = 'Ejecutando operación síncrona...';
+    
+    const startTime = performance.now();
+    
+    // ADVERTENCIA: Esto bloqueará la UI
+    setTimeout(() => {
+      const result = this.asyncService.fetchDataSync();
+      const endTime = performance.now();
+      
+      this.results.sync = result;
+      this.loading.sync = false;
+      this.addMetric('Síncrono', endTime - startTime);
+    }, 100);
+  }
+
+  testCallback() {
+    this.loading.callback = true;
+    this.results.callback = 'Esperando callback...';
+    
+    const startTime = performance.now();
+    
+    this.asyncService.fetchDataWithCallback(
+      (data) => {
+        const endTime = performance.now();
+        this.results.callback = data;
+        this.loading.callback = false;
+        this.addMetric('Callback', endTime - startTime);
+      },
+      (error) => {
+        const endTime = performance.now();
+        this.results.callback = `Error: ${error.message}`;
+        this.loading.callback = false;
+        this.addMetric('Callback (Error)', endTime - startTime);
+      }
+    );
+  }
+
+  testCallbackHell() {
+    this.loading.callbackHell = true;
+    this.results.callbackHell = 'Procesando callback hell...';
+    
+    const startTime = performance.now();
+    
+    this.asyncService.getUserDataNested(1, (result) => {
+      const endTime = performance.now();
+      this.results.callbackHell = result;
+      this.loading.callbackHell = false;
+      this.addMetric('Callback Hell', endTime - startTime);
+    });
+  }
+
+  testPromise() {
+    this.loading.promise = true;
+    this.results.promise = 'Esperando Promise...';
+    
+    const startTime = performance.now();
+    
+    this.asyncService.fetchDataWithPromise()
+      .then((data) => {
+        const endTime = performance.now();
+        this.results.promise = data;
+        this.loading.promise = false;
+        this.addMetric('Promise', endTime - startTime);
+      })
+      .catch((error) => {
+        const endTime = performance.now();
+        this.results.promise = `Error: ${error.message}`;
+        this.loading.promise = false;
+        this.addMetric('Promise (Error)', endTime - startTime);
+      });
+  }
+
+  testPromiseChain() {
+    this.loading.promiseChain = true;
+    this.results.promiseChain = 'Procesando Promise chain...';
+    
+    const startTime = performance.now();
+    
+    this.asyncService.getUserDataChained(1)
+      .then((result) => {
+        const endTime = performance.now();
+        this.results.promiseChain = result;
+        this.loading.promiseChain = false;
+        this.addMetric('Promise Chain', endTime - startTime);
+      })
+      .catch((error) => {
+        const endTime = performance.now();
+        this.results.promiseChain = { error: error.message };
+        this.loading.promiseChain = false;
+        this.addMetric('Promise Chain (Error)', endTime - startTime);
+      });
+  }
+
+  async testAsyncAwait() {
+    this.loading.asyncAwait = true;
+    this.results.asyncAwait = 'Procesando con async/await...';
+    
+    const startTime = performance.now();
+    
+    try {
+      const result = await this.asyncService.getUserDataAsync(1);
+      const endTime = performance.now();
+      
+      this.results.asyncAwait = result;
+      this.loading.asyncAwait = false;
+      this.addMetric('Async/Await', endTime - startTime);
+    } catch (error: any) {
+      const endTime = performance.now();
+      this.results.asyncAwait = { error: error.message };
+      this.loading.asyncAwait = false;
+      this.addMetric('Async/Await (Error)', endTime - startTime);
+    }
+  }
+
+  private addMetric(operation: string, time: number) {
+    this.performanceMetrics = [
+      ...this.performanceMetrics.filter(m => m.operation !== operation),
+      { operation, time: Math.round(time) }
+    ];
+  }
+}
+PARTE 2: Patrones Avanzados con Promises
+Paso 1.3: Crear Servicio de Patrones Avanzados
+ng generate service services/promise-patterns --skip-tests
+services/promise-patterns.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+}
+
+@Injectable({ providedIn: 'root' })
+export class PromisePatternsService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
+
+  // 1. PROMISE.ALL - Peticiones paralelas
+  async getMultipleResourcesParallel(): Promise<{
+    users: User[];
+    products: any[];
+    orders: any[];
+  }> {
+    console.log('🚀 Iniciando peticiones paralelas con Promise.all');
+    const startTime = performance.now();
+
+    try {
+      const [users, products, orders] = await Promise.all([
+        firstValueFrom(this.http.get<User[]>(`${this.apiUrl}/users`)),
+        firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/products`)),
+        firstValueFrom(this.http.get<any[]>(`${this.apiUrl}/orders`))
+      ]);
+
+      const endTime = performance.now();
+      console.log(`✅ Promise.all completado en ${endTime - startTime}ms`);
+
+      return { users, products, orders };
+    } catch (error) {
+      console.error('❌ Error en Promise.all:', error);
+      throw error;
+    }
+  }
+
+  // 2. PROMISE.ALLSETTLED - Manejo robusto
+  async getMultipleResourcesSafe(): Promise<PromiseSettledResult<any>[]> {
+    console.log('🛡️ Iniciando peticiones con Promise.allSettled');
+    
+    const promises = [
+      firstValueFrom(this.http.get(`${this.apiUrl}/users`)),
+      firstValueFrom(this.http.get(`${this.apiUrl}/products`)),
+      firstValueFrom(this.http.get(`${this.apiUrl}/invalid`)) // Esta fallará
+    ];
+
+    const results = await Promise.allSettled(promises);
+    
+    results.forEach((result, index) => {
+      if (result.status === 'fulfilled') {
+        console.log(`✅ Promesa ${index} exitosa:`, result.value);
+      } else {
+        console.log(`❌ Promesa ${index} falló:`, result.reason);
+      }
+    });
+
+    return results;
+  }
+
+  // 3. PROMISE.RACE - Timeout pattern
+  async fetchWithTimeout<T>(
+    promise: Promise<T>,
+    timeoutMs: number = 5000
+  ): Promise<T> {
+    const timeoutPromise = new Promise<never>((_, reject) => {
+      setTimeout(() => reject(new Error(`Timeout después de ${timeoutMs}ms`)), timeoutMs);
+    });
+
+    return Promise.race([promise, timeoutPromise]);
+  }
+
+  // 4. RETRY PATTERN con backoff exponencial
+  async fetchWithRetry<T>(
+    fetchFn: () => Promise<T>,
+    maxRetries: number = 3,
+    initialDelay: number = 1000
+  ): Promise<T> {
+    let lastError: any;
+    
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        console.log(`🔄 Intento ${attempt + 1} de ${maxRetries + 1}`);
+        const result = await fetchFn();
+        console.log(`✅ Éxito en intento ${attempt + 1}`);
+        return result;
+      } catch (error) {
+        lastError = error;
+        
+        if (attempt < maxRetries) {
+          const delay = initialDelay * Math.pow(2, attempt);
+          console.log(`⏳ Esperando ${delay}ms antes de reintentar...`);
+          await this.sleep(delay);
+        }
+      }
+    }
+    
+    console.error('❌ Todos los intentos fallaron');
+    throw lastError;
+  }
+
+  // 5. BATCH PROCESSING - Procesamiento por lotes
+  async processBatch<T, R>(
+    items: T[],
+    processor: (item: T) => Promise<R>,
+    batchSize: number = 5
+  ): Promise<R[]> {
+    const results: R[] = [];
+    
+    for (let i = 0; i < items.length; i += batchSize) {
+      const batch = items.slice(i, i + batchSize);
+      console.log(`📦 Procesando lote ${Math.floor(i / batchSize) + 1} (${batch.length} items)`);
+      
+      const batchResults = await Promise.all(
+        batch.map(item => processor(item))
+      );
+      
+      results.push(...batchResults);
+    }
+    
+    return results;
+  }
+
+  // 6. SEQUENTIAL PROCESSING - Procesamiento secuencial
+  async processSequentially<T, R>(
+    items: T[],
+    processor: (item: T) => Promise<R>
+  ): Promise<R[]> {
+    const results: R[] = [];
+    
+    for (const [index, item] of items.entries()) {
+      console.log(`➡️ Procesando item ${index + 1} de ${items.length}`);
+      const result = await processor(item);
+      results.push(result);
+    }
+    
+    return results;
+  }
+
+  // 7. DEBOUNCED PROMISE - Para búsquedas
+  private debounceTimers = new Map<string, NodeJS.Timeout>();
+
+  debouncedFetch<T>(
+    key: string,
+    fetchFn: () => Promise<T>,
+    delay: number = 300
+  ): Promise<T> {
+    return new Promise((resolve, reject) => {
+      // Cancelar timer anterior si existe
+      const existingTimer = this.debounceTimers.get(key);
+      if (existingTimer) {
+        clearTimeout(existingTimer);
+      }
+
+      // Crear nuevo timer
+      const timer = setTimeout(async () => {
+        try {
+          const result = await fetchFn();
+          resolve(result);
+        } catch (error) {
+          reject(error);
+        } finally {
+          this.debounceTimers.delete(key);
+        }
+      }, delay);
+
+      this.debounceTimers.set(key, timer);
+    });
+  }
+
+  // Utilidad: sleep
+  private sleep(ms: number): Promise<void> {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  // Ejemplo de uso real: Cargar datos de usuario con toda la información relacionada
+  async loadUserCompleteData(userId: number): Promise<any> {
+    console.log(`📋 Cargando datos completos del usuario ${userId}`);
+    
+    try {
+      // 1. Cargar usuario con timeout
+      const userPromise = firstValueFrom(
+        this.http.get<User>(`${this.apiUrl}/users/${userId}`)
+      );
+      const user = await this.fetchWithTimeout(userPromise, 3000);
+
+      // 2. Cargar datos relacionados en paralelo
+      const [orders, notifications] = await Promise.all([
+        firstValueFrom(this.http.get(`${this.apiUrl}/orders?userId=${userId}`)),
+        firstValueFrom(this.http.get(`${this.apiUrl}/notifications?userId=${userId}`))
+      ]);
+
+      // 3. Procesar órdenes en lotes si hay muchas
+      if (orders.length > 10) {
+        const processedOrders = await this.processBatch(
+          orders,
+          async (order: any) => {
+            // Simular procesamiento pesado
+            await this.sleep(100);
+            return { ...order, processed: true };
+          },
+          5
+        );
+        return { user, orders: processedOrders, notifications };
+      }
+
+      return { user, orders, notifications };
+    } catch (error) {
+      console.error('Error cargando datos del usuario:', error);
+      
+      // Intentar con retry si fue un error de red
+      if (error instanceof Error && error.message.includes('Timeout')) {
+        return this.fetchWithRetry(
+          () => this.loadUserCompleteData(userId),
+          2,
+          2000
+        );
+      }
+      
+      throw error;
+    }
+  }
+}
+________________________________________
+🎯 LAB 2: RXJS Y OBSERVABLES (45 minutos)
+PARTE 1: Fundamentos de RxJS y Patrón Observer
+Paso 2.1: Crear Servicio de RxJS Básico
+ng generate service services/rxjs-fundamentals --skip-tests
+services/rxjs-fundamentals.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import {
+  Observable,
+  Subject,
+  BehaviorSubject,
+  ReplaySubject,
+  AsyncSubject,
+  of,
+  from,
+  interval,
+  timer,
+  throwError,
+  EMPTY,
+  fromEvent,
+  merge,
+  concat,
+  forkJoin,
+  combineLatest,
+  zip
+} from 'rxjs';
+import {
+  map,
+  filter,
+  tap,
+  catchError,
+  retry,
+  retryWhen,
+  delay,
+  take,
+  takeUntil,
+  debounceTime,
+  distinctUntilChanged,
+  switchMap,
+  mergeMap,
+  concatMap,
+  exhaustMap,
+  scan,
+  shareReplay,
+  startWith,
+  finalize,
+  timeout
+} from 'rxjs/operators';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  isActive: boolean;
+}
+
+interface SearchResult {
+  id: number;
+  title: string;
+  description: string;
+}
+
+@Injectable({ providedIn: 'root' })
+export class RxjsFundamentalsService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
+  
+  // 1. SUBJECTS - Diferentes tipos
+  
+  // Subject básico - multicast de valores
+  private dataSubject = new Subject<any>();
+  public data$ = this.dataSubject.asObservable();
+  
+  // BehaviorSubject - mantiene el último valor
+  private userSubject = new BehaviorSubject<User | null>(null);
+  public user$ = this.userSubject.asObservable();
+  
+  // ReplaySubject - mantiene múltiples valores históricos
+  private messagesSubject = new ReplaySubject<string>(3); // últimos 3 mensajes
+  public messages$ = this.messagesSubject.asObservable();
+  
+  // AsyncSubject - emite solo el último valor cuando se completa
+  private resultSubject = new AsyncSubject<any>();
+  public result$ = this.resultSubject.asObservable();
+
+  // 2. CREACIÓN DE OBSERVABLES
+  
+  // Observable personalizado
+  createCustomObservable(): Observable<number> {
+    return new Observable(observer => {
+      console.log('Observable iniciado');
+      let count = 0;
+      
+      const interval = setInterval(() => {
+        observer.next(count++);
+        
+        if (count > 5) {
+          observer.complete();
+          clearInterval(interval);
+        }
+      }, 1000);
+      
+      // Cleanup
+      return () => {
+        console.log('Observable cleanup');
+        clearInterval(interval);
+      };
+    });
+  }
+  
+  // Observable desde valores
+  getStaticValues(): Observable<number> {
+    return of(1, 2, 3, 4, 5);
+  }
+  
+  // Observable desde array
+  getFromArray(): Observable<string> {
+    const fruits = ['Manzana', 'Banana', 'Naranja', 'Pera'];
+    return from(fruits);
+  }
+  
+  // Observable de intervalo
+  getInterval(): Observable<number> {
+    return interval(1000).pipe(take(10)); // Emite cada segundo, máximo 10 valores
+  }
+  
+  // Observable de timer
+  getTimer(): Observable<number> {
+    return timer(2000, 1000).pipe(take(5)); // Espera 2s, luego emite cada 1s
+  }
+
+  // 3. OPERADORES DE TRANSFORMACIÓN
+  
+  // Map - Transformar valores
+  getUserNames(): Observable<string[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+      map(users => users.map(u => u.name.toUpperCase())),
+      tap(names => console.log('Nombres transformados:', names))
+    );
+  }
+  
+  // Filter - Filtrar valores
+  getActiveUsers(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+      map(users => users.filter(u => u.isActive)),
+      tap(users => console.log(`${users.length} usuarios activos`))
+    );
+  }
+  
+  // Scan - Acumular valores
+  getAccumulatedValues(): Observable<number> {
+    return interval(1000).pipe(
+      take(5),
+      scan((acc, curr) => acc + curr, 0),
+      tap(sum => console.log('Suma acumulada:', sum))
+    );
+  }
+
+  // 4. OPERADORES DE APLANAMIENTO (Flattening)
+  
+  // SwitchMap - Cancela anterior, suscribe a nuevo
+  searchWithSwitchMap(searchTerm$: Observable<string>): Observable<SearchResult[]> {
+    return searchTerm$.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      switchMap(term => {
+        if (!term || term.length < 2) {
+          return of([]);
+        }
+        console.log(`🔍 Buscando: ${term}`);
+        return this.http.get<SearchResult[]>(`${this.apiUrl}/search?q=${term}`).pipe(
+          catchError(() => of([]))
+        );
+      })
+    );
+  }
+  
+  // MergeMap - Múltiples suscripciones paralelas
+  loadUserDetailsParallel(userIds: number[]): Observable<User> {
+    return from(userIds).pipe(
+      mergeMap(id => 
+        this.http.get<User>(`${this.apiUrl}/users/${id}`).pipe(
+          tap(user => console.log(`✅ Usuario ${id} cargado`)),
+          catchError(() => EMPTY)
+        )
+      )
+    );
+  }
+  
+  // ConcatMap - Suscripciones secuenciales
+  loadUserDetailsSequential(userIds: number[]): Observable<User> {
+    return from(userIds).pipe(
+      concatMap(id => 
+        this.http.get<User>(`${this.apiUrl}/users/${id}`).pipe(
+          tap(user => console.log(`➡️ Usuario ${id} cargado secuencialmente`)),
+          catchError(() => EMPTY)
+        )
+      )
+    );
+  }
+  
+  // ExhaustMap - Ignora mientras hay una suscripción activa
+  saveWithExhaustMap(save$: Observable<any>): Observable<any> {
+    return save$.pipe(
+      exhaustMap(data => 
+        this.http.post(`${this.apiUrl}/save`, data).pipe(
+          tap(() => console.log('💾 Guardado exitoso')),
+          catchError(error => {
+            console.error('❌ Error al guardar:', error);
+            return throwError(() => error);
+          })
+        )
+      )
+    );
+  }
+
+  // 5. OPERADORES DE COMBINACIÓN
+  
+  // CombineLatest - Combina últimos valores
+  getCombinedData(): Observable<{
+    users: User[];
+    products: any[];
+    timestamp: number;
+  }> {
+    return combineLatest({
+      users: this.http.get<User[]>(`${this.apiUrl}/users`),
+      products: this.http.get<any[]>(`${this.apiUrl}/products`),
+      timestamp: timer(0, 1000).pipe(map(() => Date.now()))
+    }).pipe(
+      tap(data => console.log('📊 Datos combinados actualizados'))
+    );
+  }
+  
+  // ForkJoin - Espera a que todos completen
+  loadInitialData(): Observable<[User[], any[], any[]]> {
+    return forkJoin([
+      this.http.get<User[]>(`${this.apiUrl}/users`),
+      this.http.get<any[]>(`${this.apiUrl}/products`),
+      this.http.get<any[]>(`${this.apiUrl}/orders`)
+    ]).pipe(
+      tap(() => console.log('✅ Todos los datos iniciales cargados'))
+    );
+  }
+  
+  // Merge - Combina múltiples streams
+  getMergedNotifications(): Observable<any> {
+    const interval1$ = interval(1000).pipe(
+      map(i => ({ source: 'interval1', value: i })),
+      take(5)
+    );
+    
+    const interval2$ = interval(1500).pipe(
+      map(i => ({ source: 'interval2', value: i })),
+      take(5)
+    );
+    
+    const interval3$ = interval(2000).pipe(
+      map(i => ({ source: 'interval3', value: i })),
+      take(5)
+    );
+    
+    return merge(interval1$, interval2$, interval3$);
+  }
+  
+  // Zip - Combina por índice
+  getZippedData(): Observable<[number, string, boolean]> {
+    const numbers$ = of(1, 2, 3, 4, 5);
+    const letters$ = of('a', 'b', 'c', 'd', 'e');
+    const booleans$ = of(true, false, true, false, true);
+    
+    return zip(numbers$, letters$, booleans$);
+  }
+
+  // 6. MANEJO DE ERRORES
+  
+  // Retry simple
+  fetchWithRetry(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+      retry(3),
+      catchError(error => {
+        console.error('❌ Error después de 3 intentos:', error);
+        return throwError(() => error);
+      })
+    );
+  }
+  
+  // Retry con delay exponencial
+  fetchWithExponentialBackoff(): Observable<User[]> {
+    let retryCount = 0;
+    
+    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+      retryWhen(errors =>
+        errors.pipe(
+          tap(() => retryCount++),
+          delay(Math.pow(2, retryCount) * 1000),
+          take(3)
+        )
+      ),
+      catchError(error => {
+        console.error('❌ Error después de reintentos con backoff:', error);
+        return of([]);
+      })
+    );
+  }
+  
+  // Timeout con fallback
+  fetchWithTimeout(): Observable<User[]> {
+    return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+      timeout(5000),
+      catchError(error => {
+        if (error.name === 'TimeoutError') {
+          console.warn('⏱️ Timeout - retornando datos de caché');
+          return of([]); // Retornar datos de caché o valores por defecto
+        }
+        return throwError(() => error);
+      })
+    );
+  }
+
+  // 7. COMPARTIR OBSERVABLES
+  
+  // ShareReplay - Cachear resultados
+  private cachedUsers$ = this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
+    tap(() => console.log('📥 Cargando usuarios del servidor')),
+    shareReplay(1)
+  );
+  
+  getCachedUsers(): Observable<User[]> {
+    return this.cachedUsers$;
+  }
+
+  // 8. MÉTODOS DE UTILIDAD
+  
+  // Emitir valores en Subjects
+  emitData(data: any): void {
+    this.dataSubject.next(data);
+  }
+  
+  setUser(user: User | null): void {
+    this.userSubject.next(user);
+  }
+  
+  addMessage(message: string): void {
+    this.messagesSubject.next(message);
+  }
+  
+  completeResult(value: any): void {
+    this.resultSubject.next(value);
+    this.resultSubject.complete();
+  }
+
+  // Cleanup
+  cleanup(): void {
+    this.dataSubject.complete();
+    this.userSubject.complete();
+    this.messagesSubject.complete();
+    this.resultSubject.complete();
+  }
+}
+Paso 2.2: Crear Componente de Demostración de RxJS
+ng generate component components/rxjs-demo --standalone --skip-tests
+components/rxjs-demo/rxjs-demo.component.ts:
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { Subject, Subscription } from 'rxjs';
+import { RxjsFundamentalsService } from '../../services/rxjs-fundamentals.service';
+
+@Component({
+  selector: 'app-rxjs-demo',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="rxjs-container">
+      <h2>🌊 Laboratorio de RxJS y Observables</h2>
+
+      <!-- Subjects Demo -->
+      <div class="demo-card">
+        <h3>1. Subjects - Patrón Observer</h3>
+        
+        <div class="subject-section">
+          <h4>BehaviorSubject (Usuario Actual)</h4>
+          <button (click)="setUser()">Cambiar Usuario</button>
+          <div class="output">
+            Usuario actual: {{ currentUser | json }}
+          </div>
+        </div>
+
+        <div class="subject-section">
+          <h4>ReplaySubject (Historial de Mensajes)</h4>
+          <input [(ngModel)]="newMessage" placeholder="Nuevo mensaje">
+          <button (click)="addMessage()">Agregar</button>
+          <div class="messages">
+            <div *ngFor="let msg of messages" class="message">
+              {{ msg }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Operadores de Transformación -->
+      <div class="demo-card">
+        <h3>2. Operadores de Transformación</h3>
+        
+        <button (click)="testTransformOperators()">Ejecutar Transformaciones</button>
+        
+        <div class="results">
+          <div class="result-item" *ngFor="let result of transformResults">
+            <strong>{{ result.operator }}:</strong>
+            <pre>{{ result.data | json }}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Búsqueda con SwitchMap -->
+      <div class="demo-card">
+        <h3>3. Búsqueda Reactiva (SwitchMap)</h3>
+        
+        <input 
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearch($event)"
+          placeholder="Buscar usuarios..."
+          class="search-input">
+        
+        <div class="search-status">
+          {{ searchStatus }}
+        </div>
+        
+        <div class="search-results">
+          <div *ngFor="let user of searchResults" class="search-item">
+            {{ user.name }} - {{ user.email }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Operadores de Combinación -->
+      <div class="demo-card">
+        <h3>4. Operadores de Combinación</h3>
+        
+        <div class="operator-buttons">
+          <button (click)="testCombineLatest()">CombineLatest</button>
+          <button (click)="testForkJoin()">ForkJoin</button>
+          <button (click)="testMerge()">Merge</button>
+          <button (click)="testZip()">Zip</button>
+        </div>
+        
+        <div class="combination-results">
+          <div *ngFor="let result of combinationResults" class="result">
+            <strong>{{ result.type }}:</strong>
+            <pre>{{ result.data | json }}</pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Manejo de Errores -->
+      <div class="demo-card">
+        <h3>5. Manejo de Errores y Retry</h3>
+        
+        <div class="error-buttons">
+          <button (click)="testRetry()">Test Retry</button>
+          <button (click)="testTimeout()">Test Timeout</button>
+          <button (click)="testCachedData()">Test Cache</button>
+        </div>
+        
+        <div class="error-log">
+          <div *ngFor="let log of errorLogs" class="log-entry" [class.error]="log.type === 'error'">
+            [{{ log.time }}] {{ log.message }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Métricas -->
+      <div class="metrics-card">
+        <h3>📊 Métricas de Observables</h3>
+        <div class="metrics">
+          <div class="metric">
+            <span>Suscripciones Activas:</span>
+            <span class="value">{{ activeSubscriptions }}</span>
+          </div>
+          <div class="metric">
+            <span>Eventos Emitidos:</span>
+            <span class="value">{{ eventsEmitted }}</span>
+          </div>
+          <div class="metric">
+            <span>Errores Manejados:</span>
+            <span class="value">{{ errorsHandled }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .rxjs-container {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      color: #673ab7;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #673ab7;
+      padding-bottom: 0.5rem;
+    }
+
+    .subject-section {
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+    }
+
+    .messages {
+      margin-top: 1rem;
+      max-height: 150px;
+      overflow-y: auto;
+    }
+
+    .message {
+      padding: 0.5rem;
+      background: white;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      border-left: 3px solid #673ab7;
+    }
+
+    button {
+      background: #673ab7;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-right: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    button:hover {
+      background: #512da8;
+    }
+
+    input {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-right: 0.5rem;
+      min-width: 200px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      font-size: 1rem;
+    }
+
+    .search-status {
+      margin: 1rem 0;
+      color: #666;
+      font-style: italic;
+    }
+
+    .search-results {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .search-item {
+      padding: 0.75rem;
+      background: #f9f9f9;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      border-left: 3px solid #4caf50;
+    }
+
+    .operator-buttons {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .results, .combination-results {
+      margin-top: 1rem;
+    }
+
+    .result-item, .result {
+      background: #f5f5f5;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+    }
+
+    pre {
+      margin: 0.5rem 0 0 0;
+      padding: 0.5rem;
+      background: white;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+
+    .error-log {
+      background: #2c3e50;
+      color: #4caf50;
+      padding: 1rem;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+
+    .log-entry {
+      margin-bottom: 0.25rem;
+    }
+
+    .log-entry.error {
+      color: #f44336;
+    }
+
+    .metrics-card {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-top: 2rem;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+
+    .metric {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.5rem;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+    }
+
+    .metric .value {
+      font-weight: bold;
+      font-size: 1.2rem;
+    }
+  `]
+})
+export class RxjsDemoComponent implements OnInit, OnDestroy {
+  private rxjsService = inject(RxjsFundamentalsService);
+  private destroy$ = new Subject<void>();
+  private subscriptions: Subscription[] = [];
+
+  // UI State
+  currentUser: any = null;
+  messages: string[] = [];
+  newMessage = '';
+  searchTerm = '';
+  searchStatus = 'Escribe al menos 2 caracteres para buscar...';
+  searchResults: any[] = [];
+  transformResults: any[] = [];
+  combinationResults: any[] = [];
+  errorLogs: any[] = [];
+
+  // Search Subject
+  private searchSubject = new Subject<string>();
+
+  // Metrics
+  activeSubscriptions = 0;
+  eventsEmitted = 0;
+  errorsHandled = 0;
+
+  ngOnInit() {
+    this.setupSubscriptions();
+  }
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.rxjsService.cleanup();
+  }
+
+  private setupSubscriptions() {
+    // Usuario actual
+    const userSub = this.rxjsService.user$.subscribe(user => {
+      this.currentUser = user;
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(userSub);
+
+    // Mensajes
+    const msgSub = this.rxjsService.messages$.subscribe(msg => {
+      if (msg) {
+        this.messages.push(msg);
+        if (this.messages.length > 3) {
+          this.messages.shift();
+        }
+        this.eventsEmitted++;
+      }
+    });
+    this.subscriptions.push(msgSub);
+
+    // Búsqueda reactiva
+    const searchSub = this.rxjsService
+      .searchWithSwitchMap(this.searchSubject)
+      .subscribe(results => {
+        this.searchResults = results;
+        this.searchStatus = results.length 
+          ? `${results.length} resultados encontrados` 
+          : 'No se encontraron resultados';
+        this.eventsEmitted++;
+      });
+    this.subscriptions.push(searchSub);
+
+    this.activeSubscriptions = this.subscriptions.length;
+  }
+
+  setUser() {
+    const users = [
+      { id: 1, name: 'Ana García', email: 'ana@provias.gob.pe', role: 'admin', isActive: true },
+      { id: 2, name: 'Carlos López', email: 'carlos@provias.gob.pe', role: 'user', isActive: true },
+      { id: 3, name: 'María Rodriguez', email: 'maria@provias.gob.pe', role: 'user', isActive: false }
+    ];
+    
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    this.rxjsService.setUser(randomUser);
+    this.logEvent(`Usuario cambiado a: ${randomUser.name}`);
+  }
+
+  addMessage() {
+    if (this.newMessage.trim()) {
+      const timestamp = new Date().toLocaleTimeString();
+      const message = `[${timestamp}] ${this.newMessage}`;
+      this.rxjsService.addMessage(message);
+      this.newMessage = '';
+      this.logEvent('Mensaje agregado al ReplaySubject');
+    }
+  }
+
+  onSearch(term: string) {
+    this.searchStatus = term.length < 2 
+      ? 'Escribe al menos 2 caracteres para buscar...' 
+      : 'Buscando...';
+    this.searchSubject.next(term);
+  }
+
+  testTransformOperators() {
+    this.transformResults = [];
+
+    // Map
+    const mapSub = this.rxjsService.getUserNames().subscribe(names => {
+      this.transformResults.push({ operator: 'Map', data: names });
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(mapSub);
+
+    // Filter
+    const filterSub = this.rxjsService.getActiveUsers().subscribe(users => {
+      this.transformResults.push({ operator: 'Filter', data: users });
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(filterSub);
+
+    // Scan
+    const scanSub = this.rxjsService.getAccumulatedValues().subscribe(sum => {
+      const existing = this.transformResults.find(r => r.operator === 'Scan');
+      if (existing) {
+        existing.data = sum;
+      } else {
+        this.transformResults.push({ operator: 'Scan', data: sum });
+      }
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(scanSub);
+
+    this.logEvent('Operadores de transformación ejecutados');
+  }
+
+  testCombineLatest() {
+    const sub = this.rxjsService.getCombinedData().subscribe(data => {
+      this.combinationResults = [
+        { type: 'CombineLatest', data },
+        ...this.combinationResults.slice(0, 2)
+      ];
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(sub);
+    this.logEvent('CombineLatest ejecutado');
+  }
+
+  testForkJoin() {
+    const sub = this.rxjsService.loadInitialData().subscribe(data => {
+      this.combinationResults = [
+        { 
+          type: 'ForkJoin', 
+          data: {
+            users: data[0],
+            products: data[1],
+            orders: data[2]
+          }
+        },
+        ...this.combinationResults.slice(0, 2)
+      ];
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(sub);
+    this.logEvent('ForkJoin ejecutado - esperando todos los observables');
+  }
+
+  testMerge() {
+    const sub = this.rxjsService.getMergedNotifications()
+      .subscribe(notification => {
+        const existing = this.combinationResults.find(r => r.type === 'Merge');
+        if (existing) {
+          if (!Array.isArray(existing.data)) {
+            existing.data = [];
+          }
+          existing.data.push(notification);
+        } else {
+          this.combinationResults.unshift({ 
+            type: 'Merge', 
+            data: [notification] 
+          });
+        }
+        this.eventsEmitted++;
+      });
+    this.subscriptions.push(sub);
+    this.logEvent('Merge ejecutado - combinando múltiples streams');
+  }
+
+  testZip() {
+    const sub = this.rxjsService.getZippedData().subscribe(data => {
+      const existing = this.combinationResults.find(r => r.type === 'Zip');
+      if (existing) {
+        if (!Array.isArray(existing.data)) {
+          existing.data = [];
+        }
+        existing.data.push(data);
+      } else {
+        this.combinationResults.unshift({ 
+          type: 'Zip', 
+          data: [data] 
+        });
+      }
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(sub);
+    this.logEvent('Zip ejecutado - combinando por índice');
+  }
+
+  testRetry() {
+    this.logEvent('Iniciando test de retry...');
+    const sub = this.rxjsService.fetchWithRetry().subscribe({
+      next: (users) => {
+        this.logEvent(`✅ Retry exitoso: ${users.length} usuarios cargados`);
+        this.eventsEmitted++;
+      },
+      error: (error) => {
+        this.logEvent
+LABORATORIO SESIÓN 7 - PARTE 2: SIGNALS Y ESTADO GLOBAL
+Continuación desde RxJS Demo Component
+Continuación del componente RxJS Demo
+  // Continuación del método testRetry()
+  testRetry() {
+    this.logEvent('Iniciando test de retry...');
+    const sub = this.rxjsService.fetchWithRetry().subscribe({
+      next: (users) => {
+        this.logEvent(`✅ Retry exitoso: ${users.length} usuarios cargados`);
+        this.eventsEmitted++;
+      },
+      error: (error) => {
+        this.logEvent(`❌ Error después de reintentos: ${error.message}`, 'error');
+        this.errorsHandled++;
+      }
+    });
+    this.subscriptions.push(sub);
+  }
+
+  testTimeout() {
+    this.logEvent('Testing timeout con fallback...');
+    const sub = this.rxjsService.fetchWithTimeout().subscribe({
+      next: (users) => {
+        this.logEvent(`✅ Datos cargados: ${users.length} usuarios`);
+        this.eventsEmitted++;
+      },
+      error: (error) => {
+        this.logEvent(`❌ Error de timeout: ${error.message}`, 'error');
+        this.errorsHandled++;
+      }
+    });
+    this.subscriptions.push(sub);
+  }
+
+  testCachedData() {
+    this.logEvent('Cargando datos cacheados...');
+    
+    // Primera llamada - carga del servidor
+    const sub1 = this.rxjsService.getCachedUsers().subscribe(users => {
+      this.logEvent(`📥 Primera llamada: ${users.length} usuarios`);
+      this.eventsEmitted++;
+    });
+    this.subscriptions.push(sub1);
+
+    // Segunda llamada - desde caché
+    setTimeout(() => {
+      const sub2 = this.rxjsService.getCachedUsers().subscribe(users => {
+        this.logEvent(`💾 Segunda llamada (caché): ${users.length} usuarios`);
+        this.eventsEmitted++;
+      });
+      this.subscriptions.push(sub2);
+    }, 1000);
+  }
+
+  private logEvent(message: string, type: 'info' | 'error' = 'info') {
+    const time = new Date().toLocaleTimeString();
+    this.errorLogs.unshift({ time, message, type });
+    if (this.errorLogs.length > 10) {
+      this.errorLogs.pop();
+    }
+  }
+}
+________________________________________
+☕ BREAK (15 minutos)
+20:30 - 20:45
+Checkpoint de Progreso
+Antes del break, verifica que tengas:
+•	✅ Proyecto Angular configurado con proxy
+•	✅ JSON Server funcionando en puerto 3000
+•	✅ Servicios de Promises y RxJS implementados
+•	✅ Componentes de demo funcionando
+•	✅ Al menos 5 ejemplos de operadores RxJS probados
+________________________________________
+🚀 LAB 3: ANGULAR SIGNALS (45 minutos)
+PARTE 1: Introducción a Signals
+Paso 3.1: Crear Servicio de Signals Básico
+ng generate service services/signals-fundamentals --skip-tests
+services/signals-fundamentals.service.ts:
+import { Injectable, signal, computed, effect, untracked, Signal, WritableSignal } from '@angular/core';
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high';
+  createdAt: Date;
+}
+
+interface CartItem {
+  id: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+@Injectable({ providedIn: 'root' })
+export class SignalsFundamentalsService {
+  
+  // 1. SIGNALS BÁSICOS
+  
+  // Signal simple de contador
+  private _counter = signal(0);
+  public counter = this._counter.asReadonly();
+  
+  // Signal de string
+  private _username = signal('Usuario Invitado');
+  public username = this._username.asReadonly();
+  
+  // Signal de boolean
+  private _isDarkMode = signal(false);
+  public isDarkMode = this._isDarkMode.asReadonly();
+
+  // 2. SIGNALS CON OBJETOS Y ARRAYS
+  
+  // Signal de array de todos
+  private _todos = signal<Todo[]>([]);
+  public todos = this._todos.asReadonly();
+  
+  // Signal de carrito de compras
+  private _cartItems = signal<CartItem[]>([]);
+  public cartItems = this._cartItems.asReadonly();
+  
+  // Signal de configuración
+  private _config = signal({
+    theme: 'light',
+    language: 'es',
+    notifications: true,
+    autoSave: false
+  });
+  public config = this._config.asReadonly();
+
+  // 3. COMPUTED SIGNALS - Valores derivados
+  
+  // Contador doble
+  public doubleCounter = computed(() => this._counter() * 2);
+  
+  // Contador es par
+  public isEven = computed(() => this._counter() % 2 === 0);
+  
+  // Mensaje de bienvenida
+  public welcomeMessage = computed(() => 
+    `¡Hola, ${this._username()}! ${this._isDarkMode() ? '🌙' : '☀️'}`
+  );
+  
+  // Todos completados
+  public completedTodos = computed(() => 
+    this._todos().filter(todo => todo.completed)
+  );
+  
+  // Todos activos
+  public activeTodos = computed(() => 
+    this._todos().filter(todo => !todo.completed)
+  );
+  
+  // Estadísticas de todos
+  public todoStats = computed(() => {
+    const todos = this._todos();
+    const total = todos.length;
+    const completed = todos.filter(t => t.completed).length;
+    const active = total - completed;
+    const completionRate = total > 0 ? (completed / total) * 100 : 0;
+    
+    return {
+      total,
+      completed,
+      active,
+      completionRate: Math.round(completionRate)
+    };
+  });
+  
+  // Todos por prioridad
+  public todosByPriority = computed(() => {
+    const todos = this._todos();
+    return {
+      high: todos.filter(t => t.priority === 'high'),
+      medium: todos.filter(t => t.priority === 'medium'),
+      low: todos.filter(t => t.priority === 'low')
+    };
+  });
+  
+  // Total del carrito
+  public cartTotal = computed(() => 
+    this._cartItems().reduce((sum, item) => sum + (item.price * item.quantity), 0)
+  );
+  
+  // Cantidad de items en el carrito
+  public cartItemCount = computed(() => 
+    this._cartItems().reduce((sum, item) => sum + item.quantity, 0)
+  );
+  
+  // Carrito está vacío
+  public isCartEmpty = computed(() => this._cartItems().length === 0);
+
+  // 4. MÉTODOS DE ACTUALIZACIÓN
+  
+  // Counter methods
+  increment(): void {
+    this._counter.update(count => count + 1);
+  }
+  
+  decrement(): void {
+    this._counter.update(count => Math.max(0, count - 1));
+  }
+  
+  resetCounter(): void {
+    this._counter.set(0);
+  }
+  
+  setCounter(value: number): void {
+    this._counter.set(value);
+  }
+  
+  // Username methods
+  setUsername(name: string): void {
+    this._username.set(name);
+  }
+  
+  // Theme methods
+  toggleDarkMode(): void {
+    this._isDarkMode.update(isDark => !isDark);
+  }
+  
+  setDarkMode(isDark: boolean): void {
+    this._isDarkMode.set(isDark);
+  }
+  
+  // Todo methods
+  addTodo(text: string, priority: 'low' | 'medium' | 'high' = 'medium'): void {
+    const newTodo: Todo = {
+      id: crypto.randomUUID(),
+      text,
+      completed: false,
+      priority,
+      createdAt: new Date()
+    };
+    
+    this._todos.update(todos => [...todos, newTodo]);
+  }
+  
+  toggleTodo(id: string): void {
+    this._todos.update(todos =>
+      todos.map(todo =>
+        todo.id === id
+          ? { ...todo, completed: !todo.completed }
+          : todo
+      )
+    );
+  }
+  
+  updateTodoPriority(id: string, priority: 'low' | 'medium' | 'high'): void {
+    this._todos.update(todos =>
+      todos.map(todo =>
+        todo.id === id
+          ? { ...todo, priority }
+          : todo
+      )
+    );
+  }
+  
+  removeTodo(id: string): void {
+    this._todos.update(todos => todos.filter(todo => todo.id !== id));
+  }
+  
+  clearCompletedTodos(): void {
+    this._todos.update(todos => todos.filter(todo => !todo.completed));
+  }
+  
+  clearAllTodos(): void {
+    this._todos.set([]);
+  }
+  
+  // Cart methods
+  addToCart(item: Omit<CartItem, 'id'>): void {
+    this._cartItems.update(items => {
+      const existingItem = items.find(i => i.name === item.name);
+      
+      if (existingItem) {
+        // Si el item ya existe, incrementar cantidad
+        return items.map(i =>
+          i.name === item.name
+            ? { ...i, quantity: i.quantity + item.quantity }
+            : i
+        );
+      } else {
+        // Si es nuevo, agregarlo
+        return [...items, { ...item, id: crypto.randomUUID() }];
+      }
+    });
+  }
+  
+  updateCartItemQuantity(id: string, quantity: number): void {
+    if (quantity <= 0) {
+      this.removeFromCart(id);
+      return;
+    }
+    
+    this._cartItems.update(items =>
+      items.map(item =>
+        item.id === id
+          ? { ...item, quantity }
+          : item
+      )
+    );
+  }
+  
+  removeFromCart(id: string): void {
+    this._cartItems.update(items => items.filter(item => item.id !== id));
+  }
+  
+  clearCart(): void {
+    this._cartItems.set([]);
+  }
+  
+  // Config methods
+  updateConfig(key: string, value: any): void {
+    this._config.update(config => ({
+      ...config,
+      [key]: value
+    }));
+  }
+
+  // 5. EFFECTS - Side effects reactivos
+  
+  // Effect de logging
+  private loggingEffect = effect(() => {
+    console.log('📊 Estado actual:');
+    console.log('  Counter:', this._counter());
+    console.log('  Username:', this._username());
+    console.log('  Dark Mode:', this._isDarkMode());
+    console.log('  Todos count:', this._todos().length);
+    console.log('  Cart items:', this._cartItems().length);
+  });
+  
+  // Effect de persistencia
+  private persistenceEffect = effect(() => {
+    const state = {
+      counter: this._counter(),
+      username: this._username(),
+      isDarkMode: this._isDarkMode(),
+      todos: this._todos(),
+      cart: this._cartItems(),
+      config: this._config()
+    };
+    
+    // Guardar en localStorage
+    localStorage.setItem('app_state', JSON.stringify(state));
+    console.log('💾 Estado guardado en localStorage');
+  });
+  
+  // Effect con untracked
+  private analyticsEffect = effect(() => {
+    const todos = this._todos();
+    
+    // Usar untracked para evitar dependencias no deseadas
+    untracked(() => {
+      // Estas lecturas no crearán dependencias
+      const timestamp = Date.now();
+      const username = this._username();
+      
+      console.log(`📈 Analytics: ${username} tiene ${todos.length} todos a las ${new Date(timestamp).toLocaleTimeString()}`);
+    });
+  });
+
+  // 6. MÉTODO DE INICIALIZACIÓN
+  
+  initializeFromStorage(): void {
+    const savedState = localStorage.getItem('app_state');
+    
+    if (savedState) {
+      try {
+        const state = JSON.parse(savedState);
+        
+        this._counter.set(state.counter || 0);
+        this._username.set(state.username || 'Usuario Invitado');
+        this._isDarkMode.set(state.isDarkMode || false);
+        this._todos.set(state.todos || []);
+        this._cartItems.set(state.cart || []);
+        this._config.set(state.config || {
+          theme: 'light',
+          language: 'es',
+          notifications: true,
+          autoSave: false
+        });
+        
+        console.log('✅ Estado restaurado desde localStorage');
+      } catch (error) {
+        console.error('Error al restaurar estado:', error);
+      }
+    }
+  }
+
+  // 7. MÉTODOS DE UTILIDAD
+  
+  // Obtener snapshot del estado actual
+  getStateSnapshot() {
+    return {
+      counter: this._counter(),
+      username: this._username(),
+      isDarkMode: this._isDarkMode(),
+      todos: this._todos(),
+      cart: this._cartItems(),
+      config: this._config(),
+      computed: {
+        doubleCounter: this.doubleCounter(),
+        todoStats: this.todoStats(),
+        cartTotal: this.cartTotal()
+      }
+    };
+  }
+  
+  // Reset completo
+  resetAll(): void {
+    this._counter.set(0);
+    this._username.set('Usuario Invitado');
+    this._isDarkMode.set(false);
+    this._todos.set([]);
+    this._cartItems.set([]);
+    this._config.set({
+      theme: 'light',
+      language: 'es',
+      notifications: true,
+      autoSave: false
+    });
+  }
+}
+Paso 3.2: Crear Componente de Demostración de Signals
+ng generate component components/signals-demo --standalone --skip-tests
+components/signals-demo/signals-demo.component.ts:
+import { Component, OnInit, inject, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { SignalsFundamentalsService } from '../../services/signals-fundamentals.service';
+
+@Component({
+  selector: 'app-signals-demo',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="signals-container">
+      <h2>⚡ Laboratorio de Angular Signals</h2>
+
+      <!-- Contador Demo -->
+      <div class="demo-card">
+        <h3>1. Signals Básicos - Contador</h3>
+        
+        <div class="counter-section">
+          <div class="counter-display">
+            <div class="value">{{ signalsService.counter() }}</div>
+            <div class="computed">
+              <span>Doble: {{ signalsService.doubleCounter() }}</span>
+              <span>Es Par: {{ signalsService.isEven() ? 'Sí' : 'No' }}</span>
+            </div>
+          </div>
+          
+          <div class="counter-controls">
+            <button (click)="signalsService.decrement()">-</button>
+            <button (click)="signalsService.resetCounter()">Reset</button>
+            <button (click)="signalsService.increment()">+</button>
+          </div>
+          
+          <div class="counter-input">
+            <input 
+              type="number" 
+              #counterInput
+              placeholder="Set value">
+            <button (click)="setCounterValue(counterInput.value)">Set</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- User & Theme -->
+      <div class="demo-card">
+        <h3>2. Estado de Usuario y Tema</h3>
+        
+        <div class="user-section">
+          <div class="welcome-message">
+            {{ signalsService.welcomeMessage() }}
+          </div>
+          
+          <div class="user-controls">
+            <input 
+              type="text" 
+              [(ngModel)]="newUsername"
+              placeholder="Nuevo nombre de usuario">
+            <button (click)="updateUsername()">Actualizar</button>
+          </div>
+          
+          <div class="theme-toggle">
+            <label class="switch">
+              <input 
+                type="checkbox" 
+                [checked]="signalsService.isDarkMode()"
+                (change)="signalsService.toggleDarkMode()">
+              <span class="slider"></span>
+            </label>
+            <span>Modo Oscuro: {{ signalsService.isDarkMode() ? 'Activado' : 'Desactivado' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Todo List -->
+      <div class="demo-card">
+        <h3>3. Lista de Tareas con Signals</h3>
+        
+        <div class="todo-stats">
+          <div class="stat">
+            <span class="label">Total:</span>
+            <span class="value">{{ signalsService.todoStats().total }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Completadas:</span>
+            <span class="value">{{ signalsService.todoStats().completed }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Activas:</span>
+            <span class="value">{{ signalsService.todoStats().active }}</span>
+          </div>
+          <div class="stat">
+            <span class="label">Progreso:</span>
+            <span class="value">{{ signalsService.todoStats().completionRate }}%</span>
+          </div>
+        </div>
+        
+        <div class="todo-input">
+          <input 
+            [(ngModel)]="newTodoText"
+            (keyup.enter)="addTodo()"
+            placeholder="Nueva tarea...">
+          <select [(ngModel)]="newTodoPriority">
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+          <button (click)="addTodo()">Agregar</button>
+        </div>
+        
+        <div class="todo-filters">
+          <button 
+            [class.active]="todoFilter === 'all'"
+            (click)="todoFilter = 'all'">
+            Todas ({{ signalsService.todos().length }})
+          </button>
+          <button 
+            [class.active]="todoFilter === 'active'"
+            (click)="todoFilter = 'active'">
+            Activas ({{ signalsService.activeTodos().length }})
+          </button>
+          <button 
+            [class.active]="todoFilter === 'completed'"
+            (click)="todoFilter = 'completed'">
+            Completadas ({{ signalsService.completedTodos().length }})
+          </button>
+        </div>
+        
+        <div class="todo-list">
+          <div 
+            *ngFor="let todo of getFilteredTodos()" 
+            class="todo-item"
+            [class.completed]="todo.completed">
+            
+            <input 
+              type="checkbox" 
+              [checked]="todo.completed"
+              (change)="signalsService.toggleTodo(todo.id)">
+            
+            <span class="todo-text">{{ todo.text }}</span>
+            
+            <span class="todo-priority" [class]="'priority-' + todo.priority">
+              {{ todo.priority }}
+            </span>
+            
+            <select 
+              [value]="todo.priority"
+              (change)="changePriority(todo.id, $event)">
+              <option value="low">Baja</option>
+              <option value="medium">Media</option>
+              <option value="high">Alta</option>
+            </select>
+            
+            <button 
+              class="delete-btn"
+              (click)="signalsService.removeTodo(todo.id)">
+              ×
+            </button>
+          </div>
+        </div>
+        
+        <div class="todo-actions">
+          <button (click)="signalsService.clearCompletedTodos()">
+            Limpiar Completadas
+          </button>
+          <button (click)="signalsService.clearAllTodos()">
+            Limpiar Todas
+          </button>
+        </div>
+        
+        <!-- Todos por prioridad -->
+        <div class="priority-breakdown">
+          <h4>Por Prioridad:</h4>
+          <div class="priority-stats">
+            <div class="priority-stat">
+              <span class="priority-high">Alta:</span>
+              <span>{{ signalsService.todosByPriority().high.length }}</span>
+            </div>
+            <div class="priority-stat">
+              <span class="priority-medium">Media:</span>
+              <span>{{ signalsService.todosByPriority().medium.length }}</span>
+            </div>
+            <div class="priority-stat">
+              <span class="priority-low">Baja:</span>
+              <span>{{ signalsService.todosByPriority().low.length }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Shopping Cart -->
+      <div class="demo-card">
+        <h3>4. Carrito de Compras Reactivo</h3>
+        
+        <div class="cart-summary">
+          <div class="summary-item">
+            <span>Items:</span>
+            <span class="value">{{ signalsService.cartItemCount() }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Total:</span>
+            <span class="value">S/. {{ signalsService.cartTotal().toFixed(2) }}</span>
+          </div>
+          <div class="summary-item">
+            <span>Estado:</span>
+            <span class="value">{{ signalsService.isCartEmpty() ? 'Vacío' : 'Con items' }}</span>
+          </div>
+        </div>
+        
+        <div class="add-to-cart">
+          <input [(ngModel)]="newItemName" placeholder="Producto">
+          <input [(ngModel)]="newItemPrice" type="number" placeholder="Precio">
+          <input [(ngModel)]="newItemQuantity" type="number" placeholder="Cantidad">
+          <button (click)="addToCart()">Agregar al Carrito</button>
+        </div>
+        
+        <div class="cart-items" *ngIf="!signalsService.isCartEmpty()">
+          <div *ngFor="let item of signalsService.cartItems()" class="cart-item">
+            <span class="item-name">{{ item.name }}</span>
+            <span class="item-price">S/. {{ item.price }}</span>
+            <input 
+              type="number" 
+              [value]="item.quantity"
+              (change)="updateQuantity(item.id, $event)"
+              min="0">
+            <span class="item-total">S/. {{ (item.price * item.quantity).toFixed(2) }}</span>
+            <button (click)="signalsService.removeFromCart(item.id)">×</button>
+          </div>
+        </div>
+        
+        <div class="cart-actions" *ngIf="!signalsService.isCartEmpty()">
+          <button (click)="signalsService.clearCart()">Vaciar Carrito</button>
+          <button class="checkout-btn">Proceder al Pago</button>
+        </div>
+      </div>
+
+      <!-- State Management -->
+      <div class="demo-card">
+        <h3>5. Gestión de Estado</h3>
+        
+        <div class="state-actions">
+          <button (click)="saveState()">💾 Guardar Estado</button>
+          <button (click)="loadState()">📥 Cargar Estado</button>
+          <button (click)="resetState()">🔄 Reset Todo</button>
+          <button (click)="showSnapshot()">📸 Ver Snapshot</button>
+        </div>
+        
+        <div class="state-snapshot" *ngIf="stateSnapshot">
+          <h4>Estado Actual:</h4>
+          <pre>{{ stateSnapshot | json }}</pre>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .signals-container {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .demo-card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h3 {
+      color: #e91e63;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #e91e63;
+      padding-bottom: 0.5rem;
+    }
+
+    /* Counter Styles */
+    .counter-section {
+      text-align: center;
+    }
+
+    .counter-display {
+      margin-bottom: 2rem;
+    }
+
+    .counter-display .value {
+      font-size: 4rem;
+      font-weight: bold;
+      color: #e91e63;
+      margin-bottom: 1rem;
+    }
+
+    .counter-display .computed {
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+      color: #666;
+    }
+
+    .counter-controls {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .counter-controls button {
+      width: 60px;
+      height: 60px;
+      font-size: 1.5rem;
+      border-radius: 50%;
+      border: 2px solid #e91e63;
+      background: white;
+      color: #e91e63;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .counter-controls button:hover {
+      background: #e91e63;
+      color: white;
+    }
+
+    .counter-input {
+      display: flex;
+      justify-content: center;
+      gap: 0.5rem;
+    }
+
+    /* User & Theme Styles */
+    .welcome-message {
+      font-size: 1.5rem;
+      text-align: center;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+    }
+
+    .user-controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    /* Switch Styles */
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 34px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #e91e63;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(26px);
+    }
+
+    /* Todo Styles */
+    .todo-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat .label {
+      display: block;
+      color: #666;
+      font-size: 0.9rem;
+    }
+
+    .stat .value {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: bold;
+      color: #e91e63;
+    }
+
+    .todo-input {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .todo-input input {
+      flex: 1;
+    }
+
+    .todo-filters {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .todo-filters button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #ddd;
+      background: white;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+
+    .todo-filters button.active {
+      background: #e91e63;
+      color: white;
+      border-color: #e91e63;
+    }
+
+    .todo-list {
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .todo-item.completed {
+      opacity: 0.6;
+    }
+
+    .todo-item.completed .todo-text {
+      text-decoration: line-through;
+    }
+
+    .todo-text {
+      flex: 1;
+    }
+
+    .todo-priority {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .priority-high {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .priority-medium {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .priority-low {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .delete-btn {
+      width: 30px;
+      height: 30px;
+      border: none;
+      background: #f44336;
+      color: white;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    .todo-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .priority-breakdown {
+      margin-top: 1.5rem;
+      padding: 1rem;
+      background: #f9f9f9;
+      border-radius: 8px;
+    }
+
+    .priority-stats {
+      display: flex;
+      gap: 1rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Cart Styles */
+    .cart-summary {
+      display: flex;
+      justify-content: space-between;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-item {
+      text-align: center;
+    }
+
+    .add-to-cart {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .cart-items {
+      margin-bottom: 1rem;
+    }
+
+    .cart-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: center;
+      padding: 0.75rem;
+      background: #f9f9f9;
+      border-radius: 4px;
+      margin-bottom: 0.5rem;
+    }
+
+    .cart-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: space-between;
+    }
+
+    .checkout-btn {
+      background: #4caf50;
+      color: white;
+    }
+
+    /* State Management Styles */
+    .state-actions {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .state-snapshot {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      max-height: 400px;
+      overflow-y: auto;
+    }
+
+    .state-snapshot pre {
+      margin: 0;
+      font-size: 0.9rem;
+    }
+
+    /* Common Styles */
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #e91e63;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #c2185b;
+      transform: translateY(-2px);
+    }
+
+    input, select {
+      padding: 0.5rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+
+    input[type="number"] {
+      width: 80px;
+    }
+  `]
+})
+export class SignalsDemoComponent implements OnInit {
+  signalsService = inject(SignalsFundamentalsService);
+  
+  // UI State
+  newUsername = '';
+  newTodoText = '';
+  newTodoPriority: 'low' | 'medium' | 'high' = 'medium';
+  todoFilter: 'all' | 'active' | 'completed' = 'all';
+  
+  newItemName = '';
+  newItemPrice = 0;
+  newItemQuantity = 1;
+  
+  stateSnapshot: any = null;
+
+  // Effect para logging
+  private loggingEffect = effect(() => {
+    console.log('🔍 Signals Demo - Estado actualizado');
+    console.log('  Counter:', this.signalsService.counter());
+    console.log('  Todos:', this.signalsService.todos().length);
+    console.log('  Cart:', this.signalsService.cartItems().length);
+  });
+
+  ngOnInit() {
+    // Inicializar desde localStorage si existe
+    this.signalsService.initializeFromStorage();
+    
+    // Agregar algunos datos de ejemplo
+    this.addSampleData();
+  }
+
+  private addSampleData() {
+    // Solo agregar si no hay datos
+    if (this.signalsService.todos().length === 0) {
+      this.signalsService.addTodo('Aprender Angular Signals', 'high');
+      this.signalsService.addTodo('Practicar RxJS', 'medium');
+      this.signalsService.addTodo('Revisar documentación', 'low');
+    }
+    
+    if (this.signalsService.cartItems().length === 0) {
+      this.signalsService.addToCart({
+        name: 'Laptop Dell',
+        price: 2500,
+        quantity: 1
+      });
+      this.signalsService.addToCart({
+        name: 'Mouse Logitech',
+        price: 50,
+        quantity: 2
+      });
+    }
+  }
+
+  setCounterValue(value: string) {
+    const numValue = parseInt(value, 10);
+    if (!isNaN(numValue)) {
+      this.signalsService.setCounter(numValue);
+    }
+  }
+
+  updateUsername() {
+    if (this.newUsername.trim()) {
+      this.signalsService.setUsername(this.newUsername);
+      this.newUsername = '';
+    }
+  }
+
+  addTodo() {
+    if (this.newTodoText.trim()) {
+      this.signalsService.addTodo(this.newTodoText, this.newTodoPriority);
+      this.newTodoText = '';
+      this.newTodoPriority = 'medium';
+    }
+  }
+
+  changePriority(todoId: string, event: any) {
+    const priority = event.target.value as 'low' | 'medium' | 'high';
+    this.signalsService.updateTodoPriority(todoId, priority);
+  }
+
+  getFilteredTodos() {
+    switch (this.todoFilter) {
+      case 'active':
+        return this.signalsService.activeTodos();
+      case 'completed':
+        return this.signalsService.completedTodos();
+      default:
+        return this.signalsService.todos();
+    }
+  }
+
+  addToCart() {
+    if (this.newItemName && this.newItemPrice > 0 && this.newItemQuantity > 0) {
+      this.signalsService.addToCart({
+        name: this.newItemName,
+        price: this.newItemPrice,
+        quantity: this.newItemQuantity
+      });
+      
+      // Reset form
+      this.newItemName = '';
+      this.newItemPrice = 0;
+      this.newItemQuantity = 1;
+    }
+  }
+
+  updateQuantity(itemId: string, event: any) {
+    const quantity = parseInt(event.target.value, 10);
+    if (!isNaN(quantity)) {
+      this.signalsService.updateCartItemQuantity(itemId, quantity);
+    }
+  }
+
+  saveState() {
+    console.log('💾 Estado guardado manualmente');
+    alert('Estado guardado en localStorage');
+  }
+
+  loadState() {
+    this.signalsService.initializeFromStorage();
+    console.log('📥 Estado cargado desde localStorage');
+    alert('Estado cargado desde localStorage');
+  }
+
+  resetState() {
+    if (confirm('¿Estás seguro de resetear todo el estado?')) {
+      this.signalsService.resetAll();
+      console.log('🔄 Estado reseteado');
+    }
+  }
+
+  showSnapshot() {
+    this.stateSnapshot = this.signalsService.getStateSnapshot();
+  }
+}
+________________________________________
+🔄 LAB 4: MIGRACIÓN Y ESTADO GLOBAL (25 minutos)
+PARTE 1: Servicio de Estado Global con Signals
+Paso 4.1: Crear Servicio de Estado Global
+ng generate service services/global-state --skip-tests
+services/global-state.service.ts:
+import { Injectable, signal, computed, effect } from '@angular/core';
+import { toObservable, toSignal } from '@angular/core/rxjs-interop';
+import { Observable } from 'rxjs';
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+  role: 'admin' | 'user' | 'guest';
+  avatar?: string;
+}
+
+interface Notification {
+  id: string;
+  title: string;
+  message: string;
+  type: 'info' | 'success' | 'warning' | 'error';
+  read: boolean;
+  timestamp: Date;
+}
+
+interface AppSettings {
+  theme: 'light' | 'dark' | 'auto';
+  language: 'es' | 'en' | 'pt';
+  notifications: boolean;
+  sounds: boolean;
+  autoSave: boolean;
+  compactView: boolean;
+}
+
+@Injectable({ providedIn: 'root' })
+export class GlobalStateService {
+  
+  // 1. ESTADO DE USUARIO
+  private readonly _currentUser = signal<User | null>(null);
+  private readonly _isAuthenticated = computed(() => this._currentUser() !== null);
+  private readonly _userRole = computed(() => this._currentUser()?.role || 'guest');
+  private readonly _isAdmin = computed(() => this._userRole() === 'admin');
+  
+  // Exposición pública
+  readonly currentUser = this._currentUser.asReadonly();
+  readonly isAuthenticated = this._isAuthenticated;
+  readonly userRole = this._userRole;
+  readonly isAdmin = this._isAdmin;
+
+  // 2. ESTADO DE LA APLICACIÓN
+  private readonly _loading = signal(false);
+  private readonly _error = signal<string | null>(null);
+  private readonly _successMessage = signal<string | null>(null);
+  
+  readonly loading = this._loading.asReadonly();
+  readonly error = this._error.asReadonly();
+  readonly successMessage = this._successMessage.asReadonly();
+
+  // 3. NOTIFICACIONES
+  private readonly _notifications = signal<Notification[]>([]);
+  private readonly _unreadCount = computed(() => 
+    this._notifications().filter(n => !n.read).length
+  );
+  private readonly _hasNotifications = computed(() => 
+    this._notifications().length > 0
+  );
+  
+  readonly notifications = this._notifications.asReadonly();
+  readonly unreadCount = this._unreadCount;
+  readonly hasNotifications = this._hasNotifications;
+
+  // 4. CONFIGURACIÓN DE LA APLICACIÓN
+  private readonly _settings = signal<AppSettings>({
+    theme: 'light',
+    language: 'es',
+    notifications: true,
+    sounds: true,
+    autoSave: false,
+    compactView: false
+  });
+  
+  readonly settings = this._settings.asReadonly();
+  readonly theme = computed(() => this._settings().theme);
+  readonly language = computed(() => this._settings().language);
+
+  // 5. ESTADO DE NAVEGACIÓN
+  private readonly _currentRoute = signal('/');
+  private readonly _previousRoute = signal<string | null>(null);
+  private readonly _breadcrumbs = signal<string[]>([]);
+  
+  readonly currentRoute = this._currentRoute.asReadonly();
+  readonly previousRoute = this._previousRoute.asReadonly();
+  readonly breadcrumbs = this._breadcrumbs.asReadonly();
+
+  // 6. DATOS DE CACHÉ
+  private readonly _cachedData = signal<Map<string, any>>(new Map());
+  
+  // 7. CONVERSIÓN A OBSERVABLES (para compatibilidad)
+  readonly currentUser$ = toObservable(this._currentUser);
+  readonly isAuthenticated$ = toObservable(this._isAuthenticated);
+  readonly notifications$ = toObservable(this._notifications);
+  readonly settings$ = toObservable(this._settings);
+
+  // 8. EFFECTS PARA SIDE EFFECTS
+  
+  // Effect de persistencia de configuración
+  private readonly persistSettingsEffect = effect(() => {
+    const settings = this._settings();
+    localStorage.setItem('app_settings', JSON.stringify(settings));
+    console.log('⚙️ Configuración guardada:', settings);
+  });
+  
+  // Effect de tema
+  private readonly themeEffect = effect(() => {
+    const theme = this._settings().theme;
+    document.body.className = `theme-${theme}`;
+    console.log('🎨 Tema aplicado:', theme);
+  });
+  
+  // Effect de autenticación
+  private readonly authEffect = effect(() => {
+    const user = this._currentUser();
+    if (user) {
+      console.log(`👤 Usuario autenticado: ${user.name} (${user.role})`);
+      this.loadUserData(user.id);
+    } else {
+      console.log('👤 Usuario no autenticado');
+      this.clearUserData();
+    }
+  });
+
+  // 9. MÉTODOS DE USUARIO
+  
+  login(user: User): void {
+    this._currentUser.set(user);
+    this._error.set(null);
+    this.addNotification(
+      'Bienvenido',
+      `Hola ${user.name}, has iniciado sesión correctamente`,
+      'success'
+    );
+  }
+  
+  logout(): void {
+    const userName = this._currentUser()?.name;
+    this._currentUser.set(null);
+    this._notifications.set([]);
+    this._cachedData.set(new Map());
+    this.addNotification(
+      'Sesión cerrada',
+      `Hasta pronto ${userName}`,
+      'info'
+    );
+  }
+  
+  updateUserProfile(updates: Partial<User>): void {
+    const current = this._currentUser();
+    if (current) {
+      this._currentUser.set({ ...current, ...updates });
+      this.showSuccess('Perfil actualizado correctamente');
+    }
+  }
+
+  // 10. MÉTODOS DE NOTIFICACIONES
+  
+  addNotification(
+    title: string,
+    message: string,
+    type: 'info' | 'success' | 'warning' | 'error' = 'info'
+  ): void {
+    const notification: Notification = {
+      id: crypto.randomUUID(),
+      title,
+      message,
+      type,
+      read: false,
+      timestamp: new Date()
+    };
+    
+    this._notifications.update(notifications => [notification, ...notifications]);
+    
+    // Auto-eliminar después de 10 segundos si es info o success
+    if (type === 'info' || type === 'success') {
+      setTimeout(() => this.removeNotification(notification.id), 10000);
+    }
+  }
+  
+  markAsRead(notificationId: string): void {
+    this._notifications.update(notifications =>
+      notifications.map(n =>
+        n.id === notificationId ? { ...n, read: true } : n
+      )
+    );
+  }
+  
+  markAllAsRead(): void {
+    this._notifications.update(notifications =>
+      notifications.map(n => ({ ...n, read: true }))
+    );
+  }
+  
+  removeNotification(id: string): void {
+    this._notifications.update(notifications =>
+      notifications.filter(n => n.id !== id)
+    );
+  }
+  
+  clearNotifications(): void {
+    this._notifications.set([]);
+  }
+
+  // 11. MÉTODOS DE CONFIGURACIÓN
+  
+  updateSettings(updates: Partial<AppSettings>): void {
+    this._settings.update(settings => ({ ...settings, ...updates }));
+    this.showSuccess('Configuración actualizada');
+  }
+  
+  toggleTheme(): void {
+    this._settings.update(settings => ({
+      ...settings,
+      theme: settings.theme === 'light' ? 'dark' : 'light'
+    }));
+  }
+  
+  setLanguage(language: 'es' | 'en' | 'pt'): void {
+    this._settings.update(settings => ({ ...settings, language }));
+    this.showSuccess(`Idioma cambiado a ${language}`);
+  }
+
+  // 12. MÉTODOS DE ESTADO DE LA APLICACIÓN
+  
+  setLoading(loading: boolean): void {
+    this._loading.set(loading);
+  }
+  
+  showError(message: string): void {
+    this._error.set(message);
+    this._successMessage.set(null);
+    
+    // Auto-limpiar después de 5 segundos
+    setTimeout(() => this._error.set(null), 5000);
+  }
+  
+  showSuccess(message: string): void {
+    this._successMessage.set(message);
+    this._error.set(null);
+    
+    // Auto-limpiar después de 3 segundos
+    setTimeout(() => this._successMessage.set(null), 3000);
+  }
+  
+  clearMessages(): void {
+    this._error.set(null);
+    this._successMessage.set(null);
+  }
+
+  // 13. MÉTODOS DE NAVEGACIÓN
+  
+  navigate(route: string): void {
+    this._previousRoute.set(this._currentRoute());
+    this._currentRoute.set(route);
+    this.updateBreadcrumbs(route);
+  }
+  
+  goBack(): void {
+    const previous = this._previousRoute();
+    if (previous) {
+      this.navigate(previous);
+    }
+  }
+  
+  private updateBreadcrumbs(route: string): void {
+    const parts = route.split('/').filter(p => p);
+    this._breadcrumbs.set(parts);
+  }
+
+  // 14. MÉTODOS DE CACHÉ
+  
+  setCacheData(key: string, data: any): void {
+    this._cachedData.update(cache => {
+      const newCache = new Map(cache);
+      newCache.set(key, data);
+      return newCache;
+    });
+  }
+  
+  getCacheData(key: string): any {
+    return this._cachedData().get(key);
+  }
+  
+  clearCache(key?: string): void {
+    if (key) {
+      this._cachedData.update(cache => {
+        const newCache = new Map(cache);
+        newCache.delete(key);
+        return newCache;
+      });
+    } else {
+      this._cachedData.set(new Map());
+    }
+  }
+
+  // 15. MÉTODOS DE INICIALIZACIÓN
+  
+  initializeApp(): void {
+    console.log('🚀 Inicializando aplicación...');
+    
+    // Cargar configuración desde localStorage
+    const savedSettings = localStorage.getItem('app_settings');
+    if (savedSettings) {
+      try {
+        const settings = JSON.parse(savedSettings);
+        this._settings.set(settings);
+      } catch (error) {
+        console.error('Error cargando configuración:', error);
+      }
+    }
+    
+    // Verificar sesión existente
+    const savedUser = localStorage.getItem('current_user');
+    if (savedUser) {
+      try {
+        const user = JSON.parse(savedUser);
+        this._currentUser.set(user);
+      } catch (error) {
+        console.error('Error cargando usuario:', error);
+      }
+    }
+    
+    console.log('✅ Aplicación inicializada');
+  }
+  
+  private loadUserData(userId: number): void {
+    // Simular carga de datos del usuario
+    console.log(`📥 Cargando datos del usuario ${userId}...`);
+    
+    // Aquí normalmente harías llamadas HTTP
+    setTimeout(() => {
+      this.setCacheData('user_preferences', { theme: 'dark' });
+      this.setCacheData('user_permissions', ['read', 'write']);
+    }, 1000);
+  }
+  
+  private clearUserData(): void {
+    this.clearCache();
+    localStorage.removeItem('current_user');
+  }
+
+  // 16. MÉTODO DE SNAPSHOT
+  
+  getStateSnapshot() {
+    return {
+      user: this._currentUser(),
+      isAuthenticated: this._isAuthenticated(),
+      notifications: this._notifications(),
+      unreadCount: this._unreadCount(),
+      settings: this._settings(),
+      currentRoute: this._currentRoute(),
+      loading: this._loading(),
+      error: this._error(),
+      successMessage: this._successMessage()
+    };
+  }
+}
+Paso 4.2: Crear Componente Final Integrador
+ng generate component components/app-dashboard --standalone --skip-tests
+components/app-dashboard/app-dashboard.component.ts:
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { GlobalStateService } from '../../services/global-state.service';
+
+@Component({
+  selector: 'app-dashboard',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="dashboard" [class.dark-theme]="globalState.theme() === 'dark'">
+      <!-- Header -->
+      <header class="app-header">
+        <div class="header-content">
+          <h1>🚀 PROVIAS - Dashboard Reactivo</h1>
+          
+          <div class="header-actions">
+            <!-- User Info -->
+            <div class="user-info" *ngIf="globalState.isAuthenticated()">
+              <span>{{ globalState.currentUser()?.name }}</span>
+              <span class="role-badge" [class]="'role-' + globalState.userRole()">
+                {{ globalState.userRole() }}
+              </span>
+            </div>
+            
+            <!-- Notifications -->
+            <div class="notifications-icon" (click)="toggleNotifications()">
+              🔔
+              <span class="badge" *ngIf="globalState.unreadCount() > 0">
+                {{ globalState.unreadCount() }}
+              </span>
+            </div>
+            
+            <!-- Theme Toggle -->
+            <button class="theme-toggle" (click)="globalState.toggleTheme()">
+              {{ globalState.theme() === 'light' ? '🌙' : '☀️' }}
+            </button>
+            
+            <!-- Auth Actions -->
+            <button *ngIf="!globalState.isAuthenticated()" (click)="login()">
+              Login
+            </button>
+            <button *ngIf="globalState.isAuthenticated()" (click)="logout()">
+              Logout
+            </button>
+          </div>
+        </div>
+      </header>
+
+      <!-- Messages -->
+      <div class="messages">
+        <div class="error-message" *ngIf="globalState.error()">
+          ❌ {{ globalState.error() }}
+        </div>
+        <div class="success-message" *ngIf="globalState.successMessage()">
+          ✅ {{ globalState.successMessage() }}
+        </div>
+      </div>
+
+      <!-- Main Content -->
+      <div class="main-content">
+        <!-- Notifications Panel -->
+        <div class="notifications-panel" *ngIf="showNotifications">
+          <div class="panel-header">
+            <h3>Notificaciones</h3>
+            <button (click)="globalState.markAllAsRead()">Marcar todas como leídas</button>
+            <button (click)="globalState.clearNotifications()">Limpiar</button>
+          </div>
+          
+          <div class="notifications-list">
+            <div 
+              *ngFor="let notification of globalState.notifications()" 
+              class="notification"
+              [class.unread]="!notification.read"
+              [class]="'notification-' + notification.type">
+              
+              <div class="notification-content">
+                <h4>{{ notification.title }}</h4>
+                <p>{{ notification.message }}</p>
+                <small>{{ notification.timestamp | date:'short' }}</small>
+              </div>
+              
+              <div class="notification-actions">
+                <button 
+                  *ngIf="!notification.read"
+                  (click)="globalState.markAsRead(notification.id)">
+                  ✓
+                </button>
+                <button (click)="globalState.removeNotification(notification.id)">
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Dashboard Cards -->
+        <div class="dashboard-cards">
+          <!-- User Card -->
+          <div class="card">
+            <h3>👤 Usuario</h3>
+            <div *ngIf="globalState.isAuthenticated(); else loginPrompt">
+              <p><strong>Nombre:</strong> {{ globalState.currentUser()?.name }}</p>
+              <p><strong>Email:</strong> {{ globalState.currentUser()?.email }}</p>
+              <p><strong>Rol:</strong> {{ globalState.userRole() }}</p>
+              <p><strong>Admin:</strong> {{ globalState.isAdmin() ? 'Sí' : 'No' }}</p>
+            </div>
+            <ng-template #loginPrompt>
+              <p>No has iniciado sesión</p>
+              <button (click)="login()">Iniciar Sesión</button>
+            </ng-template>
+          </div>
+
+          <!-- Settings Card -->
+          <div class="card">
+            <h3>⚙️ Configuración</h3>
+            <div class="settings-form">
+              <label>
+                <input 
+                  type="checkbox" 
+                  [checked]="globalState.settings().notifications"
+                  (change)="updateSetting('notifications', $event)">
+                Notificaciones
+              </label>
+              
+              <label>
+                <input 
+                  type="checkbox" 
+                  [checked]="globalState.settings().sounds"
+                  (change)="updateSetting('sounds', $event)">
+                Sonidos
+              </label>
+              
+              <label>
+                <input 
+                  type="checkbox" 
+                  [checked]="globalState.settings().autoSave"
+                  (change)="updateSetting('autoSave', $event)">
+                Auto-guardado
+              </label>
+              
+              <label>
+                <input 
+                  type="checkbox" 
+                  [checked]="globalState.settings().compactView"
+                  (change)="updateSetting('compactView', $event)">
+                Vista compacta
+              </label>
+              
+              <label>
+                Idioma:
+                <select 
+                  [value]="globalState.settings().language"
+                  (change)="changeLanguage($event)">
+                  <option value="es">Español</option>
+                  <option value="en">English</option>
+                  <option value="pt">Português</option>
+                </select>
+              </label>
+            </div>
+          </div>
+
+          <!-- Navigation Card -->
+          <div class="card">
+            <h3>🧭 Navegación</h3>
+            <p><strong>Ruta actual:</strong> {{ globalState.currentRoute() }}</p>
+            <p><strong>Ruta anterior:</strong> {{ globalState.previousRoute() || 'N/A' }}</p>
+            <div class="breadcrumbs">
+              <span *ngFor="let crumb of globalState.breadcrumbs(); let last = last">
+                {{ crumb }}
+                <span *ngIf="!last"> / </span>
+              </span>
+            </div>
+            <div class="nav-buttons">
+              <button (click)="navigate('/home')">Home</button>
+              <button (click)="navigate('/products')">Productos</button>
+              <button (click)="navigate('/users')">Usuarios</button>
+              <button (click)="globalState.goBack()">← Atrás</button>
+            </div>
+          </div>
+
+          <!-- State Snapshot Card -->
+          <div class="card full-width">
+            <h3>📸 Estado Global</h3>
+            <button (click)="showStateSnapshot()">Ver Estado Completo</button>
+            <pre *ngIf="stateSnapshot">{{ stateSnapshot | json }}</pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .dashboard {
+      min-height: 100vh;
+      background: #f5f5f5;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .dashboard.dark-theme {
+      background: #1a1a1a;
+      color: #fff;
+    }
+
+    /* Header */
+    .app-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .header-content {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .role-badge {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: bold;
+    }
+
+    .role-admin {
+      background: #ff5722;
+    }
+
+    .role-user {
+      background: #2196f3;
+    }
+
+    .role-guest {
+      background: #9e9e9e;
+    }
+
+    .notifications-icon {
+      position: relative;
+      cursor: pointer;
+      font-size: 1.5rem;
+    }
+
+    .notifications-icon .badge {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #ff5722;
+      color: white;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1px solid white;
+      color: white;
+      padding: 0.5rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 1.2rem;
+    }
+
+    /* Messages */
+    .messages {
+      max-width: 1400px;
+      margin: 1rem auto;
+      padding: 0 2rem;
+    }
+
+    .error-message, .success-message {
+      padding: 1rem;
+      border-radius: 4px;
+      margin-bottom: 1rem;
+    }
+
+    .error-message {
+      background: #ffebee;
+      color: #c62828;
+      border-left: 4px solid #f44336;
+    }
+
+    .success-message {
+      background: #e8f5e9;
+      color: #2e7d32;
+      border-left: 4px solid #4caf50;
+    }
+
+    /* Main Content */
+    .main-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Notifications Panel */
+    .notifications-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,
+LABORATORIO SESIÓN 7 - PARTE 3: DASHBOARD FINAL Y EJERCICIOS
+Continuación del Dashboard Component
+Continuación de los estilos del Dashboard
+    /* Continuación de .notifications-panel */
+    .notifications-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .dark-theme .notifications-panel {
+      background: #2a2a2a;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .notifications-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .notification {
+      display: flex;
+      justify-content: space-between;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      border-radius: 4px;
+      border-left: 3px solid transparent;
+    }
+
+    .notification.unread {
+      background: #f0f4ff;
+    }
+
+    .notification-info {
+      border-left-color: #2196f3;
+    }
+
+    .notification-success {
+      border-left-color: #4caf50;
+    }
+
+    .notification-warning {
+      border-left-color: #ff9800;
+    }
+
+    .notification-error {
+      border-left-color: #f44336;
+    }
+
+    .notification-content h4 {
+      margin: 0 0 0.25rem 0;
+      color: #333;
+    }
+
+    .dark-theme .notification-content h4 {
+      color: #fff;
+    }
+
+    .notification-content p {
+      margin: 0 0 0.25rem 0;
+      color: #666;
+    }
+
+    .notification-content small {
+      color: #999;
+    }
+
+    .notification-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .notification-actions button {
+      width: 30px;
+      height: 30px;
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      background: #e0e0e0;
+    }
+
+    /* Dashboard Cards */
+    .dashboard-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      padding: 1.5rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .dark-theme .card {
+      background: #2a2a2a;
+    }
+
+    .card.full-width {
+      grid-column: 1 / -1;
+    }
+
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 1rem;
+      color: #667eea;
+    }
+
+    .settings-form label {
+      display: block;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .settings-form input[type="checkbox"] {
+      margin-right: 0.5rem;
+    }
+
+    .settings-form select {
+      padding: 0.25rem;
+      border-radius: 4px;
+      border: 1px solid #ddd;
+      margin-left: 0.5rem;
+    }
+
+    .breadcrumbs {
+      padding: 0.5rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+      margin: 0.5rem 0;
+    }
+
+    .dark-theme .breadcrumbs {
+      background: #1a1a1a;
+    }
+
+    .nav-buttons {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    /* Common button styles */
+    button {
+      padding: 0.5rem 1rem;
+      border: none;
+      background: #667eea;
+      color: white;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+
+    pre {
+      background: #f5f5f5;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+      margin-top: 1rem;
+    }
+
+    .dark-theme pre {
+      background: #1a1a1a;
+    }
+  `]
+})
+export class AppDashboardComponent implements OnInit {
+  globalState = inject(GlobalStateService);
+  
+  showNotifications = false;
+  stateSnapshot: any = null;
+
+  ngOnInit() {
+    // Inicializar la aplicación
+    this.globalState.initializeApp();
+    
+    // Agregar algunas notificaciones de ejemplo
+    this.addSampleNotifications();
+  }
+
+  private addSampleNotifications() {
+    this.globalState.addNotification(
+      'Bienvenido',
+      'Bienvenido al Dashboard Reactivo de PROVIAS',
+      'info'
+    );
+    
+    setTimeout(() => {
+      this.globalState.addNotification(
+        'Sistema Actualizado',
+        'Angular v18 con Signals está funcionando correctamente',
+        'success'
+      );
+    }, 2000);
+  }
+
+  login() {
+    // Simular login con diferentes usuarios
+    const users = [
+      { id: 1, name: 'Ana García', email: 'ana@provias.gob.pe', role: 'admin' as const },
+      { id: 2, name: 'Carlos López', email: 'carlos@provias.gob.pe', role: 'user' as const },
+      { id: 3, name: 'María Rodriguez', email: 'maria@provias.gob.pe', role: 'user' as const }
+    ];
+    
+    const randomUser = users[Math.floor(Math.random() * users.length)];
+    this.globalState.login(randomUser);
+  }
+
+  logout() {
+    this.globalState.logout();
+  }
+
+  toggleNotifications() {
+    this.showNotifications = !this.showNotifications;
+  }
+
+  updateSetting(key: string, event: any) {
+    const value = event.target.checked;
+    this.globalState.updateSettings({ [key]: value });
+  }
+
+  changeLanguage(event: any) {
+    const language = event.target.value as 'es' | 'en' | 'pt';
+    this.globalState.setLanguage(language);
+  }
+
+  navigate(route: string) {
+    this.globalState.navigate(route);
+  }
+
+  showStateSnapshot() {
+    this.stateSnapshot = this.globalState.getStateSnapshot();
+  }
+}
+________________________________________
+🎯 EJERCICIO FINAL INTEGRADOR (15 minutos)
+Crear una Aplicación TODO Completa con Signals y RxJS
+Paso Final: Crear el Componente TODO App Completo
+ng generate component components/todo-app-final --standalone --skip-tests
+components/todo-app-final/todo-app-final.component.ts:
+import { Component, OnInit, OnDestroy, inject, signal, computed, effect } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { HttpClient } from '@angular/common/http';
+import { Subject, interval, fromEvent, merge } from 'rxjs';
+import { takeUntil, debounceTime, distinctUntilChanged, switchMap, map, filter } from 'rxjs/operators';
+import { toObservable } from '@angular/core/rxjs-interop';
+
+interface Todo {
+  id: string;
+  text: string;
+  completed: boolean;
+  priority: 'low' | 'medium' | 'high';
+  dueDate?: Date;
+  tags: string[];
+  createdAt: Date;
+  completedAt?: Date;
+}
+
+interface TodoStats {
+  total: number;
+  completed: number;
+  pending: number;
+  overdue: number;
+  completionRate: number;
+  averageCompletionTime: number;
+}
+
+@Component({
+  selector: 'app-todo-final',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="todo-app-container">
+      <header class="app-header">
+        <h1>📝 TODO App - Signals + RxJS</h1>
+        <div class="header-info">
+          <span>Hora: {{ currentTime() | date:'medium' }}</span>
+          <span>Modo: {{ isOnline() ? '🟢 Online' : '🔴 Offline' }}</span>
+          <span>Sincronizado: {{ lastSync() | date:'short' }}</span>
+        </div>
+      </header>
+
+      <!-- Estadísticas -->
+      <div class="stats-container">
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().total }}</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().completed }}</div>
+          <div class="stat-label">Completadas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().pending }}</div>
+          <div class="stat-label">Pendientes</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().overdue }}</div>
+          <div class="stat-label">Vencidas</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">{{ stats().completionRate }}%</div>
+          <div class="stat-label">Completado</div>
+        </div>
+      </div>
+
+      <!-- Barra de búsqueda y filtros -->
+      <div class="controls">
+        <div class="search-bar">
+          <input 
+            type="text"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="🔍 Buscar tareas..."
+            class="search-input">
+        </div>
+        
+        <div class="filters">
+          <button 
+            [class.active]="currentFilter() === 'all'"
+            (click)="setFilter('all')">
+            Todas ({{ todos().length }})
+          </button>
+          <button 
+            [class.active]="currentFilter() === 'active'"
+            (click)="setFilter('active')">
+            Activas ({{ activeTodos().length }})
+          </button>
+          <button 
+            [class.active]="currentFilter() === 'completed'"
+            (click)="setFilter('completed')">
+            Completadas ({{ completedTodos().length }})
+          </button>
+          <button 
+            [class.active]="currentFilter() === 'overdue'"
+            (click)="setFilter('overdue')">
+            Vencidas ({{ overdueTodos().length }})
+          </button>
+        </div>
+
+        <div class="sort-controls">
+          <label>Ordenar por:</label>
+          <select [(ngModel)]="sortBy" (change)="updateSort()">
+            <option value="createdAt">Fecha creación</option>
+            <option value="priority">Prioridad</option>
+            <option value="dueDate">Fecha vencimiento</option>
+            <option value="text">Alfabético</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Formulario de nueva tarea -->
+      <div class="add-todo-form">
+        <input 
+          type="text"
+          [(ngModel)]="newTodoText"
+          (keyup.enter)="addTodo()"
+          placeholder="Nueva tarea..."
+          class="todo-input">
+        
+        <select [(ngModel)]="newTodoPriority">
+          <option value="low">Baja</option>
+          <option value="medium">Media</option>
+          <option value="high">Alta</option>
+        </select>
+        
+        <input 
+          type="date"
+          [(ngModel)]="newTodoDueDate"
+          class="date-input">
+        
+        <input 
+          type="text"
+          [(ngModel)]="newTodoTags"
+          placeholder="Tags (separados por coma)"
+          class="tags-input">
+        
+        <button (click)="addTodo()" class="add-button">
+          ➕ Agregar
+        </button>
+      </div>
+
+      <!-- Lista de tareas -->
+      <div class="todos-container">
+        <div class="todos-list">
+          <div 
+            *ngFor="let todo of displayedTodos(); trackBy: trackByTodoId"
+            class="todo-item"
+            [class.completed]="todo.completed"
+            [class.overdue]="isOverdue(todo)">
+            
+            <input 
+              type="checkbox"
+              [checked]="todo.completed"
+              (change)="toggleTodo(todo.id)"
+              class="todo-checkbox">
+            
+            <div class="todo-content">
+              <div class="todo-text">{{ todo.text }}</div>
+              <div class="todo-meta">
+                <span class="priority" [class]="'priority-' + todo.priority">
+                  {{ todo.priority }}
+                </span>
+                <span class="due-date" *ngIf="todo.dueDate">
+                  📅 {{ todo.dueDate | date:'shortDate' }}
+                </span>
+                <div class="tags">
+                  <span *ngFor="let tag of todo.tags" class="tag">
+                    #{{ tag }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="todo-actions">
+              <button (click)="editTodo(todo)" title="Editar">✏️</button>
+              <button (click)="duplicateTodo(todo)" title="Duplicar">📋</button>
+              <button (click)="deleteTodo(todo.id)" title="Eliminar">🗑️</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel de edición -->
+        <div class="edit-panel" *ngIf="editingTodo()">
+          <h3>Editar Tarea</h3>
+          <input 
+            [(ngModel)]="editingTodo()!.text"
+            placeholder="Texto de la tarea">
+          <select [(ngModel)]="editingTodo()!.priority">
+            <option value="low">Baja</option>
+            <option value="medium">Media</option>
+            <option value="high">Alta</option>
+          </select>
+          <button (click)="saveEdit()">Guardar</button>
+          <button (click)="cancelEdit()">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- Acciones masivas -->
+      <div class="bulk-actions">
+        <button (click)="markAllComplete()">✅ Marcar todas completadas</button>
+        <button (click)="clearCompleted()">🧹 Limpiar completadas</button>
+        <button (click)="exportTodos()">📥 Exportar</button>
+        <button (click)="importTodos()">📤 Importar</button>
+        <button (click)="syncWithServer()">🔄 Sincronizar</button>
+      </div>
+
+      <!-- Progress Bar -->
+      <div class="progress-bar">
+        <div 
+          class="progress-fill"
+          [style.width.%]="stats().completionRate">
+        </div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .todo-app-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    .app-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .app-header h1 {
+      margin: 0 0 1rem 0;
+      font-size: 2.5rem;
+    }
+
+    .header-info {
+      display: flex;
+      gap: 2rem;
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+
+    /* Estadísticas */
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      transition: transform 0.3s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #667eea;
+    }
+
+    .stat-label {
+      color: #666;
+      margin-top: 0.5rem;
+    }
+
+    /* Controles */
+    .controls {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 8px;
+      font-size: 1rem;
+      transition: border-color 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #667eea;
+    }
+
+    .filters {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .filters button {
+      padding: 0.5rem 1rem;
+      border: 1px solid #e0e0e0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filters button.active {
+      background: #667eea;
+      color: white;
+      border-color: #667eea;
+    }
+
+    .sort-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Formulario de nueva tarea */
+    .add-todo-form {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .todo-input {
+      flex: 1;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+    }
+
+    .date-input, .tags-input {
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 6px;
+    }
+
+    .add-button {
+      padding: 0.75rem 1.5rem;
+      background: #4caf50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    .add-button:hover {
+      background: #45a049;
+    }
+
+    /* Lista de tareas */
+    .todos-container {
+      display: grid;
+      grid-template-columns: 1fr 300px;
+      gap: 2rem;
+      margin-bottom: 2rem;
+    }
+
+    .todos-list {
+      background: white;
+      border-radius: 8px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      max-height: 600px;
+      overflow-y: auto;
+    }
+
+    .todo-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem;
+      border-bottom: 1px solid #f0f0f0;
+      transition: all 0.3s;
+    }
+
+    .todo-item:hover {
+      background: #f9f9f9;
+    }
+
+    .todo-item.completed {
+      opacity: 0.6;
+    }
+
+    .todo-item.completed .todo-text {
+      text-decoration: line-through;
+    }
+
+    .todo-item.overdue {
+      background: #ffebee;
+    }
+
+    .todo-checkbox {
+      width: 20px;
+      height: 20px;
+      cursor: pointer;
+    }
+
+    .todo-content {
+      flex: 1;
+    }
+
+    .todo-text {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .todo-meta {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      font-size: 0.9rem;
+    }
+
+    .priority {
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-weight: bold;
+      text-transform: uppercase;
+      font-size: 0.75rem;
+    }
+
+    .priority-high {
+      background: #ffcdd2;
+      color: #c62828;
+    }
+
+    .priority-medium {
+      background: #ffe0b2;
+      color: #ef6c00;
+    }
+
+    .priority-low {
+      background: #c8e6c9;
+      color: #2e7d32;
+    }
+
+    .tags {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      background: #e3f2fd;
+      color: #1976d2;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      font-size: 0.8rem;
+    }
+
+    .todo-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .todo-actions button {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: transform 0.2s;
+    }
+
+    .todo-actions button:hover {
+      transform: scale(1.2);
+    }
+
+    /* Panel de edición */
+    .edit-panel {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .edit-panel h3 {
+      margin-top: 0;
+      color: #667eea;
+    }
+
+    .edit-panel input,
+    .edit-panel select {
+      width: 100%;
+      padding: 0.5rem;
+      margin-bottom: 1rem;
+      border: 1px solid #e0e0e0;
+      border-radius: 4px;
+    }
+
+    .edit-panel button {
+      padding: 0.5rem 1rem;
+      margin-right: 0.5rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* Acciones masivas */
+    .bulk-actions {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      margin-bottom: 2rem;
+    }
+
+    .bulk-actions button {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      background: #667eea;
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .bulk-actions button:hover {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+
+    /* Progress Bar */
+    .progress-bar {
+      height: 30px;
+      background: #e0e0e0;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4caf50 0%, #8bc34a 100%);
+      transition: width 0.5s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: bold;
+    }
+
+    /* Scrollbar personalizado */
+    .todos-list::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .todos-list::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+
+    .todos-list::-webkit-scrollbar-thumb {
+      background: #667eea;
+      border-radius: 4px;
+    }
+
+    .todos-list::-webkit-scrollbar-thumb:hover {
+      background: #5a67d8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .todos-container {
+        grid-template-columns: 1fr;
+      }
+
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .add-todo-form {
+        flex-direction: column;
+      }
+
+      .bulk-actions {
+        flex-direction: column;
+      }
+    }
+  `]
+})
+export class TodoAppFinalComponent implements OnInit, OnDestroy {
+  private http = inject(HttpClient);
+  private destroy$ = new Subject<void>();
+  
+  // SIGNALS - Estado principal
+  private _todos = signal<Todo[]>([]);
+  private _currentFilter = signal<'all' | 'active' | 'completed' | 'overdue'>('all');
+  private _searchQuery = signal('');
+  private _editingTodo = signal<Todo | null>(null);
+  private _isOnline = signal(true);
+  private _lastSync = signal(new Date());
+  private _currentTime = signal(new Date());
+  
+  // Exposición pública
+  todos = this._todos.asReadonly();
+  currentFilter = this._currentFilter.asReadonly();
+  editingTodo = this._editingTodo.asReadonly();
+  isOnline = this._isOnline.asReadonly();
+  lastSync = this._lastSync.asReadonly();
+  currentTime = this._currentTime.asReadonly();
+  
+  // COMPUTED SIGNALS
+  activeTodos = computed(() => 
+    this._todos().filter(t => !t.completed)
+  );
+  
+  completedTodos = computed(() => 
+    this._todos().filter(t => t.completed)
+  );
+  
+  overdueTodos = computed(() => 
+    this._todos().filter(t => this.isOverdue(t))
+  );
+  
+  filteredTodos = computed(() => {
+    const todos = this._todos();
+    const filter = this._currentFilter();
+    const search = this._searchQuery().toLowerCase();
+    
+    let filtered = todos;
+    
+    // Aplicar filtro
+    switch (filter) {
+      case 'active':
+        filtered = todos.filter(t => !t.completed);
+        break;
+      case 'completed':
+        filtered = todos.filter(t => t.completed);
+        break;
+      case 'overdue':
+        filtered = todos.filter(t => this.isOverdue(t));
+        break;
+    }
+    
+    // Aplicar búsqueda
+    if (search) {
+      filtered = filtered.filter(t => 
+        t.text.toLowerCase().includes(search) ||
+        t.tags.some(tag => tag.toLowerCase().includes(search))
+      );
+    }
+    
+    return filtered;
+  });
+  
+  displayedTodos = computed(() => {
+    const todos = this.filteredTodos();
+    
+    // Ordenar según criterio seleccionado
+    return todos.sort((a, b) => {
+      switch (this.sortBy) {
+        case 'priority':
+          const priorityOrder = { high: 0, medium: 1, low: 2 };
+          return priorityOrder[a.priority] - priorityOrder[b.priority];
+        case 'dueDate':
+          return (a.dueDate?.getTime() || 0) - (b.dueDate?.getTime() || 0);
+        case 'text':
+          return a.text.localeCompare(b.text);
+        default:
+          return b.createdAt.getTime() - a.createdAt.getTime();
+      }
+    });
+  });
+  
+  stats = computed((): TodoStats => {
+    const todos = this._todos();
+    const completed = todos.filter(t => t.completed);
+    const pending = todos.filter(t => !t.completed);
+    const overdue = todos.filter(t => this.isOverdue(t));
+    
+    // Calcular tiempo promedio de completación
+    const completionTimes = completed
+      .filter(t => t.completedAt)
+      .map(t => (t.completedAt!.getTime() - t.createdAt.getTime()) / (1000 * 60 * 60 * 24));
+    
+    const avgCompletionTime = completionTimes.length > 0
+      ? Math.round(completionTimes.reduce((a, b) => a + b, 0) / completionTimes.length)
+      : 0;
+    
+    return {
+      total: todos.length,
+      completed: completed.length,
+      pending: pending.length,
+      overdue: overdue.length,
+      completionRate: todos.length > 0 
+        ? Math.round((completed.length / todos.length) * 100)
+        : 0,
+      averageCompletionTime: avgCompletionTime
+    };
+  });
+  
+  // UI State
+  searchTerm = '';
+  newTodoText = '';
+  newTodoPriority: 'low' | 'medium' | 'high' = 'medium';
+  newTodoDueDate = '';
+  newTodoTags = '';
+  sortBy = 'createdAt';
+  
+  // RxJS Subjects
+  private searchSubject = new Subject<string>();
+  
+  // EFFECTS
+  private autoSaveEffect = effect(() => {
+    const todos = this._todos();
+    localStorage.setItem('todos', JSON.stringify(todos));
+    console.log('💾 Todos guardados automáticamente');
+  });
+  
+  private statsLogEffect = effect(() => {
+    const stats = this.stats();
+    console.log('📊 Estadísticas actualizadas:', stats);
+  });
+
+  ngOnInit() {
+    // Cargar todos desde localStorage
+    this.loadTodos();
+    
+    // Configurar búsqueda reactiva con RxJS
+    this.searchSubject.pipe(
+      debounceTime(300),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(query => {
+      this._searchQuery.set(query);
+    });
+    
+    // Actualizar reloj cada segundo
+    interval(1000).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this._currentTime.set(new Date());
+    });
+    
+    // Detectar estado online/offline
+    merge(
+      fromEvent(window, 'online').pipe(map(() => true)),
+      fromEvent(window, 'offline').pipe(map(() => false))
+    ).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(isOnline => {
+      this._isOnline.set(isOnline);
+    });
+    
+    // Auto-sync cada 30 segundos
+    interval(30000).pipe(
+      filter(() => this._isOnline()),
+      takeUntil(this.destroy$)
+    ).subscribe(() => {
+      this.syncWithServer();
+    });
+  }
+  
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+  
+  private loadTodos() {
+    const saved = localStorage.getItem('todos');
+    if (saved) {
+      try {
+        const todos = JSON.parse(saved);
+        // Convertir strings a fechas
+        todos.forEach((todo: any) => {
+          todo.createdAt = new Date(todo.createdAt);
+          if (todo.dueDate) todo.dueDate = new Date(todo.dueDate);
+          if (todo.completedAt) todo.completedAt = new Date(todo.completedAt);
+        });
+        this._todos.set(todos);
+      } catch (error) {
+        console.error('Error cargando todos:', error);
+        this.addSampleTodos();
+      }
+    } else {
+      this.addSampleTodos();
+    }
+  }
+  
+  private addSampleTodos() {
+    const sampleTodos: Todo[] = [
+      {
+        id: crypto.randomUUID(),
+        text: 'Completar laboratorio de Angular Signals',
+        completed: false,
+        priority: 'high',
+        dueDate: new Date(Date.now() + 24 * 60 * 60 * 1000),
+        tags: ['angular', 'signals', 'lab'],
+        createdAt: new Date()
+      },
+      {
+        id: crypto.randomUUID(),
+        text: 'Estudiar operadores RxJS',
+        completed: false,
+        priority: 'medium',
+        dueDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+        tags: ['rxjs', 'estudio'],
+        createdAt: new Date(Date.now() - 24 * 60 * 60 * 1000)
+      },
+      {
+        id: crypto.randomUUID(),
+        text: 'Implementar estado global con Signals',
+        completed: true,
+        priority: 'high',
+        tags: ['signals', 'estado'],
+        createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+        completedAt: new Date()
+      }
+    ];
+    
+    this._todos.set(sampleTodos);
+  }
+  
+  // Métodos de acciones
+  addTodo() {
+    if (!this.newTodoText.trim()) return;
+    
+    const newTodo: Todo = {
+      id: crypto.randomUUID(),
+      text: this.newTodoText,
+      completed: false,
+      priority: this.newTodoPriority,
+      dueDate: this.newTodoDueDate ? new Date(this.newTodoDueDate) : undefined,
+      tags: this.newTodoTags.split(',').map(t => t.trim()).filter(t => t),
+      createdAt: new Date()
+    };
+    
+    this._todos.update(todos => [newTodo, ...todos]);
+    
+    // Limpiar formulario
+    this.newTodoText = '';
+    this.newTodoPriority = 'medium';
+    this.newTodoDueDate = '';
+    this.newTodoTags = '';
+  }
+  
+  toggleTodo(id: string) {
+    this._todos.update(todos =>
+      todos.map(todo =>
+        todo.id === id
+          ? {
+              ...todo,
+              completed: !todo.completed,
+              completedAt: !todo.completed ? new Date() : undefined
+            }
+          : todo
+      )
+    );
+  }
+  
+  deleteTodo(id: string) {
+    this._todos.update(todos => todos.filter(t => t.id !== id));
+  }
+  
+  editTodo(todo: Todo) {
+    this._editingTodo.set({ ...todo });
+  }
+  
+  saveEdit() {
+    const editing = this._editingTodo();
+    if (!editing) return;
+    
+    this._todos.update(todos =>
+      todos.map(todo =>
+        todo.id === editing.id ? editing : todo
+      )
+    );
+    
+    this._editingTodo.set(null);
+  }
+  
+  cancelEdit() {
+    this._editingTodo.set(null);
+  }
+  
+  duplicateTodo(todo: Todo) {
+    const duplicate: Todo = {
+      ...todo,
+      id: crypto.randomUUID(),
+      completed: false,
+      createdAt: new Date(),
+      completedAt: undefined
+    };
+    
+    this._todos.update(todos => [duplicate, ...todos]);
+  }
+  
+  setFilter(filter: 'all' | 'active' | 'completed' | 'overdue') {
+    this._currentFilter.set(filter);
+  }
+  
+  onSearch(term: string) {
+    this.searchSubject.next(term);
+  }
+  
+  updateSort() {
+    // El computed displayedTodos se actualizará automáticamente
+  }
+  
+  markAllComplete() {
+    this._todos.update(todos =>
+      todos.map(todo => ({
+        ...todo,
+        completed: true,
+        completedAt: todo.completed ? todo.completedAt : new Date()
+      }))
+    );
+  }
+  
+  clearCompleted() {
+    this._todos.update(todos => todos.filter(t => !t.completed));
+  }
+  
+  exportTodos() {
+    const dataStr = JSON.stringify(this._todos(), null, 2);
+    const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+    
+    const exportFileDefaultName = `todos-${new Date().toISOString().split('T')[0]}.json`;
+    
+    const linkElement = document.createElement('a');
+    linkElement.setAttribute('href', dataUri);
+    linkElement.setAttribute('download', exportFileDefaultName);
+    linkElement.click();
+  }
+  
+  importTodos() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.json';
+    
+    input.onchange = (e: any) => {
+      const file = e.target.files[0];
+      const reader = new FileReader();
+      
+      reader.onload = (event: any) => {
+        try {
+          const todos = JSON.parse(event.target.result);
+          // Convertir fechas
+          todos.forEach((todo: any) => {
+            todo.createdAt = new Date(todo.createdAt);
+            if (todo.dueDate) todo.dueDate = new Date(todo.dueDate);
+            if (todo.completedAt) todo.completedAt = new Date(todo.completedAt);
+          });
+          this._todos.set(todos);
+        } catch (error) {
+          console.error('Error importando todos:', error);
+          alert('Error al importar el archivo');
+        }
+      };
+      
+      reader.readAsText(file);
+    };
+    
+    input.click();
+  }
+  
+  syncWithServer() {
+    console.log('🔄 Sincronizando con servidor...');
+    this._lastSync.set(new Date());
+    
+    // Aquí irían las llamadas HTTP reales
+    // this.http.post('/api/todos/sync', this._todos()).subscribe(...)
+    
+    // Simulación
+    setTimeout(() => {
+      console.log('✅ Sincronización completada');
+    }, 1000);
+  }
+  
+  isOverdue(todo: Todo): boolean {
+    if (todo.completed || !todo.dueDate) return false;
+    return todo.dueDate < new Date();
+  }
+  
+  trackByTodoId(index: number, todo: Todo): string {
+    return todo.id;
+  }
+}
+________________________________________
+🏁 INTEGRACIÓN FINAL Y RUTAS
+Configurar el Router Principal
+app.routes.ts:
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
+  },
+  {
+    path: 'async-demo',
+    loadComponent: () => import('./components/async-demo/async-demo.component')
+      .then(m => m.AsyncDemoComponent)
+  },
+  {
+    path: 'rxjs-demo',
+    loadComponent: () => import('./components/rxjs-demo/rxjs-demo.component')
+      .then(m => m.RxjsDemoComponent)
+  },
+  {
+    path: 'signals-demo',
+    loadComponent: () => import('./components/signals-demo/signals-demo.component')
+      .then(m => m.SignalsDemoComponent)
+  },
+  {
+    path: 'dashboard',
+    loadComponent: () => import('./components/app-dashboard/app-dashboard.component')
+      .then(m => m.AppDashboardComponent)
+  },
+  {
+    path: 'todo-app',
+    loadComponent: () => import('./components/todo-app-final/todo-app-final.component')
+      .then(m => m.TodoAppFinalComponent)
+  },
+  {
+    path: '**',
+    redirectTo: '/dashboard'
+  }
+];
+Actualizar el Componente Principal
+app.component.ts:
+import { Component } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  template: `
+    <nav class="main-nav">
+      <div class="nav-container">
+        <h1>🚀 PROVIAS - Sesión 7: Asincronía y RxJS</h1>
+        <div class="nav-links">
+          <a routerLink="/async-demo" routerLinkActive="active">
+            Async/Await
+          </a>
+          <a routerLink="/rxjs-demo" routerLinkActive="active">
+            RxJS
+          </a>
+          <a routerLink="/signals-demo" routerLinkActive="active">
+            Signals
+          </a>
+          <a routerLink="/dashboard" routerLinkActive="active">
+            Dashboard
+          </a>
+          <a routerLink="/todo-app" routerLinkActive="active">
+            TODO App
+          </a>
+        </div>
+      </div>
+    </nav>
+    
+    <main class="main-content">
+      <router-outlet></router-outlet>
+    </main>
+    
+    <footer class="main-footer">
+      <p>© 2025 PROVIAS DESCENTRALIZADO - Angular v18 | Instructor: Ing. Jhonny Alexander Ramirez Chiroque</p>
+    </footer>
+  `,
+  styles: [`
+    .main-nav {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-container h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      transition: background 0.3s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .nav-links a.active {
+      background: rgba(255,255,255,0.3);
+      font-weight: bold;
+    }
+
+    .main-content {
+      min-height: calc(100vh - 120px - 60px);
+      background: #f5f5f5;
+    }
+
+    .main-footer {
+      background: #2c3e50;
+      color: white;
+      padding: 1.5rem;
+      text-align: center;
+    }
+
+    .main-footer p {
+      margin: 0;
+    }
+  `]
+})
+export class AppComponent {
+  title = 'PROVIAS Reactive Lab';
+}
+________________________________________
+📊 VERIFICACIÓN FINAL Y TESTING
+Comandos para Ejecutar el Proyecto Completo
+# Terminal 1: Iniciar JSON Server (API Mock)
+npm run api
+
+# Terminal 2: Iniciar Angular Dev Server
+ng serve --proxy-config proxy.conf.json
+
+# O usar concurrently para ejecutar ambos
+npm run dev
+Verificación de Funcionalidades
+Checklist de Laboratorios Completados:
+LAB 0: Configuración ✅
+•	[ ] Node.js v18+ instalado
+•	[ ] Angular CLI v18 instalado
+•	[ ] JSON Server funcionando
+•	[ ] Proxy configurado
+•	[ ] VS Code con extensiones
+LAB 1: Asincronía ✅
+•	[ ] Callbacks funcionando
+•	[ ] Promises implementadas
+•	[ ] Async/Await dominado
+•	[ ] Patrones de retry y timeout
+•	[ ] Manejo de errores
+LAB 2: RxJS ✅
+•	[ ] Subjects implementados
+•	[ ] Operadores de transformación
+•	[ ] Operadores de combinación
+•	[ ] Manejo de errores con RxJS
+•	[ ] Búsqueda reactiva con switchMap
+LAB 3: Signals ✅
+•	[ ] Signals básicos funcionando
+•	[ ] Computed values actualizándose
+•	[ ] Effects ejecutándose
+•	[ ] Persistencia en localStorage
+•	[ ] Todo list con Signals
+LAB 4: Estado Global ✅
+•	[ ] GlobalStateService implementado
+•	[ ] Dashboard reactivo
+•	[ ] Notificaciones funcionando
+•	[ ] Migración RxJS a Signals
+•	[ ] TODO App completa
+Tests de Performance
+// performance-test.ts
+console.time('Signals Update');
+for (let i = 0; i < 1000; i++) {
+  signalValue.set(i);
+}
+console.timeEnd('Signals Update');
+
+console.time('Observable Update');
+for (let i = 0; i < 1000; i++) {
+  subject.next(i);
+}
+console.timeEnd('Observable Update');
+________________________________________
+📚 RECURSOS ADICIONALES Y REFERENCIAS
+Documentación Oficial
+•	Angular Signals Guide
+•	RxJS Documentation
+•	Angular HttpClient
+•	TypeScript Handbook
+Repositorio del Curso
+# Clonar repositorio con código completo
+git clone https://github.com/provias/angular-v18-sesion07-complete
+cd angular-v18-sesion07-complete
+npm install
+npm run dev
+Próxima Sesión
+Jueves 21 de Agosto - Sesión 8: Mejores Prácticas y Formularios
+•	Formularios Reactivos Avanzados
+•	Validaciones Personalizadas
+•	Seguridad en Angular
+•	Testing de Formularios
+________________________________________
+🎓 CONCLUSIÓN
+Lo que has logrado hoy:
+1.	Dominio de Asincronía: Callbacks, Promises, Async/Await
+2.	Maestría en RxJS: Observables, Operadores, Patrones
+3.	Expertise en Signals: Nueva API de estado reactivo
+4.	Arquitectura Profesional: Estado global, migración, best practices
+5.	Aplicación Completa: TODO App con todas las tecnologías integradas
+Tareas para Casa:
+1.	Completar todos los laboratorios si no los terminaste
+2.	Experimentar con más operadores RxJS
+3.	Migrar un componente propio de RxJS a Signals
+4.	Agregar más funcionalidades a la TODO App
+Contacto:
+Email: jhonny.ramirez@provias.gob.pe
+Slack: #angular-provias
+¡Excelente trabajo! 🎉
+Nos vemos el jueves a las 19:00 para la Sesión 8
+

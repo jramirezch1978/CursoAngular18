@@ -1,0 +1,258 @@
+GUIÓN DETALLADO - SESIÓN 7: ASINCRONÍA Y RXJS
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Carátula (2 minutos)
+Muy buenas noches a todos. Bienvenidos a la sesión 7 de nuestro curso Angular 18, una sesión que marca un antes y un después en su comprensión del desarrollo web moderno.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y hoy martes 19 de agosto de 2025, vamos a desentrañar los misterios de la programación reactiva. Si en sesiones anteriores aprendieron a construir aplicaciones, hoy aprenderán a hacerlas pensar y reaccionar inteligentemente.
+Imaginen por un momento que están manejando el tráfico en una intersección importante de Lima. Tienen semáforos que deben coordinar, peatones que cruzan, vehículos que giran, ambulancias que necesitan paso prioritario. No pueden detener todo para procesar cada evento; necesitan que todo fluya continuamente, reaccionando a múltiples situaciones simultáneamente. Eso es exactamente lo que haremos hoy con código: crear sistemas que reaccionen inteligentemente a múltiples flujos de datos.
+Esta sesión será completamente práctica. No vamos a teorizar sobre programación reactiva; vamos a escribir código real que respira, que piensa, que reacciona. Van a sentir el poder de controlar flujos de datos como un director de orquesta controla a sus músicos.
+Angular 18 nos trae dos paradigmas poderosos: RxJS, el veterano confiable de la programación reactiva, y Signals, el nuevo prodigio que promete simplificar el manejo de estado. Hoy dominarán ambos y, más importante aún, sabrán cuándo usar cada uno.
+Preparen sus editores, abran sus terminales, y prepárense para tres horas de código intensivo que cambiarán fundamentalmente cómo piensan sobre el flujo de datos en sus aplicaciones.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Los objetivos de hoy no son solo técnicos; son transformacionales para su forma de pensar en programación.
+Dominar la diferencia entre programación síncrona y asíncrona es como entender la diferencia entre una fila de banco tradicional y hacer múltiples transacciones en cajeros automáticos simultáneamente. En el mundo síncrono, todo espera su turno. En el asíncrono, múltiples operaciones ocurren en paralelo, maximizando eficiencia.
+Implementar Promises correctamente es fundamental en el JavaScript moderno. Son como contratos comerciales: "Te prometo entregar este resultado, y si algo sale mal, te explicaré qué pasó". Es la base de la confianza en operaciones asíncronas.
+El patrón Observer que aprenderán es como tener un sistema de notificaciones inteligente. Imaginen que son el gerente de proyectos en PROVIAS y necesitan estar al tanto de múltiples obras simultáneamente. En lugar de llamar constantemente preguntando el estado, cada obra les notifica automáticamente cuando hay cambios importantes.
+Los operadores RxJS son sus herramientas especializadas. Como un chef profesional no solo tiene cuchillos, sino cuchillos específicos para cada tarea, ustedes tendrán operadores para filtrar, transformar, combinar y manipular flujos de datos con precisión quirúrgica.
+Angular Signals representa la evolución. Si RxJS es como manejar un auto manual con control total, Signals es como un automático moderno: más simple para casos comunes, pero igualmente poderoso. Aprenderán cuándo la simplicidad es ventaja y cuándo necesitan el control granular.
+La migración de Observables a Signals no es solo un ejercicio académico. Muchas aplicaciones Angular existentes están haciendo esta transición. Serán los expertos que sus empresas necesitan para modernizar código legacy.
+El estado global con Signals resolverá uno de los problemas más complejos en aplicaciones modernas: compartir estado entre componentes de manera eficiente y predecible. Es como tener un sistema nervioso central para su aplicación.
+________________________________________
+Diapositiva 3: Agenda (1 minuto)
+Nuestra agenda está diseñada como una sinfonía en cuatro movimientos, cada uno construyendo sobre el anterior.
+El primer laboratorio de 45 minutos es nuestros cimientos. Exploraremos la asincronía desde sus raíces: callbacks, promises, async/await. Es como aprender los diferentes sistemas de transporte antes de elegir el más eficiente para cada viaje.
+El segundo laboratorio, también de 45 minutos, es donde RxJS brilla. Implementaremos el poder de los Observables, esos flujos de datos que son como ríos de información que pueden dividirse, unirse, filtrarse y transformarse.
+Nuestro break de 15 minutos será crucial. El cerebro necesita tiempo para consolidar estos conceptos abstractos. Es como dejar reposar un buen pisco para que todos los sabores se integren.
+El tercer laboratorio de 45 minutos introducirá Signals, la nueva joya de Angular. Verán cómo simplifica casos que con RxJS requerían ceremonias complejas. Es evolución, no revolución.
+El laboratorio final de 25 minutos es integración pura. Migraremos código real de RxJS a Signals, crearemos estado global, y verán cómo ambos paradigmas pueden coexistir armoniosamente.
+Cada minuto está optimizado para máximo aprendizaje práctico. No hay relleno, solo código que importa.
+________________________________________
+Diapositiva 4: LAB 1 - Introducción Asincronía (3 minutos)
+Bienvenidos al primer laboratorio. Vamos a desmitificar la asincronía de una vez por todas.
+La diferencia entre código síncrono y asíncrono es fundamental. El código síncrono es como hacer cola en el banco: cada cliente debe ser atendido completamente antes de pasar al siguiente. Si alguien tarda 30 minutos, todos esperan. Es predecible pero ineficiente.
+El código asíncrono es como un restaurante bien organizado. El mesero toma su orden y no se queda parado esperando que el chef cocine. Atiende otras mesas, y cuando su plato está listo, se lo trae. Múltiples operaciones en paralelo, máxima eficiencia.
+Miren el ejemplo de fetchDataSync. Esta función bloquearía completamente su aplicación por 3 segundos. En el mundo web, 3 segundos es una eternidad. Los usuarios pensarían que la aplicación se colgó. Es como si un cajero del banco se fuera a almorzar mientras lo atiende.
+fetchDataAsync, en cambio, es cortesía y eficiencia. La función dice "voy a buscar esos datos, mientras tanto, sigue con tu vida". El await es simplemente un punto de encuentro: "cuando tengas los datos, continuamos desde aquí".
+El Event Loop de JavaScript es el director de orquesta invisible. Call Stack es donde se ejecuta el código. Web APIs maneja operaciones asíncronas. Callback Queue espera su turno. Event Loop coordina todo. Es como el sistema de control de tráfico aéreo: múltiples aviones (operaciones) en el aire, pero todos aterrizan ordenadamente.
+Este concepto es la base de todo lo que viene. Sin entender asincronía, RxJS y Signals serían magia negra incomprensible. Con este entendimiento, son herramientas lógicas y poderosas.
+________________________________________
+Diapositiva 5: LAB 1 - Callbacks vs Promises (4 minutos)
+Ahora vamos a ver la evolución histórica de cómo JavaScript ha manejado la asincronía.
+El Callback Hell que ven arriba es una pesadilla real que muchos desarrolladores vivieron. Es como esas instrucciones de muebles donde cada paso depende del anterior, pero escritas en un solo párrafo interminable. Cada callback anidado añade un nivel de indentación, y pronto su código parece una pirámide tumbada.
+Imaginen que necesitan hacer un trámite en PROVIAS que requiere: primero obtener un documento del archivo, luego llevarlo a legal para revisión, después a contabilidad para aprobación, y finalmente a la gerencia para firma. Con callbacks, sería como tener que explicar todo el proceso completo cada vez, en lugar de tener un flujo claro.
+Las Promises llegaron como salvación. Transformaron la pirámide en una cadena elegante. Cada "then" es como un paso en un proceso bien documentado. Si algo falla en cualquier punto, el "catch" al final lo maneja. Es como tener un supervisor que sabe exactamente qué hacer cuando algo sale mal, sin importar en qué paso ocurra.
+Pero async/await es la cereza del pastel. Hace que el código asíncrono se lea como síncrono. Es engañosamente simple. Cada await es como decir "espera aquí hasta que esto esté listo, pero no bloquees nada más". El try/catch envuelve todo en un manejo de errores familiar y limpio.
+La función getShippingInfo es poesía en código. Lee como una receta de cocina: primero obten el usuario, luego sus órdenes, después los detalles, finalmente la información de envío. Si algo falla, el catch lo atrapa. Limpio, legible, mantenible.
+Esta evolución no es solo sintaxis más bonita. Cada paradigma resuelve problemas reales del anterior. Callbacks son el fundamento, Promises añaden composabilidad, Async/Await añade legibilidad. Necesitan entender los tres porque encontrarán los tres en código real.
+________________________________________
+Diapositiva 6: LAB 1 - Implementación con Promises (5 minutos)
+Vamos a implementar un servicio real con Promises, aplicando patrones profesionales.
+El UserPromiseService que estamos creando es un ejemplo del mundo real. No es código de juguete; es lo que escribirían en producción. Noten cómo cada método tiene un propósito específico y maneja casos particulares.
+El método getUser es la operación básica. Usa fetch, la API moderna del navegador. El chequeo de response.ok es crucial: fetch no lanza error para respuestas HTTP fallidas como 404 o 500. Tienen que verificar explícitamente. Es como verificar que un paquete llegó en buenas condiciones antes de firmarlo.
+getMultipleUsers muestra el poder de Promise.all. Imaginen que necesitan información de 5 proveedores diferentes para un proyecto. En lugar de llamar uno por uno secuencialmente (que tomaría 5 veces más), llaman a todos en paralelo. Promise.all espera a que todos respondan. Si uno falla, todo falla. Es el principio de "todo o nada", útil cuando necesitan datos completos.
+getUserWithTimeout resuelve un problema real: servicios lentos. Es como poner un límite de tiempo en una reunión. Si no han terminado en 5 segundos, asumimos que algo anda mal y seguimos adelante. Promise.race es una carrera: el primero que responde gana, sea el resultado real o el timeout.
+getUsersSafe con Promise.allSettled es resiliencia pura. A diferencia de Promise.all, no falla si una promesa falla. Es como enviar invitaciones a una reunión: si algunos no pueden venir, la reunión continúa con los que sí pueden. Cada resultado indica si fue exitoso o falló, permitiendo manejo granular.
+Estos patrones no son teóricos. Los usarán constantemente. Múltiples llamadas a APIs, timeouts para servicios externos, manejo robusto cuando algunos datos son opcionales. Es su caja de herramientas para asincronía con Promises.
+________________________________________
+Diapositiva 7: LAB 1 - Async/Await Patterns (5 minutos)
+Ahora implementaremos patrones avanzados que distinguen a desarrolladores senior de junior.
+fetchWithRetry es resiliencia inteligente. En el mundo real, las redes fallan, los servidores tienen hipos. Este patrón reintenta automáticamente con backoff exponencial: espera 1 segundo, luego 2, luego 4. Es como tocar una puerta: primero suave, si no responden, un poco más fuerte, pero no indefinidamente.
+El patrón es recursivo, elegante. Si funciona, retorna el resultado. Si falla y quedan reintentos, espera y lo intenta de nuevo. Si se acabaron los reintentos, propaga el error. El delay exponencial previene bombardear un servidor ya sobrecargado.
+processSequentially es para cuando el orden importa. Imaginen que están procesando transferencias bancarias: cada una debe completarse antes de procesar la siguiente para mantener el balance correcto. El for...of con await asegura procesamiento ordenado. No es el más rápido, pero es el más seguro cuando el orden es crítico.
+processBatch es optimización inteligente. Tienen 100 operaciones pero no quieren abrumar el servidor con 100 peticiones simultáneas. Procesan en lotes de 5: suficiente paralelismo para ser eficiente, suficiente control para no sobrecargar. Es como tener múltiples cajeros en un banco, pero no infinitos.
+El método sleep es utilidad pura. JavaScript no tiene un sleep nativo, así que lo creamos. Útil para debugging, para simular delays, para dar tiempo entre operaciones. Simple pero indispensable.
+Estos patrones separan el código amateur del profesional. No es solo hacer que funcione; es hacer que funcione confiablemente, eficientemente, y que se recupere graciosamente de fallos. Son patrones que sus aplicaciones necesitarán en producción.
+________________________________________
+Diapositiva 8: LAB 2 - Introducción a RxJS (3 minutos)
+Bienvenidos al mundo de RxJS, donde los datos fluyen como ríos que podemos controlar con precisión.
+La tabla de comparación no es solo académica; cada diferencia tiene implicaciones profundas. Los Observables pueden emitir múltiples valores en el tiempo, como un sensor de temperatura que reporta cada segundo. Las Promises son un único evento, como el resultado de un examen.
+La característica "Cancelable" es crítica. Imaginen que están buscando en Google y escriben "restaurantes". Mientras escriben, cada letra genera una búsqueda. Con Promises, todas se ejecutarían. Con Observables, cada nueva letra cancela la búsqueda anterior. Eficiencia pura.
+"Lazy" significa que los Observables no hacen nada hasta que alguien se suscribe. Es como Netflix: las películas no se transmiten hasta que alguien presiona play. Las Promises empiezan inmediatamente, como la televisión tradicional que transmite aunque nadie esté viendo.
+Los más de 100 operadores son su superpoder. Es como tener una cocina profesional completa versus solo una estufa. Pueden filtrar, transformar, combinar, throttle, debounce, retry, cache... las posibilidades son infinitas.
+Los ejemplos de creación muestran la versatilidad. Observable simple para control total. "of" para valores conocidos. "from" para convertir arrays. "interval" para eventos temporales. "fromEvent" para eventos del DOM. Cada uno resuelve un caso de uso específico.
+Este es el fundamento de la programación reactiva en Angular. HTTP requests retornan Observables. Los eventos del router son Observables. Los formularios emiten Observables. Entender esto es entender Angular moderno.
+________________________________________
+Diapositiva 9: LAB 2 - Patrón Observer (5 minutos)
+El patrón Observer es el corazón conceptual de RxJS. Vamos a dominarlo completamente.
+Un Subject es fascinante porque es Observable y Observer simultáneamente. Es como ser locutor y oyente de radio al mismo tiempo. Pueden emitir valores (next) y otros pueden suscribirse para recibirlos. Útil para comunicación entre componentes, eventos personalizados, broadcasting de información.
+BehaviorSubject es un Subject con memoria. Siempre mantiene el último valor emitido. Cuando alguien nuevo se suscribe, inmediatamente recibe el valor actual. Es perfecto para estado de aplicación: el usuario actual, tema seleccionado, configuración activa. Como un tablero de anuncios que siempre muestra el último mensaje importante.
+ReplaySubject es memoria con esteroides. Puede recordar múltiples valores pasados. En el ejemplo, recuerda los últimos 3 mensajes. Útil para logs, historial de acciones, chat donde los nuevos usuarios necesitan ver mensajes recientes. Es como una grabadora que siempre mantiene los últimos minutos de conversación.
+AsyncSubject es el más peculiar. Solo emite el último valor, y solo cuando se completa. Es como esperar a que termine una carrera para anunciar al ganador. Útil para operaciones que acumulan un resultado final, como cálculos complejos o agregaciones.
+Los métodos updateData, setUser, addMessage muestran cómo emitir valores. Es broadcasting: todos los suscriptores reciben la actualización automáticamente. No necesitan rastrear quién está escuchando; solo emiten y RxJS se encarga de la distribución.
+El patrón de suscripción con next, error, complete es completo. No es solo recibir valores; es manejar el ciclo de vida completo del stream. Como suscribirse a un servicio: recibes contenido, manejas problemas si ocurren, y sabes cuándo el servicio termina.
+________________________________________
+Diapositiva 10: LAB 2 - Operadores de Transformación (5 minutos)
+Los operadores de transformación son donde RxJS muestra su verdadero poder. Son sus pinceles para pintar con datos.
+El operador map es transformación pura. getUppercaseNames toma usuarios y retorna nombres en mayúsculas. Es como tener una línea de ensamblaje donde cada elemento pasa por una transformación específica. Simple, predecible, potente.
+filter es su guardián de calidad. getActiveUsers solo deja pasar usuarios activos. Es como un portero en un club exclusivo: solo entran los que cumplen los criterios. Útil para limpiar datos, mostrar subconjuntos, implementar búsquedas.
+tap es para efectos secundarios sin modificar el stream. Es como tener cámaras de seguridad en su línea de producción: observan todo pero no interfieren. Perfectamente útil para logging, caching, analytics. getUsersWithLogging registra y cachea sin afectar los datos que fluyen.
+switchMap es magia para búsquedas. Cada vez que el usuario escribe, cancela la búsqueda anterior y comienza una nueva. Imaginen un asistente que, cuando le cambian las instrucciones, inmediatamente olvida la tarea anterior y se enfoca en la nueva. Con debounceTime esperan 300ms después de que el usuario deja de escribir. distinctUntilChanged evita buscar si el término no cambió. Es optimización en múltiples niveles.
+mergeMap es paralelismo controlado. getUserDetails toma una lista de IDs y obtiene detalles de cada uno en paralelo. Es como tener múltiples empleados trabajando simultáneamente en diferentes tareas. Todos los resultados se combinan en un stream final.
+Estos operadores son composables. Pueden encadenar map, filter, tap, switchMap en cualquier combinación. Es como tener bloques de LEGO que siempre encajan perfectamente. La composabilidad es lo que hace a RxJS tan poderoso para casos complejos.
+________________________________________
+Diapositiva 11: LAB 2 - Operadores de Combinación (5 minutos)
+Los operadores de combinación son sus herramientas para orquestar múltiples flujos de datos.
+combineLatest es sincronización continua. Cada vez que cualquier Observable emite, combina los últimos valores de todos. Es como un dashboard en tiempo real: cuando cualquier métrica se actualiza, el dashboard se recalcula. Perfecto para formularios donde múltiples campos afectan un resultado, o vistas que dependen de múltiples fuentes de datos.
+forkJoin es el "todo listo" definitivo. Espera a que todos los Observables completen y emite todos los resultados juntos. Es como esperar a que todos los invitados lleguen antes de empezar la reunión. Ideal para inicialización de aplicación donde necesitan múltiples datos antes de mostrar la interfaz.
+merge es el combinador más simple: todos los valores de todos los Observables en un solo stream. No le importa el orden ni la sincronización. Es como tener múltiples mangueras vertiendo en el mismo tanque. Útil para combinar múltiples fuentes de eventos: clicks, teclado, touch.
+zip es emparejamiento estricto por índice. El primer valor del primer Observable se empareja con el primer valor del segundo, y así sucesivamente. Es como hacer parejas de baile: cada uno con su pareja correspondiente. Si un Observable emite más rápido, espera a su pareja. Útil cuando necesitan sincronización estricta.
+concat es secuencialidad garantizada. El segundo Observable no empieza hasta que el primero complete. Es como una lista de reproducción: cada canción espera a que termine la anterior. Perfecto para operaciones que deben ocurrir en orden específico.
+Estos operadores resuelven problemas complejos de coordinación elegantemente. Sin ellos, necesitarían flags, contadores, callbacks anidados. Con ellos, declaran la relación y RxJS maneja la complejidad.
+________________________________________
+Diapositiva 12: LAB 2 - Manejo de Errores RxJS (5 minutos)
+El manejo de errores en RxJS es sofisticado y poderoso. Vamos a implementar estrategias profesionales.
+catchError es su red de seguridad básica. getUsersSafe atrapa cualquier error y retorna un array vacío. Es como tener un plan B: si no pueden obtener los datos, al menos la aplicación no explota. El usuario ve una lista vacía en lugar de una pantalla de error. A veces, fallar silenciosamente es mejor que fallar ruidosamente.
+retry es persistencia simple. Reintenta 3 veces antes de rendirse. Es como llamar a una puerta: si no responden la primera vez, intentan un par de veces más antes de irse. Útil para errores transitorios de red. Pero cuidado: reintentar un error 404 es inútil; el recurso no existe y no aparecerá mágicamente.
+retryWhen con backoff exponencial es inteligencia aplicada. No solo reintenta; espera progresivamente más entre intentos. El scan acumula intentos, el timer crea delays exponenciales. Es como el protocolo diplomático: primer intento cortés, segundo más insistente, tercero más espaciado. Evita bombardear servidores ya estresados.
+La estrategia robusta robustDataFetch es producción-ready. Timeout previene esperas infinitas. Retry inteligente que no reintenta 404s. Manejo especial para 401 redirigiendo al login. EMPTY para errores irrecuperables que no deberían propagarse. Es defensa en profundidad: múltiples capas de protección.
+El patrón de verificar status antes de decidir si reintentar es crucial. No todos los errores son iguales. 401 es autenticación, no tiene sentido reintentar sin reautenticar. 500 es error del servidor, tal vez se recupere. 429 es rate limiting, definitivamente esperar antes de reintentar.
+Este manejo robusto de errores es lo que separa aplicaciones hobby de aplicaciones profesionales. Los usuarios no ven "undefined" o pantallas en blanco. Ven mensajes útiles, la aplicación se recupera automáticamente cuando es posible, y degrada graciosamente cuando no lo es.
+________________________________________
+Diapositiva 13: BREAK (15 minutos)
+Excelente trabajo hasta aquí. Han absorbido conceptos densos que muchos desarrolladores tardan meses en dominar.
+Han conquistado la asincronía, desde callbacks hasta async/await. Ya no son víctimas del callback hell; son arquitectos de código asíncrono elegante. Sus aplicaciones pueden manejar múltiples operaciones simultáneas sin sudar.
+El patrón Observer ya no es un misterio. Entienden cómo fluyen los datos, cómo se propagan los cambios, cómo múltiples partes de su aplicación pueden reaccionar a eventos sin acoplamiento directo. Es programación reactiva en su esencia.
+Los operadores RxJS que dominaron son herramientas poderosas. map, filter, switchMap, combineLatest... cada uno resuelve problemas específicos elegantemente. Son como haber aprendido un nuevo idioma que les permite expresar operaciones complejas de manera concisa.
+El manejo de errores robusto que implementaron asegura que sus aplicaciones sean resilientes. No solo funcionan en el camino feliz; se recuperan de fallos, reintentan inteligentemente, degradan graciosamente. Es profesionalismo en código.
+Durante este break, levántense y estiren. La programación reactiva es mentalmente intensa. Su cerebro ha estado haciendo gimnasia abstracta. Denle un descanso merecido.
+Tomen agua, café, lo que prefieran. La hidratación es crucial para mantener la concentración. La segunda mitad introducirá Signals, el nuevo paradigma de Angular que simplifica muchos casos de uso.
+Reflexionen sobre cómo RxJS puede resolver problemas en sus proyectos actuales. ¿Dónde tienen código complejo manejando asincronía que podría simplificarse con Observables? ¿Qué operadores resolverían elegantemente sus casos de uso?
+Lo que viene es emocionante: Signals, la nueva API que está revolucionando cómo manejamos estado en Angular. Es más simple que RxJS para muchos casos, pero igualmente poderosa. Van a amar la simplicidad.
+Nos vemos en 15 minutos, a las 20:45. Regresen con mente fresca y lista para el futuro del estado reactivo en Angular.
+________________________________________
+Diapositiva 14: LAB 3 - Introducción a Signals (3 minutos)
+Bienvenidos de vuelta. Signals es la revolución silenciosa de Angular, y están a punto de entender por qué.
+Signals es la respuesta de Angular a una pregunta que la comunidad ha estado haciendo por años: ¿puede el manejo de estado ser más simple? RxJS es poderoso pero complejo. Para estado local de componentes, a menudo es excesivo. Signals llena ese vacío perfectamente.
+Un signal es, en esencia, un contenedor reactivo de un valor. Cuando el valor cambia, todo lo que depende de él se actualiza automáticamente. Es como tener celdas en Excel: cambias una celda, todas las fórmulas que la usan se recalculan instantáneamente.
+La sintaxis es deliciosamente simple. signal(0) crea un signal con valor inicial 0. Para leer, llaman la función: count(). Para escribir, usan set: count.set(5). Para actualizar basándose en el valor actual, usan update: count.update(v => v + 1). No hay suscripciones que manejar, no hay unsubscribe que recordar.
+computed es magia derivada. doubled siempre será el doble de count, automáticamente. No necesitan actualizar doubled manualmente cuando count cambia. Es declarativo: describen la relación una vez, Angular la mantiene por siempre.
+effect es para efectos secundarios. Cada vez que un signal que usa cambia, el effect se re-ejecuta. Es como tener un observador automático que reacciona a cambios. Perfecto para sincronizar con localStorage, hacer logs, disparar animaciones.
+Las ventajas son tangibles. Mejor performance porque no requiere Zone.js para detección de cambios. Más simple porque no hay Observables que gestionar para estado local. Integración perfecta con templates sin async pipe. Type-safe por defecto sin gimnasia de tipos.
+________________________________________
+Diapositiva 15: LAB 3 - Signals en Componentes (5 minutos)
+Vamos a implementar un componente real con Signals y verán cuán elegante es el código resultante.
+El CounterComponent es simplicidad cristalina. No hay Subjects, no hay Observables, no hay suscripciones. Solo signals que contienen valores y se actualizan reactivamente.
+El signal count mantiene el contador actual. history mantiene los últimos valores. Son como variables de instancia, pero reactivas. Cuando cambian, la vista se actualiza automáticamente.
+Los computed values doubled e isEven son derivaciones automáticas. No necesitan actualizarlos manualmente; siempre están sincronizados con count. Es como tener fórmulas en una hoja de cálculo: siempre actualizadas, siempre correctas.
+El effect en el constructor es brillante. Cada vez que count cambia, automáticamente actualiza el historial. No necesitan llamar manualmente "addToHistory" en cada método que modifica count. La relación está declarada una vez y se mantiene por siempre.
+Los métodos increment, decrement, reset son operaciones puras. Modifican el signal, y todo lo demás se actualiza automáticamente. No hay que notificar a nadie, no hay que disparar eventos. Solo actualizar el estado y Angular hace el resto.
+En el template, la sintaxis es limpia. {{ count() }} para mostrar el valor. No necesitan async pipe, no necesitan suscripciones. Los signals son funciones, las llaman para obtener el valor actual.
+El loop @for con history muestra arrays reactivos. Cuando history cambia, la lista se actualiza automáticamente. El track asegura rendimiento óptimo en re-renderizados.
+Este componente haría lo mismo con RxJS requeriría el doble de código y sería más complejo de entender. Signals brilla para estado local de componentes.
+________________________________________
+Diapositiva 16: LAB 3 - Signals Avanzados (5 minutos)
+Ahora vamos a trabajar con estructuras de datos más complejas: objetos y arrays en Signals.
+El TodoSignalsService muestra patterns profesionales para manejar estado complejo con Signals. No es solo un contador; es una aplicación real con operaciones CRUD completas.
+El signal privado todosSignal contiene el array de todos. Es privado porque no queremos que componentes externos lo modifiquen directamente. Solo a través de métodos controlados del servicio.
+asReadonly() es encapsulación inteligente. Los componentes pueden leer el valor pero no modificarlo. Es como dar acceso de solo lectura a una base de datos. Pueden ver pero no tocar.
+Los computed signals son potentes. completedTodos filtra automáticamente todos completados. activeTodos filtra los activos. todoCount cuenta el total. Cuando todosSignal cambia, todos estos se recalculan automáticamente. Es como tener vistas materializadas que siempre están actualizadas.
+addTodo muestra modificación inmutable. No mutamos el array existente; creamos uno nuevo con el spread operator. Signals detecta el cambio porque es un nuevo array. Es el mismo principio que en Redux pero más simple.
+toggleTodo es cirugía precisa. Mapeamos el array, creando un nuevo todo solo para el que cambia. Los demás se mantienen igual (misma referencia). Es eficiencia: Angular solo re-renderiza lo que cambió.
+removeTodo filtra el todo no deseado. clearCompleted elimina todos los completados. Cada operación es inmutable, predecible, testeable.
+Este patrón escala perfectamente. Pueden manejar estado tan complejo como necesiten. La reactividad es automática, el código es limpio, el rendimiento es óptimo.
+________________________________________
+Diapositiva 17: LAB 3 - Effects y Side Effects (5 minutos)
+Los effects son el puente entre el mundo reactivo de Signals y el mundo imperativo de side effects.
+El EffectsComponent muestra casos de uso reales para effects. No son solo console.log; son operaciones significativas que necesitan ocurrir cuando el estado cambia.
+El searchEffect es auto-búsqueda inteligente. Cuando searchTerm cambia, automáticamente busca si el término tiene más de 3 caracteres. No necesitan botón de búsqueda, no necesitan manejar eventos. El effect observa y reacciona.
+untracked es crucial aquí. Dentro del effect, modificamos isLoading y llamamos performSearch. Sin untracked, esto crearía una dependencia circular: el effect dependería de isLoading, que el mismo effect modifica. untracked dice "haz esto pero no lo rastrees como dependencia".
+persistenceEffect guarda automáticamente en localStorage. Cada vez que searchResults cambia, se persiste. Es backup automático, historial automático. Los usuarios pueden recargar la página y mantener sus resultados.
+animationEffect con cleanup es sofisticación. Cuando hay resultados, añade una clase CSS para animar. onCleanup asegura que la clase se remueva cuando el effect se re-ejecuta o el componente se destruye. Es gestión de recursos responsable.
+performSearch muestra integración con el mundo Observable. Signals no reemplaza completamente RxJS; coexisten. HTTP sigue retornando Observables. El patrón es hacer la petición HTTP, y en el subscribe, actualizar el signal. Es el puente entre ambos mundos.
+La clave es entender cuándo usar effects. Son para sincronización con sistemas externos: localStorage, console, DOM, analytics. No son para derivar valores (usen computed) ni para lógica de negocio (usen métodos).
+________________________________________
+Diapositiva 18: LAB 3 - Signals vs Observables (5 minutos)
+Esta comparación es crucial. No es sobre cuál es mejor, sino sobre cuándo usar cada uno.
+Signals es perfecto para estado local del componente. Es síncrono, simple, no requiere gestión de suscripciones. Si su estado vive y muere con el componente, Signals es probablemente la mejor opción.
+Observables brillan para eventos asíncronos. HTTP requests, WebSockets, eventos del DOM que necesitan transformación compleja. Cuando necesitan los operadores de RxJS, cuando manejan streams de datos, Observables es insustituible.
+La combinación es poderosa. loadUserToSignal muestra el patrón: hacer petición HTTP con Observable, actualizar Signal con el resultado. Es lo mejor de ambos mundos: la potencia de RxJS para la operación asíncrona, la simplicidad de Signals para el estado.
+toObservable y toSignal son los puentes bidireccionales. Pueden convertir un Signal a Observable cuando necesitan operadores RxJS. Pueden convertir un Observable a Signal cuando quieren simplicidad en el template.
+El ejemplo de interoperabilidad muestra que no es una decisión binaria. En la misma aplicación, el mismo componente, pueden usar ambos. Signals para estado local, Observables para operaciones asíncronas complejas.
+La regla de oro: si pueden resolverlo con Signals, úsenlo. Es más simple. Si necesitan operadores RxJS, timing complejo, o manejan streams de eventos, usen Observables. No es competencia; es complementariedad.
+Este servicio muestra madurez arquitectónica. No es fanatismo por una tecnología; es usar la herramienta correcta para cada trabajo.
+________________________________________
+Diapositiva 19: LAB 4 - Estado Global con Signals (5 minutos)
+El estado global es uno de los problemas más complejos en aplicaciones modernas. Signals lo hace elegante.
+GlobalStateService es su store centralizado, pero sin la ceremonia de NgRx o Akita. Es estado global con la simplicidad de Signals.
+Los signals privados con underscore son encapsulación. _user, _theme, _language, _notifications son modificables solo dentro del servicio. Es control de acceso, previene modificaciones accidentales.
+La exposición como readonly es API pública limpia. Los componentes pueden leer pero no escribir directamente. Deben usar los métodos del servicio para modificaciones. Es el mismo principio que en bases de datos: SELECT para todos, UPDATE solo con permisos.
+Los computed globales son inteligencia derivada. isAuthenticated siempre refleja si hay usuario. unreadCount cuenta notificaciones no leídas. isDarkMode indica el tema actual. Son valores derivados que siempre están sincronizados, sin lógica duplicada.
+Los métodos de acción son la única forma de modificar estado. login no solo setea el usuario; también carga preferencias. logout limpia todo. toggleTheme alterna y persiste. Es encapsulación de lógica de negocio.
+La persistencia en localStorage es transparente. Los componentes no saben ni les importa cómo se persiste. Solo usan el servicio. Si mañana cambian a IndexedDB o a un backend, los componentes no cambian.
+Este patrón escala perfectamente. Pueden tener múltiples servicios de estado para diferentes dominios. UserState, CartState, UIState. Cada uno manejando su pedazo del estado global.
+La inyección con providedIn: 'root' asegura singleton. Todos los componentes comparten la misma instancia, el mismo estado. Es estado verdaderamente global.
+________________________________________
+Diapositiva 20: LAB 4 - Migración de RxJS a Signals (5 minutos)
+La migración no es solo un ejercicio académico. Muchas aplicaciones están haciendo esta transición ahora mismo.
+El OldCartService con BehaviorSubject es el patrón clásico de RxJS para estado. Funciona, pero requiere ceremonias. BehaviorSubject para mantener estado, pipe para derivar valores, suscripciones en componentes.
+El NewCartService con Signals es refrescantemente simple. El mismo funcionalidad, la mitad del código, más fácil de entender. No hay pipe, no hay operadores, solo computed values que se actualizan automáticamente.
+La comparación de totalItems es reveladora. Con RxJS, necesitan pipe y map. Con Signals, computed hace el trabajo. Ambos son reactivos, pero Signals es más directo.
+El patrón de actualización también difiere. Con BehaviorSubject, obtienen el valor actual, lo modifican, y emiten el nuevo. Con Signals, update recibe una función que transforma el valor. Es más funcional, más predecible.
+addItem muestra una ventaja de Signals: lógica más compleja es más clara. Verificar si el item existe, actualizar cantidad si existe, agregar si no. Con RxJS sería más verboso.
+La clave de la migración es identificar qué realmente necesita RxJS. Estado local raramente lo necesita. HTTP siempre lo necesita. Estado global puede ir en cualquier dirección dependiendo de la complejidad.
+No migren todo ciegamente. Evalúen cada caso. Si usan operadores RxJS complejos, manténganlo en RxJS. Si es simple estado con derivaciones, Signals es probablemente mejor.
+La migración puede ser gradual. No necesitan reescribir toda la aplicación. Pueden migrar servicio por servicio, componente por componente. Angular soporta ambos paradigmas simultáneamente.
+________________________________________
+Diapositiva 21: LAB 4 - Signals con HTTP (5 minutos)
+La integración de Signals con HTTP es el patrón que usarán constantemente en aplicaciones reales.
+HttpSignalsService muestra el patrón básico: signals para estado de la petición (data, loading, error), método que hace la petición y actualiza signals. Es simple pero poderoso.
+Los computed hasData, hasError, isReady derivan estado útil. No necesitan verificar manualmente múltiples condiciones en el template. isReady les dice si pueden mostrar datos. Es abstracción útil.
+fetchData es el patrón estándar. Setear loading true, limpiar error, hacer petición, actualizar data en success, actualizar error en failure, siempre setear loading false en finalize. Es el ciclo de vida completo de una petición HTTP.
+createResource es un patrón más avanzado, inspirado en React. Encapsula todo el estado y lógica de una petición en un objeto. Los componentes solo usan resource.data(), resource.loading(), resource.error(). Pueden recargar con resource.reload(). Es encapsulación perfecta.
+El auto-load en createResource es UX inteligente. Los datos se cargan automáticamente cuando se crea el resource. No necesitan llamar load() manualmente en ngOnInit. Es una cosa menos que recordar.
+destroy para limpiar la suscripción es importante. Signals no necesita cleanup, pero el Observable HTTP sí. Es gestión de recursos responsable.
+El template del componente muestra lo limpio que queda. @if para loading, @else if para error, @else para data. No hay async pipe, no hay suscripciones en el template. Solo signals que se leen como funciones.
+Este patrón es el futuro del manejo de HTTP en Angular. La potencia de Observables para la petición, la simplicidad de Signals para el estado.
+________________________________________
+Diapositiva 22: LAB 4 - Performance y Best Practices (5 minutos)
+Las mejores prácticas no son opcionales si quieren aplicaciones performantes y mantenibles.
+Signals granulares vs monolíticos es crucial. firstName y lastName separados permiten actualizaciones precisas. Si solo cambia firstName, solo lo que depende de firstName se actualiza. Un signal monolítico user forzaría actualización de todo lo que lo usa, incluso si solo cambió una propiedad.
+computed para valores derivados es mandatorio. Nunca calculen en el template. filteredItems y sortedItems se calculan una vez cuando sus dependencias cambian, no en cada detección de cambios. Es la diferencia entre O(n) y O(1) en renders.
+Batch updates son automáticos en Signals. Pueden actualizar múltiples signals sincrónicamente; Angular los agrupa en un solo ciclo de detección de cambios. Con RxJS necesitarían schedulers o técnicas complejas.
+untrack es su escape hatch. A veces necesitan leer un signal sin crear dependencia. El ejemplo de logging muestra esto: quieren loggear el nombre y la hora, pero no quieren que el effect se re-ejecute cuando la hora cambia.
+Signals readonly públicos son arquitectura limpia. Los consumidores no pueden modificar accidentalmente el estado. Deben pasar por los métodos del servicio. Es el mismo principio que getters/setters pero más elegante.
+La limpieza de effects con onCleanup es crucial para evitar memory leaks. Si crean timers, event listeners, o cualquier recurso, límpienlos. Angular no puede hacer esto automáticamente; es su responsabilidad.
+La medición de performance muestra la diferencia cruda. Signals es síncrono, inmediato. Observables requiere suscripción, scheduling. Para estado local, Signals es objetivamente más rápido.
+Estas prácticas no son sugerencias; son requisitos para aplicaciones profesionales. La diferencia entre código que funciona y código que escala.
+________________________________________
+Diapositiva 23: Recursos y Referencias (3 minutos)
+Los recursos correctos aceleran dramáticamente su aprendizaje. Aquí están los esenciales.
+La documentación oficial de Angular Signals es su biblia. Está excepcionalmente bien escrita, con ejemplos prácticos y casos de uso reales. No es documentación seca; es un tutorial interactivo.
+RxJS Documentation puede parecer abrumadora, pero la sección de operadores es oro puro. Cada operador tiene diagramas de mármol que visualizan exactamente qué hace. Dediquen tiempo a explorar.
+Learn RxJS complementa la documentación oficial con ejemplos más elaborados. Cuando la documentación oficial les dé la teoría, Learn RxJS les dá la práctica.
+RxJS Marbles es diversión educativa. Pueden crear diagramas de mármol interactivos para entender operadores complejos. Es como un playground para RxJS.
+El repositorio del curso no es código de juguete. Cada laboratorio está production-ready, con tests, documentación, mejores prácticas. Pueden usar este código como base para sus proyectos reales.
+Los scripts npm están optimizados para su aprendizaje. Cada laboratorio se puede ejecutar independientemente. No necesitan hacer todo en orden. Pueden saltar al tema que necesiten.
+El comando benchmark es especialmente interesante. Compara performance real entre RxJS y Signals para diferentes casos de uso. Verán con números reales cuándo cada uno es más eficiente.
+El cheat sheet de migración es su guía rápida. BehaviorSubject → signal(), Subject → signal() + methods. Imprímanlo, pónganlo en su escritorio. Es referencia instantánea durante migraciones.
+________________________________________
+Diapositiva 24: Ejercicio Integrador Final (7 minutos)
+Este ejercicio final integra todo lo aprendido. Es una aplicación completa, no un ejemplo de juguete.
+La Todo App que van a construir es el "Hello World" de las aplicaciones modernas, pero elevado al nivel profesional. Combina Signals para estado, computed para derivaciones, effects para persistencia, y toda la arquitectura limpia que aprendieron.
+El componente es standalone, moderno. No necesita módulo. Los imports son explícitos: FormsModule para ngModel, CommonModule para directivas básicas. Es arquitectura simple y clara.
+Los signals todos y filter mantienen el estado. No hay BehaviorSubjects, no hay Observables para estado local. Solo signals simples y efectivos. newTodo es string regular porque no necesita ser reactivo; solo se lee cuando agregan un todo.
+Los computed activeTodos, completedTodos, filteredTodos son derivaciones automáticas. Cuando todos cambia, se recalculan. Cuando filter cambia, filteredTodos se actualiza. Es reactividad en cascada, automática y eficiente.
+El effect de persistencia es brillante. Cada vez que todos cambia, se guarda en localStorage. No necesitan recordar llamar save(). No necesitan botón de guardar. Es persistencia transparente y automática.
+El effect de logging es debugging útil. En desarrollo, pueden ver en consola cómo cambia el estado. En producción, lo comentarían o usarían un flag.
+ngOnInit carga datos guardados. Es hidratación de estado, restauración de sesión. Los usuarios pueden cerrar el navegador y volver, sus todos están ahí.
+Los métodos de modificación son limpios. addTodo crea un todo con ID único (timestamp), lo agrega al array inmutablemente. toggleTodo mapea y modifica solo el todo específico. removeTodo filtra. clearCompleted elimina completados. Cada operación es predecible y testeable.
+El template usa las nuevas directivas de control de flujo. @if en lugar de *ngIf, @for en lugar de *ngFor. Es la sintaxis moderna de Angular 17+. Más clara, más performante.
+La vinculación bidireccional con [(ngModel)] para newTodo muestra que Signals no reemplaza todo. Para inputs de formulario, ngModel sigue siendo útil.
+Los contadores en los botones de filtro (todos().length, activeTodos().length) se actualizan automáticamente. No hay lógica manual de actualización. Es la promesa de la reactividad cumplida.
+Esta aplicación, aunque simple en concepto, demuestra arquitectura profesional. Estado centralizado, derivaciones automáticas, persistencia transparente, UI reactiva. Es el patrón que usarán en aplicaciones reales, escalado a necesidades más complejas.
+________________________________________
+Diapositiva 25: Cierre y Q&A (5 minutos)
+Felicitaciones. Han completado un viaje intenso por el corazón de la programación reactiva moderna.
+Hoy no solo aprendieron sintaxis; absorbieron paradigmas. La asincronía ya no es un misterio sino una herramienta. Entienden callbacks, dominan Promises, y async/await es su segunda naturaleza. Pueden manejar operaciones paralelas, secuenciales, con timeout, con retry. Son maestros de la asincronía.
+RxJS pasó de ser intimidante a ser poderoso. Los Observables son sus aliados para manejar streams de datos. Los operadores son sus herramientas especializadas. Pueden transformar, filtrar, combinar, manejar errores. Son programadores reactivos.
+Signals es su nueva arma secreta. Para estado local, es más simple que RxJS. Para derivaciones, computed es mágico. Para side effects, effects son automáticos. No es reemplazo de RxJS; es complemento perfecto.
+La migración de RxJS a Signals no es teórica; es práctica. Saben cuándo migrar, cómo migrar, y más importante, cuándo NO migrar. Son arquitectos que eligen la herramienta correcta para cada trabajo.
+El estado global con Signals resuelve uno de los problemas más complejos elegantemente. No necesitan librerías pesadas de state management para casos simples. Signals es suficiente para muchas aplicaciones.
+La próxima sesión, el jueves 21 de agosto, abordaremos formularios y mejores prácticas. Con el conocimiento reactivo de hoy, los formularios reactivos serán pan comido. Validaciones asíncronas, formularios dinámicos, todo será más claro con su nuevo entendimiento.
+Las tareas para casa no son opcionales si quieren solidificar el conocimiento. Migren un componente real de RxJS a Signals. Implementen estado global en un proyecto existente. Creen un formulario que use validación asíncrona con Observables. La práctica convierte conocimiento en habilidad.
+Pueden escribirme a jhonny.ramirez@provias.gob.pe con cualquier duda. No hay preguntas tontas cuando están aprendiendo paradigmas nuevos. A veces un pequeño empujón desbloquea comprensión profunda.
+Han demostrado dedicación y capacidad de absorción impresionantes. Programación reactiva no es fácil, pero la dominaron. Signals es nuevo para muchos, pero ya son expertos. Son la nueva generación de desarrolladores Angular.
+¡Excelente trabajo! Nos vemos el jueves a las 19:00 para continuar este viaje extraordinario. Hasta entonces, practiquen, experimenten, y disfruten del poder de la programación reactiva.
+¡Hasta la próxima sesión! 🚀
+
