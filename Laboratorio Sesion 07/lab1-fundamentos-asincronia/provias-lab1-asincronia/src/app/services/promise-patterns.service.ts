@@ -16,7 +16,7 @@ import { User, Product, Order, RetryConfig, TimeoutConfig, BatchConfig } from '.
 export class PromisePatternsService {
   private http = inject(HttpClient);
   private apiUrl = '/api';
-  private debounceTimers = new Map<string, NodeJS.Timeout>();
+  private debounceTimers = new Map<string, any>();
 
   // ================================
   // 1. PROMISE.ALL - PARALELISMO PURO
@@ -162,7 +162,7 @@ export class PromisePatternsService {
         return result;
       } catch (error) {
         lastError = error;
-        console.log(`❌ Intento ${attempt + 1} falló: ${error.message}`);
+        console.log(`❌ Intento ${attempt + 1} falló: ${(error as Error).message}`);
         
         if (attempt < maxRetries) {
           // 📈 Backoff exponencial: cada vez esperamos más tiempo

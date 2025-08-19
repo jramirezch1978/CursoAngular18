@@ -1,0 +1,427 @@
+<div class="lab2-container">
+  <header class="lab-header">
+    <h1>🌊 LAB 2: RXJS Y OBSERVABLES</h1>
+    <p class="subtitle">PROVIAS DESCENTRALIZADO - Angular v18</p>
+    <p class="instructor">Instructor: Ing. Jhonny Alexander Ramirez Chiroque</p>
+  </header>
+
+  <nav class="navigation-tabs">
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'intro'"
+      (click)="setActiveTab('intro')">
+      📚 Introducción RxJS
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'subjects'"
+      (click)="setActiveTab('subjects')">
+      🎭 Subjects Demo
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'transform'"
+      (click)="setActiveTab('transform')">
+      🔄 Operadores Transformación
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'combination'"
+      (click)="setActiveTab('combination')">
+      🔗 Operadores Combinación
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'errors'"
+      (click)="setActiveTab('errors')">
+      🛡️ Manejo de Errores
+    </button>
+    <button 
+      class="tab-button" 
+      [class.active]="activeTab === 'search'"
+      (click)="setActiveTab('search')">
+      🔍 Búsqueda Reactiva
+    </button>
+  </nav>
+
+  <main class="lab-content">
+    <!-- Introducción a RxJS -->
+    <section *ngIf="activeTab === 'intro'" class="content-section">
+      <div class="theory-box">
+        <h2>🎯 Bienvenidos al Mundo RxJS</h2>
+        <blockquote>
+          "Bienvenidos al mundo de RxJS, donde los datos fluyen como ríos que podemos controlar con precisión."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+        
+        <div class="comparison-table-container">
+          <h3>📊 Observable vs Promise</h3>
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Característica</th>
+                <th>Promise</th>
+                <th>Observable</th>
+                <th>Ventaja Observable</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Valores</strong></td>
+                <td>Uno solo</td>
+                <td class="highlight">Múltiples en el tiempo</td>
+                <td>Streams de datos</td>
+              </tr>
+              <tr>
+                <td><strong>Cancelable</strong></td>
+                <td class="no">❌ No</td>
+                <td class="yes">✅ Sí</td>
+                <td>Eficiencia pura</td>
+              </tr>
+              <tr>
+                <td><strong>Lazy</strong></td>
+                <td class="no">❌ Ejecuta inmediatamente</td>
+                <td class="yes">✅ Solo al suscribirse</td>
+                <td>Como Netflix</td>
+              </tr>
+              <tr>
+                <td><strong>Operadores</strong></td>
+                <td>then/catch básicos</td>
+                <td class="highlight">100+ especializados</td>
+                <td>Superpoder total</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="concept-box">
+          <h3>🧠 Conceptos Fundamentales</h3>
+          <div class="concept-grid">
+            <div class="concept-card">
+              <h4>🔥 Hot vs Cold</h4>
+              <p><strong>Cold:</strong> Se ejecuta al suscribirse (HTTP)<br>
+              <strong>Hot:</strong> Ya ejecutándose (eventos)</p>
+            </div>
+            <div class="concept-card">
+              <h4>🎼 Event Loop</h4>
+              <p>Director de orquesta que coordina todos los streams</p>
+            </div>
+            <div class="concept-card">
+              <h4>🌊 Streams</h4>
+              <p>Flujos continuos de datos que se pueden transformar</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Subjects Demo -->
+    <section *ngIf="activeTab === 'subjects'" class="content-section">
+      <div class="theory-box">
+        <h2>🎭 Patrón Observer - Subjects Demo</h2>
+        <blockquote>
+          "Un Subject es fascinante porque es Observable y Observer simultáneamente. Es como ser locutor y oyente de radio al mismo tiempo."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="subjects-grid">
+        <!-- BehaviorSubject -->
+        <div class="subject-demo-card">
+          <h3>🧠 BehaviorSubject (Usuario Actual)</h3>
+          <p><strong>Con memoria:</strong> Nuevas suscripciones reciben el último valor</p>
+          <button class="demo-button primary" (click)="setRandomUser()">
+            Cambiar Usuario
+          </button>
+          <div class="result-box" *ngIf="currentUser">
+            <strong>Usuario actual:</strong>
+            <pre>{{ currentUser | json }}</pre>
+          </div>
+        </div>
+
+        <!-- ReplaySubject -->
+        <div class="subject-demo-card">
+          <h3>📚 ReplaySubject (Historial)</h3>
+          <p><strong>Memoria múltiple:</strong> Mantiene los últimos 3 mensajes</p>
+          <div class="message-input">
+            <input 
+              [(ngModel)]="newMessage" 
+              placeholder="Nuevo mensaje"
+              (keydown.enter)="addMessage()">
+            <button class="demo-button secondary" (click)="addMessage()">
+              Enviar
+            </button>
+          </div>
+          <div class="messages-list">
+            <div *ngFor="let msg of messages" class="message-item">
+              {{ msg }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Subject Simple -->
+        <div class="subject-demo-card">
+          <h3>📡 Subject Simple (Broadcasting)</h3>
+          <p><strong>Multicast:</strong> Emite a todos los suscriptores</p>
+          <button class="demo-button broadcast" (click)="broadcastData()">
+            Broadcast Data
+          </button>
+          <div class="broadcast-status">
+            Suscriptores activos: {{ activeSubscriptions }}
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Operadores de Transformación -->
+    <section *ngIf="activeTab === 'transform'" class="content-section">
+      <div class="theory-box">
+        <h2>🔄 Operadores de Transformación</h2>
+        <blockquote>
+          "Los operadores de transformación son donde RxJS muestra su verdadero poder. Son sus pinceles para pintar con datos."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="transform-demo">
+        <button class="demo-button transform" (click)="testTransformOperators()">
+          🎨 Ejecutar Transformaciones
+        </button>
+        
+        <div class="operators-results">
+          <div *ngFor="let result of transformResults" class="operator-result">
+            <h4>{{ result.operator }}</h4>
+            <pre>{{ result.data | json }}</pre>
+          </div>
+        </div>
+
+        <div class="operators-explanation">
+          <h3>🧰 Operadores Explicados</h3>
+          <div class="operators-grid">
+            <div class="operator-card">
+              <h4>🗺️ MAP</h4>
+              <p><strong>Transformación pura:</strong> Como línea de ensamblaje, cada elemento pasa por transformación específica</p>
+            </div>
+            <div class="operator-card">
+              <h4>🚪 FILTER</h4>
+              <p><strong>Guardián de calidad:</strong> Como portero de club exclusivo, solo entran los que cumplen criterios</p>
+            </div>
+            <div class="operator-card">
+              <h4>🔍 TAP</h4>
+              <p><strong>Efectos secundarios:</strong> Como cámaras de seguridad, observan sin interferir</p>
+            </div>
+            <div class="operator-card">
+              <h4>🔄 SWITCHMAP</h4>
+              <p><strong>Magia para búsquedas:</strong> Cancela anterior y comienza nueva automáticamente</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Operadores de Combinación -->
+    <section *ngIf="activeTab === 'combination'" class="content-section">
+      <div class="theory-box">
+        <h2>🔗 Operadores de Combinación</h2>
+        <blockquote>
+          "Los operadores de combinación son sus herramientas para orquestar múltiples flujos de datos."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="combination-demo">
+        <div class="combination-buttons">
+          <button class="demo-button combine" (click)="testCombineLatest()">
+            🔄 CombineLatest
+          </button>
+          <button class="demo-button fork" (click)="testForkJoin()">
+            🍴 ForkJoin
+          </button>
+          <button class="demo-button merge" (click)="testMerge()">
+            🌊 Merge
+          </button>
+          <button class="demo-button zip" (click)="testZip()">
+            🤐 Zip
+          </button>
+        </div>
+        
+        <div class="combination-results">
+          <div *ngFor="let result of combinationResults" class="combination-result">
+            <h4>{{ result.type }}</h4>
+            <pre>{{ result.data | json }}</pre>
+          </div>
+        </div>
+
+        <div class="operators-explanation">
+          <h3>🎼 Combinaciones Explicadas</h3>
+          <div class="operators-grid">
+            <div class="operator-card">
+              <h4>🔄 COMBINELATEST</h4>
+              <p><strong>Sincronización continua:</strong> Dashboard en tiempo real que se actualiza cuando cualquier fuente cambia</p>
+            </div>
+            <div class="operator-card">
+              <h4>🍴 FORKJOIN</h4>
+              <p><strong>Todo listo definitivo:</strong> Espera a que todos lleguen antes de empezar la reunión</p>
+            </div>
+            <div class="operator-card">
+              <h4>🌊 MERGE</h4>
+              <p><strong>Combinador simple:</strong> Múltiples mangueras vertiendo en el mismo tanque</p>
+            </div>
+            <div class="operator-card">
+              <h4>🤐 ZIP</h4>
+              <p><strong>Emparejamiento estricto:</strong> Como parejas de baile, cada uno con su pareja correspondiente</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Manejo de Errores -->
+    <section *ngIf="activeTab === 'errors'" class="content-section">
+      <div class="theory-box">
+        <h2>🛡️ Manejo de Errores Profesional</h2>
+        <blockquote>
+          "El manejo de errores en RxJS es sofisticado y poderoso. Este manejo robusto de errores es lo que separa aplicaciones hobby de aplicaciones profesionales."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="error-demo">
+        <div class="error-buttons">
+          <button class="demo-button retry" (click)="testRetry()">
+            🔄 Test Retry
+          </button>
+          <button class="demo-button timeout" (click)="testTimeout()">
+            ⏰ Test Timeout
+          </button>
+          <button class="demo-button cache" (click)="testCachedData()">
+            💾 Test Cache
+          </button>
+        </div>
+        
+        <div class="error-log">
+          <h4>📋 Log de Operaciones</h4>
+          <div class="log-container">
+            <div *ngFor="let log of errorLogs" 
+                 class="log-entry" 
+                 [class.error]="log.type === 'error'">
+              [{{ log.time }}] {{ log.message }}
+            </div>
+          </div>
+        </div>
+
+        <div class="error-patterns">
+          <h3>🧰 Patrones de Error</h3>
+          <div class="patterns-grid">
+            <div class="pattern-card">
+              <h4>🪤 CATCHERROR</h4>
+              <p><strong>Red de seguridad:</strong> A veces fallar silenciosamente es mejor que fallar ruidosamente</p>
+            </div>
+            <div class="pattern-card">
+              <h4>🔄 RETRY</h4>
+              <p><strong>Persistencia simple:</strong> Como llamar a una puerta varias veces antes de irse</p>
+            </div>
+            <div class="pattern-card">
+              <h4>⚡ RETRYWHEN</h4>
+              <p><strong>Inteligencia aplicada:</strong> Backoff exponencial como protocolo diplomático</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Búsqueda Reactiva -->
+    <section *ngIf="activeTab === 'search'" class="content-section">
+      <div class="theory-box">
+        <h2>🔍 Búsqueda Reactiva Inteligente</h2>
+        <blockquote>
+          "switchMap es magia para búsquedas. Cada vez que el usuario escribe, cancela la búsqueda anterior y comienza una nueva. Con debounceTime esperan 300ms después de que el usuario deja de escribir."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="search-demo">
+        <div class="search-container">
+          <input 
+            class="search-input"
+            [(ngModel)]="searchTerm"
+            (ngModelChange)="onSearch($event)"
+            placeholder="🔍 Buscar usuarios de PROVIAS... (min 2 caracteres)"
+            autocomplete="off">
+          
+          <div class="search-status">
+            {{ searchStatus }}
+          </div>
+        </div>
+        
+        <div class="search-results" *ngIf="searchResults.length > 0">
+          <h4>📋 Resultados de búsqueda:</h4>
+          <div class="results-grid">
+            <div *ngFor="let user of searchResults" class="user-card">
+              <div class="user-info">
+                <strong>{{ user.name }}</strong>
+                <span class="email">{{ user.email }}</span>
+                <span class="role" [class]="user.role">{{ user.role }}</span>
+              </div>
+              <div class="user-status" [class.active]="user.isActive">
+                {{ user.isActive ? '🟢 Activo' : '🔴 Inactivo' }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="search-explanation">
+          <h3>🧠 Cómo Funciona la Magia</h3>
+          <div class="flow-steps">
+            <div class="step">
+              <span class="step-number">1</span>
+              <strong>debounceTime(300)</strong>
+              <p>Espera 300ms después de escribir</p>
+            </div>
+            <div class="arrow">→</div>
+            <div class="step">
+              <span class="step-number">2</span>
+              <strong>distinctUntilChanged()</strong>
+              <p>Solo busca si el término cambió</p>
+            </div>
+            <div class="arrow">→</div>
+            <div class="step">
+              <span class="step-number">3</span>
+              <strong>switchMap()</strong>
+              <p>Cancela búsqueda anterior automáticamente</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Panel de Métricas RxJS -->
+  <aside class="metrics-panel">
+    <h3>📊 Métricas de RxJS</h3>
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <span class="metric-label">Suscripciones Activas</span>
+        <span class="metric-value active">{{ activeSubscriptions }}</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Eventos Emitidos</span>
+        <span class="metric-value events">{{ eventsEmitted }}</span>
+      </div>
+      <div class="metric-card">
+        <span class="metric-label">Errores Manejados</span>
+        <span class="metric-value errors">{{ errorsHandled }}</span>
+      </div>
+    </div>
+    
+    <div class="memory-info">
+      <h4>🧹 Gestión de Memoria</h4>
+      <p>Auto-cleanup con takeUntil(destroy$)</p>
+      <div class="cleanup-status">
+        <span class="status-indicator" [class.safe]="activeSubscriptions > 0">
+          {{ activeSubscriptions > 0 ? '✅ Gestionado' : '⚠️ Sin suscripciones' }}
+        </span>
+      </div>
+    </div>
+  </aside>
+</div>
