@@ -1,9 +1,9 @@
-<div class="lab3-container">
+<div class="lab4-container">
   <header class="lab-header">
-    <h1>🔮 LAB 3: ANGULAR SIGNALS</h1>
+    <h1>🔄 LAB 4: MIGRACIÓN Y ESTADO GLOBAL</h1>
     <p class="subtitle">PROVIAS DESCENTRALIZADO - Angular v18</p>
     <p class="instructor">Instructor: Ing. Jhonny Alexander Ramirez Chiroque</p>
-    <div class="revolution-badge">✨ La Revolución Silenciosa ✨</div>
+    <div class="integration-badge">🎯 Integración Pura 🎯</div>
   </header>
 
   <nav class="navigation-tabs">
@@ -11,509 +11,675 @@
       class="tab-button" 
       [class.active]="activeTab === 'intro'"
       (click)="setActiveTab('intro')">
-      🌟 Introducción Signals
+      🎯 Migración Estratégica
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'basic'"
-      (click)="setActiveTab('basic')">
-      🔢 Signals Básicos
+      [class.active]="activeTab === 'comparison'"
+      (click)="setActiveTab('comparison')">
+      ⚖️ Antes vs Después
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'computed'"
-      (click)="setActiveTab('computed')">
-      🧮 Computed Values
+      [class.active]="activeTab === 'global-state'"
+      (click)="setActiveTab('global-state')">
+      🌍 Estado Global
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'effects'"
-      (click)="setActiveTab('effects')">
-      ⚡ Effects
+      [class.active]="activeTab === 'hybrid'"
+      (click)="setActiveTab('hybrid')">
+      🌉 Arquitectura Híbrida
     </button>
     <button 
       class="tab-button" 
-      [class.active]="activeTab === 'vs-rxjs'"
-      (click)="setActiveTab('vs-rxjs')">
-      ⚔️ Signals vs RxJS
-    </button>
-    <button 
-      class="tab-button" 
-      [class.active]="activeTab === 'todo'"
-      (click)="setActiveTab('todo')">
-      📝 Todo App Integrador
+      [class.active]="activeTab === 'provias-demo'"
+      (click)="setActiveTab('provias-demo')">
+      🏛️ Demo PROVIAS
     </button>
   </nav>
 
   <main class="lab-content">
-    <!-- Introducción -->
+    <!-- Introducción Migración -->
     <section *ngIf="activeTab === 'intro'" class="content-section">
       <div class="theory-box">
-        <h2>🎯 Bienvenidos a la Nueva Era</h2>
+        <h2>🎯 Migración Estratégica - No Todo Debe Cambiar</h2>
         <blockquote>
-          "Signals es la respuesta de Angular a una pregunta que la comunidad ha estado haciendo por años: ¿puede el manejo de estado ser más simple? RxJS es poderoso pero complejo. Para estado local de componentes, a menudo es excesivo. Signals llena ese vacío perfectamente."
+          "La migración no es solo un ejercicio académico. Muchas aplicaciones Angular existentes están haciendo esta transición. Serán los expertos que sus empresas necesitan para modernizar código legacy."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
         
-        <div class="excel-analogy">
-          <h3>📊 La Analogía de Excel</h3>
-          <div class="analogy-box">
-            <p><strong>Un signal es como una celda en Excel:</strong></p>
-            <p>Cambias una celda → Todas las fórmulas que la usan se recalculan instantáneamente</p>
-            <div class="excel-demo">
-              <div class="cell">A1: {{ count() }}</div>
-              <div class="arrow">→</div>
-              <div class="cell">B1: {{ doubled() }} (=A1*2)</div>
-              <div class="arrow">→</div>
-              <div class="cell">C1: {{ isEven() ? 'PAR' : 'IMPAR' }} (=IF(A1%2=0,"PAR","IMPAR"))</div>
+        <div class="migration-rules">
+          <h3>🎯 Reglas de Oro para Migración</h3>
+          <div class="rules-grid">
+            <div class="rule-card migrate">
+              <h4>✅ MIGRAR a Signals</h4>
+              <ul>
+                <li>🏠 Estado local de componente</li>
+                <li>🔢 Datos síncronos simples</li>
+                <li>📊 Derivaciones automáticas</li>
+                <li>🎨 UI reactiva simple</li>
+                <li>🧮 Contadores, flags, objetos</li>
+              </ul>
+            </div>
+            
+            <div class="rule-card keep-rxjs">
+              <h4>❌ NO MIGRAR (mantener RxJS)</h4>
+              <ul>
+                <li>🌐 HTTP requests complejos</li>
+                <li>⚡ Operaciones con operadores</li>
+                <li>⏰ Streams temporales</li>
+                <li>🔍 Búsquedas con debounce complejo</li>
+                <li>💎 Si ya funciona perfectamente</li>
+              </ul>
             </div>
           </div>
         </div>
 
-        <div class="advantages-grid">
-          <div class="advantage-card">
-            <h4>🚀 Performance Superior</h4>
-            <p>No requiere Zone.js para detección de cambios</p>
-          </div>
-          <div class="advantage-card">
-            <h4>🎯 Simplicidad</h4>
-            <p>No hay Observables que gestionar para estado local</p>
-          </div>
-          <div class="advantage-card">
-            <h4>🔒 Type-Safe</h4>
-            <p>Por defecto sin gimnasia de tipos</p>
-          </div>
-          <div class="advantage-card">
-            <h4>🧹 Sin Memory Leaks</h4>
-            <p>Prácticamente imposibles con Signals</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Signals Básicos -->
-    <section *ngIf="activeTab === 'basic'" class="content-section">
-      <div class="theory-box">
-        <h2>🔢 Counter Component - Simplicidad Cristalina</h2>
-        <blockquote>
-          "El CounterComponent es simplicidad cristalina. No hay Subjects, no hay Observables, no hay suscripciones. Solo signals que contienen valores y se actualizan reactivamente."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="counter-demo">
-        <div class="counter-display">
-          <div class="main-counter">
-            <span class="counter-label">Contador:</span>
-            <span class="counter-value">{{ count() }}</span>
-          </div>
-          
-          <div class="counter-controls">
-            <button class="counter-btn decrement" (click)="decrement()">-1</button>
-            <button class="counter-btn reset" (click)="reset()">Reset</button>
-            <button class="counter-btn increment" (click)="increment()">+1</button>
-          </div>
-        </div>
-
-        <div class="derived-values">
-          <div class="derived-card">
-            <h4>🔄 Computed Values</h4>
-            <div class="values-grid">
-              <div class="value-item">
-                <span class="label">Doble:</span>
-                <span class="value">{{ doubled() }}</span>
-              </div>
-              <div class="value-item">
-                <span class="label">Es Par:</span>
-                <span class="value" [class.even]="isEven()" [class.odd]="!isEven()">
-                  {{ isEven() ? '✅ PAR' : '❌ IMPAR' }}
-                </span>
-              </div>
-              <div class="value-item">
-                <span class="label">Cuadrado:</span>
-                <span class="value">{{ squared() }}</span>
-              </div>
+        <div class="migration-strategy">
+          <h3>📋 Estrategia de Migración</h3>
+          <div class="strategy-steps">
+            <div class="step-card">
+              <span class="step-number">1</span>
+              <h4>Identificar Candidatos</h4>
+              <p>Analizar qué servicios y componentes son buenos candidatos</p>
             </div>
-          </div>
-        </div>
-
-        <div class="history-section">
-          <h4>📚 Historial Automático (Effect)</h4>
-          <div class="history-list">
-            @for (entry of history(); track entry.id) {
-              <div class="history-item">
-                <span class="timestamp">{{ entry.timestamp }}</span>
-                <span class="value">{{ entry.value }}</span>
-              </div>
-            }
-          </div>
-        </div>
-
-        <div class="syntax-explanation">
-          <h3>💡 Sintaxis Deliciosamente Simple</h3>
-          <div class="syntax-examples">
-            <div class="syntax-item">
-              <strong>Crear:</strong>
-              <code>count = signal(0)</code>
+            <div class="step-card">
+              <span class="step-number">2</span>
+              <h4>Migración Gradual</h4>
+              <p>Feature por feature, service por service. Mantener interoperabilidad</p>
             </div>
-            <div class="syntax-item">
-              <strong>Leer:</strong>
-              <code>count()</code>
-            </div>
-            <div class="syntax-item">
-              <strong>Escribir:</strong>
-              <code>count.set(5)</code>
-            </div>
-            <div class="syntax-item">
-              <strong>Actualizar:</strong>
-              <code>count.update(v => v + 1)</code>
+            <div class="step-card">
+              <span class="step-number">3</span>
+              <h4>Testing y Validación</h4>
+              <p>Comparar comportamiento y performance antes/después</p>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Computed Values -->
-    <section *ngIf="activeTab === 'computed'" class="content-section">
+    <!-- Comparación Antes vs Después -->
+    <section *ngIf="activeTab === 'comparison'" class="content-section">
       <div class="theory-box">
-        <h2>🧮 Computed - Magia Derivada</h2>
+        <h2>⚖️ Cart Service: Antes vs Después</h2>
         <blockquote>
-          "computed es magia derivada. doubled siempre será el doble de count, automáticamente. No necesitan actualizar doubled manualmente cuando count cambia. Es declarativo: describen la relación una vez, Angular la mantiene por siempre."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="computed-demo">
-        <div class="user-form">
-          <h3>👤 Demo: Usuario Complejo</h3>
-          <div class="form-row">
-            <input 
-              type="text" 
-              [value]="firstName()" 
-              (input)="updateFirstName($event)"
-              placeholder="Nombre">
-            <input 
-              type="text" 
-              [value]="lastName()" 
-              (input)="updateLastName($event)"
-              placeholder="Apellido">
-          </div>
-          <div class="form-row">
-            <input 
-              type="email" 
-              [value]="email()" 
-              (input)="updateEmail($event)"
-              placeholder="Email">
-            <select [value]="role()" (change)="updateRole($event)">
-              <option value="user">Usuario</option>
-              <option value="admin">Administrador</option>
-              <option value="manager">Gerente</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="computed-results">
-          <h4>🔮 Valores Computados Automáticamente</h4>
-          <div class="computed-grid">
-            <div class="computed-card">
-              <strong>Nombre Completo:</strong>
-              <span>{{ fullName() }}</span>
-            </div>
-            <div class="computed-card">
-              <strong>Iniciales:</strong>
-              <span>{{ initials() }}</span>
-            </div>
-            <div class="computed-card">
-              <strong>Email Válido:</strong>
-              <span [class.valid]="isEmailValid()" [class.invalid]="!isEmailValid()">
-                {{ isEmailValid() ? '✅ Válido' : '❌ Inválido' }}
-              </span>
-            </div>
-            <div class="computed-card">
-              <strong>Dominio Email:</strong>
-              <span>{{ emailDomain() }}</span>
-            </div>
-            <div class="computed-card">
-              <strong>Usuario PROVIAS:</strong>
-              <span [class.provias]="isProviasUser()">
-                {{ isProviasUser() ? '🏛️ Sí' : '🏢 No' }}
-              </span>
-            </div>
-            <div class="computed-card">
-              <strong>Nivel Acceso:</strong>
-              <span [class]="accessLevel()">{{ accessLevel() }}</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="granular-explanation">
-          <h3>🎯 Signals Granulares vs Monolíticos</h3>
-          <div class="comparison-cards">
-            <div class="comparison-card good">
-              <h4>✅ GRANULAR (Recomendado)</h4>
-              <pre>firstName = signal('Ana');
-lastName = signal('García');</pre>
-              <p>Solo se actualiza lo que realmente cambió</p>
-            </div>
-            <div class="comparison-card bad">
-              <h4>❌ MONOLÍTICO (Evitar)</h4>
-              <pre>user = signal({
-  firstName: 'Ana', 
-  lastName: 'García'
-});</pre>
-              <p>Actualiza todo aunque solo cambie una propiedad</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Effects -->
-    <section *ngIf="activeTab === 'effects'" class="content-section">
-      <div class="theory-box">
-        <h2>⚡ Effects - El Puente Mágico</h2>
-        <blockquote>
-          "Los effects son el puente entre el mundo reactivo de Signals y el mundo imperativo de side effects. effect es para efectos secundarios. Cada vez que un signal que usa cambia, el effect se re-ejecuta."
-          <footer>- Ing. Jhonny Ramirez</footer>
-        </blockquote>
-      </div>
-
-      <div class="effects-demo">
-        <div class="search-effects">
-          <h3>🔍 Auto-Búsqueda con Effects</h3>
-          <input 
-            class="search-input"
-            type="text"
-            [value]="searchTerm()"
-            (input)="updateSearchTerm($event)"
-            placeholder="🔍 Buscar usuarios... (min 3 caracteres)">
-          
-          <div class="search-status" *ngIf="isSearching()">
-            🔄 Buscando automáticamente...
-          </div>
-          
-          <div class="search-results" *ngIf="searchResults().length > 0">
-            <h4>📋 Resultados ({{ searchResults().length }}):</h4>
-            <div class="results-grid">
-              @for (user of searchResults(); track user.id) {
-                <div class="user-result">
-                  <strong>{{ user.name }}</strong>
-                  <span>{{ user.email }}</span>
-                </div>
-              }
-            </div>
-          </div>
-        </div>
-
-        <div class="persistence-demo">
-          <h3>💾 Persistencia Automática</h3>
-          <div class="persistence-status">
-            <div class="status-indicator" [class.saved]="lastSaved()">
-              {{ lastSaved() ? '💾 Guardado automáticamente' : '⏳ Sin guardar' }}
-            </div>
-            <div class="save-timestamp" *ngIf="lastSaved()">
-              Último guardado: {{ lastSaved() }}
-            </div>
-          </div>
-        </div>
-
-        <div class="animation-demo">
-          <h3>🎨 Effects con Cleanup</h3>
-          <button class="demo-button animate" (click)="triggerAnimation()">
-            Activar Animación
-          </button>
-          <div class="animation-box" [class.animated]="isAnimating()">
-            <div class="floating-element">
-              ✨ Elemento Animado ✨
-            </div>
-          </div>
-        </div>
-
-        <div class="untracked-explanation">
-          <h3>🚫 UnTracked - Evitando Dependencias Circulares</h3>
-          <div class="code-example">
-            <pre><code>effect(() => {
-  const term = searchTerm();
-  
-  if (term.length > 3) {
-    untracked(() => {
-      isLoading.set(true);  // No crea dependencia
-      performSearch(term);
-    });
-  }
-});</code></pre>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- Signals vs RxJS -->
-    <section *ngIf="activeTab === 'vs-rxjs'" class="content-section">
-      <div class="theory-box">
-        <h2>⚔️ Signals vs Observables - La Decisión Sabia</h2>
-        <blockquote>
-          "Esta comparación es crucial. No es sobre cuál es mejor, sino sobre cuándo usar cada uno. La regla de oro: si pueden resolverlo con Signals, úsenlo. Es más simple. Si necesitan operadores RxJS, timing complejo, o manejan streams de eventos, usen Observables."
+          "El NewCartService con Signals es refrescantemente simple. El mismo funcionalidad, la mitad del código, más fácil de entender."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
       </div>
 
       <div class="comparison-demo">
-        <div class="decision-matrix">
-          <h3>🎯 Matriz de Decisión</h3>
-          <div class="matrix-grid">
-            <div class="matrix-section use-signals">
-              <h4>✅ Usa SIGNALS para:</h4>
-              <ul>
-                <li>🏠 Estado local del componente</li>
-                <li>🔢 Valores síncronos</li>
-                <li>📊 Derivaciones simples</li>
-                <li>🎨 UI reactiva sin async pipe</li>
-                <li>🧮 Contadores, flags, objetos simples</li>
-              </ul>
-            </div>
-            
-            <div class="matrix-section use-observables">
-              <h4>✅ Usa OBSERVABLES para:</h4>
-              <ul>
-                <li>🌐 HTTP requests complejos</li>
-                <li>🎪 Eventos del DOM con transformación</li>
-                <li>⏰ Streams temporales</li>
-                <li>🔧 Cuando necesitas operadores RxJS</li>
-                <li>🔍 Búsquedas con debounce complejo</li>
-              </ul>
-            </div>
-          </div>
-        </div>
+        <div class="cart-comparison">
+          <div class="old-way">
+            <h3>🏚️ ANTES: RxJS BehaviorSubject</h3>
+            <div class="code-example">
+              <pre><code>// RxJS Pattern - Ceremonioso
+private cartItemsSubject = new BehaviorSubject&lt;Item[]&gt;([]);
+public cartItems$ = this.cartItemsSubject.asObservable();
 
-        <div class="code-comparison">
-          <h3>📝 Comparación de Código</h3>
-          <div class="code-grid">
-            <div class="code-example rxjs-example">
-              <h4>🌊 Con RxJS (Ceremonioso)</h4>
-              <pre><code>// BehaviorSubject pattern
-private countSubject = new BehaviorSubject(0);
-count$ = this.countSubject.asObservable();
-
-doubled$ = this.count$.pipe(
-  map(count => count * 2)
+public totalItems$ = this.cartItems$.pipe(
+  map(items => items.reduce((sum, item) => sum + item.quantity, 0))
 );
 
-// En template
-{{ count$ | async }}
-{{ doubled$ | async }}</code></pre>
+// En template necesitas async pipe
+&lt;div&gt;{{ totalItems$ | async }}&lt;/div&gt;</code></pre>
             </div>
             
-            <div class="code-example signals-example">
-              <h4>✨ Con Signals (Elegante)</h4>
-              <pre><code>// Signal pattern
-count = signal(0);
+            <div class="old-cart-demo">
+              <h4>🛒 Demo Cart Antiguo (RxJS)</h4>
+              <div class="cart-actions">
+                <button class="add-btn old" (click)="addToOldCart()">
+                  ➕ Agregar Item (RxJS)
+                </button>
+                <button class="clear-btn old" (click)="clearOldCart()">
+                  🧹 Limpiar (RxJS)
+                </button>
+              </div>
+              
+              <div class="cart-info">
+                <div class="info-item">
+                  <span>Items:</span>
+                  <span>{{ oldCartItems$ | async | json }}</span>
+                </div>
+                <div class="info-item">
+                  <span>Total Items:</span>
+                  <span>{{ oldTotalItems$ | async }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
 
-doubled = computed(() => this.count() * 2);
+          <div class="new-way">
+            <h3>✨ DESPUÉS: Angular Signals</h3>
+            <div class="code-example">
+              <pre><code>// Signals Pattern - Elegante
+private cartItemsSignal = signal&lt;Item[]&gt;([]);
+public cartItems = this.cartItemsSignal.asReadonly();
 
-// En template
-{{ count() }}
-{{ doubled() }}</code></pre>
+public totalItems = computed(() => 
+  this.cartItemsSignal().reduce((sum, item) => sum + item.quantity, 0)
+);
+
+// En template es directo
+&lt;div&gt;{{ totalItems() }}&lt;/div&gt;</code></pre>
+            </div>
+            
+            <div class="new-cart-demo">
+              <h4>🛒 Demo Cart Nuevo (Signals)</h4>
+              <div class="cart-actions">
+                <button class="add-btn new" (click)="addToNewCart()">
+                  ➕ Agregar Item (Signals)
+                </button>
+                <button class="clear-btn new" (click)="clearNewCart()">
+                  🧹 Limpiar (Signals)
+                </button>
+              </div>
+              
+              <div class="cart-info">
+                <div class="info-item">
+                  <span>Items:</span>
+                  <span>{{ newCartItems() | json }}</span>
+                </div>
+                <div class="info-item">
+                  <span>Total Items:</span>
+                  <span>{{ newTotalItems() }}</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="interoperability-demo">
-          <h3>🌉 Puentes de Interoperabilidad</h3>
-          <div class="bridge-examples">
-            <div class="bridge-card">
-              <h4>Signal → Observable</h4>
-              <code>userObservable$ = toObservable(userSignal)</code>
+        <div class="metrics-comparison">
+          <h3>📊 Comparación de Métricas</h3>
+          <table class="metrics-table">
+            <thead>
+              <tr>
+                <th>Aspecto</th>
+                <th>RxJS BehaviorSubject</th>
+                <th>Signals</th>
+                <th>Ventaja</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Líneas de Código</strong></td>
+                <td class="old">~80 líneas</td>
+                <td class="new">~60 líneas</td>
+                <td class="advantage">25% menos código</td>
+              </tr>
+              <tr>
+                <td><strong>Suscripciones</strong></td>
+                <td class="old">Manual + async pipe</td>
+                <td class="new">Automáticas</td>
+                <td class="advantage">Sin gestión manual</td>
+              </tr>
+              <tr>
+                <td><strong>Memory Leaks</strong></td>
+                <td class="old">Posibles</td>
+                <td class="new">Imposibles</td>
+                <td class="advantage">Más seguro</td>
+              </tr>
+              <tr>
+                <td><strong>Performance</strong></td>
+                <td class="old">Bueno</td>
+                <td class="new">Mejor</td>
+                <td class="advantage">Síncrono directo</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estado Global -->
+    <section *ngIf="activeTab === 'global-state'" class="content-section">
+      <div class="theory-box">
+        <h2>🌍 Estado Global Profesional</h2>
+        <blockquote>
+          "GlobalStateService es su store centralizado, pero sin la ceremonia de NgRx o Akita. Es estado global con la simplicidad de Signals."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="global-state-demo">
+        <div class="state-sections">
+          <!-- Authentication State -->
+          <div class="state-section auth">
+            <h3>🔐 Estado de Autenticación</h3>
+            <div class="auth-demo">
+              <div class="user-info" *ngIf="globalState.currentUser(); else noUser">
+                <div class="user-card">
+                  <strong>{{ globalState.currentUser()?.name }}</strong>
+                  <span>{{ globalState.currentUser()?.email }}</span>
+                  <span class="role">{{ globalState.currentUser()?.role }}</span>
+                </div>
+                <button class="logout-btn" (click)="logout()">
+                  🚪 Cerrar Sesión
+                </button>
+              </div>
+              <ng-template #noUser>
+                <div class="login-form">
+                  <input type="text" [(ngModel)]="loginForm.username" placeholder="Usuario">
+                  <input type="password" [(ngModel)]="loginForm.password" placeholder="Contraseña">
+                  <button class="login-btn" (click)="login()">
+                    🔑 Iniciar Sesión
+                  </button>
+                </div>
+              </ng-template>
+              
+              <div class="auth-status">
+                <div class="status-item">
+                  <span>Autenticado:</span>
+                  <span [class.yes]="globalState.isAuthenticated()" [class.no]="!globalState.isAuthenticated()">
+                    {{ globalState.isAuthenticated() ? '✅ Sí' : '❌ No' }}
+                  </span>
+                </div>
+                <div class="status-item">
+                  <span>Rol:</span>
+                  <span>{{ globalState.userRole() }}</span>
+                </div>
+                <div class="status-item">
+                  <span>Acceso Admin:</span>
+                  <span [class.yes]="globalState.canAccessAdmin()" [class.no]="!globalState.canAccessAdmin()">
+                    {{ globalState.canAccessAdmin() ? '✅ Sí' : '❌ No' }}
+                  </span>
+                </div>
+              </div>
             </div>
-            <div class="bridge-card">
-              <h4>Observable → Signal</h4>
-              <code>dataSignal = toSignal(data$, { initialValue: [] })</code>
+          </div>
+
+          <!-- UI State -->
+          <div class="state-section ui">
+            <h3>🎨 Estado de Interfaz</h3>
+            <div class="ui-controls">
+              <div class="control-group">
+                <label>Tema:</label>
+                <button 
+                  class="theme-btn"
+                  [class.dark]="globalState.isDarkMode()"
+                  (click)="globalState.toggleTheme()">
+                  {{ globalState.theme() === 'light' ? '☀️ Claro' : '🌙 Oscuro' }}
+                </button>
+              </div>
+              
+              <div class="control-group">
+                <label>Idioma:</label>
+                <select [value]="globalState.language()" (change)="changeLanguage($event)">
+                  <option value="es">🇪🇸 Español</option>
+                  <option value="en">🇺🇸 English</option>
+                </select>
+              </div>
+              
+              <div class="control-group">
+                <label>Sidebar:</label>
+                <button 
+                  class="sidebar-btn"
+                  [class.open]="globalState.sidebarOpen()"
+                  (click)="globalState.toggleSidebar()">
+                  {{ globalState.sidebarOpen() ? '📱 Abierto' : '📱 Cerrado' }}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Notifications State -->
+          <div class="state-section notifications">
+            <h3>🔔 Sistema de Notificaciones</h3>
+            <div class="notifications-demo">
+              <div class="notification-controls">
+                <button class="notify-btn info" (click)="addInfoNotification()">
+                  ℹ️ Info
+                </button>
+                <button class="notify-btn success" (click)="addSuccessNotification()">
+                  ✅ Éxito
+                </button>
+                <button class="notify-btn warning" (click)="addWarningNotification()">
+                  ⚠️ Advertencia
+                </button>
+                <button class="notify-btn error" (click)="addErrorNotification()">
+                  ❌ Error
+                </button>
+              </div>
+              
+              <div class="notifications-status">
+                <div class="status-item">
+                  <span>Total:</span>
+                  <span class="badge">{{ globalState.notifications().length }}</span>
+                </div>
+                <div class="status-item">
+                  <span>No leídas:</span>
+                  <span class="badge unread">{{ globalState.unreadCount() }}</span>
+                </div>
+              </div>
+              
+              <div class="notifications-list" *ngIf="globalState.notifications().length > 0">
+                @for (notification of globalState.notifications().slice(0, 5); track notification.id) {
+                  <div class="notification-item" [class]="notification.type" [class.read]="notification.read">
+                    <div class="notification-content">
+                      <strong>{{ notification.title }}</strong>
+                      <p>{{ notification.message }}</p>
+                    </div>
+                    <button 
+                      class="mark-read-btn" 
+                      *ngIf="!notification.read"
+                      (click)="globalState.markNotificationAsRead(notification.id)">
+                      ✓
+                    </button>
+                  </div>
+                }
+              </div>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Todo App Integrador -->
-    <section *ngIf="activeTab === 'todo'" class="content-section">
+    <!-- Comparación Directa -->
+    <section *ngIf="activeTab === 'comparison'" class="content-section">
       <div class="theory-box">
-        <h2>📝 Todo App - Arquitectura Profesional</h2>
+        <h2>⚖️ Comparación Directa: RxJS vs Signals</h2>
         <blockquote>
-          "Esta aplicación, aunque simple en concepto, demuestra arquitectura profesional. Estado centralizado, derivaciones automáticas, persistencia transparente, UI reactiva."
+          "La comparación de totalItems es reveladora. Con RxJS, necesitan pipe y map. Con Signals, computed hace el trabajo. Ambos son reactivos, pero Signals es más directo."
           <footer>- Ing. Jhonny Ramirez</footer>
         </blockquote>
       </div>
 
-      <div class="todo-app">
-        <div class="todo-header">
-          <h3>📝 PROVIAS Todo Manager</h3>
-          <div class="add-todo">
-            <input 
-              class="todo-input"
-              type="text"
-              [(ngModel)]="newTodo"
-              (keydown.enter)="addTodo()"
-              placeholder="¿Qué necesitas hacer para PROVIAS?">
-            <button class="add-btn" (click)="addTodo()" [disabled]="!newTodo.trim()">
-              ➕ Agregar
-            </button>
+      <div class="side-by-side-demo">
+        <div class="demo-section">
+          <h3>🏚️ Implementación RxJS Legacy</h3>
+          <div class="legacy-demo">
+            <div class="cart-display old">
+              <h4>🛒 Carrito RxJS</h4>
+              <div class="cart-items">
+                @for (item of (oldCartItems$ | async) || []; track item.id) {
+                  <div class="cart-item">
+                    {{ item.name }} - ${{ item.price }} x {{ item.quantity }}
+                  </div>
+                }
+              </div>
+              <div class="cart-totals">
+                <div class="total-line">
+                  <span>Total Items:</span>
+                  <span class="total-value">{{ oldTotalItems$ | async }}</span>
+                </div>
+                <div class="total-line">
+                  <span>Total Precio:</span>
+                  <span class="total-value">${{ oldTotalPrice$ | async }}</span>
+                </div>
+                <div class="total-line">
+                  <span>Está Vacío:</span>
+                  <span class="total-value">{{ (oldIsEmpty$ | async) ? 'Sí' : 'No' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="old-actions">
+              <button class="add-item-btn old" (click)="addToOldCart()">
+                ➕ Agregar Item
+              </button>
+              <button class="remove-item-btn old" (click)="removeFromOldCart()">
+                ➖ Remover Item
+              </button>
+            </div>
           </div>
         </div>
 
-        <div class="todo-filters">
-          <button 
-            *ngFor="let filter of filters" 
-            class="filter-btn"
-            [class.active]="currentFilter() === filter.value"
-            (click)="setFilter(filter.value)">
-            {{ filter.label }} <span class="count">({{ filter.count() }})</span>
-          </button>
+        <div class="demo-section">
+          <h3>✨ Implementación Signals Moderna</h3>
+          <div class="modern-demo">
+            <div class="cart-display new">
+              <h4>🛒 Carrito Signals</h4>
+              <div class="cart-items">
+                @for (item of newCartItems(); track item.id) {
+                  <div class="cart-item">
+                    {{ item.name }} - ${{ item.price }} x {{ item.quantity }}
+                  </div>
+                }
+              </div>
+              <div class="cart-totals">
+                <div class="total-line">
+                  <span>Total Items:</span>
+                  <span class="total-value">{{ newTotalItems() }}</span>
+                </div>
+                <div class="total-line">
+                  <span>Total Precio:</span>
+                  <span class="total-value">${{ newTotalPrice() }}</span>
+                </div>
+                <div class="total-line">
+                  <span>Está Vacío:</span>
+                  <span class="total-value">{{ newIsEmpty() ? 'Sí' : 'No' }}</span>
+                </div>
+              </div>
+            </div>
+            
+            <div class="new-actions">
+              <button class="add-item-btn new" (click)="addToNewCart()">
+                ➕ Agregar Item
+              </button>
+              <button class="remove-item-btn new" (click)="removeFromNewCart()">
+                ➖ Remover Item
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Estado Global Demo -->
+    <section *ngIf="activeTab === 'global-state'" class="content-section">
+      <div class="theory-box">
+        <h2>🌍 Estado Global sin Ceremonia</h2>
+        <blockquote>
+          "Este patrón escala perfectamente. Pueden tener múltiples servicios de estado para diferentes dominios. UserState, CartState, UIState."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="global-demo">
+        <div class="global-dashboard">
+          <h3>📊 Dashboard de Estado Global</h3>
+          
+          <div class="dashboard-grid">
+            <div class="dashboard-card user">
+              <h4>👤 Usuario Global</h4>
+              <div class="card-content">
+                <div class="status-indicator" [class.active]="globalState.isAuthenticated()">
+                  {{ globalState.isAuthenticated() ? '🟢 Conectado' : '🔴 Desconectado' }}
+                </div>
+                <div *ngIf="globalState.currentUser()">
+                  <strong>{{ globalState.currentUser()?.name }}</strong>
+                  <span>{{ globalState.userRole() }}</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="dashboard-card theme">
+              <h4>🎨 Tema Global</h4>
+              <div class="card-content">
+                <div class="theme-display" [class]="globalState.theme()">
+                  {{ globalState.theme() === 'light' ? '☀️ Modo Claro' : '🌙 Modo Oscuro' }}
+                </div>
+                <button class="theme-toggle" (click)="globalState.toggleTheme()">
+                  Cambiar Tema
+                </button>
+              </div>
+            </div>
+
+            <div class="dashboard-card notifications">
+              <h4>🔔 Notificaciones</h4>
+              <div class="card-content">
+                <div class="notification-summary">
+                  <span class="total">{{ globalState.notifications().length }} total</span>
+                  <span class="unread">{{ globalState.unreadCount() }} no leídas</span>
+                </div>
+                <button class="clear-notifications" (click)="globalState.clearAllNotifications()">
+                  🧹 Limpiar Todo
+                </button>
+              </div>
+            </div>
+
+            <div class="dashboard-card projects">
+              <h4>🏗️ Proyectos PROVIAS</h4>
+              <div class="card-content">
+                <div class="projects-summary">
+                  <div class="project-stat">
+                    <span class="stat-value">{{ globalState.projects().length }}</span>
+                    <span class="stat-label">Total</span>
+                  </div>
+                  <div class="project-stat">
+                    <span class="stat-value">{{ globalState.activeProjectsCount() }}</span>
+                    <span class="stat-label">Activos</span>
+                  </div>
+                </div>
+                <button class="load-projects-btn" (click)="globalState.loadProjects()">
+                  📋 Cargar Proyectos
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Arquitectura Híbrida -->
+    <section *ngIf="activeTab === 'hybrid'" class="content-section">
+      <div class="theory-box">
+        <h2>🌉 Arquitectura Híbrida - Lo Mejor de Ambos Mundos</h2>
+        <blockquote>
+          "El ejemplo de interoperabilidad muestra que no es una decisión binaria. En la misma aplicación, el mismo componente, pueden usar ambos."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="hybrid-demo">
+        <div class="hybrid-examples">
+          <div class="bridge-demo">
+            <h3>🌉 Puentes de Interoperabilidad</h3>
+            
+            <div class="bridge-examples">
+              <div class="bridge-card">
+                <h4>Signal → Observable</h4>
+                <code>userObservable$ = toObservable(userSignal)</code>
+                <button class="test-bridge" (click)="testSignalToObservable()">
+                  Probar Conversión
+                </button>
+              </div>
+              
+              <div class="bridge-card">
+                <h4>Observable → Signal</h4>
+                <code>dataSignal = toSignal(data$, { initialValue: [] })</code>
+                <button class="test-bridge" (click)="testObservableToSignal()">
+                  Probar Conversión
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="real-time-demo">
+            <h3>📡 Demo: HTTP + Signals + WebSocket</h3>
+            <div class="realtime-status">
+              <div class="connection-status">
+                <span class="status-dot" [class.connected]="isConnected()"></span>
+                {{ isConnected() ? 'Conectado en tiempo real' : 'Desconectado' }}
+              </div>
+              <button class="connect-btn" (click)="toggleConnection()">
+                {{ isConnected() ? '🔌 Desconectar' : '🔌 Conectar' }}
+              </button>
+            </div>
+            
+            <div class="realtime-data" *ngIf="realtimeData().length > 0">
+              <h4>📊 Datos en Tiempo Real:</h4>
+              @for (data of realtimeData().slice(0, 5); track data.id) {
+                <div class="realtime-item">
+                  <span class="timestamp">{{ data.timestamp | date:'medium' }}</span>
+                  <span class="message">{{ data.message }}</span>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Demo PROVIAS -->
+    <section *ngIf="activeTab === 'provias-demo'" class="content-section">
+      <div class="theory-box">
+        <h2>🏛️ Demo Completo PROVIAS</h2>
+        <blockquote>
+          "Esta aplicación demuestra arquitectura profesional. Estado centralizado, derivaciones automáticas, persistencia transparente, UI reactiva."
+          <footer>- Ing. Jhonny Ramirez</footer>
+        </blockquote>
+      </div>
+
+      <div class="provias-dashboard">
+        <div class="dashboard-header">
+          <h3>🏛️ PROVIAS - Dashboard Unificado</h3>
+          <div class="header-stats">
+            <span class="stat">{{ globalState.projectsStats().total }} Proyectos</span>
+            <span class="stat">{{ globalState.unreadCount() }} Notificaciones</span>
+            <span class="stat">{{ globalState.onlineUsers() }} Usuarios Online</span>
+          </div>
         </div>
 
-        <div class="todo-list" *ngIf="filteredTodos().length > 0">
-          @for (todo of filteredTodos(); track todo.id) {
-            <div class="todo-item" [class.completed]="todo.completed">
-              <input 
-                type="checkbox"
-                [checked]="todo.completed"
-                (change)="toggleTodo(todo.id)"
-                class="todo-checkbox">
-              <span class="todo-text">{{ todo.text }}</span>
-              <span class="todo-date">{{ todo.createdAt | date:'short' }}</span>
-              <button class="remove-btn" (click)="removeTodo(todo.id)">🗑️</button>
+        <div class="dashboard-content">
+          <div class="projects-section">
+            <h4>🏗️ Proyectos Activos</h4>
+            <div class="projects-grid">
+              @for (project of globalState.activeProjects().slice(0, 4); track project.id) {
+                <div class="project-card" [class.selected]="project.id === globalState.activeProject()?.id">
+                  <div class="project-header">
+                    <strong>{{ project.name }}</strong>
+                    <span class="project-status" [class]="project.status">{{ project.status }}</span>
+                  </div>
+                  <div class="project-details">
+                    <span>📍 {{ project.location }}</span>
+                    <span>💰 ${{ project.budget | number }}</span>
+                    <span>📅 {{ project.deadline | date:'shortDate' }}</span>
+                  </div>
+                  <button class="select-project" (click)="globalState.setActiveProject(project)">
+                    {{ project.id === globalState.activeProject()?.id ? '✅ Seleccionado' : '👁️ Ver' }}
+                  </button>
+                </div>
+              }
             </div>
-          }
-        </div>
+          </div>
 
-        <div class="todo-actions" *ngIf="todos().length > 0">
-          <button 
-            class="action-btn clear"
-            (click)="clearCompleted()"
-            [disabled]="completedTodos().length === 0">
-            🧹 Limpiar Completados ({{ completedTodos().length }})
-          </button>
-          <button class="action-btn clear-all" (click)="clearAll()">
-            🗑️ Limpiar Todo
-          </button>
-        </div>
-
-        <div class="todo-stats">
-          <h4>📊 Estadísticas Automáticas</h4>
-          <div class="stats-grid">
-            <div class="stat-card">
-              <span class="stat-value">{{ todos().length }}</span>
-              <span class="stat-label">Total</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-value">{{ activeTodos().length }}</span>
-              <span class="stat-label">Activos</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-value">{{ completedTodos().length }}</span>
-              <span class="stat-label">Completados</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-value">{{ completionPercentage() }}%</span>
-              <span class="stat-label">Progreso</span>
+          <div class="active-project-details" *ngIf="globalState.activeProject()">
+            <h4>🎯 Proyecto Activo: {{ globalState.activeProject()?.name }}</h4>
+            <div class="project-info">
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="label">Estado:</span>
+                  <span class="value" [class]="globalState.activeProject()?.status">
+                    {{ globalState.activeProject()?.status }}
+                  </span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Progreso:</span>
+                  <span class="value">{{ globalState.activeProject()?.progress }}%</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Ingenieros:</span>
+                  <span class="value">{{ globalState.activeProjectEngineers().length }}</span>
+                </div>
+                <div class="info-item">
+                  <span class="label">Presupuesto:</span>
+                  <span class="value">${{ globalState.activeProject()?.budget | number }}</span>
+                </div>
+              </div>
+              
+              <div class="project-actions">
+                <button class="action-btn update" (click)="updateProjectStatus()">
+                  🔄 Actualizar Estado
+                </button>
+                <button class="action-btn assign" (click)="assignEngineer()">
+                  👨‍💻 Asignar Ingeniero
+                </button>
+                <button class="action-btn report" (click)="generateReport()">
+                  📊 Generar Reporte
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -521,27 +687,26 @@ doubled = computed(() => this.count() * 2);
     </section>
   </main>
 
-  <!-- Panel de Info Técnica -->
-  <aside class="tech-panel">
-    <h3>⚙️ Información Técnica</h3>
-    <div class="tech-stats">
-      <div class="tech-item">
-        <span class="tech-label">Signals Activos:</span>
-        <span class="tech-value">{{ getSignalCount() }}</span>
+  <!-- Estado Persistente -->
+  <aside class="persistence-panel">
+    <h3>💾 Estado Persistente</h3>
+    <div class="persistence-info">
+      <div class="auto-save-status">
+        <span class="status-dot saving" *ngIf="globalState.isSaving()"></span>
+        <span class="status-dot saved" *ngIf="!globalState.isSaving()"></span>
+        {{ globalState.isSaving() ? 'Guardando...' : 'Todo guardado' }}
       </div>
-      <div class="tech-item">
-        <span class="tech-label">Computed Values:</span>
-        <span class="tech-value">{{ getComputedCount() }}</span>
+      
+      <div class="last-save" *ngIf="globalState.lastSaveTime()">
+        Último guardado: {{ globalState.lastSaveTime() | date:'medium' }}
       </div>
-      <div class="tech-item">
-        <span class="tech-label">Effects Ejecutados:</span>
-        <span class="tech-value">{{ effectsExecuted() }}</span>
-      </div>
-    </div>
-    
-    <div class="performance-note">
-      <h4>🚀 Performance</h4>
-      <p>Signals es síncrono e inmediato. No requiere scheduling como Observables.</p>
+      
+      <button class="export-btn" (click)="exportState()">
+        📤 Exportar Estado
+      </button>
+      <button class="import-btn" (click)="importState()">
+        📥 Importar Estado
+      </button>
     </div>
   </aside>
 </div>
