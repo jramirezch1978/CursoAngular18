@@ -1,25 +1,55 @@
 <div class="users-container">
   <header class="page-header">
     <div class="header-content">
-      <h1>👥 Gestión de Usuarios</h1>
+      <h1>
+        @switch (currentMode) {
+          @case ('list') { 👥 Gestión de Usuarios }
+          @case ('view') { 👤 Detalles de Usuario }
+          @case ('edit') { ✏️ Editar Usuario }
+          @case ('new') { ➕ Nuevo Usuario }
+        }
+      </h1>
       <p class="page-description">
-        Administra usuarios del sistema PROVIAS. Esta página demuestra navegación 
-        con parámetros y query parameters.
+        @switch (currentMode) {
+          @case ('list') { 
+            Administra usuarios del sistema PROVIAS. Esta página demuestra navegación 
+            con parámetros y query parameters.
+          }
+          @case ('view') { 
+            Visualiza los detalles completos del usuario seleccionado.
+            <strong>ID del usuario:</strong> {{ selectedUserId }}
+          }
+          @case ('edit') { 
+            Modifica la información del usuario seleccionado.
+            <strong>Editando usuario:</strong> {{ selectedUser?.name }}
+          }
+          @case ('new') { 
+            Crea un nuevo usuario en el sistema PROVIAS.
+          }
+        }
       </p>
     </div>
     
     <div class="header-actions">
-      <button class="btn btn-secondary" (click)="goToDashboard()">
-        🏠 Dashboard
-      </button>
-      <button class="btn btn-primary" (click)="addNewUser()">
-        ➕ Nuevo Usuario
-      </button>
+      @if (currentMode !== 'list') {
+        <button class="btn btn-secondary" (click)="goBackToList()">
+          ⬅️ Volver a Lista
+        </button>
+      }
+      @if (currentMode === 'list') {
+        <button class="btn btn-secondary" (click)="goToDashboard()">
+          🏠 Dashboard
+        </button>
+        <button class="btn btn-primary" (click)="addNewUser()">
+          ➕ Nuevo Usuario
+        </button>
+      }
     </div>
   </header>
 
   <!-- 📊 Estadísticas rápidas -->
-  <section class="stats-bar">
+  @if (currentMode === 'list') {
+    <section class="stats-bar">
     <div class="stat-item">
       <span class="stat-value">{{ users.length }}</span>
       <span class="stat-label">Total Usuarios</span>
@@ -34,27 +64,27 @@
     </div>
   </section>
 
-  <!-- 🔍 Filtros -->
-  <section class="filters-section">
-    <h3>🔍 Filtros</h3>
-    <div class="filter-buttons">
-      <button 
-        class="filter-btn" 
-        (click)="filterByStatus('all')">
-        Todos
-      </button>
-      <button 
-        class="filter-btn" 
-        (click)="filterByStatus('active')">
-        Solo Activos
-      </button>
-      <button 
-        class="filter-btn" 
-        (click)="filterByStatus('inactive')">
-        Solo Inactivos
-      </button>
-    </div>
-  </section>
+    <!-- 🔍 Filtros -->
+    <section class="filters-section">
+      <h3>🔍 Filtros</h3>
+      <div class="filter-buttons">
+        <button 
+          class="filter-btn" 
+          (click)="filterByStatus('all')">
+          Todos
+        </button>
+        <button 
+          class="filter-btn" 
+          (click)="filterByStatus('active')">
+          Solo Activos
+        </button>
+        <button 
+          class="filter-btn" 
+          (click)="filterByStatus('inactive')">
+          Solo Inactivos
+        </button>
+      </div>
+    </section>
 
   <!-- 👥 Lista de usuarios -->
   <section class="users-grid">
@@ -99,9 +129,147 @@
       </div>
     }
   </section>
+  }
+
+  <!-- 👤 Vista de detalle de usuario -->
+  @if (currentMode === 'view' && selectedUser) {
+    <section class="user-detail-section">
+      <div class="user-detail-card">
+        <div class="user-header">
+          <div class="user-avatar">{{ selectedUser.avatar }}</div>
+          <div class="user-info">
+            <h2>{{ selectedUser.name }}</h2>
+            <p class="user-email">📧 {{ selectedUser.email }}</p>
+            <span class="user-role" [class]="getRoleClass(selectedUser.role)">
+              {{ selectedUser.role }}
+            </span>
+            <span class="user-status" [class]="selectedUser.isActive ? 'active' : 'inactive'">
+              {{ selectedUser.isActive ? '✅ Activo' : '❌ Inactivo' }}
+            </span>
+          </div>
+        </div>
+        
+        <div class="user-details">
+          <h3>📋 Información Detallada</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <strong>🆔 ID:</strong>
+              <span>{{ selectedUser.id }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>👤 Nombre:</strong>
+              <span>{{ selectedUser.name }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>📧 Email:</strong>
+              <span>{{ selectedUser.email }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>👔 Rol:</strong>
+              <span>{{ selectedUser.role }}</span>
+            </div>
+            <div class="detail-item">
+              <strong>📊 Estado:</strong>
+              <span>{{ selectedUser.isActive ? 'Activo' : 'Inactivo' }}</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="user-actions">
+          <button class="btn btn-primary" (click)="editUser(selectedUser.id)">
+            ✏️ Editar Usuario
+          </button>
+          <button class="btn btn-secondary" (click)="goBackToList()">
+            📋 Ver Todos los Usuarios
+          </button>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ✏️ Vista de edición de usuario -->
+  @if (currentMode === 'edit' && selectedUser) {
+    <section class="user-edit-section">
+      <div class="edit-form-card">
+        <h3>✏️ Editando: {{ selectedUser.name }}</h3>
+        
+        <div class="form-demo">
+          <div class="form-group">
+            <label>👤 Nombre:</label>
+            <input type="text" [value]="selectedUser.name" class="form-control" readonly>
+            <small>📝 En el LAB 4 este campo será editable con validación</small>
+          </div>
+          
+          <div class="form-group">
+            <label>📧 Email:</label>
+            <input type="email" [value]="selectedUser.email" class="form-control" readonly>
+            <small>📝 En el LAB 4 este campo será editable con validación</small>
+          </div>
+          
+          <div class="form-group">
+            <label>👔 Rol:</label>
+            <select class="form-control" disabled>
+              <option [value]="selectedUser.role" selected>{{ selectedUser.role }}</option>
+            </select>
+            <small>📝 En el LAB 4 habrá opciones seleccionables</small>
+          </div>
+          
+          <div class="form-group">
+            <label>📊 Estado:</label>
+            <input type="checkbox" [checked]="selectedUser.isActive" disabled>
+            <span>Usuario activo</span>
+            <small>📝 En el LAB 4 será modificable</small>
+          </div>
+        </div>
+        
+        <div class="edit-actions">
+          <button class="btn btn-success" (click)="saveUser()">
+            💾 Guardar Cambios (Demo)
+          </button>
+          <button class="btn btn-secondary" (click)="cancelEdit()">
+            ❌ Cancelar
+          </button>
+        </div>
+        
+        <div class="demo-note">
+          <h4>🎓 Nota Educativa:</h4>
+          <p>
+            Este es el <strong>LAB 3 - Router</strong>, enfocado en navegación.
+            Los formularios funcionales completos están en el <strong>LAB 4 - Guards</strong>.
+          </p>
+        </div>
+      </div>
+    </section>
+  }
+
+  <!-- ➕ Vista de nuevo usuario -->
+  @if (currentMode === 'new') {
+    <section class="new-user-section">
+      <div class="new-form-card">
+        <h3>➕ Crear Nuevo Usuario</h3>
+        
+        <div class="demo-note">
+          <p>
+            <strong>🎓 Demo de Ruta:</strong> Estás en <code>/users/new</code>
+          </p>
+          <p>
+            En el LAB 4 encontrarás el formulario completo para crear usuarios
+            con validación y guards de seguridad.
+          </p>
+        </div>
+        
+        <div class="new-actions">
+          <button class="btn btn-primary" (click)="goBackToList()">
+            📋 Ver Lista de Usuarios
+          </button>
+        </div>
+      </div>
+    </section>
+  }
 
   <!-- 🧭 Demo de navegación -->
-  <section class="navigation-demo">
+  @if (currentMode === 'list') {
+    <section class="navigation-demo">
     <h3>🧭 Demo de Navegación Angular Router</h3>
     
     <div class="demo-info">
@@ -149,4 +317,5 @@
       </div>
     </div>
   </section>
+  }
 </div>
