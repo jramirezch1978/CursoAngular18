@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 })
 export class NotFoundComponent implements OnInit {
   
+  // 🌐 Referencias a objetos globales para el template
+  window = window;
+  document = document;
+  
   // 🎯 Rutas sugeridas para el usuario
   suggestedRoutes = [
     {
@@ -106,5 +110,12 @@ export class NotFoundComponent implements OnInit {
     }
     
     this.currentMessage = this.errorMessages[newIndex];
+  }
+
+  /**
+   * ⏰ Obtener timestamp actual
+   */
+  getCurrentTimestamp(): string {
+    return new Date().toLocaleString('es-PE');
   }
 }

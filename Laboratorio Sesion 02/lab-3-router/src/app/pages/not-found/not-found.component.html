@@ -92,7 +92,7 @@
       
       <div class="debug-item">
         <strong>⏰ Timestamp:</strong>
-        <code>{{ new Date().toLocaleString('es-PE') }}</code>
+        <code>{{ getCurrentTimestamp() }}</code>
       </div>
     </div>
   </section>
@@ -109,7 +109,7 @@
           configurada en el archivo de rutas. Debe estar siempre al final.
         </p>
         <code class="code-example">
-          { path: '**', component: NotFoundComponent }
+          {{ '{' }} path: '**', component: NotFoundComponent {{ '}' }}
         </code>
       </div>
       
@@ -140,7 +140,7 @@
       </div>
       
       <div class="contact-section">
-        <p>📧 soporte@provias.gob.pe</p>
+        <p>📧 soporte&#64;provias.gob.pe</p>
         <p>📞 (01) 615-7800</p>
         <p>📍 Jr. Carabaya 535, Lima - Perú</p>
       </div>

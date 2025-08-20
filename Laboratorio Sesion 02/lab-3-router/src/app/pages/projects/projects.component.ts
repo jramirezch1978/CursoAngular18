@@ -192,7 +192,7 @@ export class ProjectsComponent implements OnInit {
    * 📊 Obtener texto del estado
    */
   getStatusText(status: string): string {
-    const statusTexts = {
+    const statusTexts: { [key: string]: string } = {
       'planning': 'En Planificación',
       'in-progress': 'En Ejecución',
       'completed': 'Completado',
@@ -205,7 +205,7 @@ export class ProjectsComponent implements OnInit {
    * 🎯 Obtener texto de prioridad
    */
   getPriorityText(priority: string): string {
-    const priorityTexts = {
+    const priorityTexts: { [key: string]: string } = {
       'low': 'Baja',
       'medium': 'Media',
       'high': 'Alta'
