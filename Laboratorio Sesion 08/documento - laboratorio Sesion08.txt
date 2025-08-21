@@ -1,0 +1,3408 @@
+LABORATORIO COMPLETO - SESIÓN 08: MEJORES PRÁCTICAS Y FORMULARIOS
+PROVIAS DESCENTRALIZADO - ANGULAR v18
+Instructor: Ing. Jhonny Alexander Ramirez Chiroque
+Fecha: Jueves, 21 de Agosto 2025
+Horario: 19:00 - 22:00 (3 horas)
+Modalidad: 100% Online Live - Laboratorio Práctico
+________________________________________
+📋 INFORMACIÓN IMPORTANTE
+Pre-requisitos de Sesiones Anteriores
+Para realizar este laboratorio necesitas tener completado:
+•	✅ Sesión 1-2: Proyecto Angular base configurado con routing
+•	✅ Sesión 5: Servicios e inyección de dependencias
+•	✅ Sesión 6: HttpClient configurado y funcionando
+•	✅ Sesión 7: RxJS y manejo de asincronía
+•	✅ Node.js v18.19.0+ y Angular CLI v18 instalados
+•	✅ Visual Studio Code con extensiones Angular
+Si NO tienes el proyecto de sesiones anteriores:
+# Crear proyecto base rápido
+ng new provias-forms-lab --routing --style=scss --standalone
+cd provias-forms-lab
+
+# Instalar dependencias necesarias
+npm install rxjs@7.8.1
+npm install --save-dev @types/node
+npm install json-server --save-dev
+
+# Configurar HttpClient en app.config.ts
+________________________________________
+🛠️ LAB 0: CONFIGURACIÓN DEL ENTORNO Y HERRAMIENTAS
+Duración: 15 minutos
+HERRAMIENTAS NECESARIAS
+1. Extensiones VS Code Requeridas
+Verificar que tengas instaladas estas extensiones:
+•	Angular Language Service (Angular)
+•	Angular Snippets (John Papa)
+•	Prettier - Code formatter (esbenp)
+•	Auto Rename Tag (formulahendry)
+•	Error Lens (usernamehw)
+•	Thunder Client (para probar APIs)
+•	Angular Files (Alexander Ivanichev)
+2. Configuración del Proyecto Base
+2.1 Actualizar tsconfig.json:
+{
+  "compilerOptions": {
+    "baseUrl": "./",
+    "paths": {
+      "@app/*": ["src/app/*"],
+      "@services/*": ["src/app/services/*"],
+      "@models/*": ["src/app/models/*"],
+      "@components/*": ["src/app/components/*"],
+      "@validators/*": ["src/app/validators/*"],
+      "@guards/*": ["src/app/guards/*"],
+      "@pipes/*": ["src/app/pipes/*"]
+    },
+    "strict": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "lib": ["ES2022", "dom"],
+    "target": "ES2022"
+  }
+}
+2.2 Configurar app.config.ts:
+import { ApplicationConfig } from '@angular/core';
+import { provideRouter } from '@angular/router';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { provideAnimations } from '@angular/platform-browser/animations';
+import { routes } from './app.routes';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([])),
+    provideAnimations()
+  ]
+};
+2.3 Instalar JSON Server para API Mock:
+# Instalar localmente en el proyecto
+npm install --save-dev json-server concurrently
+
+# Crear archivo db.json en la raíz del proyecto
+2.4 Crear db.json con datos de prueba:
+{
+  "users": [
+    { 
+      "id": 1, 
+      "dni": "12345678",
+      "name": "Ana García", 
+      "email": "ana@provias.gob.pe", 
+      "role": "admin", 
+      "isActive": true,
+      "department": "Ingeniería"
+    },
+    { 
+      "id": 2, 
+      "dni": "87654321",
+      "name": "Carlos López", 
+      "email": "carlos@provias.gob.pe", 
+      "role": "user", 
+      "isActive": true,
+      "department": "Administración"
+    },
+    { 
+      "id": 3, 
+      "dni": "45678912",
+      "name": "María Rodriguez", 
+      "email": "maria@provias.gob.pe", 
+      "role": "user", 
+      "isActive": false,
+      "department": "Logística"
+    }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "code": "PROV-2025-001",
+      "name": "Mejoramiento Vial Cusco",
+      "budget": 5000000,
+      "startDate": "2025-01-15",
+      "endDate": "2025-12-31",
+      "status": "active",
+      "manager": "ana@provias.gob.pe"
+    },
+    {
+      "id": 2,
+      "code": "PROV-2025-002",
+      "name": "Puente Peatonal Lima Norte",
+      "budget": 2500000,
+      "startDate": "2025-02-01",
+      "endDate": "2025-08-31",
+      "status": "planning",
+      "manager": "carlos@provias.gob.pe"
+    }
+  ],
+  "departments": [
+    { "id": 1, "name": "Ingeniería", "code": "ING" },
+    { "id": 2, "name": "Administración", "code": "ADM" },
+    { "id": 3, "name": "Logística", "code": "LOG" },
+    { "id": 4, "name": "Recursos Humanos", "code": "RH" },
+    { "id": 5, "name": "Tecnología", "code": "TI" }
+  ]
+}
+2.5 Agregar scripts al package.json:
+{
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "api": "json-server --watch db.json --port 3000 --delay 500",
+    "dev": "concurrently \"npm run api\" \"npm start\"",
+    "test": "ng test",
+    "test:coverage": "ng test --no-watch --code-coverage"
+  }
+}
+2.6 Crear proxy.conf.json:
+{
+  "/api/*": {
+    "target": "http://localhost:3000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "pathRewrite": {
+      "^/api": ""
+    }
+  }
+}
+2.7 Actualizar angular.json para usar proxy:
+"serve": {
+  "builder": "@angular-devkit/build-angular:dev-server",
+  "configurations": {
+    "development": {
+      "buildTarget": "provias-forms-lab:build:development",
+      "proxyConfig": "proxy.conf.json"
+    }
+  }
+}
+3. Verificación del Entorno
+# Terminal 1: Iniciar JSON Server
+npm run api
+
+# Terminal 2: Iniciar Angular con proxy
+ng serve --proxy-config proxy.conf.json
+
+# O usar el comando combinado
+npm run dev
+
+# Verificar en navegador
+# Angular: http://localhost:4200
+# API: http://localhost:3000
+________________________________________
+🎯 LAB 1: TEMPLATE-DRIVEN FORMS (30 minutos)
+PARTE 1: Formulario Simple de Contacto
+Paso 1.1: Crear el Modelo y Servicio
+ng generate interface models/contact --type=model
+ng generate service services/contact --skip-tests
+models/contact.model.ts:
+export interface Contact {
+  name: string;
+  email: string;
+  phone?: string;
+  department: string;
+  message: string;
+  priority: 'low' | 'medium' | 'high';
+  acceptTerms: boolean;
+}
+services/contact.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { Contact } from '@models/contact.model';
+
+@Injectable({ providedIn: 'root' })
+export class ContactService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
+
+  sendContact(contact: Contact): Observable<any> {
+    // Simulación de envío
+    console.log('Enviando contacto:', contact);
+    return this.http.post(`${this.apiUrl}/contacts`, contact);
+  }
+
+  getDepartments(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.apiUrl}/departments`);
+  }
+}
+Paso 1.2: Crear Componente Template-driven
+ng generate component forms/template-contact --standalone --skip-tests
+forms/template-contact/template-contact.component.ts:
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { ContactService } from '@services/contact.service';
+import { Contact } from '@models/contact.model';
+
+@Component({
+  selector: 'app-template-contact',
+  standalone: true,
+  imports: [CommonModule, FormsModule],
+  template: `
+    <div class="form-container">
+      <h2>📝 Formulario de Contacto (Template-driven)</h2>
+      
+      <form #contactForm="ngForm" (ngSubmit)="onSubmit()" novalidate>
+        <!-- Nombre -->
+        <div class="form-group">
+          <label for="name">Nombre Completo *</label>
+          <input 
+            type="text" 
+            id="name"
+            name="name"
+            [(ngModel)]="model.name"
+            #nameInput="ngModel"
+            required
+            minlength="3"
+            maxlength="50"
+            class="form-control"
+            [class.is-invalid]="nameInput.invalid && nameInput.touched">
+          
+          <div *ngIf="nameInput.invalid && nameInput.touched" class="error-message">
+            <span *ngIf="nameInput.errors?.['required']">El nombre es obligatorio</span>
+            <span *ngIf="nameInput.errors?.['minlength']">
+              Mínimo {{ nameInput.errors?.['minlength'].requiredLength }} caracteres
+            </span>
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email" 
+            id="email"
+            name="email"
+            [(ngModel)]="model.email"
+            #emailInput="ngModel"
+            required
+            email
+            pattern="[a-z0-9._%+-]+@provias\\.gob\\.pe"
+            class="form-control"
+            [class.is-invalid]="emailInput.invalid && emailInput.touched">
+          
+          <div *ngIf="emailInput.invalid && emailInput.touched" class="error-message">
+            <span *ngIf="emailInput.errors?.['required']">El email es obligatorio</span>
+            <span *ngIf="emailInput.errors?.['email']">Formato de email inválido</span>
+            <span *ngIf="emailInput.errors?.['pattern']">
+              Debe ser un email @provias.gob.pe
+            </span>
+          </div>
+        </div>
+
+        <!-- Teléfono -->
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input 
+            type="tel" 
+            id="phone"
+            name="phone"
+            [(ngModel)]="model.phone"
+            #phoneInput="ngModel"
+            pattern="[0-9]{9}"
+            class="form-control"
+            [class.is-invalid]="phoneInput.invalid && phoneInput.touched"
+            placeholder="999999999">
+          
+          <div *ngIf="phoneInput.invalid && phoneInput.touched" class="error-message">
+            <span *ngIf="phoneInput.errors?.['pattern']">
+              El teléfono debe tener 9 dígitos
+            </span>
+          </div>
+        </div>
+
+        <!-- Departamento -->
+        <div class="form-group">
+          <label for="department">Departamento *</label>
+          <select 
+            id="department"
+            name="department"
+            [(ngModel)]="model.department"
+            #deptInput="ngModel"
+            required
+            class="form-control"
+            [class.is-invalid]="deptInput.invalid && deptInput.touched">
+            <option value="">-- Seleccionar --</option>
+            <option *ngFor="let dept of departments" [value]="dept.code">
+              {{ dept.name }}
+            </option>
+          </select>
+          
+          <div *ngIf="deptInput.invalid && deptInput.touched" class="error-message">
+            <span *ngIf="deptInput.errors?.['required']">
+              Debe seleccionar un departamento
+            </span>
+          </div>
+        </div>
+
+        <!-- Prioridad -->
+        <div class="form-group">
+          <label>Prioridad *</label>
+          <div class="radio-group">
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="priority"
+                [(ngModel)]="model.priority"
+                value="low"
+                required>
+              <span class="priority-badge low">Baja</span>
+            </label>
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="priority"
+                [(ngModel)]="model.priority"
+                value="medium"
+                required>
+              <span class="priority-badge medium">Media</span>
+            </label>
+            <label class="radio-label">
+              <input 
+                type="radio" 
+                name="priority"
+                [(ngModel)]="model.priority"
+                value="high"
+                required>
+              <span class="priority-badge high">Alta</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Mensaje -->
+        <div class="form-group">
+          <label for="message">Mensaje *</label>
+          <textarea 
+            id="message"
+            name="message"
+            [(ngModel)]="model.message"
+            #messageInput="ngModel"
+            required
+            minlength="10"
+            maxlength="500"
+            rows="4"
+            class="form-control"
+            [class.is-invalid]="messageInput.invalid && messageInput.touched">
+          </textarea>
+          
+          <div class="char-counter">
+            {{ model.message.length }}/500 caracteres
+          </div>
+          
+          <div *ngIf="messageInput.invalid && messageInput.touched" class="error-message">
+            <span *ngIf="messageInput.errors?.['required']">El mensaje es obligatorio</span>
+            <span *ngIf="messageInput.errors?.['minlength']">
+              Mínimo {{ messageInput.errors?.['minlength'].requiredLength }} caracteres
+            </span>
+          </div>
+        </div>
+
+        <!-- Términos -->
+        <div class="form-group">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox"
+              name="acceptTerms"
+              [(ngModel)]="model.acceptTerms"
+              #termsInput="ngModel"
+              required>
+            <span>Acepto los términos y condiciones *</span>
+          </label>
+          
+          <div *ngIf="termsInput.invalid && termsInput.touched" class="error-message">
+            <span *ngIf="termsInput.errors?.['required']">
+              Debe aceptar los términos
+            </span>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button 
+            type="button" 
+            class="btn btn-secondary"
+            (click)="resetForm(contactForm)">
+            Limpiar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="contactForm.invalid || loading">
+            <span *ngIf="!loading">Enviar</span>
+            <span *ngIf="loading">Enviando...</span>
+          </button>
+        </div>
+      </form>
+
+      <!-- Debug Info -->
+      <div class="debug-info" *ngIf="showDebug">
+        <h4>Debug Info:</h4>
+        <pre>{{ contactForm.value | json }}</pre>
+        <div>Form Valid: {{ contactForm.valid }}</div>
+        <div>Form Touched: {{ contactForm.touched }}</div>
+        <div>Form Dirty: {{ contactForm.dirty }}</div>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .form-container {
+      max-width: 600px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid #667eea;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #e0e0e0;
+      border-radius: 4px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control.is-invalid {
+      border-color: #f44336;
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .radio-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .radio-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .radio-label input {
+      margin-right: 0.5rem;
+    }
+
+    .priority-badge {
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .priority-badge.low {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .priority-badge.medium {
+      background: #fff3e0;
+      color: #ef6c00;
+    }
+
+    .priority-badge.high {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      margin-right: 0.5rem;
+    }
+
+    .error-message {
+      color: #f44336;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.875rem;
+      color: #999;
+      margin-top: 0.25rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 1rem;
+      border-top: 1px solid #e0e0e0;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: #667eea;
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: #5a67d8;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: #e0e0e0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #d0d0d0;
+    }
+
+    .debug-info {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #f5f5f5;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+
+    .debug-info h4 {
+      margin-top: 0;
+      color: #666;
+    }
+
+    .debug-info pre {
+      background: white;
+      padding: 1rem;
+      border-radius: 4px;
+      overflow-x: auto;
+    }
+  `]
+})
+export class TemplateContactComponent implements OnInit {
+  private contactService = inject(ContactService);
+  
+  model: Contact = {
+    name: '',
+    email: '',
+    phone: '',
+    department: '',
+    message: '',
+    priority: 'medium',
+    acceptTerms: false
+  };
+
+  departments: any[] = [];
+  loading = false;
+  showDebug = false; // Cambiar a true para ver debug
+
+  ngOnInit() {
+    this.loadDepartments();
+  }
+
+  loadDepartments() {
+    this.contactService.getDepartments().subscribe({
+      next: (depts) => this.departments = depts,
+      error: (err) => console.error('Error cargando departamentos:', err)
+    });
+  }
+
+  onSubmit() {
+    if (!this.model.acceptTerms) {
+      alert('Debe aceptar los términos y condiciones');
+      return;
+    }
+
+    this.loading = true;
+    
+    // Simulación de envío
+    setTimeout(() => {
+      console.log('Formulario enviado:', this.model);
+      alert('✅ Formulario enviado correctamente');
+      this.loading = false;
+      
+      // Reset form
+      this.model = {
+        name: '',
+        email: '',
+        phone: '',
+        department: '',
+        message: '',
+        priority: 'medium',
+        acceptTerms: false
+      };
+    }, 2000);
+  }
+
+  resetForm(form: any) {
+    form.reset();
+    this.model.priority = 'medium';
+  }
+}
+________________________________________
+🚀 LAB 2: REACTIVE FORMS (45 minutos)
+PARTE 1: Formulario de Registro de Usuario
+Paso 2.1: Crear Validadores Personalizados
+ng generate class validators/custom-validators --skip-tests
+validators/custom-validators.ts:
+import { AbstractControl, ValidationErrors, ValidatorFn, AsyncValidatorFn } from '@angular/forms';
+import { Observable, of } from 'rxjs';
+import { map, delay } from 'rxjs/operators';
+
+export class CustomValidators {
+  
+  // Validador de DNI peruano
+  static dniValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const dni = control.value;
+      
+      if (!dni) return null; // Si está vacío, required lo maneja
+      
+      // DNI debe ser exactamente 8 dígitos
+      const dniRegex = /^[0-9]{8}$/;
+      
+      if (!dniRegex.test(dni)) {
+        return { 
+          invalidDni: { 
+            message: 'El DNI debe contener exactamente 8 dígitos',
+            actualLength: dni.length 
+          } 
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador de RUC
+  static rucValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const ruc = control.value;
+      
+      if (!ruc) return null;
+      
+      // RUC debe ser 11 dígitos y comenzar con 10, 15, 17 o 20
+      const rucRegex = /^(10|15|17|20)[0-9]{9}$/;
+      
+      if (!rucRegex.test(ruc)) {
+        return { 
+          invalidRuc: { 
+            message: 'RUC inválido (debe tener 11 dígitos y comenzar con 10, 15, 17 o 20)' 
+          } 
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador de contraseñas coincidentes
+  static passwordMatchValidator(passwordField: string, confirmField: string): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const password = control.get(passwordField)?.value;
+      const confirm = control.get(confirmField)?.value;
+      
+      if (!password || !confirm) return null;
+      
+      if (password !== confirm) {
+        // Setear error en el campo específico
+        control.get(confirmField)?.setErrors({ passwordMismatch: true });
+        return { passwordMismatch: true };
+      } else {
+        // Limpiar error si coinciden
+        const errors = control.get(confirmField)?.errors;
+        if (errors) {
+          delete errors['passwordMismatch'];
+          if (Object.keys(errors).length === 0) {
+            control.get(confirmField)?.setErrors(null);
+          }
+        }
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador de fecha (no puede ser futura)
+  static pastDateValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const inputDate = new Date(control.value);
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      
+      if (inputDate > today) {
+        return { 
+          futureDate: { 
+            message: 'La fecha no puede ser futura' 
+          } 
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador de edad mínima
+  static minAgeValidator(minAge: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      
+      if (age < minAge) {
+        return { 
+          minAge: { 
+            required: minAge, 
+            actual: age 
+          } 
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador de palabras prohibidas
+  static forbiddenWordsValidator(forbiddenWords: string[]): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) return null;
+      
+      const value = control.value.toLowerCase();
+      const foundWord = forbiddenWords.find(word => value.includes(word.toLowerCase()));
+      
+      if (foundWord) {
+        return { 
+          forbiddenWord: { 
+            word: foundWord,
+            message: `La palabra "${foundWord}" no está permitida` 
+          } 
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador asíncrono de email único
+  static emailAvailableValidator(checkEmail: (email: string) => Observable<boolean>): AsyncValidatorFn {
+    return (control: AbstractControl): Observable<ValidationErrors | null> => {
+      if (!control.value) {
+        return of(null);
+      }
+      
+      return checkEmail(control.value).pipe(
+        delay(1000), // Simular delay de red
+        map(isAvailable => {
+          return isAvailable ? null : { emailTaken: { email: control.value } };
+        })
+      );
+    };
+  }
+
+  // Validador de presupuesto de proyecto
+  static budgetRangeValidator(min: number, max: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const value = control.value;
+      
+      if (!value) return null;
+      
+      if (value < min || value > max) {
+        return {
+          budgetOutOfRange: {
+            min,
+            max,
+            actual: value
+          }
+        };
+      }
+      
+      return null;
+    };
+  }
+
+  // Validador cross-field de fechas de proyecto
+  static projectDatesValidator(): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      const startDate = control.get('startDate')?.value;
+      const endDate = control.get('endDate')?.value;
+      
+      if (!startDate || !endDate) return null;
+      
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      
+      if (start > end) {
+        return { 
+          invalidDateRange: { 
+            message: 'La fecha de fin debe ser posterior a la fecha de inicio' 
+          } 
+        };
+      }
+      
+      // Validar duración mínima (30 días)
+      const diffTime = Math.abs(end.getTime() - start.getTime());
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+      
+      if (diffDays < 30) {
+        return {
+          minProjectDuration: {
+            message: 'El proyecto debe durar al menos 30 días',
+            actualDays: diffDays
+          }
+        };
+      }
+      
+      return null;
+    };
+  }
+}
+Paso 2.2: Crear Servicio de Validación
+ng generate service services/validation --skip-tests
+services/validation.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, of } from 'rxjs';
+import { map, catchError, delay } from 'rxjs/operators';
+
+@Injectable({ providedIn: 'root' })
+export class ValidationService {
+  private http = inject(HttpClient);
+  private apiUrl = '/api';
+
+  // Cache de emails verificados
+  private emailCache = new Map<string, boolean>();
+
+  checkEmailAvailability(email: string): Observable<boolean> {
+    // Verificar cache primero
+    if (this.emailCache.has(email)) {
+      return of(this.emailCache.get(email)!).pipe(delay(500));
+    }
+
+    // Simular llamada a API
+    return this.http.get<any[]>(`${this.apiUrl}/users`).pipe(
+      map(users => {
+        const exists = users.some(u => u.email === email);
+        const isAvailable = !exists;
+        this.emailCache.set(email, isAvailable);
+        return isAvailable;
+      }),
+      catchError(() => of(true)) // En caso de error, asumir disponible
+    );
+  }
+
+  checkDniAvailability(dni: string): Observable<boolean> {
+    return this.http.get<any[]>(`${this.apiUrl}/users`).pipe(
+      map(users => !users.some(u => u.dni === dni)),
+      catchError(() => of(true))
+    );
+  }
+
+  validateProjectCode(code: string): Observable<boolean> {
+    // Validar formato: PROV-YYYY-XXX
+    const codeRegex = /^PROV-\d{4}-\d{3}$/;
+    if (!codeRegex.test(code)) {
+      return of(false);
+    }
+
+    return this.http.get<any[]>(`${this.apiUrl}/projects`).pipe(
+      map(projects => !projects.some(p => p.code === code)),
+      catchError(() => of(true))
+    );
+  }
+}
+Paso 2.3: Crear Componente de Registro con Reactive Forms
+ng generate component forms/reactive-registration --standalone --skip-tests
+forms/reactive-registration/reactive-registration.component.ts:
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, FormArray } from '@angular/forms';
+import { CustomValidators } from '@validators/custom-validators';
+import { ValidationService } from '@services/validation.service';
+import { ContactService } from '@services/contact.service';
+
+@Component({
+  selector: 'app-reactive-registration',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
+    <div class="form-container">
+      <h2>⚡ Formulario de Registro (Reactive Forms)</h2>
+      
+      <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Sección: Datos Personales -->
+        <div class="form-section">
+          <h3>Datos Personales</h3>
+          
+          <div class="form-row">
+            <!-- DNI -->
+            <div class="form-group">
+              <label for="dni">DNI *</label>
+              <input 
+                type="text" 
+                id="dni"
+                formControlName="dni"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('dni')"
+                placeholder="12345678">
+              
+              <div *ngIf="isFieldInvalid('dni')" class="error-message">
+                <span *ngIf="dni?.errors?.['required']">DNI es obligatorio</span>
+                <span *ngIf="dni?.errors?.['invalidDni']">
+                  {{ dni?.errors?.['invalidDni'].message }}
+                </span>
+              </div>
+            </div>
+
+            <!-- Nombre -->
+            <div class="form-group">
+              <label for="firstName">Nombres *</label>
+              <input 
+                type="text" 
+                id="firstName"
+                formControlName="firstName"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('firstName')">
+              
+              <div *ngIf="isFieldInvalid('firstName')" class="error-message">
+                <span *ngIf="firstName?.errors?.['required']">Nombre es obligatorio</span>
+                <span *ngIf="firstName?.errors?.['minlength']">
+                  Mínimo {{ firstName?.errors?.['minlength'].requiredLength }} caracteres
+                </span>
+                <span *ngIf="firstName?.errors?.['forbiddenWord']">
+                  {{ firstName?.errors?.['forbiddenWord'].message }}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <!-- Apellidos -->
+            <div class="form-group">
+              <label for="lastName">Apellidos *</label>
+              <input 
+                type="text" 
+                id="lastName"
+                formControlName="lastName"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('lastName')">
+              
+              <div *ngIf="isFieldInvalid('lastName')" class="error-message">
+                <span *ngIf="lastName?.errors?.['required']">Apellidos son obligatorios</span>
+              </div>
+            </div>
+
+            <!-- Fecha de Nacimiento -->
+            <div class="form-group">
+              <label for="birthDate">Fecha de Nacimiento *</label>
+              <input 
+                type="date" 
+                id="birthDate"
+                formControlName="birthDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('birthDate')">
+              
+              <div *ngIf="isFieldInvalid('birthDate')" class="error-message">
+                <span *ngIf="birthDate?.errors?.['required']">Fecha es obligatoria</span>
+                <span *ngIf="birthDate?.errors?.['futureDate']">
+                  {{ birthDate?.errors?.['futureDate'].message }}
+                </span>
+                <span *ngIf="birthDate?.errors?.['minAge']">
+                  Debe ser mayor de {{ birthDate?.errors?.['minAge'].required }} años
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Información de Cuenta -->
+        <div class="form-section">
+          <h3>Información de Cuenta</h3>
+          
+          <!-- Email con validación asíncrona -->
+          <div class="form-group">
+            <label for="email">Email Corporativo *</label>
+            <div class="input-with-status">
+              <input 
+                type="email" 
+                id="email"
+                formControlName="email"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('email')"
+                [class.is-checking]="email?.pending"
+                placeholder="usuario@provias.gob.pe">
+              
+              <span *ngIf="email?.pending" class="checking-status">
+                🔄 Verificando disponibilidad...
+              </span>
+            </div>
+            
+            <div *ngIf="isFieldInvalid('email')" class="error-message">
+              <span *ngIf="email?.errors?.['required']">Email es obligatorio</span>
+              <span *ngIf="email?.errors?.['email']">Formato de email inválido</span>
+              <span *ngIf="email?.errors?.['pattern']">
+                Debe ser un email @provias.gob.pe
+              </span>
+              <span *ngIf="email?.errors?.['emailTaken']">
+                Este email ya está registrado
+              </span>
+            </div>
+          </div>
+
+          <!-- Contraseñas -->
+          <div formGroupName="passwords">
+            <div class="form-row">
+              <div class="form-group">
+                <label for="password">Contraseña *</label>
+                <input 
+                  type="password" 
+                  id="password"
+                  formControlName="password"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('passwords.password')">
+                
+                <div class="password-strength">
+                  Fortaleza: <span [class]="getPasswordStrengthClass()">
+                    {{ getPasswordStrength() }}
+                  </span>
+                </div>
+                
+                <div *ngIf="isFieldInvalid('passwords.password')" class="error-message">
+                  <span *ngIf="passwordGroup?.get('password')?.errors?.['required']">
+                    Contraseña es obligatoria
+                  </span>
+                  <span *ngIf="passwordGroup?.get('password')?.errors?.['minlength']">
+                    Mínimo 8 caracteres
+                  </span>
+                  <span *ngIf="passwordGroup?.get('password')?.errors?.['pattern']">
+                    Debe contener mayúsculas, minúsculas, números y caracteres especiales
+                  </span>
+                </div>
+              </div>
+
+              <div class="form-group">
+                <label for="confirmPassword">Confirmar Contraseña *</label>
+                <input 
+                  type="password" 
+                  id="confirmPassword"
+                  formControlName="confirmPassword"
+                  class="form-control"
+                  [class.is-invalid]="isFieldInvalid('passwords.confirmPassword') || 
+                                       passwordGroup?.errors?.['passwordMismatch']">
+                
+                <div *ngIf="isFieldInvalid('passwords.confirmPassword') || 
+                            passwordGroup?.errors?.['passwordMismatch']" 
+                     class="error-message">
+                  <span *ngIf="passwordGroup?.get('confirmPassword')?.errors?.['required']">
+                    Confirmación es obligatoria
+                  </span>
+                  <span *ngIf="passwordGroup?.errors?.['passwordMismatch'] || 
+                               passwordGroup?.get('confirmPassword')?.errors?.['passwordMismatch']">
+                    Las contraseñas no coinciden
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Información Laboral -->
+        <div class="form-section">
+          <h3>Información Laboral</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="department">Departamento *</label>
+              <select 
+                id="department"
+                formControlName="department"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('department')">
+                <option value="">-- Seleccionar --</option>
+                <option *ngFor="let dept of departments" [value]="dept.code">
+                  {{ dept.name }}
+                </option>
+              </select>
+              
+              <div *ngIf="isFieldInvalid('department')" class="error-message">
+                <span *ngIf="department?.errors?.['required']">
+                  Departamento es obligatorio
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="position">Cargo *</label>
+              <input 
+                type="text" 
+                id="position"
+                formControlName="position"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('position')">
+              
+              <div *ngIf="isFieldInvalid('position')" class="error-message">
+                <span *ngIf="position?.errors?.['required']">Cargo es obligatorio</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Fecha de Ingreso *</label>
+              <input 
+                type="date" 
+                id="startDate"
+                formControlName="startDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('startDate')">
+              
+              <div *ngIf="isFieldInvalid('startDate')" class="error-message">
+                <span *ngIf="startDate?.errors?.['required']">Fecha es obligatoria</span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="employeeType">Tipo de Empleado *</label>
+              <select 
+                id="employeeType"
+                formControlName="employeeType"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('employeeType')">
+                <option value="">-- Seleccionar --</option>
+                <option value="permanent">Permanente</option>
+                <option value="contract">Contrato</option>
+                <option value="consultant">Consultor</option>
+              </select>
+              
+              <div *ngIf="isFieldInvalid('employeeType')" class="error-message">
+                <span *ngIf="employeeType?.errors?.['required']">Tipo es obligatorio</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sección: Teléfonos (FormArray) -->
+        <div class="form-section">
+          <h3>
+            Teléfonos
+            <button type="button" class="btn-add" (click)="addPhone()">
+              + Agregar
+            </button>
+          </h3>
+          
+          <div formArrayName="phones">
+            <div *ngFor="let phone of phones.controls; let i = index" 
+                 class="phone-row">
+              <div [formGroupName]="i" class="form-row">
+                <div class="form-group flex-grow">
+                  <input 
+                    type="tel" 
+                    formControlName="number"
+                    class="form-control"
+                    placeholder="999999999">
+                </div>
+                
+                <div class="form-group">
+                  <select formControlName="type" class="form-control">
+                    <option value="mobile">Móvil</option>
+                    <option value="home">Casa</option>
+                    <option value="work">Trabajo</option>
+                  </select>
+                </div>
+                
+                <button type="button" 
+                        class="btn-remove" 
+                        (click)="removePhone(i)"
+                        [disabled]="phones.length === 1">
+                  ×
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Términos y Condiciones -->
+        <div class="form-section">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox"
+              formControlName="acceptTerms">
+            <span>
+              Acepto los <a href="#" (click)="showTerms($event)">términos y condiciones</a> 
+              y la <a href="#" (click)="showPrivacy($event)">política de privacidad</a> *
+            </span>
+          </label>
+          
+          <div *ngIf="isFieldInvalid('acceptTerms')" class="error-message">
+            <span *ngIf="acceptTerms?.errors?.['requiredTrue']">
+              Debe aceptar los términos y condiciones
+            </span>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            🔄 Limpiar
+          </button>
+          <button type="button" class="btn btn-info" (click)="fillTestData()">
+            📝 Datos de Prueba
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="registrationForm.invalid || registrationForm.pending || loading">
+            <span *ngIf="!loading && !registrationForm.pending">✅ Registrar</span>
+            <span *ngIf="registrationForm.pending">⏳ Validando...</span>
+            <span *ngIf="loading">📤 Enviando...</span>
+          </button>
+        </div>
+
+        <!-- Debug Panel -->
+        <div class="debug-panel" *ngIf="showDebug">
+          <h4>🐛 Debug Panel</h4>
+          
+          <div class="debug-section">
+            <strong>Form Status:</strong>
+            <div class="status-grid">
+              <span [class.status-ok]="registrationForm.valid">
+                Valid: {{ registrationForm.valid }}
+              </span>
+              <span [class.status-warn]="registrationForm.invalid">
+                Invalid: {{ registrationForm.invalid }}
+              </span>
+              <span [class.status-info]="registrationForm.pending">
+                Pending: {{ registrationForm.pending }}
+              </span>
+              <span>Touched: {{ registrationForm.touched }}</span>
+              <span>Dirty: {{ registrationForm.dirty }}</span>
+            </div>
+          </div>
+
+          <div class="debug-section">
+            <strong>Form Errors:</strong>
+            <pre>{{ registrationForm.errors | json }}</pre>
+          </div>
+
+          <div class="debug-section">
+            <strong>Form Value:</strong>
+            <pre>{{ registrationForm.value | json }}</pre>
+          </div>
+        </div>
+      </form>
+    </div>
+  `,
+  styles: [`
+    .form-container {
+      max-width: 900px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #333;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid #667eea;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-section {
+      margin-bottom: 2rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border-radius: 8px;
+      border-left: 4px solid #667eea;
+    }
+
+    .form-section h3 {
+      margin-top: 0;
+      margin-bottom: 1.5rem;
+      color: #495057;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group.flex-grow {
+      flex: 1;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #495057;
+    }
+
+    .form-control {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #dee2e6;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.3s;
+      background: white;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #667eea;
+      box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .form-control.is-invalid {
+      border-color: #dc3545;
+      background-color: #fff5f5;
+    }
+
+    .form-control.is-checking {
+      border-color: #ffc107;
+      background-color: #fffef5;
+    }
+
+    select.form-control {
+      cursor: pointer;
+    }
+
+    .input-with-status {
+      position: relative;
+    }
+
+    .checking-status {
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #ffc107;
+      font-size: 0.875rem;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    .password-strength {
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .password-strength span {
+      font-weight: bold;
+      padding: 0.125rem 0.5rem;
+      border-radius: 4px;
+    }
+
+    .password-strength .weak {
+      color: #dc3545;
+      background: #fff5f5;
+    }
+
+    .password-strength .medium {
+      color: #ffc107;
+      background: #fffef5;
+    }
+
+    .password-strength .strong {
+      color: #28a745;
+      background: #f0fff4;
+    }
+
+    .phone-row {
+      margin-bottom: 0.5rem;
+    }
+
+    .phone-row .form-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .btn-add {
+      padding: 0.25rem 0.75rem;
+      background: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-add:hover {
+      background: #218838;
+    }
+
+    .btn-remove {
+      width: 36px;
+      height: 36px;
+      background: #dc3545;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      font-size: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-remove:hover:not(:disabled) {
+      background: #c82333;
+      transform: scale(1.1);
+    }
+
+    .btn-remove:disabled {
+      background: #6c757d;
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .checkbox-label input {
+      margin-right: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .checkbox-label a {
+      color: #667eea;
+      text-decoration: none;
+    }
+
+    .checkbox-label a:hover {
+      text-decoration: underline;
+    }
+
+    .error-message {
+      color: #dc3545;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #dee2e6;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    }
+
+    .btn-secondary {
+      background: #6c757d;
+      color: white;
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: #5a6268;
+    }
+
+    .btn-info {
+      background: #17a2b8;
+      color: white;
+    }
+
+    .btn-info:hover:not(:disabled) {
+      background: #138496;
+    }
+
+    /* Debug Panel */
+    .debug-panel {
+      margin-top: 2rem;
+      padding: 1.5rem;
+      background: #f8f9fa;
+      border: 2px dashed #6c757d;
+      border-radius: 8px;
+    }
+
+    .debug-panel h4 {
+      margin-top: 0;
+      color: #495057;
+    }
+
+    .debug-section {
+      margin-bottom: 1rem;
+      padding: 1rem;
+      background: white;
+      border-radius: 4px;
+    }
+
+    .debug-section strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #6c757d;
+    }
+
+    .status-grid {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .status-grid span {
+      padding: 0.25rem 0.5rem;
+      background: #e9ecef;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+
+    .status-ok {
+      background: #d4edda !important;
+      color: #155724;
+    }
+
+    .status-warn {
+      background: #f8d7da !important;
+      color: #721c24;
+    }
+
+    .status-info {
+      background: #fff3cd !important;
+      color: #856404;
+    }
+
+    pre {
+      margin: 0;
+      padding: 1rem;
+      background: #f8f9fa;
+      border-radius: 4px;
+      overflow-x: auto;
+      font-size: 0.875rem;
+    }
+  `]
+})
+export class ReactiveRegistrationComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private validationService = inject(ValidationService);
+  private contactService = inject(ContactService);
+
+  registrationForm!: FormGroup;
+  departments: any[] = [];
+  loading = false;
+  showDebug = true; // Cambiar a false en producción
+
+  ngOnInit() {
+    this.buildForm();
+    this.loadDepartments();
+    this.setupFormSubscriptions();
+  }
+
+  private buildForm() {
+    this.registrationForm = this.fb.group({
+      // Datos Personales
+      dni: ['', [
+        Validators.required,
+        CustomValidators.dniValidator()
+      ]],
+      firstName: ['', [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50),
+        CustomValidators.forbiddenWordsValidator(['admin', 'test', 'usuario'])
+      ]],
+      lastName: ['', [
+        Validators.required,
+        Validators.minLength(2),
+        Validators.maxLength(50)
+      ]],
+      birthDate: ['', [
+        Validators.required,
+        CustomValidators.pastDateValidator(),
+        CustomValidators.minAgeValidator(18)
+      ]],
+      
+      // Información de Cuenta
+      email: ['', 
+        [
+          Validators.required,
+          Validators.email,
+          Validators.pattern('[a-z0-9._%+-]+@provias\\.gob\\.pe')
+        ],
+        [CustomValidators.emailAvailableValidator(
+          this.validationService.checkEmailAvailability.bind(this.validationService)
+        )]
+      ],
+      
+      // Grupo de contraseñas con validación cruzada
+      passwords: this.fb.group({
+        password: ['', [
+          Validators.required,
+          Validators.minLength(8),
+          Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]/)
+        ]],
+        confirmPassword: ['', Validators.required]
+      }, { 
+        validators: CustomValidators.passwordMatchValidator('password', 'confirmPassword')
+      }),
+      
+      // Información Laboral
+      department: ['', Validators.required],
+      position: ['', Validators.required],
+      startDate: ['', Validators.required],
+      employeeType: ['', Validators.required],
+      
+      // Teléfonos (FormArray)
+      phones: this.fb.array([
+        this.createPhoneGroup()
+      ]),
+      
+      // Términos
+      acceptTerms: [false, Validators.requiredTrue]
+    });
+  }
+
+  private createPhoneGroup(): FormGroup {
+    return this.fb.group({
+      number: ['', [
+        Validators.pattern('[0-9]{9}')
+      ]],
+      type: ['mobile']
+    });
+  }
+
+  private loadDepartments() {
+    this.contactService.getDepartments().subscribe({
+      next: (depts) => this.departments = depts,
+      error: (err) => console.error('Error cargando departamentos:', err)
+    });
+  }
+
+  private setupFormSubscriptions() {
+    // Suscribirse a cambios en email para debug
+    this.email?.valueChanges.subscribe(value => {
+      console.log('Email changed:', value, 'Status:', this.email?.status);
+    });
+
+    // Suscribirse a cambios de contraseña para actualizar fortaleza
+    this.passwordGroup?.get('password')?.valueChanges.subscribe(() => {
+      // Trigger UI update
+    });
+  }
+
+  // Getters para acceso fácil a los controles
+  get dni() { return this.registrationForm.get('dni'); }
+  get firstName() { return this.registrationForm.get('firstName'); }
+  get lastName() { return this.registrationForm.get('lastName'); }
+  get birthDate() { return this.registrationForm.get('birthDate'); }
+  get email() { return this.registrationForm.get('email'); }
+  get passwordGroup() { return this.registrationForm.get('passwords'); }
+  get department() { return this.registrationForm.get('department'); }
+  get position() { return this.registrationForm.get('position'); }
+  get startDate() { return this.registrationForm.get('startDate'); }
+  get employeeType() { return this.registrationForm.get('employeeType'); }
+  get acceptTerms() { return this.registrationForm.get('acceptTerms'); }
+LABORATORIO SESIÓN 08 - PARTE 2: FORMULARIOS DINÁMICOS Y MEJORES PRÁCTICAS
+Continuación de ReactiveRegistrationComponent
+  // Continuación del componente...
+  
+  get phones() { 
+    return this.registrationForm.get('phones') as FormArray; 
+  }
+
+  // Métodos de manejo de FormArray
+  addPhone() {
+    if (this.phones.length < 5) { // Límite de 5 teléfonos
+      this.phones.push(this.createPhoneGroup());
+    }
+  }
+
+  removePhone(index: number) {
+    if (this.phones.length > 1) { // Mantener al menos 1
+      this.phones.removeAt(index);
+    }
+  }
+
+  // Validación de campos
+  isFieldInvalid(fieldPath: string): boolean {
+    const field = this.registrationForm.get(fieldPath);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  // Fortaleza de contraseña
+  getPasswordStrength(): string {
+    const password = this.passwordGroup?.get('password')?.value;
+    if (!password) return '';
+    
+    let strength = 0;
+    if (password.length >= 8) strength++;
+    if (password.length >= 12) strength++;
+    if (/[a-z]/.test(password)) strength++;
+    if (/[A-Z]/.test(password)) strength++;
+    if (/[0-9]/.test(password)) strength++;
+    if (/[^a-zA-Z0-9]/.test(password)) strength++;
+    
+    if (strength < 3) return 'Débil';
+    if (strength < 5) return 'Media';
+    return 'Fuerte';
+  }
+
+  getPasswordStrengthClass(): string {
+    const strength = this.getPasswordStrength();
+    switch(strength) {
+      case 'Débil': return 'weak';
+      case 'Media': return 'medium';
+      case 'Fuerte': return 'strong';
+      default: return '';
+    }
+  }
+
+  // Datos de prueba
+  fillTestData() {
+    this.registrationForm.patchValue({
+      dni: '12345678',
+      firstName: 'Juan Carlos',
+      lastName: 'Pérez García',
+      birthDate: '1990-05-15',
+      email: 'juan.perez@provias.gob.pe',
+      passwords: {
+        password: 'Test@1234',
+        confirmPassword: 'Test@1234'
+      },
+      department: 'TI',
+      position: 'Desarrollador Senior',
+      startDate: '2020-01-15',
+      employeeType: 'permanent',
+      acceptTerms: true
+    });
+    
+    // Agregar teléfono de prueba
+    if (this.phones.length === 1) {
+      this.phones.at(0).patchValue({
+        number: '987654321',
+        type: 'mobile'
+      });
+    }
+  }
+
+  // Reset del formulario
+  resetForm() {
+    this.registrationForm.reset();
+    // Mantener al menos un teléfono
+    while (this.phones.length > 1) {
+      this.phones.removeAt(1);
+    }
+  }
+
+  // Mostrar términos y privacidad
+  showTerms(event: Event) {
+    event.preventDefault();
+    alert('Términos y Condiciones de PROVIAS DESCENTRALIZADO\n\n' +
+          '1. Uso apropiado del sistema\n' +
+          '2. Protección de datos sensibles\n' +
+          '3. Responsabilidad del usuario\n' +
+          '...');
+  }
+
+  showPrivacy(event: Event) {
+    event.preventDefault();
+    alert('Política de Privacidad\n\n' +
+          'Sus datos serán tratados conforme a la Ley de Protección de Datos Personales...');
+  }
+
+  // Submit del formulario
+  onSubmit() {
+    if (this.registrationForm.invalid) {
+      // Marcar todos los campos como tocados para mostrar errores
+      Object.keys(this.registrationForm.controls).forEach(key => {
+        const control = this.registrationForm.get(key);
+        control?.markAsTouched();
+        
+        // Si es un FormGroup, marcar sus controles también
+        if (control instanceof FormGroup) {
+          Object.keys(control.controls).forEach(subKey => {
+            control.get(subKey)?.markAsTouched();
+          });
+        }
+      });
+      
+      alert('⚠️ Por favor, corrija los errores en el formulario');
+      return;
+    }
+
+    this.loading = true;
+    
+    // Simular envío al servidor
+    setTimeout(() => {
+      console.log('Datos a enviar:', this.registrationForm.value);
+      alert('✅ Registro completado exitosamente!\n\n' +
+            'Se ha enviado un email de confirmación a: ' + 
+            this.registrationForm.value.email);
+      
+      this.loading = false;
+      this.resetForm();
+    }, 2000);
+  }
+}
+________________________________________
+🔒 LAB 3: SEGURIDAD Y MEJORES PRÁCTICAS (30 minutos)
+PARTE 1: Implementar Seguridad contra XSS y CSRF
+Paso 3.1: Crear Servicio de Seguridad
+ng generate service services/security --skip-tests
+services/security.service.ts:
+import { Injectable, inject } from '@angular/core';
+import { DomSanitizer, SafeHtml, SafeUrl, SafeResourceUrl } from '@angular/platform-browser';
+import { HttpHeaders } from '@angular/common/http';
+
+@Injectable({ providedIn: 'root' })
+export class SecurityService {
+  private sanitizer = inject(DomSanitizer);
+  
+  // Token CSRF almacenado
+  private csrfToken: string = '';
+
+  constructor() {
+    // Generar token CSRF al iniciar
+    this.generateCSRFToken();
+  }
+
+  // Generar token CSRF
+  private generateCSRFToken(): void {
+    this.csrfToken = this.generateRandomToken(32);
+    // En producción, esto vendría del servidor
+    sessionStorage.setItem('csrf-token', this.csrfToken);
+  }
+
+  // Obtener token CSRF
+  getCSRFToken(): string {
+    return this.csrfToken || sessionStorage.getItem('csrf-token') || '';
+  }
+
+  // Generar token aleatorio
+  private generateRandomToken(length: number): string {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    return result;
+  }
+
+  // Agregar headers de seguridad
+  getSecureHeaders(): HttpHeaders {
+    return new HttpHeaders({
+      'X-CSRF-Token': this.getCSRFToken(),
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block',
+      'Content-Security-Policy': "default-src 'self'"
+    });
+  }
+
+  // Sanitización de HTML
+  sanitizeHtml(html: string): SafeHtml {
+    // Angular automáticamente sanitiza, pero podemos ser más estrictos
+    const cleaned = this.removeScriptTags(html);
+    return this.sanitizer.sanitize(1, cleaned) || '';
+  }
+
+  // Remover script tags manualmente
+  private removeScriptTags(html: string): string {
+    return html.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  }
+
+  // Sanitizar URL
+  sanitizeUrl(url: string): SafeUrl {
+    // Validar que sea una URL segura
+    if (this.isValidUrl(url)) {
+      return this.sanitizer.sanitize(4, url) || '';
+    }
+    return '';
+  }
+
+  // Validar URL
+  private isValidUrl(url: string): boolean {
+    try {
+      const urlObj = new URL(url);
+      // Solo permitir https y http
+      return ['https:', 'http:'].includes(urlObj.protocol);
+    } catch {
+      return false;
+    }
+  }
+
+  // Sanitizar Resource URL (para iframes, etc.)
+  sanitizeResourceUrl(url: string): SafeResourceUrl {
+    // Lista blanca de dominios permitidos
+    const allowedDomains = [
+      'provias.gob.pe',
+      'youtube.com',
+      'vimeo.com'
+    ];
+    
+    try {
+      const urlObj = new URL(url);
+      const domain = urlObj.hostname.replace('www.', '');
+      
+      if (allowedDomains.some(allowed => domain.includes(allowed))) {
+        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
+      }
+    } catch {
+      console.error('URL inválida:', url);
+    }
+    
+    return '';
+  }
+
+  // Validar input para prevenir inyección
+  validateInput(input: string, type: 'text' | 'email' | 'number' | 'alphanumeric'): boolean {
+    const patterns = {
+      text: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s\-'\.]+$/,
+      email: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
+      number: /^[0-9]+$/,
+      alphanumeric: /^[a-zA-Z0-9]+$/
+    };
+    
+    return patterns[type].test(input);
+  }
+
+  // Escapar caracteres especiales para prevenir inyección
+  escapeHtml(text: string): string {
+    const map: { [key: string]: string } = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;',
+      '/': '&#x2F;'
+    };
+    
+    return text.replace(/[&<>"'\/]/g, (s) => map[s]);
+  }
+
+  // Validar tamaño de archivo
+  validateFileSize(file: File, maxSizeMB: number = 5): boolean {
+    const maxSize = maxSizeMB * 1024 * 1024; // Convertir a bytes
+    return file.size <= maxSize;
+  }
+
+  // Validar tipo de archivo
+  validateFileType(file: File, allowedTypes: string[]): boolean {
+    return allowedTypes.includes(file.type);
+  }
+
+  // Generar hash para contraseñas (en producción usar bcrypt en el servidor)
+  hashPassword(password: string): string {
+    // NOTA: Esto es solo para demostración
+    // NUNCA hacer hash de contraseñas en el cliente en producción
+    let hash = 0;
+    for (let i = 0; i < password.length; i++) {
+      const char = password.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash;
+    }
+    return Math.abs(hash).toString(16);
+  }
+
+  // Verificar fortaleza de contraseña
+  checkPasswordStrength(password: string): {
+    score: number;
+    feedback: string[];
+    isStrong: boolean;
+  } {
+    const feedback: string[] = [];
+    let score = 0;
+
+    if (password.length < 8) {
+      feedback.push('Debe tener al menos 8 caracteres');
+    } else {
+      score += 1;
+    }
+
+    if (password.length >= 12) {
+      score += 1;
+    }
+
+    if (!/[a-z]/.test(password)) {
+      feedback.push('Debe contener minúsculas');
+    } else {
+      score += 1;
+    }
+
+    if (!/[A-Z]/.test(password)) {
+      feedback.push('Debe contener mayúsculas');
+    } else {
+      score += 1;
+    }
+
+    if (!/[0-9]/.test(password)) {
+      feedback.push('Debe contener números');
+    } else {
+      score += 1;
+    }
+
+    if (!/[^a-zA-Z0-9]/.test(password)) {
+      feedback.push('Debe contener caracteres especiales');
+    } else {
+      score += 1;
+    }
+
+    // Verificar patrones comunes débiles
+    const weakPatterns = [
+      '12345', 'password', 'qwerty', 'admin', 'letmein'
+    ];
+    
+    if (weakPatterns.some(pattern => password.toLowerCase().includes(pattern))) {
+      feedback.push('Evite patrones comunes');
+      score -= 1;
+    }
+
+    return {
+      score: Math.max(0, score),
+      feedback,
+      isStrong: score >= 5
+    };
+  }
+}
+Paso 3.2: Crear Interceptor de Seguridad
+ng generate interceptor interceptors/security --skip-tests
+interceptors/security.interceptor.ts:
+import { HttpInterceptorFn, HttpRequest, HttpHandlerFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { SecurityService } from '@services/security.service';
+
+export const securityInterceptor: HttpInterceptorFn = (req: HttpRequest<any>, next: HttpHandlerFn) => {
+  const securityService = inject(SecurityService);
+  
+  // Agregar token CSRF a todas las peticiones POST, PUT, DELETE
+  if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(req.method)) {
+    const csrfToken = securityService.getCSRFToken();
+    
+    req = req.clone({
+      setHeaders: {
+        'X-CSRF-Token': csrfToken,
+        'X-Requested-With': 'XMLHttpRequest'
+      }
+    });
+  }
+  
+  // Agregar headers de seguridad
+  req = req.clone({
+    setHeaders: {
+      'X-Content-Type-Options': 'nosniff',
+      'X-Frame-Options': 'DENY',
+      'X-XSS-Protection': '1; mode=block'
+    }
+  });
+  
+  return next(req);
+};
+PARTE 2: Componente Seguro con Validación
+Paso 3.3: Crear Formulario de Proyecto Seguro
+ng generate component forms/secure-project-form --standalone --skip-tests
+forms/secure-project-form/secure-project-form.component.ts:
+import { Component, OnInit, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { SecurityService } from '@services/security.service';
+import { CustomValidators } from '@validators/custom-validators';
+import { DomSanitizer } from '@angular/platform-browser';
+
+@Component({
+  selector: 'app-secure-project-form',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
+  template: `
+    <div class="secure-form-container">
+      <div class="security-badge">
+        🔒 Formulario Seguro - Proyecto PROVIAS
+      </div>
+      
+      <h2>Registro de Nuevo Proyecto</h2>
+      
+      <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Información Básica -->
+        <div class="form-section">
+          <h3>📋 Información Básica</h3>
+          
+          <!-- Código de Proyecto -->
+          <div class="form-group">
+            <label for="projectCode">Código de Proyecto *</label>
+            <input 
+              type="text" 
+              id="projectCode"
+              formControlName="projectCode"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('projectCode')"
+              placeholder="PROV-2025-XXX"
+              (input)="onInputChange($event, 'projectCode')">
+            
+            <div class="hint">Formato: PROV-YYYY-###</div>
+            
+            <div *ngIf="isFieldInvalid('projectCode')" class="error-message">
+              <span *ngIf="projectCode?.errors?.['required']">Código es obligatorio</span>
+              <span *ngIf="projectCode?.errors?.['pattern']">
+                Formato inválido. Use PROV-YYYY-###
+              </span>
+            </div>
+          </div>
+
+          <!-- Nombre del Proyecto (con sanitización) -->
+          <div class="form-group">
+            <label for="projectName">Nombre del Proyecto *</label>
+            <input 
+              type="text" 
+              id="projectName"
+              formControlName="projectName"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('projectName')"
+              (input)="sanitizeInput($event, 'projectName')"
+              maxlength="100">
+            
+            <div class="char-counter">
+              {{ projectForm.get('projectName')?.value?.length || 0 }}/100
+            </div>
+            
+            <div *ngIf="isFieldInvalid('projectName')" class="error-message">
+              <span *ngIf="projectName?.errors?.['required']">Nombre es obligatorio</span>
+              <span *ngIf="projectName?.errors?.['forbiddenWord']">
+                {{ projectName?.errors?.['forbiddenWord'].message }}
+              </span>
+              <span *ngIf="projectName?.errors?.['xssDetected']">
+                ⚠️ Contenido potencialmente peligroso detectado
+              </span>
+            </div>
+          </div>
+
+          <!-- Descripción (con sanitización HTML) -->
+          <div class="form-group">
+            <label for="description">Descripción *</label>
+            <textarea 
+              id="description"
+              formControlName="description"
+              class="form-control"
+              [class.is-invalid]="isFieldInvalid('description')"
+              rows="4"
+              (input)="sanitizeTextarea($event)"
+              maxlength="500">
+            </textarea>
+            
+            <div class="char-counter">
+              {{ projectForm.get('description')?.value?.length || 0 }}/500
+            </div>
+            
+            <div *ngIf="isFieldInvalid('description')" class="error-message">
+              <span *ngIf="description?.errors?.['required']">Descripción es obligatoria</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Fechas del Proyecto -->
+        <div class="form-section" formGroupName="dates">
+          <h3>📅 Fechas del Proyecto</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="startDate">Fecha de Inicio *</label>
+              <input 
+                type="date" 
+                id="startDate"
+                formControlName="startDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('dates.startDate')"
+                [min]="minDate"
+                [max]="maxDate">
+              
+              <div *ngIf="isFieldInvalid('dates.startDate')" class="error-message">
+                <span *ngIf="datesGroup?.get('startDate')?.errors?.['required']">
+                  Fecha de inicio es obligatoria
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="endDate">Fecha de Fin *</label>
+              <input 
+                type="date" 
+                id="endDate"
+                formControlName="endDate"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('dates.endDate') || 
+                                     datesGroup?.errors?.['invalidDateRange']"
+                [min]="projectForm.get('dates.startDate')?.value">
+              
+              <div *ngIf="isFieldInvalid('dates.endDate') || 
+                          datesGroup?.errors?.['invalidDateRange']" 
+                   class="error-message">
+                <span *ngIf="datesGroup?.get('endDate')?.errors?.['required']">
+                  Fecha de fin es obligatoria
+                </span>
+                <span *ngIf="datesGroup?.errors?.['invalidDateRange']">
+                  {{ datesGroup?.errors?.['invalidDateRange'].message }}
+                </span>
+                <span *ngIf="datesGroup?.errors?.['minProjectDuration']">
+                  {{ datesGroup?.errors?.['minProjectDuration'].message }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Presupuesto -->
+        <div class="form-section">
+          <h3>💰 Presupuesto</h3>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="budget">Presupuesto (S/.) *</label>
+              <input 
+                type="number" 
+                id="budget"
+                formControlName="budget"
+                class="form-control"
+                [class.is-invalid]="isFieldInvalid('budget')"
+                min="10000"
+                max="100000000"
+                step="1000">
+              
+              <div class="budget-display">
+                {{ formatCurrency(projectForm.get('budget')?.value) }}
+              </div>
+              
+              <div *ngIf="isFieldInvalid('budget')" class="error-message">
+                <span *ngIf="budget?.errors?.['required']">Presupuesto es obligatorio</span>
+                <span *ngIf="budget?.errors?.['budgetOutOfRange']">
+                  Presupuesto debe estar entre S/. 10,000 y S/. 100,000,000
+                </span>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="currency">Moneda *</label>
+              <select 
+                id="currency"
+                formControlName="currency"
+                class="form-control">
+                <option value="PEN">Soles (PEN)</option>
+                <option value="USD">Dólares (USD)</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Archivos Adjuntos (con validación) -->
+        <div class="form-section">
+          <h3>📎 Archivos Adjuntos</h3>
+          
+          <div class="form-group">
+            <label for="attachment">Documento del Proyecto</label>
+            <input 
+              type="file" 
+              id="attachment"
+              (change)="onFileSelected($event)"
+              accept=".pdf,.doc,.docx"
+              class="form-control-file">
+            
+            <div class="file-info">
+              <small>Formatos permitidos: PDF, DOC, DOCX. Máximo 5MB</small>
+            </div>
+            
+            <div *ngIf="fileError" class="error-message">
+              {{ fileError }}
+            </div>
+            
+            <div *ngIf="selectedFile" class="file-selected">
+              ✅ Archivo seleccionado: {{ selectedFile.name }} 
+              ({{ formatFileSize(selectedFile.size) }})
+            </div>
+          </div>
+        </div>
+
+        <!-- Medidas de Seguridad -->
+        <div class="form-section">
+          <h3>🛡️ Verificación de Seguridad</h3>
+          
+          <!-- CAPTCHA simulado -->
+          <div class="form-group">
+            <label>Resuelva la operación: {{ captchaQuestion }}</label>
+            <input 
+              type="number" 
+              formControlName="captchaAnswer"
+              class="form-control captcha-input"
+              [class.is-invalid]="isFieldInvalid('captchaAnswer')">
+            
+            <div *ngIf="isFieldInvalid('captchaAnswer')" class="error-message">
+              <span *ngIf="captchaAnswer?.errors?.['required']">
+                Debe resolver la operación
+              </span>
+              <span *ngIf="captchaAnswer?.errors?.['incorrect']">
+                Respuesta incorrecta
+              </span>
+            </div>
+          </div>
+
+          <!-- Token CSRF (oculto) -->
+          <input type="hidden" name="csrf_token" [value]="csrfToken">
+        </div>
+
+        <!-- Confirmación -->
+        <div class="form-section">
+          <label class="checkbox-label">
+            <input 
+              type="checkbox"
+              formControlName="confirmData">
+            <span>
+              Confirmo que todos los datos ingresados son correctos y verídicos
+            </span>
+          </label>
+          
+          <div *ngIf="isFieldInvalid('confirmData')" class="error-message">
+            <span *ngIf="confirmData?.errors?.['requiredTrue']">
+              Debe confirmar la veracidad de los datos
+            </span>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" (click)="resetForm()">
+            Limpiar
+          </button>
+          <button 
+            type="submit" 
+            class="btn btn-primary"
+            [disabled]="projectForm.invalid || loading">
+            <span *ngIf="!loading">🔒 Enviar de Forma Segura</span>
+            <span *ngIf="loading">Procesando...</span>
+          </button>
+        </div>
+
+        <!-- Panel de Seguridad -->
+        <div class="security-panel">
+          <h4>🔐 Medidas de Seguridad Activas</h4>
+          <ul>
+            <li>✅ Protección CSRF activa</li>
+            <li>✅ Sanitización de inputs en tiempo real</li>
+            <li>✅ Validación de archivos</li>
+            <li>✅ Prevención de XSS</li>
+            <li>✅ Validación del lado del cliente</li>
+            <li>✅ Conexión segura HTTPS</li>
+          </ul>
+        </div>
+      </form>
+    </div>
+  `,
+  styles: [`
+    .secure-form-container {
+      max-width: 800px;
+      margin: 2rem auto;
+      padding: 2rem;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+
+    .security-badge {
+      background: linear-gradient(135deg, #2ecc71, #27ae60);
+      color: white;
+      padding: 0.75rem;
+      border-radius: 8px 8px 0 0;
+      text-align: center;
+      font-weight: bold;
+      margin: -2rem -2rem 2rem -2rem;
+    }
+
+    h2 {
+      color: #2c3e50;
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+    .form-section {
+      background: #f8f9fa;
+      padding: 1.5rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      border-left: 4px solid #3498db;
+    }
+
+    .form-section h3 {
+      margin-top: 0;
+      color: #34495e;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #555;
+    }
+
+    .form-control, .form-control-file {
+      width: 100%;
+      padding: 0.75rem;
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .form-control:focus {
+      outline: none;
+      border-color: #3498db;
+      box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+    }
+
+    .form-control.is-invalid {
+      border-color: #e74c3c;
+      background-color: #fff5f5;
+    }
+
+    .hint {
+      font-size: 0.875rem;
+      color: #7f8c8d;
+      margin-top: 0.25rem;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 0.875rem;
+      color: #95a5a6;
+      margin-top: 0.25rem;
+    }
+
+    .budget-display {
+      font-size: 1.25rem;
+      font-weight: bold;
+      color: #27ae60;
+      margin-top: 0.5rem;
+    }
+
+    .captcha-input {
+      max-width: 150px;
+    }
+
+    .file-info {
+      margin-top: 0.5rem;
+      color: #7f8c8d;
+    }
+
+    .file-selected {
+      margin-top: 0.5rem;
+      padding: 0.5rem;
+      background: #d4edda;
+      color: #155724;
+      border-radius: 4px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: flex-start;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      margin-right: 0.5rem;
+      margin-top: 0.25rem;
+    }
+
+    .error-message {
+      color: #e74c3c;
+      font-size: 0.875rem;
+      margin-top: 0.25rem;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 1rem;
+      justify-content: flex-end;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 2px solid #ecf0f1;
+    }
+
+    .btn {
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+    }
+
+    .btn-secondary {
+      background: #95a5a6;
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    .security-panel {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #e8f8f5;
+      border: 1px solid #27ae60;
+      border-radius: 8px;
+    }
+
+    .security-panel h4 {
+      margin-top: 0;
+      color: #27ae60;
+    }
+
+    .security-panel ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .security-panel li {
+      padding: 0.25rem 0;
+      color: #27ae60;
+    }
+  `]
+})
+export class SecureProjectFormComponent implements OnInit {
+  private fb = inject(FormBuilder);
+  private securityService = inject(SecurityService);
+  private sanitizer = inject(DomSanitizer);
+
+  projectForm!: FormGroup;
+  loading = false;
+  fileError = '';
+  selectedFile: File | null = null;
+  
+  // CAPTCHA
+  captchaQuestion = '';
+  captchaAnswer = 0;
+  
+  // CSRF Token
+  csrfToken = '';
+  
+  // Fechas límite
+  minDate = new Date().toISOString().split('T')[0];
+  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 2))
+    .toISOString().split('T')[0];
+
+  ngOnInit() {
+    this.buildForm();
+    this.generateCaptcha();
+    this.csrfToken = this.securityService.getCSRFToken();
+  }
+
+  private buildForm() {
+    this.projectForm = this.fb.group({
+      projectCode: ['', [
+        Validators.required,
+        Validators.pattern(/^PROV-\d{4}-\d{3}$/)
+      ]],
+      projectName: ['', [
+        Validators.required,
+        Validators.minLength(5),
+        Validators.maxLength(100),
+        CustomValidators.forbiddenWordsValidator(['script', 'drop', 'delete'])
+      ]],
+      description: ['', [
+        Validators.required,
+        Validators.minLength(10),
+        Validators.maxLength(500)
+      ]],
+      dates: this.fb.group({
+        startDate: ['', Validators.required],
+        endDate: ['', Validators.required]
+      }, { 
+        validators: CustomValidators.projectDatesValidator()
+      }),
+      budget: ['', [
+        Validators.required,
+        CustomValidators.budgetRangeValidator(10000, 100000000)
+      ]],
+      currency: ['PEN', Validators.required],
+      captchaAnswer: ['', Validators.required],
+      confirmData: [false, Validators.requiredTrue]
+    });
+  }
+
+  // Getters
+  get projectCode() { return this.projectForm.get('projectCode'); }
+  get projectName() { return this.projectForm.get('projectName'); }
+  get description() { return this.projectForm.get('description'); }
+  get datesGroup() { return this.projectForm.get('dates'); }
+  get budget() { return this.projectForm.get('budget'); }
+  get captchaAnswer() { return this.projectForm.get('captchaAnswer'); }
+  get confirmData() { return this.projectForm.get('confirmData'); }
+
+  // Validación de campos
+  isFieldInvalid(fieldPath: string): boolean {
+    const field = this.projectForm.get(fieldPath);
+    return !!(field && field.invalid && (field.dirty || field.touched));
+  }
+
+  // Sanitización de inputs
+  onInputChange(event: any, fieldName: string) {
+    const value = event.target.value;
+    
+    // Verificar caracteres peligrosos
+    if (this.containsDangerousCharacters(value)) {
+      const control = this.projectForm.get(fieldName);
+      control?.setErrors({ xssDetected: true });
+    }
+  }
+
+  sanitizeInput(event: any, fieldName: string) {
+    let value = event.target.value;
+    
+    // Remover scripts y tags HTML
+    value = this.securityService.escapeHtml(value);
+    
+    // Actualizar el valor del formulario
+    this.projectForm.get(fieldName)?.setValue(value, { emitEvent: false });
+    event.target.value = value;
+  }
+
+  sanitizeTextarea(event: any) {
+    let value = event.target.value;
+    
+    // Sanitizar HTML peligroso
+    value = value.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    value = value.replace(/<iframe\b[^<]*(?:(?!<\/iframe>)<[^<]*)*<\/iframe>/gi, '');
+    
+    this.projectForm.get('description')?.setValue(value, { emitEvent: false });
+    event.target.value = value;
+  }
+
+  private containsDangerousCharacters(value: string): boolean {
+    const dangerous = [
+      '<script', '</script>', '<iframe', 'javascript:',
+      'onerror=', 'onclick=', 'onload=', 'eval('
+    ];
+    
+    return dangerous.some(pattern => 
+      value.toLowerCase().includes(pattern.toLowerCase())
+    );
+  }
+
+  // Manejo de archivos
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    
+    if (!file) {
+      this.selectedFile = null;
+      this.fileError = '';
+      return;
+    }
+
+    // Validar tipo de archivo
+    const allowedTypes = [
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+    
+    if (!this.securityService.validateFileType(file, allowedTypes)) {
+      this.fileError = 'Tipo de archivo no permitido. Use PDF, DOC o DOCX';
+      this.selectedFile = null;
+      return;
+    }
+
+    // Validar tamaño
+    if (!this.securityService.validateFileSize(file, 5)) {
+      this.fileError = 'El archivo excede el tamaño máximo de 5MB';
+      this.selectedFile = null;
+      return;
+    }
+
+    this.selectedFile = file;
+    this.fileError = '';
+  }
+
+  // CAPTCHA
+  generateCaptcha() {
+    const num1 = Math.floor(Math.random() * 10) + 1;
+    const num2 = Math.floor(Math.random() * 10) + 1;
+    this.captchaQuestion = `${num1} + ${num2} = ?`;
+    this.captchaAnswer = num1 + num2;
+  }
+
+  validateCaptcha(): boolean {
+    const userAnswer = this.projectForm.get('captchaAnswer')?.value;
+    if (userAnswer !== this.captchaAnswer) {
+      this.projectForm.get('captchaAnswer')?.setErrors({ incorrect: true });
+      return false;
+    }
+    return true;
+  }
+
+  // Formateo
+  formatCurrency(value: number): string {
+    if (!value) return 'S/. 0.00';
+    return new Intl.NumberFormat('es-PE', {
+      style: 'currency',
+      currency: 'PEN'
+    }).format(value);
+  }
+
+  formatFileSize(bytes: number): string {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  }
+
+  // Acciones del formulario
+  resetForm() {
+    this.projectForm.reset({
+      currency: 'PEN'
+    });
+    this.selectedFile = null;
+    this.fileError = '';
+    this.generateCaptcha();
+  }
+
+  onSubmit() {
+    // Validar CAPTCHA
+    if (!this.validateCaptcha()) {
+      alert('❌ Respuesta de seguridad incorrecta');
+      this.generateCaptcha();
+      return;
+    }
+
+    if (this.projectForm.invalid) {
+      Object.keys(this.projectForm.controls).forEach(key => {
+        const control = this.projectForm.get(key);
+        control?.markAsTouched();
+        
+        if (control instanceof FormGroup) {
+          Object.keys(control.controls).forEach(subKey => {
+            control.get(subKey)?.markAsTouched();
+          });
+        }
+      });
+      
+      alert('⚠️ Por favor, corrija los errores en el formulario');
+      return;
+    }
+
+    this.loading = true;
+    
+    // Preparar datos seguros
+    const formData = {
+      ...this.projectForm.value,
+      csrf_token: this.csrfToken,
+      file: this.selectedFile,
+      timestamp: new Date().toISOString(),
+      userAgent: navigator.userAgent
+    };
+
+    // Simular envío seguro
+    setTimeout(() => {
+      console.log('Datos enviados de forma segura:', formData);
+      alert('✅ Proyecto registrado exitosamente!\n\n' +
+            '🔒 Todos los datos han sido enviados de forma segura\n' +
+            'Código de proyecto: ' + formData.projectCode);
+      
+      this.loading = false;
+      this.resetForm();
+    }, 2000);
+  }
+}
+________________________________________
+🚀 LAB 4: PERFORMANCE Y ACCESIBILIDAD (20 minutos)
+Configurar el Router y App Principal
+Paso 4.1: Actualizar app.routes.ts
+import { Routes } from '@angular/router';
+
+export const routes: Routes = [
+  {
+    path: '',
+    redirectTo: '/template-form',
+    pathMatch: 'full'
+  },
+  {
+    path: 'template-form',
+    loadComponent: () => import('./forms/template-contact/template-contact.component')
+      .then(m => m.TemplateContactComponent),
+    title: 'Formulario Template-driven'
+  },
+  {
+    path: 'reactive-form',
+    loadComponent: () => import('./forms/reactive-registration/reactive-registration.component')
+      .then(m => m.ReactiveRegistrationComponent),
+    title: 'Formulario Reactivo'
+  },
+  {
+    path: 'secure-form',
+    loadComponent: () => import('./forms/secure-project-form/secure-project-form.component')
+      .then(m => m.SecureProjectFormComponent),
+    title: 'Formulario Seguro'
+  },
+  {
+    path: '**',
+    redirectTo: '/template-form'
+  }
+];
+Paso 4.2: Actualizar app.component.ts
+import { Component, ChangeDetectionStrategy } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [CommonModule, RouterOutlet, RouterLink, RouterLinkActive],
+  changeDetection: ChangeDetectionStrategy.OnPush, // Optimización de rendimiento
+  template: `
+    <nav class="main-nav" role="navigation" aria-label="Navegación principal">
+      <div class="nav-container">
+        <h1>
+          <img src="/assets/logo.svg" alt="PROVIAS Logo" class="logo">
+          PROVIAS - Sesión 08: Formularios y Mejores Prácticas
+        </h1>
+        
+        <div class="nav-links">
+          <a 
+            routerLink="/template-form" 
+            routerLinkActive="active"
+            [attr.aria-current]="isActive('/template-form') ? 'page' : null">
+            📝 Template-driven
+          </a>
+          <a 
+            routerLink="/reactive-form" 
+            routerLinkActive="active"
+            [attr.aria-current]="isActive('/reactive-form') ? 'page' : null">
+            ⚡ Reactive Forms
+          </a>
+          <a 
+            routerLink="/secure-form" 
+            routerLinkActive="active"
+            [attr.aria-current]="isActive('/secure-form') ? 'page' : null">
+            🔒 Formulario Seguro
+          </a>
+        </div>
+        
+        <button 
+          class="menu-toggle"
+          (click)="toggleMenu()"
+          [attr.aria-expanded]="menuOpen"
+          aria-label="Menú de navegación">
+          <span class="hamburger"></span>
+        </button>
+      </div>
+    </nav>
+
+    <main class="main-content" role="main">
+      <router-outlet></router-outlet>
+    </main>
+
+    <footer class="main-footer" role="contentinfo">
+      <p>© 2025 PROVIAS DESCENTRALIZADO - Angular v18</p>
+      <p>Instructor: Ing. Jhonny Alexander Ramirez Chiroque</p>
+      <div class="footer-links">
+        <a href="#" (click)="showAccessibility($event)">♿ Accesibilidad</a>
+        <a href="#" (click)="showPrivacy($event)">🔒 Privacidad</a>
+        <a href="#" (click)="showHelp($event)">❓ Ayuda</a>
+      </div>
+    </footer>
+
+    <!-- Panel de Accesibilidad -->
+    <div class="a11y-panel" *ngIf="showA11yPanel" role="complementary">
+      <h2>Opciones de Accesibilidad</h2>
+      <button (click)="increaseFontSize()">A+ Aumentar texto</button>
+      <button (click)="decreaseFontSize()">A- Reducir texto</button>
+      <button (click)="toggleHighContrast()">🎨 Alto contraste</button>
+      <button (click)="closeA11yPanel()">✕ Cerrar</button>
+    </div>
+  `,
+  styles: [`
+    :host {
+      display: block;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .main-nav {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    .nav-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .nav-container h1 {
+      margin: 0;
+      font-size: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .logo {
+      width: 40px;
+      height: 40px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .nav-links a {
+      color: white;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus {
+      background: rgba(255,255,255,0.2);
+      outline: 2px solid white;
+      outline-offset: 2px;
+    }
+
+    .nav-links a.active {
+      background: rgba(255,255,255,0.3);
+      font-weight: bold;
+    }
+
+    .menu-toggle {
+      display: none;
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+      padding: 0.5rem;
+    }
+
+    .hamburger {
+      display: block;
+      width: 25px;
+      height: 3px;
+      background: white;
+      position: relative;
+    }
+
+    .hamburger::before,
+    .hamburger::after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: white;
+      left: 0;
+    }
+
+    .hamburger::before {
+      top: -8px;
+    }
+
+    .hamburger::after {
+      top: 8px;
+    }
+
+    .main-content {
+      flex: 1;
+      background: #f5f5f5;
+      padding: 2rem 1rem;
+    }
+
+    .main-footer {
+      background: #2c3e50;
+      color: white;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .main-footer p {
+      margin: 0.5rem 0;
+    }
+
+    .footer-links {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: center;
+      gap: 2rem;
+    }
+
+    .footer-links a {
+      color: white;
+      text-decoration: none;
+      transition: all 0.3s;
+    }
+
+    .footer-links a:hover,
+    .footer-links a:focus {
+      text-decoration: underline;
+      outline: 2px solid white;
+      outline-offset: 4px;
+    }
+
+    .a11y-panel {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: white;
+      padding: 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      z-index: 2000;
+    }
+
+    .a11y-panel h2 {
+      margin-top: 0;
+      color: #333;
+    }
+
+    .a11y-panel button {
+      display: block;
+      width: 100%;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      background: #667eea;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .a11y-panel button:hover,
+    .a11y-panel button:focus {
+      background: #5a67d8;
+      transform: translateX(5px);
+    }
+
+    /* Alto contraste */
+    :host-context(.high-contrast) {
+      filter: contrast(1.5);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links {
+        display: none;
+      }
+
+      .menu-toggle {
+        display: block;
+      }
+
+      .nav-links.mobile-open {
+        display: flex;
+        flex-direction: column;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background: rgba(0,0,0,0.9);
+        padding: 1rem;
+      }
+    }
+
+    /* Focus visible para accesibilidad */
+    *:focus-visible {
+      outline: 3px solid #ffd700;
+      outline-offset: 2px;
+    }
+
+    /* Skip to content link */
+    .skip-to-content {
+      position: absolute;
+      top: -40px;
+      left: 0;
+      background: #000;
+      color: white;
+      padding: 8px;
+      text-decoration: none;
+      z-index: 100;
+    }
+
+    .skip-to-content:focus {
+      top: 0;
+    }
+  `]
+})
+export class AppComponent {
+  title = 'PROVIAS Forms Lab';
+  menuOpen = false;
+  showA11yPanel = false;
+  fontSize = 16;
+
+  isActive(route: string): boolean {
+    // Implementar lógica para verificar ruta activa
+    return false;
+  }
+
+  toggleMenu() {
+    this.menuOpen = !this.menuOpen;
+  }
+
+  showAccessibility(event: Event) {
+    event.preventDefault();
+    this.showA11yPanel = true;
+  }
+
+  showPrivacy(event: Event) {
+    event.preventDefault();
+    alert('Política de Privacidad\n\nPROVIAS DESCENTRALIZADO respeta su privacidad...');
+  }
+
+  showHelp(event: Event) {
+    event.preventDefault();
+    alert('Centro de Ayuda\n\nPara asistencia, contacte a soporte@provias.gob.pe');
+  }
+
+  closeA11yPanel() {
+    this.showA11yPanel = false;
+  }
+
+  increaseFontSize() {
+    this.fontSize = Math.min(this.fontSize + 2, 24);
+    document.documentElement.style.fontSize = `${this.fontSize}px`;
+  }
+
+  decreaseFontSize() {
+    this.fontSize = Math.max(this.fontSize - 2, 12);
+    document.documentElement.style.fontSize = `${this.fontSize}px`;
+  }
+
+  toggleHighContrast() {
+    document.body.classList.toggle('high-contrast');
+  }
+}
+________________________________________
+📊 VERIFICACIÓN FINAL Y TESTING
+Comandos para Ejecutar el Proyecto
+# Instalar dependencias
+npm install
+
+# Ejecutar JSON Server y Angular Dev Server
+npm run dev
+
+# O por separado:
+# Terminal 1
+npm run api
+
+# Terminal 2
+ng serve --proxy-config proxy.conf.json
+Verificación de URLs
+•	Angular App: http://localhost:4200
+•	JSON Server API: http://localhost:3000
+•	Template Form: http://localhost:4200/template-form
+•	Reactive Form: http://localhost:4200/reactive-form
+•	Secure Form: http://localhost:4200/secure-form
+Checklist de Funcionalidades
+✅ Template-driven Forms
+•	[ ] Binding bidireccional con ngModel
+•	[ ] Validaciones HTML5
+•	[ ] Mensajes de error condicionales
+•	[ ] Estados del formulario (pristine, dirty, valid)
+•	[ ] Submit deshabilitado cuando inválido
+✅ Reactive Forms
+•	[ ] FormBuilder configurado
+•	[ ] Validaciones síncronas personalizadas
+•	[ ] Validaciones asíncronas (email único)
+•	[ ] FormArray para campos dinámicos
+•	[ ] Cross-field validation (contraseñas)
+•	[ ] Getters para acceso fácil a controles
+✅ Seguridad
+•	[ ] Protección CSRF implementada
+•	[ ] Sanitización de inputs
+•	[ ] Validación de archivos
+•	[ ] Prevención de XSS
+•	[ ] CAPTCHA simulado
+•	[ ] Headers de seguridad
+✅ Performance
+•	[ ] ChangeDetectionStrategy.OnPush
+•	[ ] Lazy Loading de componentes
+•	[ ] Formularios standalone
+✅ Accesibilidad
+•	[ ] Labels para todos los inputs
+•	[ ] ARIA attributes
+•	[ ] Navegación por teclado
+•	[ ] Focus visible
+•	[ ] Mensajes de error descriptivos
+•	[ ] Contraste adecuado
+________________________________________
+🎓 EJERCICIOS ADICIONALES
+Ejercicio 1: Agregar Autoguardado
+Implementar guardado automático cada 30 segundos en el formulario reactivo.
+Ejercicio 2: Validador de RUC
+Crear un validador personalizado que valide el dígito verificador del RUC.
+Ejercicio 3: Integración con API Real
+Conectar los formularios con una API REST real usando HttpClient.
+Ejercicio 4: Testing
+Escribir tests unitarios con Jasmine para los validadores personalizados.
+________________________________________
+📚 RECURSOS Y DOCUMENTACIÓN
+•	Angular Forms Guide
+•	Reactive Forms
+•	Form Validation
+•	Security Guide
+•	Accessibility Guide
+________________________________________
+🏆 CONCLUSIÓN
+Has completado exitosamente el laboratorio de Formularios y Mejores Prácticas. Ahora tienes las habilidades para:
+1.	Crear formularios profesionales tanto Template-driven como Reactive
+2.	Implementar validaciones complejas síncronas y asíncronas
+3.	Aplicar seguridad robusta contra XSS y CSRF
+4.	Optimizar rendimiento con OnPush y Lazy Loading
+5.	Garantizar accesibilidad para todos los usuarios
+6.	Escribir código mantenible y testeable
+¡Excelente trabajo! 🎉
+________________________________________
+Próxima Sesión: Lunes 25 de Agosto - Angular Material UI
+

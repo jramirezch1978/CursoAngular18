@@ -1,0 +1,257 @@
+GUIÓN DETALLADO - SESIÓN 08: MEJORES PRÁCTICAS Y FORMULARIOS
+PROVIAS DESCENTRALIZADO
+________________________________________
+Diapositiva 1: Carátula (2 minutos)
+Muy buenas noches a todos. Bienvenidos a la sesión 8 de nuestro curso Angular 18, una sesión que transformará completamente cómo construyen formularios y aplican mejores prácticas en sus aplicaciones.
+Mi nombre es Jhonny Alexander Ramirez Chiroque y hoy jueves 21 de agosto de 2025, vamos a dominar uno de los aspectos más críticos pero a menudo subestimados del desarrollo web: los formularios. Si piensan que los formularios son aburridos, prepárense para cambiar de opinión.
+Imaginen por un momento que están diseñando el sistema de registro para la nueva plataforma digital de PROVIAS. Miles de usuarios ingresarán datos críticos: información personal, documentos, coordenadas de proyectos. Un formulario mal diseñado no solo frustra usuarios; puede comprometer la integridad de datos de toda la organización. Un formulario bien diseñado es invisible: los usuarios completan su tarea sin siquiera notar la complejidad que manejan por detrás.
+Esta sesión es 100% práctica. No vamos a filosofar sobre formularios; vamos a construirlos, validarlos, asegurarlos y optimizarlos. Van a escribir código que no solo funciona, sino que es seguro, accesible y performante. Código del que pueden estar orgullosos.
+Angular 18 nos ofrece dos caminos para formularios: Template-driven para simplicidad y Reactive para control total. Hoy dominarán ambos y, más importante, sabrán exactamente cuándo usar cada uno. También implementaremos seguridad real contra ataques XSS y CSRF, optimizaremos rendimiento con OnPush y Lazy Loading, y haremos nuestras aplicaciones accesibles para todos.
+Preparen sus editores, abran sus terminales, y prepárense para tres horas intensivas que elevarán la calidad de sus aplicaciones al nivel profesional que sus usuarios merecen.
+________________________________________
+Diapositiva 2: Objetivos de la Sesión (2 minutos)
+Los objetivos de hoy van más allá de simplemente crear formularios. Vamos a transformar cómo piensan sobre la interacción usuario-aplicación.
+Crear formularios tanto Template-driven como Reactive es como aprender a conducir tanto automático como manual. Cada uno tiene su lugar, sus ventajas, sus casos de uso ideales. No es sobre cuál es mejor; es sobre cuál es correcto para cada situación.
+Implementar validaciones personalizadas y asíncronas es donde la magia ocurre. Es como tener un asistente inteligente que verifica en tiempo real si el RUC ingresado existe en SUNAT, si el email ya está registrado, si las coordenadas corresponden a una ubicación válida en Perú. No más formularios que fallan al enviar después de 10 minutos llenándolos.
+La seguridad no es opcional. Cada día, aplicaciones son comprometidas por ataques XSS y CSRF. Aprenderán a blindar sus formularios como si fueran la bóveda de un banco. Sus usuarios confían en ustedes con sus datos; esa confianza es sagrada.
+Optimizar el rendimiento con OnPush y Lazy Loading es la diferencia entre una aplicación que se siente moderna y una que se siente del 2010. Es como la diferencia entre usar Waze con actualización en tiempo real versus un mapa de papel: ambos te llevan al destino, pero la experiencia es incomparable.
+El manejo profesional de errores transforma frustración en comprensión. En lugar de "Error: undefined", sus usuarios verán "El DNI debe contener exactamente 8 dígitos". Es empatía codificada.
+La accesibilidad no es un extra; es un derecho. Sus formularios funcionarán para usuarios con discapacidades visuales, motoras, cognitivas. Es inclusión a través del código.
+Las pruebas básicas con Jasmine y Karma son su red de seguridad. Cada cambio que hagan estará respaldado por tests que confirman que nada se rompió. Es dormir tranquilo sabiendo que su código es sólido.
+________________________________________
+Diapositiva 3: Agenda (1 minuto)
+Nuestra agenda está diseñada como un crescendo musical, cada laboratorio construyendo sobre el anterior.
+Los primeros 45 minutos establecerán los fundamentos. Exploraremos la filosofía detrás de Template-driven versus Reactive Forms. Es como elegir entre un smartphone con interfaz simplificada versus uno con modo desarrollador: ambos son poderosos, pero sirven diferentes necesidades.
+Los siguientes 45 minutos son pura construcción con Reactive Forms. Aquí es donde el poder real se desata. FormBuilder será su mejor amigo, las validaciones serán su armadura.
+Nuestro break de 15 minutos es estratégico. Los conceptos de formularios reactivos son densos. Su cerebro necesita tiempo para procesar y consolidar antes de avanzar a territorio más complejo.
+El tercer bloque de 45 minutos es donde nos volvemos ninjas. Validaciones personalizadas que verifican CUIPs, validaciones asíncronas que consultan APIs, formularios dinámicos que se adaptan según las respuestas del usuario.
+Los últimos 25 minutos son sobre excelencia. Seguridad que protege, performance que deleita, accesibilidad que incluye. Es la diferencia entre código que funciona y código profesional.
+Cada minuto está optimizado. No hay relleno, solo conocimiento aplicable que usarán mañana mismo en sus proyectos.
+________________________________________
+Diapositiva 4: Introducción a Formularios (3 minutos)
+Bienvenidos al mundo de los formularios en Angular, donde la recolección de datos se convierte en arte.
+Los formularios son el puente entre sus usuarios y su aplicación. Son como las ventanillas de atención en una oficina: si están bien diseñadas, el flujo es eficiente y placentero. Si están mal diseñadas, generan colas, frustración y abandono.
+Template-driven Forms es el enfoque clásico, intuitivo. La lógica vive en el HTML, usa directivas como ngModel para binding bidireccional. Es como llenar un formulario físico: lo que ves es lo que obtienes. Perfecto cuando necesitan algo rápido, simple, sin complicaciones.
+Piensen en un formulario de contacto básico: nombre, email, mensaje. Template-driven es perfecto aquí. No necesitan artillery pesada para capturar tres campos. Es como usar una bicicleta para ir a la tienda de la esquina: simple, eficiente, apropiado.
+Reactive Forms es el enfoque programático, poderoso. La lógica vive en TypeScript, tienen control total sobre el estado del formulario. Es como tener un asistente personal que no solo recoge información, sino que la valida, la transforma, la prepara exactamente como la necesitan.
+Imaginen un formulario de registro de proyecto en PROVIAS: múltiples secciones, validaciones cruzadas entre fechas de inicio y fin, presupuestos que deben sumar correctamente, anexos que dependen del tipo de proyecto. Aquí Reactive Forms brilla. Tienen control quirúrgico sobre cada aspecto.
+La regla de oro es simple: si pueden dibujarlo en una servilleta, probablemente Template-driven es suficiente. Si necesitan un diagrama de flujo para explicarlo, Reactive Forms es su amigo.
+No es una decisión permanente. Pueden tener formularios Template-driven y Reactive en la misma aplicación. Usen la herramienta correcta para cada trabajo.
+________________________________________
+Diapositiva 5: Template-driven Forms (4 minutos)
+Profundicemos en Template-driven Forms y entendamos por qué, a pesar de ser "simple", sigue siendo poderoso.
+Las ventajas son tangibles e inmediatas. Es fácil de aprender porque se parece a HTML tradicional con superpoderes. Si vienen de otros frameworks o incluso de desarrollo web clásico, se sentirán en casa inmediatamente.
+Menos código TypeScript significa menos superficie para bugs. El componente queda limpio, enfocado en lógica de negocio, no en gestión de formularios. Es como tener un asistente que se encarga del papeleo mientras ustedes se enfocan en decisiones importantes.
+Para formularios simples, es imbatible. Un formulario de login, una encuesta de satisfacción, un formulario de búsqueda. No necesitan un cañón para matar una mosca. Template-driven es su matamoscas elegante.
+El binding automático con ngModel es magia conveniente. Escriben en el input, el modelo se actualiza. Cambian el modelo, el input refleja el cambio. Es sincronización sin esfuerzo, como tener espejos que siempre reflejan la realidad actual.
+Pero las desventajas son reales y deben considerarlas. Testing unitario es más difícil porque la lógica está en el template. No pueden simplemente instanciar el componente y probar métodos; necesitan el template renderizado.
+El menor control sobre el estado puede ser frustrante en escenarios complejos. Es como conducir un auto automático en una pista de carreras: funciona, pero no tienen el control fino que necesitan para optimizar cada curva.
+Las validaciones están limitadas a lo que Angular ofrece o a directivas personalizadas. No pueden fácilmente implementar validación condicional compleja o validaciones que dependen de servicios externos.
+La escalabilidad es el talón de Aquiles. Un formulario de 50 campos con validaciones cruzadas, secciones condicionales y lógica compleja se vuelve un monstruo en Template-driven. El template se vuelve ilegible, la lógica se esparce, el mantenimiento se vuelve pesadilla.
+________________________________________
+Diapositiva 6: Estructura Template-driven (3 minutos)
+Analicemos la anatomía de un Template-driven Form para entender cómo funciona bajo el capó.
+ngForm es el director de orquesta. Automáticamente se aplica a cualquier tag form y crea una instancia de FormGroup internamente. Es como el gerente de una oficina: coordina todo pero ustedes raramente interactúan directamente con él.
+ngModel es su caballo de batalla. Crea el binding bidireccional, pero también hace más: registra el control con ngForm, aplica validaciones, trackea el estado. Es como un empleado multitarea que no solo recoge datos sino que los valida y organiza.
+El atributo name es crítico y a menudo olvidado. Sin él, ngModel no puede registrar el control correctamente. Es como intentar archivar documentos sin etiquetas: todo se vuelve un caos. Cada input necesita un name único dentro del formulario.
+Las referencias locales con # son su ventana al estado del formulario. #myForm="ngForm" les da acceso al formulario completo. #nameInput="ngModel" les da acceso a un control específico. Es como tener acceso directo a reportes de estado en tiempo real.
+Los estados del formulario son su sistema de semáforos. Pristine/dirty les dice si el usuario ha interacturado. Es como saber si un documento ha sido modificado desde que se abrió. Valid/invalid es su luz roja/verde para proceder. Touched/untouched indica si el campo ha tenido foco, útil para mostrar errores solo después de interacción.
+Estos estados no son solo booleanos; son inteligencia que pueden usar. Mostrar errores solo cuando touched evita abrumar al usuario con rojo antes de que empiece. Deshabilitar el botón submit cuando invalid previene envíos incorrectos. Es UX inteligente basada en estado.
+________________________________________
+Diapositiva 7: Ejemplo Template-driven (4 minutos)
+Veamos un ejemplo práctico que pueden implementar inmediatamente en sus proyectos.
+El ContactComponent es simplicidad elegante. El modelo es un objeto plano con las propiedades del formulario. No hay FormGroups, no hay FormControls, solo un objeto JavaScript simple. Es como tener un formulario de papel que mágicamente se digitaliza.
+En el TypeScript, la magia es mínima. Definen el modelo con valores iniciales vacíos. El método onSubmit simplemente toma el modelo actual y hace algo con él. En este caso, un console.log, pero en la vida real sería una llamada HTTP a su backend.
+El template es donde ocurre la acción. La referencia #contactForm="ngForm" captura el formulario completo. Esto les da acceso a contactForm.valid, contactForm.pristine, y todos los estados que necesiten.
+El binding [(ngModel)]="model.name" es bidireccional. Los paréntesis cuadrados [] son property binding (modelo hacia vista). Los paréntesis normales () son event binding (vista hacia modelo). Juntos [()] crean el two-way binding. Es como un walkie-talkie: habla en ambas direcciones.
+El atributo required es validación declarativa. Angular automáticamente valida que el campo no esté vacío. Pueden agregar minlength, maxlength, pattern, email. Son validaciones HTML5 mejoradas por Angular.
+El botón [disabled]="!contactForm.valid" es UX inteligente. No pueden enviar hasta que todo esté correcto. Es como un cajero automático que no les deja continuar hasta que ingresen un PIN válido.
+Este patrón escala hasta cierto punto. Pueden agregar más campos, más validaciones básicas. Pero cuando necesiten validación cruzada entre campos, validación asíncrona, o lógica condicional compleja, es hora de considerar Reactive Forms.
+________________________________________
+Diapositiva 8: Reactive Forms Introducción (3 minutos)
+Ahora entramos al territorio de Reactive Forms, donde el control y la flexibilidad son absolutos.
+La programación reactiva en formularios es un cambio de paradigma. Ya no están describiendo qué es el formulario en el template; están programando cómo se comporta en TypeScript. Es como la diferencia entre dar instrucciones paso a paso versus programar un GPS que se adapta dinámicamente.
+FormControl es el átomo de Reactive Forms. Representa un único campo con su valor, validaciones y estado. Es como una celda en Excel: tiene un valor, puede tener fórmulas (validaciones), y sabe su estado (válido, modificado, etc.).
+FormGroup es la molécula. Agrupa múltiples FormControls en una estructura coherente. Es como una sección de un formulario: datos personales, dirección, información laboral. Cada grupo puede validarse independientemente y como conjunto.
+FormArray es la estructura dinámica. Perfecta para listas de items donde no saben cuántos habrá. Es como las líneas de detalle en una factura: pueden ser 1 o 100, FormArray las maneja todas.
+FormBuilder es su asistente de construcción. Reduce el boilerplate, hace el código más legible. Es como usar una plantilla prediseñada versus dibujar desde cero: mismo resultado, menos trabajo.
+El principio fundamental es que el estado vive en el componente. El template es solo una vista de ese estado. Es como MVC clásico: el modelo (FormGroup) está separado de la vista (template). Esto hace testing trivial, reutilización simple, y mantenimiento placentero.
+El flujo unidireccional modelo→vista es predecible. No hay sorpresas, no hay binding mágico que no entiendan. Ustedes controlan exactamente cuándo y cómo el estado se actualiza.
+________________________________________
+Diapositiva 9: FormControl y FormGroup (4 minutos)
+Profundicemos en los bloques fundamentales de construcción de Reactive Forms.
+FormControl es sorprendentemente poderoso para algo tan simple. Cuando crean new FormControl('Juan'), no solo están guardando un string. Están creando un objeto rico que trackea valor, validaciones, estado, y emite eventos cuando cambia.
+El método .value les da el valor actual. Simple, directo. Pero también tienen .valid, .invalid, .pristine, .dirty, .touched, .untouched. Cada property cuenta una parte de la historia del campo.
+.setValue() es actualización directa. Reemplaza el valor completamente. Pero también tienen .patchValue() para actualizaciones parciales, .reset() para volver al estado inicial, .disable() y .enable() para control de interacción.
+FormGroup eleva esto al siguiente nivel. Cuando crean un FormGroup con múltiples FormControls, están creando una jerarquía. Es como un organigrama: el FormGroup es el departamento, los FormControls son los empleados. Pueden gestionar a nivel individual o departamental.
+La belleza está en la composición. Pueden tener FormGroups dentro de FormGroups. Un formulario de empleado puede tener un FormGroup para datos personales, otro para dirección, otro para información laboral. Cada uno con sus propias validaciones y lógica.
+El acceso a controles es flexible. userForm.get('name') obtiene el FormControl por path. Pueden incluso hacer userForm.get('address.street') para navegación profunda. Es como acceder a propiedades de objetos JavaScript, familiar y poderoso.
+Los FormGroups también emiten eventos. .valueChanges es un Observable que emite cada vez que cualquier control cambia. .statusChanges emite cuando el estado de validación cambia. Pueden reaccionar a estos cambios, implementar autoguardado, validación en tiempo real, lo que imaginen.
+________________________________________
+Diapositiva 10: FormBuilder Service (3 minutos)
+FormBuilder es su mejor amigo para construir formularios complejos sin el boilerplate.
+Sin FormBuilder, el código es verboso. Cada FormControl necesita new FormControl(), cada FormGroup necesita new FormGroup(). Es como escribir HTML sin emmet: funciona, pero es tedioso.
+Con FormBuilder, el código es poesía. this.fb.group({}) es más limpio que new FormGroup({}). Pero la verdadera magia está en la sintaxis de array para controles con validaciones.
+Cuando escriben name: ['Juan', Validators.required], FormBuilder entiende que el primer elemento es el valor inicial, el segundo son las validaciones síncronas. Pueden incluso agregar un tercer elemento para validaciones asíncronas: ['', Validators.required, this.checkUsername.bind(this)].
+FormBuilder también simplifica grupos anidados. En lugar de crear FormGroups separados y anidarlos manualmente, simplemente anidan las llamadas a .group(). Es composición natural, como escribir JSON.
+La ventaja no es solo menos código; es código más mantenible. Cuando miran un formulario construido con FormBuilder, inmediatamente ven la estructura. Es autodocumentado. Un nuevo desarrollador puede entender el formulario en segundos, no minutos.
+FormBuilder también tiene .array() para FormArrays y .control() para FormControls individuales. Es una API consistente para todas las necesidades de construcción de formularios.
+El patrón de inyectar FormBuilder en el constructor es estándar. constructor(private fb: FormBuilder) {} y están listos. No necesitan importar FormControl, FormGroup, FormArray en cada componente. FormBuilder los abstrae todos.
+________________________________________
+Diapositiva 11: Validaciones Built-in (4 minutos)
+Angular viene con un arsenal de validadores listos para usar. Conozcámoslos íntimamente.
+Validators.required es el más básico pero más usado. Es el "este campo es obligatorio" universal. Pero no subestimen su importancia: campos requeridos mal manejados son la primera fuente de frustración de usuarios.
+Validators.email es validación de formato de email. No verifica si el email existe, solo si tiene formato válido. Es como verificar que un número de teléfono tenga el formato correcto, no que el número exista.
+Validators.minLength y maxLength son para strings. minLength(3) requiere al menos 3 caracteres. Perfecto para usernames, passwords, descripciones. No confundan con min/max que son para números.
+Validators.pattern es su navaja suiza. Acepta expresiones regulares para validación personalizada. pattern('[0-9]{8}') valida exactamente 8 dígitos, perfecto para DNI peruano. pattern('^[A-Z]{2}[0-9]{4}$') podría validar códigos de proyecto.
+Validators.min y max son para valores numéricos. min(18) para edad mínima, max(100) para porcentajes. Útiles en formularios financieros, configuración de parámetros, rangos de fechas convertidas a números.
+La composición de validadores es poderosa. [Validators.required, Validators.email] requiere un campo y que sea email válido. Angular ejecuta todos los validadores y acumula los errores. Si cualquiera falla, el campo es inválido.
+El orden importa para UX. Pongan Validators.required primero para que sea el primer error que vean los usuarios. No tiene sentido decirles que el formato de email es incorrecto si el campo está vacío.
+Estos validadores cubren 80% de los casos. Para el 20% restante, necesitarán validadores personalizados, que veremos pronto.
+________________________________________
+Diapositiva 12: Estados y Errores (4 minutos)
+El manejo inteligente de estados y errores transforma un formulario funcional en uno profesional.
+Los estados booleanos son su sistema de información. Valid/invalid es obvio, pero pristine/dirty es sutil y poderoso. Pristine significa que el usuario no ha modificado el valor inicial. Útil para prevenir mensajes de "cambios no guardados" cuando nada cambió.
+Touched/untouched indica interacción física. Un campo se vuelve touched cuando pierde el foco (blur event). Esto es crucial para UX: no muestren errores en campos que el usuario aún no ha visitado. Es como no corregir a alguien mientras está hablando.
+Enabled/disabled controla interactividad. Pueden deshabilitar campos basados en lógica de negocio. Por ejemplo, deshabilitar el campo de descuento si el usuario no es premium. .disable() y .enable() lo controlan programáticamente.
+El objeto errors es donde vive la inteligencia de validación. Cuando un validador falla, agrega una propiedad al objeto errors. control.errors['required'] es true si falta el campo. control.errors['minlength'] contiene información adicional como la longitud actual y la requerida.
+El patrón de chequeo es importante. Siempre verifiquen primero si errors existe: if (control.errors). Luego accedan a errores específicos. Esto previene errores de "cannot read property of null".
+Los errores personalizados siguen el mismo patrón. Si su validador retorna {invalidDni: true}, pueden checkearlo con control.errors['invalidDni']. Consistencia en el manejo de errores hace el código predecible.
+La priorización de errores mejora UX. Si un campo tiene múltiples errores, muestren el más importante primero. Required antes que formato, formato antes que lógica de negocio. Guíen al usuario paso a paso, no lo abrumen con todos los errores de una vez.
+________________________________________
+Diapositiva 13: Reactive Form Completo (5 minutos)
+Construyamos un formulario completo que demuestre el poder de Reactive Forms en acción.
+El userForm que creamos es un ejemplo del mundo real. Cada campo tiene validaciones apropiadas que trabajan juntas para asegurar datos de calidad.
+El campo name requiere mínimo 3 caracteres. Esto previene nombres de una letra o iniciales cuando necesitan nombres completos. La combinación de required y minLength asegura datos significativos.
+El campo email usa validación doble: requerido y formato válido. Noten cómo usamos arrays para múltiples validadores. Angular los ejecuta en orden y acumula errores.
+El campo age demuestra validadores numéricos. Min(18) asegura mayoría de edad, max(100) previene edades irreales. El valor inicial null es intencional: muestra placeholder sin pre-llenar con 0.
+El getter get name() es un patrón crucial. En lugar de escribir userForm.get('name') en todo el template, crean un getter limpio. Es como crear un atajo que hace el template más legible.
+En el template, [formGroup]="userForm" conecta el formulario HTML con el FormGroup TypeScript. Es el puente entre modelo y vista. Sin esto, nada funciona.
+formControlName="name" conecta cada input con su FormControl. Noten que no usan corchetes []. formControlName espera un string literal, no una expresión.
+La validación condicional *ngIf="name?.invalid && name?.touched" es UX profesional. Solo muestran errores después de que el usuario interactuó con el campo. El operador ?. previene errores si name es null.
+Este patrón escala hermosamente. Pueden agregar campos, validaciones complejas, lógica condicional. El componente permanece organizado, el template limpio, las responsabilidades claras.
+________________________________________
+Diapositiva 14: BREAK (15 minutos)
+Excelente trabajo hasta aquí. Han absorbido conceptos fundamentales que transformarán cómo construyen formularios.
+Han visto la simplicidad de Template-driven forms y el poder de Reactive forms. Ya no es un misterio cuándo usar cada uno. Tienen criterios claros basados en complejidad y requisitos.
+FormControl, FormGroup y FormBuilder ya no son abstracciones confusas. Son herramientas concretas que pueden usar mañana mismo. Saben cómo construir formularios complejos con código limpio y mantenible.
+Las validaciones básicas que dominaron cubren la mayoría de casos reales. Required, email, minLength, pattern... cada una tiene su lugar. Y saben cómo combinarlas para validación comprensiva.
+El manejo de estados y errores que aprendieron separa formularios amateur de profesionales. Sus usuarios verán mensajes útiles en el momento correcto, no un mar de rojo apenas cargan la página.
+Durante este break, reflexionen sobre los formularios en sus aplicaciones actuales. ¿Cuáles podrían beneficiarse de migrar a Reactive Forms? ¿Dónde podrían mejorar la validación y manejo de errores?
+Hidrátense bien. La segunda mitad es intensa: validaciones personalizadas que pueden verificar cualquier regla de negocio, validaciones asíncronas que consultan servicios externos, y mejores prácticas de seguridad y performance.
+También cubriremos accesibilidad, asegurando que sus formularios funcionen para todos los usuarios, sin importar sus capacidades. Es desarrollo inclusivo y es más simple de lo que piensan.
+Nos vemos en 15 minutos, a las 20:45. Regresen con energía porque vamos a llevar sus habilidades de formularios al siguiente nivel.
+________________________________________
+Diapositiva 15: Validaciones Personalizadas (4 minutos)
+Bienvenidos de vuelta. Ahora aprenderán a crear validadores que resuelven sus necesidades específicas de negocio.
+Un validador personalizado es simplemente una función que recibe un AbstractControl y retorna ValidationErrors o null. Si retorna null, el campo es válido. Si retorna un objeto, el campo es inválido y el objeto describe el error.
+La estructura es elegante en su simplicidad. La función recibe el control, examina su valor, aplica la lógica de validación, y retorna el resultado. Es como un inspector de calidad en una línea de producción: examina, decide, marca.
+El ejemplo de DNI validator es perfectamente aplicable en Perú. Un DNI válido tiene exactamente 8 dígitos. La función verifica primero si hay valor (para no validar campos vacíos), luego verifica la longitud. Simple, efectivo, reutilizable.
+Podrían expandir este validador. Verificar que sean solo números con una expresión regular. Verificar el dígito verificador si existiera. Incluso hacer una llamada a RENIEC para verificar que existe (eso sería validación asíncrona, que veremos pronto).
+El objeto de error { invalidDni: true } es importante. El key 'invalidDni' es cómo identificarán este error específico en el template. Pueden agregar más información: { invalidDni: { actualLength: dni.length, requiredLength: 8 } }.
+Estos validadores son reutilizables. Defínanlos en un archivo separado, expórtenlos, úsenlos en múltiples formularios. Es como tener una biblioteca de reglas de negocio que pueden aplicar consistentemente.
+La composición funciona igual que con validadores built-in: [Validators.required, dniValidator]. Angular ejecuta todos y acumula errores.
+________________________________________
+Diapositiva 16: Validadores con Parámetros (4 minutos)
+Los validadores parametrizables llevan la reutilización al siguiente nivel.
+El patrón Factory es brillante aquí. En lugar de una función validadora, tienen una función que retorna una función validadora. Es como tener un molde configurable que produce validadores específicos.
+El ejemplo forbiddenWords es inmediatamente útil. Imaginen un formulario de username donde quieren prohibir 'admin', 'root', 'test', 'temp'. En lugar de hardcodear estos valores, los pasan como parámetro.
+La función externa recibe la configuración (las palabras prohibidas). La función interna es el validador real que recibe el control. Este patrón de closure permite que el validador interno acceda a los parámetros externos.
+El uso de toLowerCase() es UX inteligente. No importa si el usuario escribe 'Admin', 'ADMIN', o 'admin', todos son detectados. Es validación robusta que previene bypasses accidentales.
+Retornar la palabra encontrada en el error ({ forbiddenWord: found }) permite mensajes específicos. En lugar de "Username inválido", pueden mostrar "La palabra 'admin' no está permitida en usernames".
+Este patrón es infinitamente flexible. Pueden crear validadores para rangos de fechas, validadores que comparan con listas dinámicas, validadores que aplican reglas de negocio complejas. La configuración los hace reutilizables entre proyectos.
+Un validador de rango podría ser: rangeValidator(min, max). Un validador de formato podría ser: formatValidator(regex, errorMessage). Las posibilidades son ilimitadas.
+________________________________________
+Diapositiva 17: Validaciones Asíncronas (5 minutos)
+Las validaciones asíncronas son donde sus formularios se vuelven verdaderamente inteligentes.
+Los casos de uso son comunes y críticos. Verificar si un email ya está registrado previene frustraciones en el registro. Verificar disponibilidad de username evita el ciclo de "intente otro nombre" múltiples veces. Validar códigos con APIs externas asegura datos correctos desde el inicio.
+La estructura es similar a validadores síncronos, pero retornan Observable o Promise en lugar de objeto directo. Angular se suscribe automáticamente, muestra estado de "pending" mientras valida, y actualiza cuando completa.
+El ejemplo emailAvailable es patrón de producción. Hacen petición HTTP al backend, que verifica en base de datos si existe. El map transforma la respuesta booleana en ValidationErrors o null.
+El estado pending es UX crucial. Mientras la validación asíncrona corre, el campo tiene estado 'PENDING'. Pueden mostrar un spinner, un mensaje "Verificando...", feedback visual que algo está pasando.
+El timing importa. No quieren verificar disponibilidad en cada keystroke. Usen debounceTime en el Observable, o mejor aún, validen en blur en lugar de cambio. Es balance entre feedback rápido y no sobrecargar el servidor.
+El manejo de errores es crítico. Si la petición HTTP falla, ¿qué hacen? ¿Marcan el campo como válido o inválido? Generalmente, usen catchError para retornar null (válido) y logeen el error. No castiguen al usuario por problemas de red.
+Las validaciones asíncronas son el tercer parámetro en FormControl: ['', validadoresSíncronos, validadoresAsíncronos]. Pueden tener múltiples de cada tipo.
+________________________________________
+Diapositiva 18: Cross-field Validation (4 minutos)
+La validación entre campos es donde los formularios se vuelven verdaderamente sofisticados.
+El ejemplo clásico es confirmar contraseña, pero los casos reales son infinitos. Fecha de fin debe ser después de fecha de inicio. La suma de porcentajes debe ser 100%. El monto de descuento no puede exceder el total.
+La clave es que estos validadores se aplican al FormGroup, no a FormControls individuales. Tiene sentido: están validando la relación entre campos, no campos aislados.
+El validador passwordMatch es elegantemente simple. Obtiene ambos campos del FormGroup, compara valores, retorna error si no coinciden. El error está en el grupo, no en campos individuales.
+Aplicar el validador al grupo requiere sintaxis especial: { validators: passwordMatch } como segundo parámetro de .group(). No confundan con validadores de campos individuales.
+El manejo de errores es diferente. El error está en form.errors, no en form.get('field').errors. En el template, pueden chequear userForm.errors?.['mismatch'] para mostrar mensajes.
+Un patrón útil es también setear errores en campos individuales desde el validador de grupo. Esto permite mostrar errores junto a campos específicos, no solo como error general del formulario.
+La validación condicional es poderosa aquí. Si el usuario elige "proyecto con financiamiento", pueden validar que los campos de presupuesto sumen correctamente. Si elige "proyecto sin financiamiento", esas validaciones no aplican.
+________________________________________
+Diapositiva 19: Formularios Dinámicos (5 minutos)
+FormArray es su herramienta para formularios que crecen y se adaptan según las necesidades del usuario.
+El concepto es simple pero poderoso: una lista de FormControls o FormGroups que puede crecer o reducirse dinámicamente. Es como tener un formulario elástico que se estira según lo necesiten.
+El ejemplo de teléfonos es universal. Un usuario puede tener uno, tres, diez teléfonos. No pueden predefinir cuántos campos mostrar. FormArray resuelve esto elegantemente.
+this.fb.array([]) crea un FormArray vacío. Es como una lista esperando ser llenada. Pueden inicializarlo con valores si tienen datos existentes.
+addPhone() muestra la adición dinámica. push() agrega un nuevo FormControl al array. En el template, Angular automáticamente renderiza el nuevo campo. Es reactividad en acción.
+removePhone(index) demuestra remoción precisa. removeAt() elimina el control en esa posición. Los índices se reajustan automáticamente. No hay huecos, no hay problemas de índices.
+En el template, usan *ngFor="let phone of phones.controls; let i = index". Cada iteración es un FormControl que pueden vincular con [formControl]="phone".
+Los casos de uso son infinitos. Lista de educación en un CV donde pueden agregar múltiples títulos. Items en una orden de compra. Participantes en un proyecto. Cualquier lista de datos similares.
+Pueden tener FormArrays de FormGroups para estructuras complejas. Imaginen una lista de direcciones donde cada dirección tiene calle, ciudad, código postal. Cada elemento del array es un FormGroup completo.
+La validación funciona normal. Pueden validar elementos individuales o el array completo. Por ejemplo, requerir al menos un teléfono, máximo cinco, cada uno con formato válido.
+________________________________________
+Diapositiva 20: Seguridad en Angular (4 minutos)
+La seguridad no es opcional. Cada formulario es una puerta potencial para atacantes.
+XSS (Cross-Site Scripting) es cuando código malicioso se ejecuta en el navegador del usuario. Un atacante inyecta JavaScript en un campo, se guarda en la base de datos, y cuando otro usuario lo ve, el script se ejecuta robando cookies, tokens, datos sensibles.
+Angular sanitiza automáticamente, pero no sean complacientes. Eviten innerHTML directo, especialmente con contenido de usuarios. Si necesitan HTML dinámico, usen DomSanitizer, pero entiendan los riesgos. Es como manejar químicos peligrosos: con el equipo adecuado y mucho cuidado.
+CSRF (Cross-Site Request Forgery) es cuando un sitio malicioso hace requests a su aplicación usando las credenciales del usuario. Como si alguien firmara documentos en su nombre sin su conocimiento.
+Implementen tokens CSRF. Cada formulario incluye un token único que el servidor valida. Sin el token correcto, el request es rechazado. Es como un sello de autenticidad en documentos importantes.
+Los Injection Attacks no son solo SQL. Pueden ser NoSQL, LDAP, comandos de sistema. La regla es simple: nunca confíen en input de usuarios. Siempre saniticen, siempre validen, siempre usen consultas parametrizadas.
+La validación en el cliente no es seguridad. Es UX. Un atacante puede bypasser su validación de JavaScript en segundos. Siempre validen en el servidor. El cliente valida por conveniencia, el servidor valida por seguridad.
+El principio de menor privilegio aplica. Si un formulario solo necesita crear registros, no le den permisos de eliminar. Si un usuario solo puede editar sus propios datos, verifiquen ownership en el servidor.
+________________________________________
+Diapositiva 21: Performance - OnPush (4 minutos)
+OnPush Change Detection es como pasar de revisar todo constantemente a revisar solo cuando hay notificaciones.
+La estrategia Default de Angular es segura pero costosa. En cada ciclo de detección, Angular revisa TODOS los componentes para ver si algo cambió. Es como un guardia de seguridad que revisa cada oficina cada minuto, incluso las vacías.
+OnPush es inteligencia aplicada. El componente solo se revisa si: un @Input cambia referencia, un evento se dispara en el componente o sus hijos, o un Observable emite y el componente está suscrito con async pipe.
+Para formularios, OnPush es especialmente poderoso. Los formularios tienden a ser islas de interactividad. Cuando el usuario escribe en un campo, solo ese formulario necesita actualizarse, no toda la aplicación.
+Implementarlo es trivial: changeDetection: ChangeDetectionStrategy.OnPush en el decorador. Pero las implicaciones son profundas. Deben pensar en inmutabilidad, en referencias, en cómo fluyen los datos.
+Con Reactive Forms y OnPush, tienen lo mejor de ambos mundos. Los FormControls emiten cambios, OnPush los detecta, solo ese componente se actualiza. Es eficiencia quirúrgica.
+En aplicaciones grandes, la diferencia es dramática. De cientos de chequeos por segundo a decenas. De lag perceptible a fluidez instantánea. Es la diferencia entre una aplicación del 2015 y una del 2025.
+El truco está en la inmutabilidad. Siempre creen nuevos objetos/arrays en lugar de mutar existentes. [...array, newItem] en lugar de array.push(newItem). OnPush detecta el cambio de referencia y actualiza.
+________________________________________
+Diapositiva 22: Lazy Loading (3 minutos)
+Lazy Loading es como un buffet donde solo traen los platos cuando los piden, no todos de una vez.
+Sin Lazy Loading, toda su aplicación se carga al inicio. Cada módulo, cada componente, cada byte de JavaScript. Es como descargar una enciclopedia completa para leer un artículo. El usuario espera, el navegador sufre, la experiencia es pobre.
+Con Lazy Loading, solo cargan lo necesario inicialmente. El módulo de administración se carga cuando navegan a /admin. El módulo de reportes cuando van a /reports. Es eficiencia bajo demanda.
+La implementación es sorprendentemente simple. En lugar de importar el módulo directamente, usan una función que retorna una promesa del módulo. Angular se encarga del resto: carga, caché, integración.
+El impacto es inmediato y medible. Una aplicación de 5MB puede tener un bundle inicial de 1.5MB con Lazy Loading. Es 70% menos tiempo de carga inicial. En conexiones móviles, es la diferencia entre usuarios que esperan y usuarios que abandonan.
+Para formularios, Lazy Loading es especialmente útil. Formularios complejos con validadores personalizados, componentes especializados, pueden estar en módulos separados. El formulario de registro empresarial de 50 campos no necesita cargarse para usuarios que solo hacen login.
+La estrategia de preloading añade inteligencia. Pueden precargar módulos en background después de que la aplicación inicial carga. El usuario no espera, pero cuando navega, todo está listo instantáneamente.
+________________________________________
+Diapositiva 23: Accesibilidad (a11y) (4 minutos)
+La accesibilidad no es caridad; es profesionalismo. Sus formularios deben funcionar para todos.
+Labels y ARIA son fundamentales. Cada input necesita un label asociado. No solo placeholder, un label real. Screen readers dependen de esto para describir campos a usuarios con discapacidad visual.
+aria-label es para cuando no pueden tener un label visible. aria-describedby conecta campos con texto de ayuda o errores. aria-invalid indica estado de validación. Es metadata que hace sus formularios hablables.
+La navegación por teclado debe ser impecable. Tab debe moverse lógicamente entre campos. Enter debe submitir formularios. Escape debe cancelar modales. No todos usan mouse; muchos navegan exclusivamente con teclado.
+Los screen readers necesitan información clara. Mensajes de error deben ser descriptivos: "El DNI debe contener 8 dígitos" no "Campo inválido". Usen role="alert" para mensajes importantes que deben ser anunciados inmediatamente.
+El contraste es crítico. Texto gris claro en fondo blanco puede verse moderno, pero es ilegible para usuarios con baja visión. WCAG requiere ratio de 4.5:1 para texto normal, 3:1 para texto grande. Herramientas como Chrome DevTools pueden verificar esto.
+Los targets de click de 44x44px no son capricho. Usuarios con problemas motores necesitan áreas más grandes. Ese checkbox tiny puede ser imposible de clickear para alguien con artritis o Parkinson.
+La accesibilidad beneficia a todos. Formularios accesibles son más usables para usuarios en móviles, usuarios en ambientes ruidosos, usuarios cansados. Es diseño universal que mejora la experiencia para todos.
+________________________________________
+Diapositiva 24: Testing Básico (3 minutos)
+Las pruebas son su red de seguridad. Código sin tests es como construcción sin planos: funciona hasta que no.
+El patrón AAA (Arrange-Act-Assert) es su mantra. Arrange prepara el escenario: crean el componente, configuran datos iniciales. Act ejecuta la acción: llaman el método, disparan el evento. Assert verifica el resultado: comprueban que el estado es el esperado.
+El ejemplo muestra testing básico pero esencial. Verifican que el formulario se crea con valores iniciales correctos. No es test complejo, pero detecta regresiones básicas.
+Para formularios, testen la creación inicial, que validadores funcionan correctamente, que submit se deshabilita cuando es inválido, que errores se muestran en condiciones correctas.
+No necesitan 100% coverage. Testen lo crítico: validación de datos sensibles, lógica de negocio compleja, integraciones con servicios. Es mejor pocos tests bien escritos que muchos tests frágiles.
+Los tests son documentación ejecutable. Un nuevo desarrollador puede leer los tests y entender qué debe hacer el código. Es conocimiento que no se desactualiza.
+La confianza que dan los tests es invaluable. Pueden refactorizar sabiendo que si algo se rompe, los tests lo detectarán. Pueden agregar features sin miedo a romper existentes. Es libertad a través de la disciplina.
+________________________________________
+Diapositiva 25: Cierre y Q&A (5 minutos)
+Felicitaciones. Han completado un viaje intensivo por el mundo profesional de formularios y mejores prácticas en Angular.
+Hoy dominaron ambos paradigmas de formularios. Template-driven ya no es "el simple", es el apropiado para casos específicos. Reactive Forms no es "el complejo", es el poderoso para necesidades avanzadas. Tienen criterio para elegir.
+Las validaciones que implementaron van desde básicas hasta asíncronas complejas. Pueden validar DNIs, verificar disponibilidad en tiempo real, asegurar consistencia entre campos. Sus formularios ahora piensan.
+La seguridad que aplicaron protege a sus usuarios y su reputación. XSS y CSRF no son solo acrónimos; son amenazas reales que ahora saben prevenir. Cada formulario que construyan será una fortaleza.
+La performance con OnPush y Lazy Loading transforma aplicaciones lentas en experiencias fluidas. No es optimización prematura; es arquitectura inteligente desde el inicio.
+La accesibilidad que implementaron abre sus aplicaciones a millones de usuarios adicionales. No es cumplimiento legal; es desarrollo ético y profesional.
+Los tests básicos que escribieron son el inicio de una práctica que definirá su carrera. Desarrolladores que testean duermen tranquilos y entregan confiablemente.
+La próxima sesión, el lunes 25 de agosto, exploraremos Angular Material UI. Con los formularios sólidos de hoy, agregar una interfaz hermosa será la cereza del pastel. Componentes profesionales, temas personalizados, experiencias que deleitan.
+Practiquen lo aprendido. Tomen un formulario existente y míguenlo a Reactive Forms. Agreguen validaciones personalizadas. Implementen OnPush. Cada mejora es aprendizaje consolidado.
+¡Excelente trabajo! Han elevado sus habilidades al nivel que la industria demanda. Nos vemos el lunes a las 19:00 para continuar construyendo excelencia.
+¡Hasta la próxima sesión! 🚀
+
