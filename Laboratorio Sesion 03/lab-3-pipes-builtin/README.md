@@ -1,200 +1,312 @@
 # 📋 LAB 3: PIPES BUILT-IN Y ASYNC
 
-**PROVIAS DESCENTRALIZADO - Angular v18**
-
-*Duración: 40 minutos*  
-*Objetivo: Dominar pipes nativos de Angular y programación reactiva con async pipe*
+**PROVIAS DESCENTRALIZADO - Angular v18**  
+**Curso: Desarrollo de Aplicaciones Web con Angular**  
+**Instructor: Ing. Jhonny Alexander Ramirez Chiroque**  
 
 ---
 
-## 📚 CONCEPTOS TEÓRICOS
+## 🎯 **¿QUÉ VAS A APRENDER EN ESTE LAB?**
 
-### ¿Qué son los Pipes?
+En este laboratorio vas a construir un **Sistema de Gestión de Tareas** para PROVIAS que maneja información en tiempo real. Dominarás los **pipes built-in de Angular** y aprenderás **programación reactiva** con RxJS y el poderoso **async pipe**.
 
-Los **Pipes** son como los filtros de Instagram pero para datos. Toman información cruda y la convierten en algo hermoso y comprensible. Son **transformadores de datos** que hacen que la información sea más presentable y útil para los usuarios.
+**Al final de este lab podrás:**
+- ✅ Transformar textos con **pipes de texto** (uppercase, titlecase, slice)
+- ✅ Formatear números y monedas con **pipes numéricos** (number, percent, currency)
+- ✅ Mostrar fechas profesionalmente con **pipes de fecha** (date con localización)
+- ✅ Manejar datos asíncronos con **async pipe** (sin memory leaks)
+- ✅ Crear **filtrado reactivo** con BehaviorSubject y Observables
+- ✅ Implementar **búsqueda en tiempo real** con debounce
 
-La sintaxis es elegante: simplemente agregan una barra vertical `|` y el nombre del pipe después de cualquier expresión.
+---
 
-### 🔤 **Pipes de Texto**
+## 🏗️ **¿QUÉ VAS A CONSTRUIR?**
 
-#### UpperCasePipe y LowerCasePipe
+### **Sistema de Gestión de Tareas PROVIAS**
+Imagina que PROVIAS necesita coordinar cientos de tareas simultáneas: construcción de carreteras, mantenimiento de puentes, supervisión de obras, auditorías de presupuesto. Vas a crear:
+
+📋 **Gestor de Tareas Completo**
+- 8 tareas reales de PROVIAS con información detallada
+- Estados: pendiente, en progreso, completada, vencida
+- Prioridades: baja, media, alta, crítica, urgente
+- Tipos: construcción, mantenimiento, supervisión, presupuesto
+
+🔍 **Filtrado Reactivo Avanzado**
+- Búsqueda que filtra mientras escribes (sin lag)
+- Filtros por tipo, prioridad, estado y región
+- Ordenamiento por múltiples campos
+- Vistas: lista, grid y kanban
+
+📊 **Estadísticas en Tiempo Real**
+- Contadores que se actualizan automáticamente
+- Distribución por estado, prioridad y región
+- Cálculos de presupuesto y utilización
+- Todo usando async pipe (sin memory leaks)
+
+---
+
+## 🔧 **PIPES BUILT-IN EXPLICADOS CON EJEMPLOS**
+
+### **🔤 PIPES DE TEXTO - "Transformadores de Palabras"**
+
+#### **UpperCase Pipe**
 ```html
-<!-- Convertir a mayúsculas -->
-{{ 'proyecto carretera norte' | uppercase }}
-<!-- Resultado: PROYECTO CARRETERA NORTE -->
+<!-- En el template -->
+{{ 'gestión de tareas provias' | uppercase }}
 
-<!-- Convertir a minúsculas -->
-{{ 'PRESUPUESTO ANUAL' | lowercase }}
-<!-- Resultado: presupuesto anual -->
+<!-- Resultado -->
+GESTIÓN DE TAREAS PROVIAS
+```
+**Uso en PROVIAS:** Títulos importantes, códigos de proyecto, alertas críticas.
+
+#### **TitleCase Pipe**
+```html
+<!-- En el template -->
+{{ 'construcción carretera longitudinal norte' | titlecase }}
+
+<!-- Resultado -->
+Construcción Carretera Longitudinal Norte
+```
+**Uso en PROVIAS:** Nombres de proyectos, títulos de reportes, nombres de responsables.
+
+#### **Slice Pipe**
+```html
+<!-- En el template -->
+{{ 'Descripción muy larga del proyecto que necesita ser truncada...' | slice:0:50 }}
+
+<!-- Resultado -->
+Descripción muy larga del proyecto que necesita ser
+```
+**Uso en PROVIAS:** Resúmenes en tarjetas, previews de documentos, listados compactos.
+
+### **🔢 PIPES NUMÉRICOS - "Formateadores de Números"**
+
+#### **Number Pipe**
+```html
+<!-- En el template -->
+{{ 1234567.89 | number:'1.0-0' }}
+
+<!-- Resultado -->
+1,234,568
+```
+**Uso en PROVIAS:** Presupuestos, cantidades de materiales, códigos numéricos.
+
+#### **Percent Pipe**
+```html
+<!-- En el template -->
+{{ 0.685 | percent:'1.1-1' }}
+
+<!-- Resultado -->
+68.5%
+```
+**Uso en PROVIAS:** Avance de obras, utilización de presupuesto, eficiencia de equipos.
+
+#### **Currency Pipe**
+```html
+<!-- En el template -->
+{{ 125000000 | currency:'PEN':'symbol':'1.0-0' }}
+
+<!-- Resultado -->
+S/ 125,000,000
+```
+**Uso en PROVIAS:** Presupuestos, costos, valorizaciones, pagos a contratistas.
+
+### **📅 PIPES DE FECHA - "Humanizadores de Tiempo"**
+
+#### **Date Pipe Básico**
+```html
+<!-- En el template -->
+{{ task.dueDate | date:'dd/MM/yyyy' }}
+
+<!-- Resultado -->
+15/12/2025
 ```
 
-#### TitleCasePipe
+#### **Date Pipe Completo en Español**
 ```html
-<!-- Capitalizar cada palabra -->
-{{ 'gestión de infraestructura vial' | titlecase }}
-<!-- Resultado: Gestión De Infraestructura Vial -->
+<!-- En el template -->
+{{ task.createdAt | date:'fullDate':'':'es' }}
+
+<!-- Resultado -->
+martes, 21 de agosto de 2025
 ```
 
-#### SlicePipe
+#### **Date Pipe para Hora**
 ```html
-<!-- Tomar substring o subarray -->
-{{ 'Descripción muy larga del proyecto...' | slice:0:50 }}
-{{ tareas | slice:0:10 }}  <!-- Primeras 10 tareas -->
+<!-- En el template -->
+{{ task.lastUpdate | date:'HH:mm:ss' }}
+
+<!-- Resultado -->
+14:35:22
 ```
+**Uso en PROVIAS:** Fechas de inicio/fin de proyectos, reportes, cronogramas, bitácoras.
 
-### 🔢 **Pipes Numéricos**
+### **🚀 ASYNC PIPE - "El Pipe Mágico"**
 
-#### DecimalPipe (number)
-```html
-<!-- Formatear números con precisión -->
-{{ 3.14159 | number:'1.2-2' }}
-<!-- Resultado: 3.14 -->
+**¿Por qué es mágico?** Porque maneja automáticamente las suscripciones y evita memory leaks.
 
-<!-- 1.2-2 significa: mínimo 1 entero, mínimo 2 decimales, máximo 2 decimales -->
-{{ presupuesto | number:'1.0-0' }}
-<!-- Sin decimales para presupuestos -->
-```
-
-#### PercentPipe
-```html
-<!-- Convertir decimales a porcentajes -->
-{{ 0.259 | percent }}
-<!-- Resultado: 26% -->
-
-{{ progreso | percent:'2.2-2' }}
-<!-- Resultado: 25.90% (con precisión) -->
-```
-
-#### CurrencyPipe
-```html
-<!-- Formatear moneda -->
-{{ 1234.5 | currency }}
-<!-- Resultado: $1,234.50 (USD por defecto) -->
-
-{{ presupuesto | currency:'PEN':'symbol':'1.0-0' }}
-<!-- Resultado: S/ 1,235 (Soles peruanos sin decimales) -->
-
-{{ costo | currency:'PEN':'symbol-narrow':'1.2-2' }}
-<!-- Resultado: S/ 1,234.50 -->
-```
-
-### 📅 **Pipes de Fecha**
-
-```html
-<!-- Formato básico -->
-{{ fechaCreacion | date }}
-<!-- Resultado: Mar 5, 2025 -->
-
-<!-- Formato personalizado -->
-{{ fechaVencimiento | date:'dd/MM/yyyy' }}
-<!-- Resultado: 05/08/2025 -->
-
-<!-- Formato completo -->
-{{ fechaReunion | date:'fullDate' }}
-<!-- Resultado: martes, 5 de agosto de 2025 -->
-
-<!-- Fecha y hora -->
-{{ timestamp | date:'dd/MM/yy HH:mm:ss' }}
-<!-- Resultado: 05/08/25 19:30:00 -->
-
-<!-- Con localización -->
-{{ fecha | date:'full':'':'es' }}
-<!-- En español -->
-```
-
-### 🔧 **Pipes Útiles**
-
-#### JsonPipe
-```html
-<!-- Para debugging - mostrar objetos -->
-<pre>{{ objetoComplejo | json }}</pre>
-```
-
-#### KeyValuePipe
-```html
-<!-- Para iterar sobre objetos -->
-<div *ngFor="let item of objeto | keyvalue">
-  {{ item.key }}: {{ item.value }}
-</div>
-```
-
-### 🚀 **Async Pipe - La Joya de la Corona**
-
-El **async pipe** es probablemente el pipe más poderoso de Angular. Maneja automáticamente la suscripción y desuscripción de Observables y Promises.
-
-#### ¿Por qué es tan importante?
-
-**Sin async pipe** (❌ Malo):
+#### **Sin Async Pipe (❌ Problemático)**
 ```typescript
-// Componente
-ngOnInit() {
-  this.dataService.getTasks().subscribe(tasks => {
-    this.tasks = tasks;
-  });
+// En el componente - MALO
+export class TaskComponent implements OnInit, OnDestroy {
+  tasks: Task[] = [];
+  private subscription: Subscription;
+
+  ngOnInit() {
+    this.subscription = this.taskService.getTasks().subscribe(tasks => {
+      this.tasks = tasks;  // Asignación manual
+    });
+  }
+
+  ngOnDestroy() {
+    this.subscription.unsubscribe();  // ¡Fácil de olvidar!
+  }
+}
+```
+
+#### **Con Async Pipe (✅ Perfecto)**
+```typescript
+// En el componente - BUENO
+export class TaskComponent {
+  tasks$ = this.taskService.getTasks();  // Observable directo
+  // ¡No necesitas ngOnDestroy!
+}
+```
+
+```html
+<!-- En el template -->
+@if (tasks$ | async; as tasks) {
+  <div class="tasks-list">
+    @for (task of tasks; track task.id) {
+      <div class="task-item">{{ task.title }}</div>
+    }
+  </div>
+}
+```
+
+**Resultado:** Angular automáticamente:
+1. Se suscribe al Observable cuando se crea el componente
+2. Actualiza la vista cuando llegan nuevos datos
+3. Se desuscribe cuando se destruye el componente
+4. ¡Cero memory leaks!
+
+---
+
+## 🚀 **CÓMO EJECUTAR EL LABORATORIO**
+
+### **Paso 1: Preparar el Entorno**
+```bash
+# Navegar al directorio del lab
+cd lab-3-pipes-builtin
+
+# Instalar dependencias
+npm install
+
+# Levantar el servidor de desarrollo
+ng serve --port 4202
+```
+
+### **Paso 2: Abrir en el Navegador**
+- Abre tu navegador en: http://localhost:4202
+- Verás la página de inicio con demos de pipes en vivo
+- Haz click en "📋 Tareas" para acceder al gestor completo
+
+### **Paso 3: Explorar las Funcionalidades**
+1. **🔍 Búsqueda reactiva:** Escribe "carretera" y ve el filtrado instantáneo
+2. **🎛️ Filtros avanzados:** Cambia tipo, prioridad, estado y región
+3. **📊 Estadísticas:** Observa cómo se actualizan automáticamente
+4. **👁️ Vistas múltiples:** Alterna entre lista, grid y kanban
+5. **📈 Progreso:** Usa los sliders para cambiar el progreso de tareas
+
+---
+
+## 📚 **CONCEPTOS EN ACCIÓN - EJEMPLOS REALES**
+
+### **Pipes de Texto Transformando Datos**
+```html
+<!-- Título dinámico -->
+<h1>{{ 'gestión de tareas provias' | titlecase }}</h1>
+<!-- Resultado: "Gestión De Tareas Provias" -->
+
+<!-- Descripción truncada -->
+<p>{{ task.description | slice:0:100 }}...</p>
+<!-- Resultado: Solo los primeros 100 caracteres -->
+```
+
+### **Pipes Numéricos en Presupuestos**
+```html
+<!-- Presupuesto en soles peruanos -->
+<span>{{ task.budget | currency:'PEN':'symbol':'1.0-0' }}</span>
+<!-- Resultado: "S/ 125,000,000" -->
+
+<!-- Progreso como porcentaje -->
+<span>{{ task.progress | percent:'1.1-1' }}</span>
+<!-- Resultado: "68.5%" -->
+```
+
+### **Pipes de Fecha en Cronogramas**
+```html
+<!-- Fecha de creación en español -->
+<span>{{ task.createdAt | date:'fullDate':'':'es' }}</span>
+<!-- Resultado: "martes, 15 de marzo de 2024" -->
+
+<!-- Fecha de vencimiento -->
+<span>{{ task.dueDate | date:'dd/MM/yyyy HH:mm' }}</span>
+<!-- Resultado: "30/11/2025 18:00" -->
+```
+
+### **Async Pipe Manejando Estados**
+```html
+<!-- Lista reactiva con estados de carga -->
+@if (loading$ | async) {
+  <div class="loading">Cargando tareas...</div>
 }
 
-ngOnDestroy() {
-  // Olvidamos desuscribirnos = Memory Leak!
+@if (filteredTasks$ | async; as tasks) {
+  <div class="tasks-count">{{ tasks.length }} tareas encontradas</div>
+  @for (task of tasks; track task.id) {
+    <div class="task-item">{{ task.title }}</div>
+  }
+} @empty {
+  <div class="empty-state">No hay tareas disponibles</div>
 }
 ```
 
-**Con async pipe** (✅ Bueno):
-```html
-<!-- Template -->
-<div *ngFor="let task of tasks$ | async">
-  {{ task.title }}
-</div>
-```
+---
 
-#### Características del Async Pipe:
+## 🔄 **PROGRAMACIÓN REACTIVA EXPLICADA**
 
-1. **Suscripción automática**: Se suscribe al Observable cuando se inicializa
-2. **Desuscripción automática**: Se desuscribe cuando el componente se destruye
-3. **Detección de cambios**: Marca el componente para verificación cuando llegan nuevos datos
-4. **Manejo de estados**: Muestra datos cuando están disponibles
+### **¿Qué es un Observable?**
+Un Observable es como una **manguera de datos** que puede enviar información en cualquier momento:
 
-#### Patrones Avanzados con Async Pipe:
-
-##### 1. **Patrón "as"**
-```html
-<div *ngIf="user$ | async as user">
-  <h2>{{ user.name }}</h2>
-  <p>{{ user.email }}</p>
-  <!-- user está disponible en todo el bloque -->
-</div>
-```
-
-##### 2. **Con Loading States**
-```html
-<div *ngIf="loading$ | async">Cargando...</div>
-<div *ngIf="tasks$ | async as tasks">
-  <div *ngFor="let task of tasks">...</div>
-</div>
-<div *ngIf="error$ | async">Error al cargar</div>
-```
-
-##### 3. **Combinando múltiples Observables**
-```html
-<div *ngIf="{ 
-  tasks: tasks$ | async, 
-  stats: stats$ | async 
-} as data">
-  <p>{{ data.stats.total }} tareas</p>
-  <div *ngFor="let task of data.tasks">...</div>
-</div>
-```
-
-### 🔄 **Programación Reactiva con RxJS**
-
-#### BehaviorSubject para Estado
 ```typescript
+// Crear un Observable de tareas
 private tasksSubject = new BehaviorSubject<Task[]>([]);
 public tasks$ = this.tasksSubject.asObservable();
 
-// Filtrado reactivo
+// Enviar nuevos datos
+this.tasksSubject.next(newTasks);  // ¡Todos los suscriptores se actualizan!
+```
+
+### **¿Qué es BehaviorSubject?**
+Es como un Observable que **recuerda el último valor**:
+
+```typescript
+// BehaviorSubject siempre tiene un valor inicial
+private searchSubject = new BehaviorSubject<string>('');
+
+// Cualquier nuevo suscriptor recibe inmediatamente el último valor
+this.searchSubject.subscribe(term => {
+  console.log('Término actual:', term);  // Recibe '' inmediatamente
+});
+```
+
+### **Filtrado Reactivo en Acción**
+```typescript
+// Combinar búsqueda + lista de tareas
 public filteredTasks$ = combineLatest([
-  this.tasks$,
-  this.searchTerm$
+  this.tasks$,        // Lista de tareas
+  this.searchTerm$    // Término de búsqueda
 ]).pipe(
   map(([tasks, searchTerm]) => 
     tasks.filter(task => 
@@ -204,207 +316,456 @@ public filteredTasks$ = combineLatest([
 );
 ```
 
-#### Operadores Útiles
+**Resultado:** Cada vez que cambias el término de búsqueda O se agregan nuevas tareas, la lista filtrada se actualiza automáticamente.
+
+---
+
+## 🎛️ **FUNCIONALIDADES IMPLEMENTADAS**
+
+### **🔍 Búsqueda Inteligente con Debounce**
 ```typescript
-// debounceTime - esperar antes de procesar
-this.searchControl.valueChanges.pipe(
+// Búsqueda que espera 300ms antes de filtrar
+this.searchTerm$.pipe(
+  debounceTime(300),           // Espera 300ms
+  distinctUntilChanged(),      // Solo si cambió el valor
+  takeUntil(this.destroy$)     // Se limpia automáticamente
+).subscribe(searchTerm => {
+  this.taskService.updateSearch(searchTerm);
+});
+```
+**Beneficio:** No hace búsqueda en cada tecla, solo cuando paras de escribir.
+
+### **📊 Estadísticas Automáticas**
+```typescript
+// Estadísticas que se calculan automáticamente
+public statistics$: Observable<TaskStatistics> = this.filteredTasks$.pipe(
+  map(tasks => this.calculateStatistics(tasks)),
+  shareReplay(1)  // Cache el último cálculo
+);
+```
+**Beneficio:** Cada vez que cambian las tareas, las estadísticas se recalculan automáticamente.
+
+### **🎯 Estados de Carga Profesionales**
+```html
+<!-- Manejo elegante de estados asincrónicos -->
+@if (loading$ | async) {
+  <div class="loading-container">
+    <div class="loading-spinner"></div>
+    <span>Cargando tareas...</span>
+  </div>
+}
+
+@if (error$ | async; as error) {
+  <div class="error-container">
+    <h3>Error al cargar tareas</h3>
+    <p>{{ error }}</p>
+    <button (click)="refreshTasks()">🔄 Reintentar</button>
+  </div>
+}
+```
+
+---
+
+## 🚀 **CÓMO EJECUTAR EL LABORATORIO**
+
+### **Paso 1: Preparar el Entorno**
+```bash
+# Navegar al directorio del lab
+cd lab-3-pipes-builtin
+
+# Instalar dependencias
+npm install
+
+# Levantar el servidor de desarrollo
+ng serve --port 4202
+```
+
+### **Paso 2: Abrir en el Navegador**
+- Abre tu navegador en: http://localhost:4202
+- Verás demos en vivo de todos los pipes
+- Haz click en "📋 Tareas" para el gestor completo
+
+### **Paso 3: Experimentar con Pipes y Reactividad**
+1. **🔤 Pipes de texto:** Ve cómo se transforman títulos y descripciones
+2. **💰 Pipes de moneda:** Observa presupuestos en soles peruanos
+3. **📅 Pipes de fecha:** Fechas en español con diferentes formatos
+4. **🔍 Búsqueda reactiva:** Escribe y ve filtrado instantáneo
+5. **📊 Estadísticas:** Cambia filtros y ve estadísticas actualizándose
+
+---
+
+## 📚 **PIPES EN ACCIÓN - CASOS REALES DE PROVIAS**
+
+### **🏗️ Gestión de Proyectos**
+```html
+<!-- Título del proyecto formateado -->
+<h2>{{ 'carretera longitudinal norte' | titlecase }}</h2>
+<!-- Resultado: "Carretera Longitudinal Norte" -->
+
+<!-- Presupuesto en soles -->
+<span>{{ 125000000 | currency:'PEN':'symbol':'1.0-0' }}</span>
+<!-- Resultado: "S/ 125,000,000" -->
+
+<!-- Progreso del proyecto -->
+<span>{{ 0.685 | percent:'1.1-1' }}</span>
+<!-- Resultado: "68.5%" -->
+```
+
+### **⏰ Cronogramas y Fechas**
+```html
+<!-- Fecha de inicio en formato peruano -->
+<span>{{ project.startDate | date:'dd/MM/yyyy' }}</span>
+<!-- Resultado: "15/03/2024" -->
+
+<!-- Fecha completa en español -->
+<span>{{ project.startDate | date:'fullDate':'':'es' }}</span>
+<!-- Resultado: "viernes, 15 de marzo de 2024" -->
+
+<!-- Última actualización con hora -->
+<span>{{ project.lastUpdate | date:'dd/MM/yy HH:mm' }}</span>
+<!-- Resultado: "21/08/25 14:35" -->
+```
+
+### **📊 Reportes y Estadísticas**
+```html
+<!-- Cantidad de tareas -->
+<span>{{ totalTasks | number:'1.0-0' }} tareas activas</span>
+<!-- Resultado: "42 tareas activas" -->
+
+<!-- Eficiencia del equipo -->
+<span>Eficiencia: {{ efficiency | percent:'1.2-2' }}</span>
+<!-- Resultado: "Eficiencia: 94.25%" -->
+
+<!-- Presupuesto utilizado -->
+<span>{{ budgetUsed | currency:'PEN':'symbol':'1.2-2' }}</span>
+<!-- Resultado: "S/ 89,500,000.00" -->
+```
+
+---
+
+## 🔄 **PROGRAMACIÓN REACTIVA EN ACCIÓN**
+
+### **📡 Flujo de Datos Reactivo**
+
+```typescript
+// 1. Usuario escribe en búsqueda
+searchTerm$ = new BehaviorSubject<string>('');
+
+// 2. Se combina con lista de tareas
+filteredTasks$ = combineLatest([
+  this.tasks$,      // Lista de tareas (puede cambiar)
+  this.searchTerm$  // Término de búsqueda (puede cambiar)
+]).pipe(
+  // 3. Se filtran automáticamente
+  map(([tasks, searchTerm]) => 
+    tasks.filter(task => 
+      task.title.toLowerCase().includes(searchTerm.toLowerCase())
+    )
+  )
+);
+
+// 4. Estadísticas se calculan automáticamente
+statistics$ = this.filteredTasks$.pipe(
+  map(tasks => ({
+    total: tasks.length,
+    completed: tasks.filter(t => t.status === 'completada').length,
+    overdue: tasks.filter(t => this.isOverdue(t)).length
+  }))
+);
+```
+
+**En el template:**
+```html
+<!-- Todo se actualiza automáticamente -->
+@if (statistics$ | async; as stats) {
+  <div class="stats">
+    <span>{{ stats.total }} tareas</span>
+    <span>{{ stats.completed }} completadas</span>
+    <span>{{ stats.overdue }} vencidas</span>
+  </div>
+}
+
+@if (filteredTasks$ | async; as tasks) {
+  @for (task of tasks; track task.id) {
+    <div class="task">{{ task.title | titlecase }}</div>
+  }
+}
+```
+
+**💡 La Magia:** Cambias el término de búsqueda → Se filtran las tareas → Se recalculan las estadísticas → Se actualiza la vista. ¡Todo automático!
+
+---
+
+## 🎯 **EJERCICIOS PASO A PASO**
+
+### **Ejercicio 1: Experimentar con Pipes de Texto**
+1. Ve a la página de inicio (http://localhost:4202/home)
+2. Observa cómo el texto "gestión de infraestructura vial" se transforma
+3. En DevTools, cambia temporalmente el texto y ve los pipes en acción
+
+### **Ejercicio 2: Modificar Pipes de Fecha**
+1. Ve al gestor de tareas (http://localhost:4202/tasks)
+2. En `task-manager.component.html`, encuentra: `{{ task.dueDate | date:'dd/MM/yy HH:mm' }}`
+3. Cámbialo a: `{{ task.dueDate | date:'fullDate':'':'es' }}`
+4. Ve cómo cambia el formato de todas las fechas
+
+### **Ejercicio 3: Agregar tu Propio Pipe**
+1. En el template, encuentra un precio
+2. Agrega el pipe slice: `{{ task.budget | currency:'PEN' | slice:0:-3 }}`
+3. Ve cómo se cortan los últimos 3 caracteres del precio
+
+### **Ejercicio 4: Entender el Async Pipe**
+1. En DevTools, ve la pestaña Network
+2. Busca algo en el gestor de tareas
+3. Observa que NO se hacen requests HTTP (porque son datos mock)
+4. Ve cómo el async pipe actualiza la vista automáticamente
+
+---
+
+## 💼 **¿POR QUÉ ES IMPORTANTE PARA PROVIAS?**
+
+### **📊 Reportes Ejecutivos**
+Los directivos necesitan información clara y actualizada:
+```html
+<!-- Reporte automático -->
+<div class="executive-summary">
+  <h2>Reporte Ejecutivo - {{ currentDate | date:'MMMM yyyy':'':'es' }}</h2>
+  <p>Proyectos activos: {{ activeProjects | number }}</p>
+  <p>Presupuesto ejecutado: {{ budgetUsed | currency:'PEN':'symbol':'1.0-0' }}</p>
+  <p>Eficiencia promedio: {{ efficiency | percent:'1.1-1' }}</p>
+</div>
+```
+
+### **📱 Apps Móviles para Campo**
+Los supervisores en obra necesitan información rápida:
+```html
+<!-- Dashboard móvil -->
+<div class="mobile-dashboard">
+  <h3>{{ projectName | titlecase }}</h3>
+  <p>Avance: {{ progress | percent:'1.0-0' }}</p>
+  <p>Vence: {{ dueDate | date:'dd/MM' }}</p>
+  <p>Presupuesto: {{ budget | currency:'PEN':'symbol':'1.0-0' }}</p>
+</div>
+```
+
+### **🔍 Sistemas de Búsqueda**
+Los ingenieros necesitan encontrar información rápidamente:
+```typescript
+// Búsqueda reactiva en especificaciones técnicas
+searchResults$ = this.searchTerm$.pipe(
   debounceTime(300),
-  distinctUntilChanged(),
-  switchMap(term => this.searchTasks(term))
-)
-
-// startWith - valor inicial
-this.filteredTasks$ = this.searchTerm$.pipe(
-  startWith(''),
-  switchMap(term => this.filterTasks(term))
-)
-
-// catchError - manejo de errores
-this.tasks$ = this.dataService.getTasks().pipe(
-  catchError(error => {
-    console.error('Error:', error);
-    return of([]); // Valor por defecto
-  })
-)
+  switchMap(term => 
+    this.documentService.searchSpecs(term)
+  )
+);
 ```
 
 ---
 
-## 🏗️ ESTRUCTURA DEL PROYECTO
+## 🎛️ **FUNCIONALIDADES AVANZADAS**
 
-```
-lab-3-pipes-builtin/
-├── src/
-│   ├── app/
-│   │   ├── components/
-│   │   │   └── task-manager/
-│   │   │       ├── task-manager.component.ts
-│   │   │       ├── task-manager.component.html
-│   │   │       └── task-manager.component.scss
-│   │   ├── models/
-│   │   │   └── task.interface.ts
-│   │   ├── services/
-│   │   │   ├── task.service.ts
-│   │   │   └── statistics.service.ts
-│   │   ├── app.component.ts
-│   │   ├── app.component.html
-│   │   └── app.routes.ts
-│   ├── index.html
-│   ├── main.ts
-│   └── styles.scss
-├── package.json
-├── angular.json
-└── README.md
-```
-
----
-
-## 🎯 OBJETIVOS ESPECÍFICOS
-
-Al completar este laboratorio, serás capaz de:
-
-1. ✅ **Aplicar pipes de texto** (uppercase, titlecase, slice)
-2. ✅ **Usar pipes numéricos** (number, percent, currency)
-3. ✅ **Formatear fechas** con parámetros personalizados
-4. ✅ **Implementar async pipe** para manejo automático de Observables
-5. ✅ **Crear filtrado reactivo** con BehaviorSubject
-6. ✅ **Manejar estados de carga** con programación reactiva
-
----
-
-## 🚀 FUNCIONALIDADES A IMPLEMENTAR
-
-### Sistema de Gestión de Tareas PROVIAS
-- **Lista de tareas** con información completa de proyectos
-- **Filtrado en tiempo real** por título, estado, prioridad
-- **Estadísticas automáticas** calculadas reactivamente
-- **Formateo profesional** de fechas, monedas y porcentajes
-- **Estados de carga** y manejo de errores
-- **Búsqueda debounced** para mejor performance
-
-### Tipos de Tareas PROVIAS
-- **Construcción de carreteras**: Proyectos de pavimentación
-- **Mantenimiento vial**: Reparación y mejoras
-- **Supervisión**: Inspecciones y auditorías
-- **Presupuesto**: Gestión financiera
-- **Equipos**: Mantenimiento de maquinaria
-- **Seguridad**: Protocolos y capacitación
-
----
-
-## 💡 CASOS DE USO EMPRESARIALES
-
-Este laboratorio simula el **Sistema de Gestión de Tareas** de PROVIAS:
-
-1. **Panel de Proyectos**: Seguimiento de obras en ejecución
-2. **Centro de Tareas**: Asignación y monitoreo de actividades
-3. **Dashboard Financiero**: Control de presupuestos y gastos
-4. **Gestión de Plazos**: Seguimiento de cronogramas
-5. **Reportes Ejecutivos**: Estadísticas y métricas clave
-
----
-
-## 🎨 CARACTERÍSTICAS TÉCNICAS
-
-### Programación Reactiva
-- **Observables** para datos en tiempo real
-- **BehaviorSubject** para estado compartido
-- **combineLatest** para múltiples fuentes de datos
-- **debounceTime** para optimizar búsquedas
-- **switchMap** para cancelar requests anteriores
-
-### Performance Optimization
-- **OnPush Change Detection** para mejor rendimiento
-- **trackBy functions** para listas grandes
-- **Lazy loading** de componentes pesados
-- **Memoización** de cálculos costosos
-
-### Manejo de Estados
-- **Loading states**: Indicadores de carga
-- **Error states**: Manejo elegante de errores
-- **Empty states**: Pantallas vacías informativas
-- **Success states**: Confirmaciones visuales
-
----
-
-## 📊 PIPES EN ACCIÓN
-
-### Ejemplos Prácticos del Lab
-
-```html
-<!-- Títulos formateados -->
-<h2>{{ 'gestión de tareas provias' | titlecase }}</h2>
-
-<!-- Fechas en español -->
-<span>{{ task.dueDate | date:'fullDate':'':'es' }}</span>
-
-<!-- Presupuestos en soles -->
-<span>{{ task.budget | currency:'PEN':'symbol':'1.0-0' }}</span>
-
-<!-- Progreso como porcentaje -->
-<span>{{ task.progress | percent:'1.1-1' }}</span>
-
-<!-- Descripción truncada -->
-<p>{{ task.description | slice:0:100 }}...</p>
-
-<!-- Lista filtrada reactivamente -->
-<div *ngFor="let task of filteredTasks$ | async">
-  <!-- Contenido de la tarea -->
-</div>
-
-<!-- Estadísticas en tiempo real -->
-<div *ngIf="stats$ | async as stats">
-  <span>{{ stats.total | number }} tareas</span>
-  <span>{{ stats.completed | percent:'1.0-0' }}</span>
-</div>
-```
-
----
-
-## 🏆 ENTREGABLES ESPERADOS
-
-1. **Gestor de Tareas** completamente funcional
-2. **Filtrado reactivo** con búsqueda en tiempo real
-3. **Estadísticas automáticas** calculadas con RxJS
-4. **Formateo profesional** usando todos los pipes built-in
-5. **Manejo de async data** con loading y error states
-6. **Performance optimizada** con OnPush y trackBy
-
----
-
-## 🎯 CONCEPTOS AVANZADOS
-
-### Pipe Chaining
-```html
-<!-- Combinar múltiples pipes -->
-{{ task.title | slice:0:30 | titlecase }}
-{{ task.budget | currency:'PEN' | slice:0:-3 }}
-```
-
-### Async Pipe con Error Handling
+### **🔍 Búsqueda Multi-campo**
 ```typescript
-// Service
-getTasks(): Observable<Task[]> {
-  return this.http.get<Task[]>('/api/tasks').pipe(
-    retry(3),
-    catchError(this.handleError),
-    shareReplay(1)
+// Busca en título, descripción, responsable y región
+filterTasks(tasks: Task[], searchTerm: string) {
+  const search = searchTerm.toLowerCase();
+  return tasks.filter(task =>
+    task.title.toLowerCase().includes(search) ||
+    task.description.toLowerCase().includes(search) ||
+    task.assignee.name.toLowerCase().includes(search) ||
+    task.location.region.toLowerCase().includes(search)
   );
 }
 ```
 
-### Reactive Forms + Pipes
-```html
-<input [formControl]="searchControl" 
-       placeholder="Buscar tareas...">
+### **📊 Estadísticas Reactivas**
+```typescript
+// Estadísticas que se actualizan automáticamente
+statistics$ = this.filteredTasks$.pipe(
+  map(tasks => ({
+    total: tasks.length,
+    byStatus: this.groupByStatus(tasks),
+    byPriority: this.groupByPriority(tasks),
+    budgetTotal: tasks.reduce((sum, t) => sum + t.budget, 0),
+    averageProgress: tasks.reduce((sum, t) => sum + t.progress, 0) / tasks.length
+  }))
+);
+```
 
-<div *ngFor="let task of tasks$ | async | slice:0:pageSize">
-  <!-- Tasks filtradas y paginadas -->
-</div>
+### **🎯 Vista Kanban Dinámica**
+```html
+<!-- Columnas que se generan automáticamente -->
+@for (status of taskStatuses; track status.value) {
+  <div class="kanban-column">
+    <h3>{{ status.label }}</h3>
+    <span class="task-count">
+      {{ getTasksByStatus(tasks, status.value).length }}
+    </span>
+    
+    @for (task of getTasksByStatus(tasks, status.value); track task.id) {
+      <div class="kanban-card">
+        <h4>{{ task.title | slice:0:30 }}</h4>
+        <p>{{ task.progress | percent:'1.0-0' }}</p>
+      </div>
+    }
+  </div>
+}
 ```
 
 ---
 
-*¡Prepárate para dominar la transformación de datos y la programación reactiva! 🚀*
+## ⚡ **OPTIMIZACIÓN Y PERFORMANCE**
 
-**Este sistema podría gestionar las tareas reales de PROVIAS** 💼
+### **🎯 Async Pipe vs Suscripción Manual**
+
+| Aspecto | Async Pipe | Suscripción Manual |
+|---------|------------|-------------------|
+| **Memory Leaks** | ✅ Imposibles | ❌ Fáciles de crear |
+| **Código** | ✅ Menos líneas | ❌ Más boilerplate |
+| **Mantenimiento** | ✅ Automático | ❌ Manual |
+| **Performance** | ✅ Optimizado | ⚠️ Depende de ti |
+
+### **🔄 Debounce para Búsquedas**
+```typescript
+// Sin debounce: 100 búsquedas por segundo ❌
+// Con debounce: 1 búsqueda cada 300ms ✅
+
+this.searchControl.valueChanges.pipe(
+  debounceTime(300),           // Espera 300ms
+  distinctUntilChanged(),      // Solo si cambió
+  switchMap(term => this.search(term))  // Cancela búsquedas anteriores
+);
+```
+
+---
+
+## 🏆 **CRITERIOS DE EVALUACIÓN**
+
+### **Pipes y Transformación (40%)**
+- ✅ Todos los pipes built-in funcionan correctamente
+- ✅ Fechas se muestran en español sin errores
+- ✅ Monedas usan formato peruano (PEN)
+- ✅ Textos están bien formateados
+- ✅ Números tienen separadores de miles
+
+### **Programación Reactiva (40%)**
+- ✅ Async pipe maneja Observables sin errores
+- ✅ Búsqueda filtra en tiempo real
+- ✅ Estadísticas se actualizan automáticamente
+- ✅ No hay memory leaks (sin suscripciones manuales)
+- ✅ Estados de carga y error están implementados
+
+### **UX y Funcionalidad (20%)**
+- ✅ Filtros responden inmediatamente
+- ✅ Vistas múltiples (lista, grid, kanban) funcionan
+- ✅ Interfaz es intuitiva y responsive
+- ✅ No hay errores en consola del navegador
+
+---
+
+## ❓ **PREGUNTAS FRECUENTES**
+
+### **P: ¿Por qué usar async pipe en lugar de suscripciones?**
+**R:** Async pipe previene memory leaks automáticamente. Con suscripciones manuales, si olvidas hacer `unsubscribe()`, tu app consume memoria infinitamente.
+
+### **P: ¿Cuándo usar debounceTime?**
+**R:** Siempre que el usuario pueda escribir rápido: búsquedas, filtros, validaciones. Sin debounce, harías cientos de operaciones por segundo.
+
+### **P: ¿Qué es shareReplay(1)?**
+**R:** Hace que múltiples suscriptores compartan el mismo resultado. Sin él, cada async pipe haría su propia request/cálculo.
+
+### **P: ¿Por qué las fechas dan error en español?**
+**R:** Angular necesita que registres el locale español. Ya está configurado en `main.ts` con `registerLocaleData(localeEs)`.
+
+---
+
+## 🌟 **CASOS DE USO REALES EN PROVIAS**
+
+### **📋 Sistema de Seguimiento de Obras**
+```typescript
+// Dashboard de obras en tiempo real
+obras$ = this.obraService.getObrasActivas().pipe(
+  map(obras => obras.map(obra => ({
+    ...obra,
+    // Pipes aplicados en el servicio para consistencia
+    nombreFormateado: obra.nombre.toUpperCase(),
+    presupuestoFormateado: this.currencyPipe.transform(obra.presupuesto, 'PEN'),
+    avanceFormateado: this.percentPipe.transform(obra.avance / 100)
+  })))
+);
+```
+
+### **📊 Reportes Automáticos**
+```typescript
+// Reporte que se genera automáticamente
+reporteEjecutivo$ = combineLatest([
+  this.proyectos$,
+  this.presupuestos$,
+  this.cronogramas$
+]).pipe(
+  map(([proyectos, presupuestos, cronogramas]) => ({
+    fechaReporte: new Date(),
+    totalProyectos: proyectos.length,
+    presupuestoTotal: presupuestos.reduce((sum, p) => sum + p.monto, 0),
+    proyectosEnRiesgo: proyectos.filter(p => p.riesgo === 'alto').length
+  }))
+);
+```
+
+### **🚨 Sistema de Alertas**
+```typescript
+// Alertas que se actualizan en tiempo real
+alertasCriticas$ = this.equipos$.pipe(
+  map(equipos => equipos.filter(equipo => 
+    equipo.horasMantenimiento > equipo.limiteHoras
+  )),
+  map(equiposEnRiesgo => equiposEnRiesgo.map(equipo => ({
+    mensaje: `${equipo.nombre} requiere mantenimiento urgente`,
+    tiempo: equipo.proximoMantenimiento,
+    prioridad: 'critica'
+  })))
+);
+```
+
+---
+
+## 🎓 **CONCEPTOS CLAVE PARA RECORDAR**
+
+### **🔧 Pipes Built-in Esenciales**
+- **uppercase/lowercase/titlecase:** Para formateo de texto
+- **number:** Para números con separadores de miles  
+- **percent:** Para porcentajes con decimales configurables
+- **currency:** Para monedas con símbolo y precisión
+- **date:** Para fechas con formato y localización
+- **slice:** Para truncar texto o arrays
+
+### **🚀 Async Pipe Benefits**
+- **Automático:** Suscripción y desuscripción automática
+- **Seguro:** Previene memory leaks garantizadamente
+- **Limpio:** Menos código boilerplate
+- **Reactivo:** Actualización automática de la vista
+
+### **🔄 Programación Reactiva**
+- **Observable:** Stream de datos que puede emitir valores
+- **BehaviorSubject:** Observable que recuerda el último valor
+- **combineLatest:** Combina múltiples Observables
+- **debounceTime:** Evita ejecuciones excesivas
+- **switchMap:** Cancela operaciones anteriores
+
+---
+
+## 🚀 **PRÓXIMOS PASOS**
+
+Después de dominar pipes y programación reactiva, estarás listo para:
+
+- **Lab 4:** Pipes Personalizados (Crear tus propias herramientas de transformación)
+- **Sesión 4:** Directivas (Manipular el DOM directamente)
+- **Proyectos Reales:** Aplicar estos conceptos en sistemas de PROVIAS
+
+**¡Este lab es crucial para entender Angular moderno! 🎓**
+
+---
+
+**¡Prepárate para dominar la transformación de datos y la programación reactiva! 🚀**
+
+*El sistema de tareas que construyas podría gestionar los proyectos reales de PROVIAS*

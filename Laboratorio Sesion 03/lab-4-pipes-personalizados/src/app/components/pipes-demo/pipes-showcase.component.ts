@@ -50,8 +50,8 @@ export class PipesShowcaseComponent implements OnInit, OnDestroy {
 
   // 🎮 Estado del componente
   currentTab: DemoTab = 'overview';
-  sampleData: SampleData;
-  pipeDocumentation: PipeExample[];
+  sampleData!: SampleData;
+  pipeDocumentation!: PipeExample[];
   
   // 📝 Configuración local
   searchTerm = '';
@@ -494,5 +494,10 @@ export class PipesShowcaseComponent implements OnInit, OnDestroy {
     linkElement.click();
     
     console.log('💾 Configuración exportada');
+  }
+
+  // 🔧 Método auxiliar para acceso seguro a propiedades
+  getProjectField(project: Project, field: string): any {
+    return (project as any)[field] || '';
   }
 }

@@ -202,7 +202,7 @@
                     {{ project.createdAt | date:'dd/MM/yy' }}
                   }
                   @default {
-                    {{ project[sortField] }}
+                    {{ getProjectField(project, sortField) }}
                   }
                 }
               </span>
