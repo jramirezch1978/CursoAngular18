@@ -69,6 +69,20 @@ export class ProjectsComponent implements OnInit {
   }
 
   /**
+   * 📊 Obtener cantidad de proyectos por estado
+   */
+  getProjectCountByStatus(status: string): number {
+    return this.projects.filter(p => p.status === status).length;
+  }
+
+  /**
+   * 💰 Obtener presupuesto total
+   */
+  getTotalBudget(): number {
+    return this.projects.reduce((sum, project) => sum + project.budget, 0);
+  }
+
+  /**
    * 💰 Formatear presupuesto
    */
   formatBudget(amount: number): string {

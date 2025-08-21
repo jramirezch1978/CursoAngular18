@@ -12,6 +12,9 @@ import { AuthService } from '../../services/auth.service';
 })
 export class UsersComponent implements OnInit {
   
+  // 🌐 Referencias a objetos globales para el template
+  Object = Object;
+  
   // 📊 Datos mock de usuarios
   users = [
     { id: 1, name: 'Ana García', role: 'admin', status: 'active' },

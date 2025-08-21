@@ -11,6 +11,10 @@ import { Router } from '@angular/router';
 })
 export class NotFoundComponent implements OnInit {
   
+  // 🌐 Referencias a objetos globales para el template
+  window = window;
+  document = document;
+  
   // 🎲 Mensajes aleatorios de error 404
   errorMessages = [
     '¡Esta página se perdió como turista en Lima! 🗺️',
@@ -97,5 +101,12 @@ export class NotFoundComponent implements OnInit {
     }
     
     this.currentMessage = this.errorMessages[newIndex];
+  }
+
+  /**
+   * ⏰ Obtener timestamp actual
+   */
+  getCurrentTimestamp(): string {
+    return new Date().toLocaleString('es-PE');
   }
 }

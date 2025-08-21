@@ -103,7 +103,7 @@
       <div class="stat-card planning">
         <div class="stat-icon">📋</div>
         <div class="stat-info">
-          <h3>{{ projects.filter(p => p.status === 'planning').length }}</h3>
+          <h3>{{ getProjectCountByStatus('planning') }}</h3>
           <p>En Planificación</p>
         </div>
       </div>
@@ -111,7 +111,7 @@
       <div class="stat-card in-progress">
         <div class="stat-icon">🚧</div>
         <div class="stat-info">
-          <h3>{{ projects.filter(p => p.status === 'in-progress').length }}</h3>
+          <h3>{{ getProjectCountByStatus('in-progress') }}</h3>
           <p>En Ejecución</p>
         </div>
       </div>
@@ -119,7 +119,7 @@
       <div class="stat-card completed">
         <div class="stat-icon">✅</div>
         <div class="stat-info">
-          <h3>{{ projects.filter(p => p.status === 'completed').length }}</h3>
+          <h3>{{ getProjectCountByStatus('completed') }}</h3>
           <p>Completados</p>
         </div>
       </div>

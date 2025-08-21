@@ -178,7 +178,7 @@ Gracias por su atención.`);
   /**
    * 🏠 Ir al dashboard
    */
-  private goToDashboard(): void {
+  goToDashboard(): void {
     console.log('🏠 [AccessDeniedComponent] Navegando al dashboard');
     this.router.navigate(['/dashboard']);
   }

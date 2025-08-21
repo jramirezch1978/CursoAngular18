@@ -9,7 +9,7 @@
         </p>
         <p class="role-info">
           Rol: {{ currentUser?.role }} | 
-          Permisos: {{ currentUser?.permissions.length }} activos
+          Permisos: {{ currentUser?.permissions?.length || 0 }} activos
         </p>
       </div>
       
