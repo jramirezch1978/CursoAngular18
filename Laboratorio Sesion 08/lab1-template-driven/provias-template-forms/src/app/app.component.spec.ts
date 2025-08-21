@@ -14,16 +14,16 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have the 'provias-forms-config' title`, () => {
+  it(`should have the 'provias-template-forms' title`, () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('provias-forms-config');
+    expect(app.title).toEqual('provias-template-forms');
   });
 
   it('should render title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, provias-forms-config');
+    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, provias-template-forms');
   });
 });

@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "provias-forms-config": {
+    "provias-template-forms": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/provias-forms-config",
+            "outputPath": "dist/provias-template-forms",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "provias-forms-config:build:production"
+              "buildTarget": "provias-template-forms:build:production"
             },
             "development": {
-              "buildTarget": "provias-forms-config:build:development"
+              "buildTarget": "provias-template-forms:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -98,5 +98,8 @@
         }
       }
     }
+  },
+  "cli": {
+    "analytics": false
   }
 }

@@ -1,0 +1,61 @@
+{
+  "contacts": [],
+  "users": [
+    { 
+      "id": 1, 
+      "dni": "12345678",
+      "name": "Ana García", 
+      "email": "ana@provias.gob.pe", 
+      "role": "admin", 
+      "isActive": true,
+      "department": "Ingeniería"
+    },
+    { 
+      "id": 2, 
+      "dni": "87654321",
+      "name": "Carlos López", 
+      "email": "carlos@provias.gob.pe", 
+      "role": "user", 
+      "isActive": true,
+      "department": "Administración"
+    },
+    { 
+      "id": 3, 
+      "dni": "45678912",
+      "name": "María Rodriguez", 
+      "email": "maria@provias.gob.pe", 
+      "role": "user", 
+      "isActive": false,
+      "department": "Logística"
+    }
+  ],
+  "departments": [
+    { "id": 1, "name": "Ingeniería", "code": "ING" },
+    { "id": 2, "name": "Administración", "code": "ADM" },
+    { "id": 3, "name": "Logística", "code": "LOG" },
+    { "id": 4, "name": "Recursos Humanos", "code": "RH" },
+    { "id": 5, "name": "Tecnología", "code": "TI" }
+  ],
+  "projects": [
+    {
+      "id": 1,
+      "code": "PROV-2025-001",
+      "name": "Mejoramiento Vial Cusco",
+      "budget": 5000000,
+      "startDate": "2025-01-15",
+      "endDate": "2025-12-31",
+      "status": "active",
+      "manager": "ana@provias.gob.pe"
+    },
+    {
+      "id": 2,
+      "code": "PROV-2025-002",
+      "name": "Puente Peatonal Lima Norte",
+      "budget": 2500000,
+      "startDate": "2025-02-01",
+      "endDate": "2025-08-31",
+      "status": "planning",
+      "manager": "carlos@provias.gob.pe"
+    }
+  ]
+}
