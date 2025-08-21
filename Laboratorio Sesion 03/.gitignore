@@ -5,6 +5,8 @@
 # ANGULAR SPECIFIC
 # =============================================================================
 
+prompt.txt
+
 # Compiled output
 **/dist/
 **/tmp/

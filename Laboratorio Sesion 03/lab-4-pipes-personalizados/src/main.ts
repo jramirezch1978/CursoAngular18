@@ -1,10 +1,10 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { provideRouter } from '@angular/router';
 import { AppComponent } from './app/app.component';
-
-console.log('🚀 Iniciando Lab 4: Pipes Personalizados - PROVIAS');
+import { routes } from './app/app.routes';
 
 bootstrapApplication(AppComponent, {
-  providers: []
-}).catch(err => {
-  console.error('❌ Error al inicializar la aplicación:', err);
-});
+  providers: [
+    provideRouter(routes)
+  ]
+}).catch(err => console.error(err));

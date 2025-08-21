@@ -1,319 +1,342 @@
-<!-- 📊 DASHBOARD COMPONENT - Lab 2: Binding Avanzado -->
-<div class="dashboard-container" 
-     [ngStyle]="{
-       '--primary-color': themeColors.primary,
-       '--secondary-color': themeColors.secondary,
-       '--accent-color': themeColors.accent,
-       '--background-color': themeColors.background,
-       '--surface-color': themeColors.surface,
-       '--text-color': themeColors.text
-     }"
-     [class]="'theme-' + currentTheme">
+<!-- 📊 LAB 2: BINDING AVANZADO Y MANEJO DE EVENTOS -->
+<!-- DASHBOARD EJECUTIVO DE PROVIAS -->
 
-  <!-- 🎯 HEADER DEL DASHBOARD -->
-  <header class="dashboard-header">
-    <div class="header-content">
-      <h1 class="dashboard-title">📊 Dashboard PROVIAS</h1>
-      <p class="dashboard-subtitle">Sistema de Monitoreo de Proyectos Viales</p>
-    </div>
+<div class="dashboard-container" [ngClass]="getThemeClasses()">
 
-    <div class="header-controls">
-      <button 
-        type="button"
-        (click)="toggleFullscreen()"
-        class="control-btn">
-        {{ (state$ | async)?.isFullscreen ? '🔲' : '⛶' }}
-      </button>
-      
-      <button 
-        type="button"
-        (click)="toggleTheme()"
-        class="control-btn">
-        {{ currentTheme === 'light' ? '☀️' : currentTheme === 'dark' ? '🌙' : '🔆' }}
-      </button>
-      
-      <button 
-        type="button"
-        (click)="refreshAllWidgets()"
-        class="control-btn">
-        🔄
-      </button>
-      
-      <button 
-        type="button"
-        (click)="openConfigPanel()"
-        class="control-btn">
-        ⚙️
-      </button>
-    </div>
-  </header>
-
-  <!-- 📊 ESTADÍSTICAS RÁPIDAS -->
-  <section class="quick-stats">
-    <div class="stat-card">
-      <span class="stat-icon">📦</span>
-      <span class="stat-value">{{ (widgets$ | async)?.length || 0 }}</span>
-      <span class="stat-label">Widgets</span>
-    </div>
+  <!-- 🎛️ BARRA DE HERRAMIENTAS SUPERIOR -->
+  <header class="dashboard-toolbar">
     
-    <div class="stat-card">
-      <span class="stat-icon">🎨</span>
-      <span class="stat-value">{{ currentTheme | titlecase }}</span>
-      <span class="stat-label">Tema</span>
-    </div>
-    
-    <div class="stat-card">
-      <span class="stat-icon">🕒</span>
-      <span class="stat-value">{{ getCurrentTime() | date:'HH:mm:ss' }}</span>
-      <span class="stat-label">Hora</span>
-    </div>
-  </section>
-
-  <!-- 🏗️ CONTENEDOR PRINCIPAL DE WIDGETS -->
-  <main class="dashboard-main">
-    
-    <div class="widgets-grid">
-      <div *ngFor="let widget of (widgets$ | async); trackBy: trackByWidgetId" 
-           class="widget-container"
-           [class.widget-selected]="selectedWidgetId === widget.id"
-           (click)="onWidgetClick(widget, $event)"
-           (dblclick)="onWidgetDoubleClick(widget)">
-
-        <!-- WIDGET HEADER -->
-        <header class="widget-header" *ngIf="widget.config.showHeader">
-          <h3 class="widget-title">{{ widget.title }}</h3>
-          <div class="widget-controls">
-            <span class="widget-type-badge">{{ getWidgetTypeLabel(widget.type) }}</span>
-            <button type="button" (click)="refreshWidget(widget.id)" class="widget-btn">🔄</button>
-            <button type="button" (click)="removeWidget(widget.id)" class="widget-btn">🗑️</button>
-          </div>
-        </header>
-
-        <!-- WIDGET CONTENT -->
-        <div class="widget-content">
-          
-          <!-- WIDGET TIPO METRIC -->
-          <div *ngIf="widget.type === 'metric'" class="metric-widget">
-            <div class="metric-value">{{ widget.data.value || 0 }}</div>
-            <div class="metric-label">{{ widget.title }}</div>
-            <div *ngIf="widget.data.change" class="metric-change">{{ widget.data.change }}</div>
-          </div>
-
-          <!-- WIDGET TIPO PROGRESS -->
-          <div *ngIf="widget.type === 'progress'" class="progress-widget">
-            <div class="progress-info">
-              <span class="progress-label">Progreso</span>
-              <span class="progress-percentage">{{ widget.data.percentage || 0 }}%</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" 
-                   [style.width.%]="widget.data.percentage || 0">
-              </div>
-            </div>
-            <div *ngIf="widget.data.total && widget.data.used" class="progress-details">
-              <span>{{ formatCurrency(widget.data.used) }} / {{ formatCurrency(widget.data.total) }}</span>
-            </div>
-          </div>
-
-          <!-- WIDGET TIPO ALERT -->
-          <div *ngIf="widget.type === 'alert'" class="alert-widget">
-            <div class="alert-stats">
-              <div class="alert-stat critical">
-                <span class="alert-count">{{ widget.data.critical || 0 }}</span>
-                <span class="alert-label">Críticas</span>
-              </div>
-              <div class="alert-stat warning">
-                <span class="alert-count">{{ widget.data.warning || 0 }}</span>
-                <span class="alert-label">Advertencias</span>
-              </div>
-              <div class="alert-stat info">
-                <span class="alert-count">{{ widget.data.info || 0 }}</span>
-                <span class="alert-label">Informativas</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- WIDGET TIPO STATUS -->
-          <div *ngIf="widget.type === 'status'" class="status-widget">
-            <div class="status-grid">
-              <div class="status-item">
-                <span class="status-icon">🟢</span>
-                <span class="status-count">{{ widget.data.operational || 0 }}</span>
-                <span class="status-label">Operativo</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">🟡</span>
-                <span class="status-count">{{ widget.data.maintenance || 0 }}</span>
-                <span class="status-label">Mantenimiento</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">🔴</span>
-                <span class="status-count">{{ widget.data.repair || 0 }}</span>
-                <span class="status-label">Reparación</span>
-              </div>
-              <div class="status-item">
-                <span class="status-icon">⚪</span>
-                <span class="status-count">{{ widget.data.idle || 0 }}</span>
-                <span class="status-label">Inactivo</span>
-              </div>
-            </div>
-          </div>
-
-          <!-- WIDGET TIPO CHART -->
-          <div *ngIf="widget.type === 'chart'" class="chart-widget">
-            <div class="chart-container">
-              <div class="chart-bars">
-                <div *ngFor="let region of widget.data.regions; let i = index" 
-                     class="chart-bar-item">
-                  <div class="chart-bar-container">
-                    <div class="chart-bar" 
-                         [style.height.%]="widget.data.progress[i] || 0"
-                         [style.background-color]="getProgressColor(widget.data.progress[i])">
-                    </div>
-                  </div>
-                  <div class="chart-bar-label">{{ region }}</div>
-                  <div class="chart-bar-value">{{ widget.data.progress[i] || 0 }}%</div>
-                </div>
-              </div>
-              <div class="chart-legend" *ngIf="widget.data.budget">
-                <div class="chart-legend-item" *ngFor="let region of widget.data.regions; let i = index">
-                  <span class="legend-color" [style.background-color]="getProgressColor(widget.data.progress[i])"></span>
-                  <span class="legend-text">{{ region }}: {{ formatCurrency(widget.data.budget[i]) }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- WIDGET GENÉRICO -->
-          <div *ngIf="!['metric', 'progress', 'alert', 'status', 'chart'].includes(widget.type)" class="generic-widget">
-            <div class="widget-placeholder">
-              <span class="placeholder-icon">{{ getWidgetTypeIcon(widget.type) }}</span>
-              <span class="placeholder-text">{{ widget.title }}</span>
-              <small class="placeholder-subtitle">Tipo: {{ getWidgetTypeLabel(widget.type) }}</small>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- WIDGET FOOTER -->
-        <footer class="widget-footer" *ngIf="widget.config.showFooter">
-          <span class="widget-status">{{ widget.status }}</span>
-          <span class="widget-update">{{ widget.lastUpdate | date:'HH:mm' }}</span>
-        </footer>
-
+    <!-- 🔍 SECCIÓN DE BÚSQUEDA -->
+    <div class="search-section">
+      <div class="search-input-group">
+        <input
+          type="text"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          (keydown)="onSearchKeydown($event)"
+          placeholder="Buscar widgets, proyectos, equipos..."
+          class="search-input"
+          [class.has-value]="searchTerm.length > 0">
+        
+        <button
+          type="button"
+          (click)="clearSearch()"
+          class="search-clear-btn"
+          [style.opacity]="searchTerm.length > 0 ? '1' : '0'"
+          title="Limpiar búsqueda">
+          ❌
+        </button>
+      </div>
+      
+      <div class="search-info">
+        <small>💡 Atajos: Ctrl+F (Fullscreen) | Ctrl+D (Cambiar Tema) | Escape (Salir)</small>
       </div>
     </div>
 
-    <!-- ESTADO VACÍO -->
-    <div *ngIf="(widgets$ | async)?.length === 0" class="empty-state">
-      <div class="empty-icon">📊</div>
-      <h3 class="empty-title">No hay widgets configurados</h3>
-      <p class="empty-subtitle">Agrega widgets para comenzar a monitorear tus proyectos</p>
-      <button type="button" (click)="openConfigPanel()" class="empty-btn">➕ Agregar Widget</button>
+    <!-- 🎮 CONTROLES DE VISTA -->
+    <div class="view-controls">
+      
+      <!-- 🎨 SELECTOR DE TEMA -->
+      <div class="theme-selector">
+        <select
+          [(ngModel)]="selectedTheme"
+          (change)="changeTheme(selectedTheme)"
+          class="theme-select">
+          @for (theme of themes; track theme.value) {
+            <option [value]="theme.value">{{ theme.label }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- 🖥️ FULLSCREEN -->
+      <button
+        type="button"
+        (click)="toggleFullscreen()"
+        class="control-btn fullscreen-btn"
+        [class.active]="isFullscreen"
+        title="Pantalla completa (Ctrl+F)">
+        {{ isFullscreen ? '🔲' : '⛶' }}
+      </button>
+
+      <!-- 🔄 TIEMPO ACTUAL -->
+      <div class="current-time">
+        {{ currentTime | date:'HH:mm:ss' }}
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- 📊 INDICADORES DE ESTADO GLOBAL -->
+  <section class="status-bar">
+    
+    <!-- 🔌 ESTADO DE CONEXIÓN -->
+    <div class="connection-status">
+      <span class="status-indicator online"></span>
+      <span>En línea</span>
+    </div>
+
+    <!-- ⏳ INDICADOR DE CARGA -->
+    @if (isLoading) {
+      <div class="loading-indicator">
+        <span class="loading-spinner"></span>
+        <span>Actualizando datos...</span>
+      </div>
+    }
+
+    <!-- 🚨 CONTADOR DE ALERTAS -->
+    <div class="alerts-counter"
+      [ngClass]="{
+        'has-critical': alertsData.critical > 0,
+        'has-warnings': alertsData.warning > 0
+      }">
+      🚨 {{ alertsData.critical + alertsData.warning + alertsData.info }} alertas
+    </div>
+
+  </section>
+
+  <!-- 🏗️ CONTENEDOR PRINCIPAL DEL DASHBOARD -->
+  <main class="dashboard-main">
+
+    <!-- 🎯 WIDGETS DINÁMICOS -->
+    <div class="widgets-grid">
+      @for (widget of widgets; track widget.id) {
+        
+        <!-- 📦 WIDGET CONTAINER -->
+        <article
+          class="widget-container"
+          [ngClass]="getWidgetClasses(widget)"
+          [ngStyle]="getWidgetStyles(widget)"
+          [attr.data-widget-id]="widget.id"
+          [attr.data-widget-type]="widget.type"
+          (click)="onWidgetClick(widget, $event)"
+          (mouseenter)="onWidgetHover(widget, true)"
+          (mouseleave)="onWidgetHover(widget, false)"
+          tabindex="0">
+
+          <!-- 📋 WIDGET HEADER -->
+          <header class="widget-header">
+            
+            <div class="widget-title-section">
+              <h3 class="widget-title">{{ widget.title }}</h3>
+              <span class="widget-type-badge">{{ widget.type | titlecase }}</span>
+            </div>
+
+            <!-- 🎛️ WIDGET CONTROLS -->
+            <div class="widget-controls">
+              <button
+                type="button"
+                (click)="refreshWidget(widget); $event.stopPropagation()"
+                class="widget-action-btn"
+                [disabled]="isLoading"
+                title="Actualizar widget">
+                🔄
+              </button>
+            </div>
+
+          </header>
+
+          <!-- 📊 WIDGET CONTENT -->
+          <div class="widget-content">
+
+            <!-- 📈 METRIC WIDGET -->
+            @if (widget.type === 'metric') {
+              <div class="metric-widget">
+                <div class="metric-value"
+                  [ngStyle]="{
+                    'color': widget.data.trend === 'up' ? '#10b981' : 
+                             widget.data.trend === 'down' ? '#ef4444' : '#6b7280',
+                    'font-size': widget.size.width > 4 ? '3rem' : '2rem'
+                  }">
+                  {{ widget.data.value | number }}
+                </div>
+                
+                <div class="metric-change"
+                  [ngClass]="{
+                    'trend-up': widget.data.trend === 'up',
+                    'trend-down': widget.data.trend === 'down',
+                    'trend-stable': widget.data.trend === 'stable'
+                  }">
+                  {{ widget.data.change }}
+                  @switch (widget.data.trend) {
+                    @case ('up') { ↗️ }
+                    @case ('down') { ↘️ }
+                    @default { ➡️ }
+                  }
+                </div>
+              </div>
+            }
+
+            <!-- 📊 CHART WIDGET -->
+            @if (widget.type === 'chart') {
+              <div class="chart-widget">
+                <div class="chart-header">
+                  <span class="chart-label">Progreso del Presupuesto</span>
+                  <span class="chart-percentage"
+                    [ngStyle]="{
+                      'color': widget.data.percentage >= 90 ? '#10b981' :
+                               widget.data.percentage >= 70 ? '#f59e0b' : '#3b82f6'
+                    }">
+                    {{ widget.data.percentage | percent:'1.1-1' }}
+                  </span>
+                </div>
+                
+                <div class="progress-bar-container">
+                  <div class="progress-bar"
+                    [ngStyle]="{
+                      'width': widget.data.percentage + '%',
+                      'background-color': widget.data.percentage >= 90 ? '#10b981' :
+                                          widget.data.percentage >= 70 ? '#f59e0b' : '#3b82f6'
+                    }">
+                  </div>
+                </div>
+
+                <div class="chart-details">
+                  <div class="chart-amounts">
+                    <span>{{ widget.data.used | currency:'PEN':'symbol':'1.0-0' }}</span>
+                    <span>de {{ widget.data.total | currency:'PEN':'symbol':'1.0-0' }}</span>
+                  </div>
+                </div>
+              </div>
+            }
+
+            <!-- 🚨 ALERT WIDGET -->
+            @if (widget.type === 'alert') {
+              <div class="alert-widget">
+                <div class="alert-summary">
+                  
+                  <div class="alert-item critical"
+                    [ngClass]="{ 'has-alerts': widget.data.critical > 0 }">
+                    <span class="alert-count">{{ widget.data.critical }}</span>
+                    <span class="alert-label">Críticas</span>
+                  </div>
+
+                  <div class="alert-item warning"
+                    [ngClass]="{ 'has-alerts': widget.data.warning > 0 }">
+                    <span class="alert-count">{{ widget.data.warning }}</span>
+                    <span class="alert-label">Advertencias</span>
+                  </div>
+
+                  <div class="alert-item info"
+                    [ngClass]="{ 'has-alerts': widget.data.info > 0 }">
+                    <span class="alert-count">{{ widget.data.info }}</span>
+                    <span class="alert-label">Información</span>
+                  </div>
+
+                </div>
+              </div>
+            }
+
+            <!-- 🟢 STATUS WIDGET -->
+            @if (widget.type === 'status') {
+              <div class="status-widget">
+                <div class="status-grid">
+                  
+                  <div class="status-item operational">
+                    <div class="status-icon">🟢</div>
+                    <div class="status-count">{{ widget.data.operational }}</div>
+                    <div class="status-label">Operativo</div>
+                  </div>
+
+                  <div class="status-item maintenance">
+                    <div class="status-icon">🟡</div>
+                    <div class="status-count">{{ widget.data.maintenance }}</div>
+                    <div class="status-label">Mantenimiento</div>
+                  </div>
+
+                  <div class="status-item repair">
+                    <div class="status-icon">🔴</div>
+                    <div class="status-count">{{ widget.data.repair }}</div>
+                    <div class="status-label">Reparación</div>
+                  </div>
+
+                </div>
+                
+                <div class="status-total">
+                  Total: {{ widget.data.operational + widget.data.maintenance + widget.data.repair }} equipos
+                </div>
+              </div>
+            }
+
+          </div>
+
+          <!-- 📊 WIDGET FOOTER -->
+          <footer class="widget-footer">
+            <div class="widget-meta">
+              <span class="last-update">
+                Actualizado: {{ currentTime | date:'HH:mm:ss' }}
+              </span>
+            </div>
+          </footer>
+
+        </article>
+
+      }
     </div>
 
   </main>
 
-  <!-- ⚙️ PANEL DE CONFIGURACIÓN -->
-  <aside class="config-panel" *ngIf="isConfigPanelOpen" [class.open]="isConfigPanelOpen">
-    <div class="config-content">
+  <!-- 📚 DOCUMENTACIÓN DE BINDING AVANZADO -->
+  <aside class="binding-docs">
+    <h3>📚 Técnicas Demostradas</h3>
+    
+    <div class="docs-grid">
       
-      <!-- HEADER DEL PANEL -->
-      <header class="config-header">
-        <h2 class="config-title">⚙️ Configuración</h2>
-        <button type="button" (click)="closeConfigPanel()" class="config-close">✕</button>
-      </header>
-
-      <!-- AGREGAR WIDGETS -->
-      <section class="config-section">
-        <h3>➕ Agregar Widgets</h3>
-        <div class="widget-types-grid">
-          <button *ngFor="let widgetType of availableWidgetTypes"
-                  type="button"
-                  (click)="addWidget(widgetType.type)"
-                  class="widget-type-btn">
-            <span class="widget-type-icon">{{ widgetType.icon }}</span>
-            <span class="widget-type-label">{{ widgetType.label }}</span>
-          </button>
+      <!-- NgClass -->
+      <div class="doc-card">
+        <h4>🎨 NgClass</h4>
+        <p>Aplicación de múltiples clases CSS dinámicas</p>
+        <div class="code-example">
+          <code>[ngClass]="getWidgetClasses(widget)"</code>
         </div>
-      </section>
-
-      <!-- CONFIGURACIÓN DE TEMA -->
-      <section class="config-section">
-        <h3>🎨 Tema</h3>
-        <div class="theme-options">
-          <label class="theme-option">
-            <input type="radio" name="theme" value="light" 
-                   [checked]="currentTheme === 'light'" 
-                   (change)="setLightTheme()">
-            <span>☀️ Claro</span>
-          </label>
-          <label class="theme-option">
-            <input type="radio" name="theme" value="dark" 
-                   [checked]="currentTheme === 'dark'" 
-                   (change)="setDarkTheme()">
-            <span>🌙 Oscuro</span>
-          </label>
-          <label class="theme-option">
-            <input type="radio" name="theme" value="high-contrast" 
-                   [checked]="currentTheme === 'high-contrast'" 
-                   (change)="setHighContrastTheme()">
-            <span>🔆 Alto Contraste</span>
-          </label>
-        </div>
-      </section>
-
-      <!-- ALERTAS ACTIVAS -->
-      <section class="config-section" *ngIf="(alerts$ | async)?.length">
-        <h3>🚨 Alertas Activas ({{ (alerts$ | async)?.length }})</h3>
-        <div class="alerts-list">
-          <div *ngFor="let alert of (alerts$ | async)" 
-               class="alert-item"
-               [class.alert-critical]="alert.severity === 'critical'"
-               [class.alert-warning]="alert.severity === 'warning'">
-            <div class="alert-content">
-              <div class="alert-message">{{ alert.message }}</div>
-              <div class="alert-meta">
-                <span class="alert-source">{{ alert.source }}</span>
-                <span class="alert-time">{{ alert.timestamp | date:'HH:mm' }}</span>
-              </div>
-            </div>
-            <button *ngIf="!alert.acknowledged" 
-                    type="button"
-                    (click)="acknowledgeAlert(alert.id)"
-                    class="acknowledge-btn">
-              ✅
-            </button>
+        <div class="demo-section">
+          <div [ngClass]="{ 'demo-active': isFullscreen, 'demo-inactive': !isFullscreen }">
+            Estado: {{ isFullscreen ? 'Fullscreen' : 'Normal' }}
           </div>
         </div>
-      </section>
+      </div>
 
-      <!-- ESTADÍSTICAS -->
-      <section class="config-section">
-        <h3>📊 Estadísticas</h3>
-        <div class="dashboard-stats">
-          <div class="stat-item">
-            <span class="stat-label">Widgets activos:</span>
-            <span class="stat-value">{{ (widgets$ | async)?.length || 0 }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Última actualización:</span>
-            <span class="stat-value">{{ getCurrentTime() | date:'HH:mm:ss' }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">Tema actual:</span>
-            <span class="stat-value">{{ currentTheme }}</span>
+      <!-- NgStyle -->
+      <div class="doc-card">
+        <h4>🎭 NgStyle</h4>
+        <p>Estilos dinámicos calculados en tiempo real</p>
+        <div class="code-example">
+          <code>[ngStyle]="getWidgetStyles(widget)"</code>
+        </div>
+        <div class="demo-section">
+          <div [ngStyle]="{ 'background-color': primaryColor, 'color': 'white', 'padding': '1rem', 'border-radius': '8px' }">
+            Color dinámico: {{ selectedTheme }}
           </div>
         </div>
-      </section>
+      </div>
+
+      <!-- HostListener -->
+      <div class="doc-card">
+        <h4>🎧 HostListener</h4>
+        <p>Eventos globales del DOM y ventana</p>
+        <div class="code-example">
+          <code>@HostListener('window:keydown')</code>
+        </div>
+        <div class="demo-section">
+          <p>Presiona Ctrl+F o Ctrl+D para probar</p>
+          <p>Última tecla: <span id="last-key">-</span></p>
+        </div>
+      </div>
+
+      <!-- HostBinding -->
+      <div class="doc-card">
+        <h4>🎯 HostBinding</h4>
+        <p>Binding de propiedades del elemento host</p>
+        <div class="code-example">
+          <code>@HostBinding('class.fullscreen')</code>
+        </div>
+        <div class="demo-section">
+          <p>Modo: {{ isFullscreen ? 'Fullscreen' : 'Normal' }}</p>
+          <p>Tema: {{ isDarkTheme ? 'Oscuro' : 'Claro' }}</p>
+        </div>
+      </div>
 
     </div>
   </aside>
-
-  <!-- OVERLAY -->
-  <div *ngIf="isConfigPanelOpen" 
-       class="config-overlay"
-       (click)="closeConfigPanel()">
-  </div>
 
 </div>

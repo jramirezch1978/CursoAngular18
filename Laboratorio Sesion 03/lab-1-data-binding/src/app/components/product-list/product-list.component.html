@@ -330,7 +330,7 @@
   </main>
 
   <!-- 🛒 RESUMEN DEL CARRITO (Sidebar) -->
-  <aside class="cart-sidebar" [class.expanded]="(cartSummary$ | async)?.itemCount > 0">
+  <aside class="cart-sidebar" [class.expanded]="((cartSummary$ | async)?.itemCount || 0) > 0">
     
     <!-- 🎯 ASYNC PIPE: Datos del carrito en tiempo real -->
     @if (cartSummary$ | async; as summary) {

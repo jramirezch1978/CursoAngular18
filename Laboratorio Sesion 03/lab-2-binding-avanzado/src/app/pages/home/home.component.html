@@ -1,135 +1,115 @@
-<!-- 🏠 HOME COMPONENT - Lab 2: Binding Avanzado -->
+<!-- 🏠 HOME PAGE - LAB 2 BINDING AVANZADO -->
 <div class="home-container">
-
+  
   <!-- 🎯 HERO SECTION -->
-  <section class="hero-section" role="banner">
+  <section class="hero-section">
     <div class="hero-content">
-      <div class="hero-text">
-        <h1 class="hero-title">{{ welcomeTitle }}</h1>
-        <p class="hero-subtitle">{{ provias.labObjective }}</p>
-        <div class="hero-meta">
-          <span class="meta-item">
-            <span class="meta-icon">🏢</span>
-            <span>{{ provias.fullName }}</span>
-          </span>
-          <span class="meta-item">
-            <span class="meta-icon">📅</span>
-            <span>{{ currentYear }}</span>
-          </span>
-          <span class="meta-item">
-            <span class="meta-icon">🔄</span>
-            <span>{{ lastUpdate | date:'short':'':'es' }}</span>
-          </span>
-        </div>
-      </div>
-      <div class="hero-visual">
-        <div class="visual-icon">🎯</div>
-        <div class="visual-particles">
-          <span class="particle particle-1">📊</span>
-          <span class="particle particle-2">🎨</span>
-          <span class="particle particle-3">🎧</span>
-          <span class="particle particle-4">⚡</span>
-        </div>
+      <!-- 🔤 INTERPOLACIÓN: Título dinámico -->
+      <h1 class="hero-title">{{ welcomeTitle }}</h1>
+      <p class="hero-subtitle">{{ provias.labObjective }}</p>
+      
+      <!-- 🎯 PROPERTY BINDING: Botón con ruteo -->
+      <div class="hero-actions">
+        <button 
+          type="button"
+          [routerLink]="'/dashboard'"
+          class="cta-button primary">
+          📊 Explorar Dashboard Interactivo
+        </button>
       </div>
     </div>
   </section>
 
-  <!-- 📚 FEATURES SECTION -->
-  <section class="features-section" role="main">
+  <!-- 🎯 FEATURES SECTION -->
+  <section class="features-section">
     <div class="section-header">
-      <h2 class="section-title">🚀 Características del Laboratorio</h2>
-      <p class="section-subtitle">{{ provias.mission }}</p>
+      <h2>🎯 Técnicas de Binding Avanzado</h2>
+      <p>Explora las funcionalidades avanzadas de data binding</p>
     </div>
 
     <div class="features-grid">
+      <!-- 🔁 STRUCTURAL DIRECTIVE: Mostrar features -->
       @for (feature of features; track feature.title; let i = $index) {
         <article 
           class="feature-card"
           [ngClass]="getFeatureClasses(i)"
           [ngStyle]="getFeatureStyles(i)"
           (click)="onFeatureClick(feature)"
-          [attr.aria-label]="'Característica: ' + feature.title"
-          role="button"
-          tabindex="0"
-          (keydown.enter)="onFeatureClick(feature)"
-          (keydown.space)="onFeatureClick(feature)">
+          tabindex="0">
           
-          <!-- 🎭 FEATURE HEADER -->
-          <header class="feature-header">
-            <div class="feature-icon">{{ feature.icon }}</div>
-            <h3 class="feature-title">{{ feature.title }}</h3>
-          </header>
-
+          <!-- 🎨 FEATURE ICON -->
+          <div class="feature-icon">{{ feature.icon }}</div>
+          
           <!-- 📝 FEATURE CONTENT -->
           <div class="feature-content">
+            <h3 class="feature-title">{{ feature.title }}</h3>
             <p class="feature-description">{{ feature.description }}</p>
             
-            <!-- 🏷️ CONCEPTS TAGS -->
-            <div class="feature-concepts">
+            <!-- ✅ CONCEPTS LIST -->
+            <ul class="concepts-list">
               @for (concept of feature.concepts; track concept) {
-                <span class="concept-tag">{{ concept }}</span>
+                <li class="concept-item">
+                  <code>{{ concept }}</code>
+                </li>
               }
-            </div>
+            </ul>
           </div>
 
-          <!-- 🔗 FEATURE FOOTER -->
-          <footer class="feature-footer">
-            <span class="feature-link">
-              <span class="link-text">Explorar</span>
-              <span class="link-icon">→</span>
-            </span>
-          </footer>
+          <!-- 🎯 FEATURE ACTIONS -->
+          <div class="feature-actions">
+            <button 
+              type="button"
+              [routerLink]="feature.route"
+              class="feature-btn"
+              [attr.aria-label]="'Ir a ' + feature.title">
+              🚀 Explorar
+            </button>
+          </div>
 
         </article>
       }
     </div>
   </section>
 
-  <!-- 🎯 GETTING STARTED SECTION -->
-  <section class="getting-started-section">
-    <div class="section-header">
-      <h2 class="section-title">🚀 Comenzar</h2>
-      <p class="section-subtitle">Explora las características de binding avanzado en Angular v18</p>
+  <!-- 🏢 ABOUT PROVIAS SECTION -->
+  <section class="about-section">
+    <div class="about-content">
+      <h2>🏢 Lab 2: Binding Avanzado</h2>
+      
+      <div class="about-grid">
+        
+        <div class="about-card mission">
+          <h3>🎯 Objetivo</h3>
+          <p>{{ provias.labObjective }}</p>
+        </div>
+
+        <div class="about-card techniques">
+          <h3>🔧 Técnicas</h3>
+          <ul>
+            <li>🎨 NgClass para clases dinámicas</li>
+            <li>🎭 NgStyle para estilos calculados</li>
+            <li>🎧 HostListener para eventos globales</li>
+            <li>🎯 Attribute binding avanzado</li>
+          </ul>
+        </div>
+
+      </div>
     </div>
+  </section>
 
-    <div class="getting-started-content">
-      <div class="steps-container">
-        <div class="step-item">
-          <div class="step-icon">1️⃣</div>
-          <div class="step-content">
-            <h4 class="step-title">Explora NgClass</h4>
-            <p class="step-description">Aprende a aplicar clases CSS dinámicamente</p>
-          </div>
-        </div>
-        
-        <div class="step-item">
-          <div class="step-icon">2️⃣</div>
-          <div class="step-content">
-            <h4 class="step-title">Domina NgStyle</h4>
-            <p class="step-description">Controla estilos CSS de forma programática</p>
-          </div>
-        </div>
-        
-        <div class="step-item">
-          <div class="step-icon">3️⃣</div>
-          <div class="step-content">
-            <h4 class="step-title">Utiliza HostListener</h4>
-            <p class="step-description">Maneja eventos globales del DOM eficientemente</p>
-          </div>
-        </div>
-      </div>
-
-      <!-- 🎯 CTA BUTTON -->
-      <div class="cta-container">
-        <a 
-          routerLink="/dashboard" 
-          class="cta-button"
-          role="button">
-          <span class="cta-icon">📊</span>
-          <span class="cta-text">Ir al Dashboard</span>
-          <span class="cta-arrow">→</span>
-        </a>
-      </div>
+  <!-- 📅 FOOTER INFO -->
+  <section class="footer-info">
+    <div class="footer-content">
+      <p>
+        <!-- 📅 DATE PIPE: Última actualización -->
+        Última actualización: {{ lastUpdate | date:'fullDate':'':'es' }} 
+        a las {{ lastUpdate | date:'HH:mm:ss' }}
+      </p>
+      <p>
+        <!-- 🔤 INTERPOLACIÓN: Año dinámico -->
+        © {{ currentYear }} PROVIAS DESCENTRALIZADO - 
+        Lab 2: Binding Avanzado con Angular v18
+      </p>
     </div>
   </section>
 

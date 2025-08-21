@@ -191,7 +191,7 @@ export class ProductListComponent implements OnInit {
     this.filterProducts();
   }
 
-  private filterProducts(): void {
+  filterProducts(): void {
     let filtered = [...this.products];
 
     // Filtrar por búsqueda

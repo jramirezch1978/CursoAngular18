@@ -76,7 +76,7 @@
           class="feature-card"
           [ngClass]="getFeatureClasses(i)"
           (click)="onFeatureClick(feature)"
-          (mouseenter)="onFeatureClick"
+          (mouseenter)="onFeatureClick(feature)"
           [attr.data-feature]="feature.title"
           tabindex="0">
           

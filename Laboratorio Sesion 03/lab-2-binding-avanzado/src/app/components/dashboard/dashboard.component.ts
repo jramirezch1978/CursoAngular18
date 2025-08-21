@@ -1,20 +1,14 @@
-import { Component, OnInit, OnDestroy, HostListener, HostBinding } from '@angular/core';
+import { Component, OnInit, HostListener, HostBinding } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
-import { 
-  DashboardWidget, 
-  DashboardState, 
-  WidgetEvent,
-  Alert,
-  ProjectMetrics,
-  EquipmentStatus,
-  DashboardTheme,
-  WidgetType
-} from '../../models/dashboard.interface';
-import { DashboardService } from '../../services/dashboard.service';
+interface Widget {
+  id: string;
+  title: string;
+  type: 'metric' | 'chart' | 'status' | 'alert';
+  data: any;
+  size: { width: number; height: number };
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -23,125 +17,74 @@ import { DashboardService } from '../../services/dashboard.service';
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
-export class DashboardComponent implements OnInit, OnDestroy {
+export class DashboardComponent implements OnInit {
   
   // 🎯 HOST BINDINGS - Demostración avanzada de binding
-  @HostBinding('class.fullscreen') get isFullscreenClass() {
-    return this.state?.isFullscreen || false;
-  }
-  
-  @HostBinding('class.mobile') get isMobileClass() {
-    return this.state?.isMobile || false;
-  }
-  
-  @HostBinding('class.dark-theme') get isDarkThemeClass() {
-    return this.currentTheme === 'dark';
-  }
-  
-  @HostBinding('style.--primary-color') get primaryColorStyle() {
-    return this.themeColors.primary;
-  }
-  
-  @HostBinding('style.--secondary-color') get secondaryColorStyle() {
-    return this.themeColors.secondary;
-  }
+  @HostBinding('class.fullscreen') isFullscreen = false;
+  @HostBinding('class.dark-theme') isDarkTheme = false;
+  @HostBinding('style.--primary-color') primaryColor = '#1e3a8a';
 
-  // 📊 Observables
-  widgets$: Observable<DashboardWidget[]>;
-  state$: Observable<DashboardState>;
-  events$: Observable<WidgetEvent[]>;
-  alerts$: Observable<Alert[]>;
-
-  // 🎮 Estado local del componente
-  state: DashboardState | null = null;
+  // 📊 Datos del dashboard
   searchTerm = '';
-  selectedWidgetId = '';
-  isConfigPanelOpen = false;
-  currentTheme: 'light' | 'dark' | 'high-contrast' = 'light';
-  
-  // ⏰ Tiempo actual para el reloj
+  selectedTheme = 'light';
+  isLoading = false;
   currentTime = new Date();
-  
-  // 🎨 Configuración de vista
-  gridSize = 12;
-  rowHeight = 100;
-  widgetSpacing = 16;
-  
-  // 🎭 Configuración de temas
-  themeColors = {
-    primary: '#1e3a8a',
-    secondary: '#fbbf24',
-    accent: '#10b981',
-    background: '#f9fafb',
-    surface: '#ffffff',
-    text: '#374151'
-  };
 
-  // 🔧 Configuración de widgets
-  availableWidgetTypes: Array<{type: WidgetType, label: string, icon: string}> = [
-    { type: 'metric', label: 'Métrica', icon: '📊' },
-    { type: 'chart', label: 'Gráfico', icon: '📈' },
-    { type: 'progress', label: 'Progreso', icon: '⏳' },
-    { type: 'status', label: 'Estado', icon: '🟢' },
-    { type: 'alert', label: 'Alertas', icon: '🚨' },
-    { type: 'map', label: 'Mapa', icon: '🗺️' },
-    { type: 'table', label: 'Tabla', icon: '📋' }
+  // 🎨 Configuración de temas
+  themes = [
+    { value: 'light', label: '☀️ Claro', colors: { primary: '#1e3a8a', bg: '#ffffff' } },
+    { value: 'dark', label: '🌙 Oscuro', colors: { primary: '#3b82f6', bg: '#1f2937' } },
+    { value: 'contrast', label: '🔆 Alto Contraste', colors: { primary: '#000000', bg: '#ffffff' } }
   ];
 
-  // 🎪 Gestión de eventos
-  private destroy$ = new Subject<void>();
-  
-  // 🎛️ Control de drag & drop
-  isDragging = false;
-  draggedWidget: DashboardWidget | null = null;
-  dropZoneActive = false;
+  // 📊 Widgets de ejemplo
+  widgets: Widget[] = [
+    {
+      id: 'widget-1',
+      title: 'Proyectos Activos',
+      type: 'metric',
+      data: { value: 42, trend: 'up', change: '+5%' },
+      size: { width: 3, height: 2 }
+    },
+    {
+      id: 'widget-2',
+      title: 'Presupuesto Ejecutado',
+      type: 'chart',
+      data: { percentage: 68.5, total: 150000000, used: 89500000 },
+      size: { width: 6, height: 3 }
+    },
+    {
+      id: 'widget-3',
+      title: 'Alertas del Sistema',
+      type: 'alert',
+      data: { critical: 2, warning: 8, info: 15 },
+      size: { width: 3, height: 2 }
+    },
+    {
+      id: 'widget-4',
+      title: 'Estado de Equipos',
+      type: 'status',
+      data: { operational: 156, maintenance: 23, repair: 8 },
+      size: { width: 4, height: 3 }
+    }
+  ];
 
-  constructor(public dashboardService: DashboardService) {
-    // Inicializar observables
-    this.widgets$ = this.dashboardService.widgets$;
-    this.state$ = this.dashboardService.state$;
-    this.events$ = this.dashboardService.events$;
-    this.alerts$ = this.dashboardService.alerts$;
+  constructor() {
+    console.log('📊 Lab 2 - DashboardComponent inicializado');
   }
 
   ngOnInit(): void {
-    console.log('📊 Dashboard Component inicializado');
+    console.log('🎯 Dashboard cargado con', this.widgets.length, 'widgets');
     
-    // Suscribirse al estado
-    this.state$.pipe(takeUntil(this.destroy$)).subscribe(state => {
-      this.state = state;
-      this.searchTerm = state.searchTerm;
-    });
-
-    // Detectar tamaño de pantalla inicial
-    this.checkScreenSize();
-    
-    // Inicializar reloj en tiempo real
-    this.startClock();
-    
-    // Simular carga inicial
-    this.dashboardService.setLoading(true);
-    setTimeout(() => {
-      this.dashboardService.setLoading(false);
-    }, 1500);
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+    // Actualizar tiempo cada segundo
+    setInterval(() => {
+      this.currentTime = new Date();
+    }, 1000);
   }
 
   // 🎧 HOST LISTENERS - Eventos globales
-  @HostListener('window:resize', ['$event'])
-  onWindowResize(event: Event): void {
-    console.log('🖥️ Ventana redimensionada');
-    this.checkScreenSize();
-    this.adjustWidgetSizes();
-  }
-
   @HostListener('window:keydown', ['$event'])
   onKeyDown(event: KeyboardEvent): void {
-    // Atajos de teclado
     if (event.ctrlKey || event.metaKey) {
       switch (event.key) {
         case 'f':
@@ -152,44 +95,27 @@ export class DashboardComponent implements OnInit, OnDestroy {
           event.preventDefault();
           this.toggleTheme();
           break;
-        case 'r':
-          event.preventDefault();
-          this.refreshAllWidgets();
-          break;
       }
     }
 
-    // Navegación con teclado
-    switch (event.key) {
-      case 'Escape':
-        this.exitFullscreen();
-        this.closeConfigPanel();
-        break;
-      case 'Tab':
-        this.handleTabNavigation(event);
-        break;
+    if (event.key === 'Escape') {
+      this.exitFullscreen();
     }
   }
 
-  @HostListener('document:click', ['$event'])
-  onDocumentClick(event: Event): void {
-    // Cerrar paneles al hacer click fuera
-    const target = event.target as HTMLElement;
-    if (!target.closest('.config-panel') && !target.closest('.config-trigger')) {
-      this.closeConfigPanel();
-    }
+  @HostListener('window:resize', ['$event'])
+  onWindowResize(event: Event): void {
+    console.log('🖥️ Ventana redimensionada:', window.innerWidth + 'x' + window.innerHeight);
   }
 
-  // 🔍 Métodos de búsqueda y filtrado
+  // 🔍 Métodos de búsqueda
   onSearchChange(): void {
-    console.log(`🔍 Búsqueda actualizada: "${this.searchTerm}"`);
-    this.dashboardService.setSearchTerm(this.searchTerm);
+    console.log(`🔍 Búsqueda: "${this.searchTerm}"`);
   }
 
   onSearchKeydown(event: KeyboardEvent): void {
     if (event.key === 'Enter') {
       console.log('🔍 Búsqueda ejecutada con Enter');
-      this.focusFirstWidget();
     }
     
     if (event.key === 'Escape') {
@@ -199,410 +125,93 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   clearSearch(): void {
     this.searchTerm = '';
-    this.onSearchChange();
     console.log('🧹 Búsqueda limpiada');
   }
 
-  // 🎛️ Métodos de widget
-  onWidgetClick(widget: DashboardWidget, event: MouseEvent): void {
-    console.log(`🖱️ Widget clickeado: ${widget.title}`);
-    
-    // Prevenir propagación si es necesario
-    if (event.ctrlKey) {
-      event.stopPropagation();
-      this.selectWidget(widget.id);
-    } else {
-      this.focusWidget(widget.id);
-    }
-
-    // Emitir evento
-    this.dashboardService.emitWidgetEvent({
-      type: 'click',
-      widgetId: widget.id,
-      payload: { x: event.clientX, y: event.clientY }
-    });
-  }
-
-  onWidgetDoubleClick(widget: DashboardWidget): void {
-    console.log(`⚡ Widget doble-click: ${widget.title}`);
-    this.openWidgetConfig(widget.id);
-  }
-
-  onWidgetMouseEnter(widget: DashboardWidget): void {
-    console.log(`🖱️ Mouse enter: ${widget.title}`);
-    this.dashboardService.emitWidgetEvent({
-      type: 'hover',
-      widgetId: widget.id,
-      payload: { action: 'enter' }
-    });
-  }
-
-  onWidgetMouseLeave(widget: DashboardWidget): void {
-    console.log(`🖱️ Mouse leave: ${widget.title}`);
-    this.dashboardService.emitWidgetEvent({
-      type: 'hover',
-      widgetId: widget.id,
-      payload: { action: 'leave' }
-    });
-  }
-
-  onWidgetFocus(widget: DashboardWidget): void {
-    console.log(`🎯 Widget enfocado: ${widget.title}`);
-    this.selectedWidgetId = widget.id;
-  }
-
-  onWidgetKeydown(widget: DashboardWidget, event: KeyboardEvent): void {
-    switch (event.key) {
-      case 'Enter':
-      case ' ':
-        event.preventDefault();
-        this.openWidgetConfig(widget.id);
-        break;
-      case 'Delete':
-        event.preventDefault();
-        this.removeWidget(widget.id);
-        break;
-    }
-  }
-
-  // 🎨 Métodos de estilo dinámico
-  getWidgetClasses(widget: DashboardWidget): { [key: string]: boolean } {
-    return {
-      'widget': true,
-      'widget-selected': this.selectedWidgetId === widget.id,
-      'widget-loading': widget.status === 'loading',
-      'widget-error': widget.status === 'error',
-      'widget-offline': widget.status === 'offline',
-      'widget-updating': widget.status === 'updating',
-      [`widget-${widget.type}`]: true,
-      [`widget-${widget.config.theme}`]: true,
-      'widget-dragging': this.isDragging && this.draggedWidget?.id === widget.id,
-      'widget-compact': widget.size.width <= 3,
-      'widget-large': widget.size.width >= 8,
-      'widget-featured': widget.id === 'widget-1', // Widget destacado
-      'widget-resizable': widget.config.allowResize,
-      'widget-movable': widget.config.allowMove
-    };
-  }
-
-  getWidgetStyles(widget: DashboardWidget): { [key: string]: string } {
-    const baseStyles = {
-      'grid-column': `span ${widget.size.width}`,
-      'grid-row': `span ${widget.size.height}`,
-      'min-height': `${widget.size.height * this.rowHeight}px`,
-      'order': widget.position.zIndex?.toString() || '0'
-    };
-
-    // Estilos adicionales basados en configuración
-    const configStyles: { [key: string]: string } = {};
-    
-    if (widget.config.customStyles) {
-      Object.assign(configStyles, widget.config.customStyles);
-    }
-
-    // Estilos dinámicos basados en datos
-    const dataStyles: { [key: string]: string } = {};
-    
-    if (widget.type === 'progress' && widget.data.percentage) {
-      const percentage = widget.data.percentage;
-      if (percentage >= 90) {
-        dataStyles['border-left'] = '4px solid var(--color-success)';
-      } else if (percentage >= 70) {
-        dataStyles['border-left'] = '4px solid var(--color-warning)';
-      } else {
-        dataStyles['border-left'] = '4px solid var(--color-info)';
-      }
-    }
-
-    if (widget.type === 'alert' && widget.data.critical > 0) {
-      dataStyles['animation'] = 'pulse-alert 2s infinite';
-    }
-
-    return { ...baseStyles, ...configStyles, ...dataStyles };
-  }
-
-  getGridClasses(): { [key: string]: boolean } {
-    return {
-      'dashboard-grid': true,
-      'grid-compact': this.state?.isMobile || false,
-      'grid-fullscreen': this.state?.isFullscreen || false,
-      'grid-dragging': this.isDragging,
-      [`theme-${this.currentTheme}`]: true
-    };
-  }
-
-  getGridStyles(): { [key: string]: string } {
-    const cols = this.state?.isMobile ? 2 : this.gridSize;
-    
-    return {
-      'grid-template-columns': `repeat(${cols}, 1fr)`,
-      'gap': `${this.widgetSpacing}px`,
-      'padding': this.state?.isFullscreen ? '0' : '2rem'
-    };
-  }
-
-  // 🎮 Métodos de control
+  // 🎛️ Métodos de control
   toggleFullscreen(): void {
-    const newState = !this.state?.isFullscreen;
-    this.dashboardService.setFullscreen(newState);
-    console.log(`🖥️ Fullscreen: ${newState ? 'activado' : 'desactivado'}`);
+    this.isFullscreen = !this.isFullscreen;
+    console.log(`🖥️ Fullscreen: ${this.isFullscreen ? 'activado' : 'desactivado'}`);
   }
 
   exitFullscreen(): void {
-    if (this.state?.isFullscreen) {
-      this.dashboardService.setFullscreen(false);
+    if (this.isFullscreen) {
+      this.isFullscreen = false;
     }
   }
 
   toggleTheme(): void {
-    const themes: typeof this.currentTheme[] = ['light', 'dark', 'high-contrast'];
-    const currentIndex = themes.indexOf(this.currentTheme);
-    this.currentTheme = themes[(currentIndex + 1) % themes.length];
+    const currentIndex = this.themes.findIndex(t => t.value === this.selectedTheme);
+    const nextIndex = (currentIndex + 1) % this.themes.length;
+    this.changeTheme(this.themes[nextIndex].value);
+  }
+
+  changeTheme(theme: string): void {
+    this.selectedTheme = theme;
+    const themeConfig = this.themes.find(t => t.value === theme);
     
-    this.updateThemeColors();
-    console.log(`🎨 Tema cambiado a: ${this.currentTheme}`);
-  }
-
-  // 🔧 Métodos de configuración
-  openConfigPanel(): void {
-    this.isConfigPanelOpen = true;
-    console.log('⚙️ Panel de configuración abierto');
-  }
-
-  // 🎨 Métodos para cambio de tema
-  setLightTheme(): void {
-    this.currentTheme = 'light';
-    this.updateThemeColors();
-  }
-
-  setDarkTheme(): void {
-    this.currentTheme = 'dark';
-    this.updateThemeColors();
-  }
-
-  setHighContrastTheme(): void {
-    this.currentTheme = 'high-contrast';
-    this.updateThemeColors();
-  }
-
-  // 📅 Método para obtener fecha actual
-  getCurrentTime(): Date {
-    return this.currentTime;
-  }
-
-  // ⏰ Inicializar reloj en tiempo real
-  private startClock(): void {
-    // Actualizar cada segundo
-    interval(1000).pipe(takeUntil(this.destroy$)).subscribe(() => {
-      this.currentTime = new Date();
-    });
-  }
-
-  // 📊 Método para reconocer alertas
-  acknowledgeAlert(alertId: string): void {
-    this.dashboardService.acknowledgeAlert(alertId);
-  }
-
-  // 🎨 Método para obtener icono de tipo de widget
-  getWidgetTypeIcon(type: string): string {
-    const icons = {
-      'metric': '📊',
-      'chart': '📈',
-      'progress': '⏳',
-      'status': '🟢',
-      'alert': '🚨',
-      'map': '🗺️',
-      'table': '📋',
-      'calendar': '📅'
-    };
-    return icons[type as keyof typeof icons] || '📦';
-  }
-
-  // 🔍 Track function para performance
-  trackByWidgetId(index: number, widget: DashboardWidget): string {
-    return widget.id;
-  }
-
-  closeConfigPanel(): void {
-    this.isConfigPanelOpen = false;
-    console.log('⚙️ Panel de configuración cerrado');
-  }
-
-  openWidgetConfig(widgetId: string): void {
-    console.log(`🔧 Configuración de widget: ${widgetId}`);
-    this.selectedWidgetId = widgetId;
-    this.openConfigPanel();
-  }
-
-  // ➕ Métodos de gestión de widgets
-  addWidget(type: DashboardWidget['type']): void {
-    const newWidget = {
-      title: `Nuevo ${this.getWidgetTypeLabel(type)}`,
-      type,
-      size: { width: 4, height: 2 },
-      position: { x: 0, y: 0 },
-      data: this.getDefaultWidgetData(type)
-    };
-
-    this.dashboardService.addWidget(newWidget);
-    console.log(`➕ Widget agregado: ${type}`);
-  }
-
-  removeWidget(widgetId: string): void {
-    if (confirm('¿Estás seguro de que quieres eliminar este widget?')) {
-      this.dashboardService.removeWidget(widgetId);
-      console.log(`🗑️ Widget eliminado: ${widgetId}`);
+    if (themeConfig) {
+      this.isDarkTheme = theme === 'dark';
+      this.primaryColor = themeConfig.colors.primary;
+      console.log(`🎨 Tema cambiado a: ${theme}`);
     }
   }
 
-  refreshWidget(widgetId: string): void {
-    this.dashboardService.updateWidgetStatus(widgetId, 'updating');
+  // 🛒 Métodos de widgets
+  onWidgetClick(widget: Widget, event: MouseEvent): void {
+    console.log(`🖱️ Widget clickeado: ${widget.title}`);
+    event.stopPropagation();
+  }
+
+  onWidgetHover(widget: Widget, isEntering: boolean): void {
+    console.log(`🖱️ ${isEntering ? 'Mouse enter' : 'Mouse leave'}: ${widget.title}`);
+  }
+
+  refreshWidget(widget: Widget): void {
+    console.log(`🔄 Refrescando widget: ${widget.title}`);
+    this.isLoading = true;
     
     setTimeout(() => {
-      this.dashboardService.updateWidgetStatus(widgetId, 'ready');
-      console.log(`🔄 Widget actualizado: ${widgetId}`);
+      this.isLoading = false;
+      console.log(`✅ Widget ${widget.title} actualizado`);
     }, 1000);
   }
 
-  refreshAllWidgets(): void {
-    console.log('🔄 Actualizando todos los widgets...');
-    this.dashboardService.setLoading(true);
-    
-    setTimeout(() => {
-      this.dashboardService.setLoading(false);
-      console.log('✅ Todos los widgets actualizados');
-    }, 2000);
-  }
-
-  // 🎯 Métodos auxiliares
-  private checkScreenSize(): void {
-    const isMobile = window.innerWidth < 768;
-    this.dashboardService.setMobileMode(isMobile);
-  }
-
-  private adjustWidgetSizes(): void {
-    if (this.state?.isMobile) {
-      // Ajustar widgets para móvil
-      console.log('📱 Ajustando widgets para móvil');
-    }
-  }
-
-  private focusWidget(widgetId: string): void {
-    const element = document.querySelector(`[data-widget-id="${widgetId}"]`) as HTMLElement;
-    element?.focus();
-  }
-
-  private focusFirstWidget(): void {
-    const firstWidget = document.querySelector('.widget') as HTMLElement;
-    firstWidget?.focus();
-  }
-
-  private selectWidget(widgetId: string): void {
-    this.selectedWidgetId = this.selectedWidgetId === widgetId ? '' : widgetId;
-  }
-
-  private handleTabNavigation(event: KeyboardEvent): void {
-    // Implementar navegación personalizada con Tab
-    console.log('⌨️ Navegación con Tab');
-  }
-
-  updateThemeColors(): void {
-    switch (this.currentTheme) {
-      case 'dark':
-        this.themeColors = {
-          primary: '#3b82f6',
-          secondary: '#fbbf24',
-          accent: '#10b981',
-          background: '#111827',
-          surface: '#1f2937',
-          text: '#f9fafb'
-        };
-        break;
-      case 'high-contrast':
-        this.themeColors = {
-          primary: '#000000',
-          secondary: '#ffff00',
-          accent: '#00ff00',
-          background: '#ffffff',
-          surface: '#f0f0f0',
-          text: '#000000'
-        };
-        break;
-      default: // light
-        this.themeColors = {
-          primary: '#1e3a8a',
-          secondary: '#fbbf24',
-          accent: '#10b981',
-          background: '#f9fafb',
-          surface: '#ffffff',
-          text: '#374151'
-        };
-    }
-  }
-
-  getWidgetTypeLabel(type: DashboardWidget['type']): string {
-    const typeMap = {
-      'metric': 'Métrica',
-      'chart': 'Gráfico',
-      'progress': 'Progreso',
-      'status': 'Estado',
-      'alert': 'Alerta',
-      'map': 'Mapa',
-      'table': 'Tabla',
-      'calendar': 'Calendario'
+  // 🎨 Métodos de estilo dinámico
+  getWidgetClasses(widget: Widget): { [key: string]: boolean } {
+    return {
+      'widget': true,
+      'widget-loading': this.isLoading,
+      [`widget-${widget.type}`]: true,
+      'widget-compact': widget.size.width <= 3,
+      'widget-large': widget.size.width >= 6
     };
-    return typeMap[type] || 'Widget';
   }
 
-  private getDefaultWidgetData(type: DashboardWidget['type']): any {
-    switch (type) {
-      case 'metric':
-        return { value: 0, trend: 'stable', change: '0%' };
-      case 'progress':
-        return { percentage: 0, total: 100, current: 0 };
-      case 'status':
-        return { status: 'normal', count: 0 };
-      case 'alert':
-        return { critical: 0, warning: 0, info: 0 };
-      default:
-        return {};
-    }
-  }
-
-  // 📊 Métodos para datos específicos de PROVIAS
-  getProjectStatusColor(status: string): string {
-    const colors = {
-      'planning': '#6b7280',
-      'in-progress': '#3b82f6',
-      'on-hold': '#f59e0b',
-      'completed': '#10b981',
-      'cancelled': '#ef4444',
-      'delayed': '#f97316'
+  getWidgetStyles(widget: Widget): { [key: string]: string } {
+    return {
+      'grid-column': `span ${widget.size.width}`,
+      'grid-row': `span ${widget.size.height}`,
+      'min-height': `${widget.size.height * 100}px`
     };
-    return colors[status as keyof typeof colors] || '#6b7280';
   }
 
-  getEquipmentStatusIcon(status: string): string {
-    const icons = {
-      'operational': '🟢',
-      'maintenance': '🟡',
-      'repair': '🔴',
-      'idle': '⚪',
-      'critical': '🚨'
+  getThemeClasses(): { [key: string]: boolean } {
+    return {
+      'dashboard-container': true,
+      'theme-light': this.selectedTheme === 'light',
+      'theme-dark': this.selectedTheme === 'dark',
+      'theme-contrast': this.selectedTheme === 'contrast',
+      'fullscreen-mode': this.isFullscreen
     };
-    return icons[status as keyof typeof icons] || '❓';
   }
 
-  getAlertSeverityClass(severity: string): string {
-    return `alert-${severity}`;
-  }
-
+  // 🎯 Métodos de presentación
   formatCurrency(amount: number): string {
     return new Intl.NumberFormat('es-PE', {
       style: 'currency',
       currency: 'PEN',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0
+      minimumFractionDigits: 0
     }).format(amount);
   }
 
@@ -614,16 +223,30 @@ export class DashboardComponent implements OnInit, OnDestroy {
     }).format(value / 100);
   }
 
-  // 🎨 Método para obtener color basado en el progreso
-  getProgressColor(progress: number): string {
-    if (progress >= 90) {
-      return '#10b981'; // Verde
-    } else if (progress >= 70) {
-      return '#f59e0b'; // Amarillo
-    } else if (progress >= 50) {
-      return '#3b82f6'; // Azul
-    } else {
-      return '#ef4444'; // Rojo
-    }
+  getStatusIcon(status: string): string {
+    const icons = {
+      'operational': '🟢',
+      'maintenance': '🟡',
+      'repair': '🔴',
+      'critical': '🚨'
+    };
+    return icons[status as keyof typeof icons] || '❓';
+  }
+
+  // 📊 Getters para datos calculados
+  get totalProjects(): number {
+    return this.widgets.find(w => w.id === 'widget-1')?.data?.value || 0;
+  }
+
+  get budgetData(): any {
+    return this.widgets.find(w => w.id === 'widget-2')?.data || {};
+  }
+
+  get alertsData(): any {
+    return this.widgets.find(w => w.id === 'widget-3')?.data || {};
+  }
+
+  get equipmentData(): any {
+    return this.widgets.find(w => w.id === 'widget-4')?.data || {};
   }
 }

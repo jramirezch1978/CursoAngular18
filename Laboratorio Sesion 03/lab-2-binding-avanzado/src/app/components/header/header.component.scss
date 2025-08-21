@@ -1,265 +1,107 @@
-/* 🎯 HEADER COMPONENT STYLES - Lab 2: Binding Avanzado */
-
-.app-header {
+// 🎯 HEADER COMPONENT STYLES - LAB 2
+.main-header {
   display: flex;
-  align-items: center;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 2rem;
-  background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+  background: linear-gradient(135deg, #1e3a8a, #3b82f6);
   color: white;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  position: relative;
-  min-height: 70px;
-
-  @media (max-width: 768px) {
-    padding: 0.75rem 1rem;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-}
-
-/* 🏢 BRAND SECTION */
-.header-brand {
-  display: flex;
-  align-items: center;
-  flex-shrink: 0;
-}
-
-.brand-logo {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-.logo-icon {
-  font-size: 2rem;
-  line-height: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 48px;
-  height: 48px;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  backdrop-filter: blur(10px);
-}
-
-.brand-text {
-  line-height: 1.2;
-}
-
-.brand-title {
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin: 0;
-  color: white;
-  
-  @media (max-width: 768px) {
-    font-size: 1.1rem;
-  }
-}
-
-.brand-subtitle {
-  font-size: 0.875rem;
-  margin: 0;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  
-  @media (max-width: 768px) {
-    font-size: 0.8rem;
-  }
-}
-
-/* 🧭 NAVIGATION SECTION */
-.header-nav {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  
-  @media (max-width: 768px) {
-    order: 3;
-    width: 100%;
-    justify-content: flex-start;
-  }
-}
-
-.nav-list {
-  display: flex;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  gap: 0.5rem;
-  
-  @media (max-width: 768px) {
-    gap: 0.25rem;
-  }
-}
-
-.nav-item {
-  display: flex;
-}
-
-.nav-link,
-.nav-button {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  text-decoration: none;
-  color: rgba(255, 255, 255, 0.9);
-  border-radius: 8px;
-  transition: all 0.2s ease;
-  font-size: 0.875rem;
-  font-weight: 500;
-  border: none;
-  background: none;
-  cursor: pointer;
-  font-family: inherit;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.1);
-    color: white;
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  @media (max-width: 768px) {
-    padding: 0.5rem 0.75rem;
-    font-size: 0.8rem;
-  }
-}
-
-.nav-link--active {
-  background: rgba(255, 255, 255, 0.15);
-  color: white;
-  font-weight: 600;
-}
-
-.nav-icon {
-  font-size: 1rem;
-  line-height: 1;
-  
-  @media (max-width: 768px) {
-    font-size: 0.9rem;
-  }
-}
-
-.nav-text {
-  @media (max-width: 640px) {
-    display: none;
-  }
-}
-
-/* 🎛️ ACTIONS SECTION */
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-shrink: 0;
-}
-
-.action-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 40px;
-  height: 40px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  font-size: 1.1rem;
-  backdrop-filter: blur(10px);
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.2);
-    transform: translateY(-1px);
-  }
-
-  &:active {
-    transform: translateY(0);
-  }
-
-  @media (max-width: 768px) {
-    width: 36px;
-    height: 36px;
-    font-size: 1rem;
-  }
-}
-
-.action-icon {
-  line-height: 1;
-}
-
-/* 🎨 RESPONSIVE ADJUSTMENTS */
-@media (max-width: 640px) {
-  .app-header {
-    padding: 0.5rem 1rem;
-  }
-  
-  .brand-title {
-    font-size: 1rem;
-  }
-  
-  .brand-subtitle {
-    font-size: 0.75rem;
-  }
-  
-  .logo-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.5rem;
-  }
-}
-
-/* 🌟 ANIMATIONS */
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.app-header {
-  animation: fadeInUp 0.6s ease-out;
-}
-
-/* 🎯 ACCESSIBILITY */
-.nav-link:focus,
-.nav-button:focus,
-.action-btn:focus {
-  outline: 2px solid rgba(255, 255, 255, 0.8);
-  outline-offset: 2px;
-}
-
-/* 🔥 MODERN EFFECTS */
-.app-header::before {
-  content: '';
-  position: absolute;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: sticky;
   top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(
-    45deg,
-    rgba(255, 255, 255, 0.1) 0%,
-    rgba(255, 255, 255, 0.05) 50%,
-    rgba(255, 255, 255, 0.1) 100%
-  );
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+  z-index: 1000;
 
-.app-header:hover::before {
-  opacity: 1;
+  .brand-section {
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .logo-text {
+        h1 {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: white;
+        }
+
+        p {
+          margin: 0;
+          font-size: 0.9rem;
+          opacity: 0.9;
+          color: #e2e8f0;
+        }
+      }
+    }
+  }
+
+  .navigation {
+    display: flex;
+    gap: 1.5rem;
+    align-items: center;
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      padding: 0.75rem 1.25rem;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+      border: 2px solid transparent;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: translateY(-2px);
+        border-color: rgba(255, 255, 255, 0.3);
+      }
+
+      &.active {
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      }
+    }
+  }
+
+  .mobile-menu-toggle {
+    display: none;
+    background: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    font-size: 1.5rem;
+    padding: 0.5rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 1rem;
+
+    .brand-section {
+      .logo .logo-text {
+        h1 {
+          font-size: 1.2rem;
+        }
+        p {
+          display: none;
+        }
+      }
+    }
+
+    .navigation {
+      display: none;
+    }
+
+    .mobile-menu-toggle {
+      display: block;
+    }
+  }
 }
