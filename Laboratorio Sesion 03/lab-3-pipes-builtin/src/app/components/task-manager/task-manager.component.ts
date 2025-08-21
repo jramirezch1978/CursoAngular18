@@ -421,4 +421,28 @@ export class TaskManagerComponent implements OnInit, OnDestroy {
   getCurrentTime(): Date {
     return new Date();
   }
+
+  // 🔧 Métodos auxiliares para template
+  getAbsoluteDays(days: number): number {
+    return Math.abs(days);
+  }
+
+  deleteTask(taskId: number): void {
+    this.taskService.deleteTask(taskId).subscribe(
+      success => {
+        if (success) {
+          console.log(`🗑️ Tarea eliminada: ${taskId}`);
+        }
+      }
+    );
+  }
+
+  getTasksByStatus(tasks: Task[], status: string): Task[] {
+    if (status === 'all') return tasks;
+    return tasks.filter(task => task.status === status);
+  }
+
+  getRegionKeys(byRegion: { [region: string]: number }): string[] {
+    return Object.keys(byRegion);
+  }
 }

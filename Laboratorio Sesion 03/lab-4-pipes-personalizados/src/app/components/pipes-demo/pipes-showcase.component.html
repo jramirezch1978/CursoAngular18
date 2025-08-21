@@ -1,0 +1,275 @@
+<!-- 🔧 LAB 4: PIPES PERSONALIZADOS -->
+<!-- SHOWCASE INTERACTIVO DE PIPES -->
+
+<div class="pipes-showcase-container">
+  
+  <!-- 🎯 HEADER -->
+  <header class="showcase-header">
+    <h1>🔧 Showcase de Pipes Personalizados</h1>
+    <p class="subtitle">Demostración interactiva de pipes personalizados para PROVIAS</p>
+  </header>
+
+  <!-- 🎛️ CONTROLES DE DEMOSTRACIÓN -->
+  <section class="demo-controls">
+    <h2>⚙️ Controles de Demostración</h2>
+    
+    <div class="controls-grid">
+      
+      <!-- 🔍 CONTROL DE BÚSQUEDA -->
+      <div class="control-group">
+        <label for="search">🔍 Filtro de Búsqueda:</label>
+        <input
+          type="text"
+          id="search"
+          [(ngModel)]="searchTerm"
+          (input)="onSearchChange()"
+          placeholder="Buscar proyectos..."
+          class="form-control">
+        <small class="pipe-info">Usa: <code>FilterPipe</code></small>
+      </div>
+
+      <!-- ✂️ CONTROL DE TRUNCADO -->
+      <div class="control-group">
+        <label for="truncate">✂️ Límite de Truncado: {{ truncateLimit }}</label>
+        <input
+          type="range"
+          id="truncate"
+          [(ngModel)]="truncateLimit"
+          (input)="onTruncateConfigChange()"
+          min="20"
+          max="150"
+          class="form-range">
+        <small class="pipe-info">Usa: <code>TruncatePipe</code></small>
+      </div>
+
+      <!-- 📁 CONTROL DE FILESIZE -->
+      <div class="control-group">
+        <label>📁 Unidades de Archivo:</label>
+        <select [(ngModel)]="fileSizeUnits" (change)="onFileSizeConfigChange()" class="form-control">
+          <option value="binary">Binario (1024)</option>
+          <option value="decimal">Decimal (1000)</option>
+        </select>
+        <small class="pipe-info">Usa: <code>FileSizePipe</code></small>
+      </div>
+
+      <!-- 🎨 CONTROL DE HIGHLIGHT -->
+      <div class="control-group">
+        <label for="highlight-term">🖍️ Término a Resaltar:</label>
+        <input
+          type="text"
+          id="highlight-term"
+          [(ngModel)]="highlightTerm"
+          (input)="onHighlightConfigChange()"
+          placeholder="PROVIAS"
+          class="form-control">
+        <small class="pipe-info">Usa: <code>SearchHighlightPipe</code></small>
+      </div>
+
+      <!-- 📊 CONTROL DE ORDENAMIENTO -->
+      <div class="control-group">
+        <label for="sort-field">📊 Ordenar por:</label>
+        <select
+          id="sort-field"
+          [(ngModel)]="sortField"
+          (change)="onSortFieldChange()"
+          class="form-control">
+          @for (field of sortFields; track field.value) {
+            <option [value]="field.value">{{ field.label }}</option>
+          }
+        </select>
+        <small class="pipe-info">Usa: <code>SortByPipe</code></small>
+      </div>
+
+      <!-- 🔄 RESET BUTTON -->
+      <div class="control-group">
+        <button
+          type="button"
+          (click)="resetAllConfig()"
+          class="btn btn-warning">
+          🔄 Reset Configuración
+        </button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- 📊 DEMOSTRACIÓN DE DATOS -->
+  <section class="demo-section">
+    <h2>📊 Datos de Demostración</h2>
+    
+    <!-- 🔍 FILTERPIPE DEMO -->
+    <div class="demo-card">
+      <h3>🔍 FilterPipe</h3>
+      <div class="demo-content">
+        <p><strong>Proyectos encontrados:</strong> {{ filteredProjects.length }} de {{ sampleData.projects.length }}</p>
+        
+        <div class="projects-list">
+          @for (project of filteredProjects; track project.id) {
+            <div class="project-item">
+              <h4>{{ project.name }}</h4>
+              <p>{{ project.description | truncate:truncateLimit:truncateTrail:useWordBoundary }}</p>
+              <div class="project-meta">
+                <span>📍 {{ project.region }}</span>
+                <span>👤 {{ project.manager }}</span>
+                <span>💰 {{ project.budget | currency:'PEN':'symbol':'1.0-0' }}</span>
+                <span>📁 {{ project.fileSize | fileSize:fileSizeDecimals:fileSizeUnits }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ✂️ TRUNCATEPIPE DEMO -->
+    <div class="demo-card">
+      <h3>✂️ TruncatePipe</h3>
+      <div class="demo-content">
+        <div class="truncate-examples">
+          <div class="example-item">
+            <strong>Texto original:</strong>
+            <p>{{ selectedText }}</p>
+          </div>
+          
+          <div class="example-item">
+            <strong>Truncado normal ({{ truncateLimit }} chars):</strong>
+            <p>{{ selectedText | truncate:truncateLimit:truncateTrail:false }}</p>
+          </div>
+          
+          <div class="example-item">
+            <strong>Truncado con word boundary:</strong>
+            <p>{{ selectedText | truncate:truncateLimit:truncateTrail:true }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📁 FILESIZEPIPE DEMO -->
+    <div class="demo-card">
+      <h3>📁 FileSizePipe</h3>
+      <div class="demo-content">
+        <div class="filesize-examples">
+          @for (file of sampleData.files; track file.name) {
+            <div class="file-example">
+              <span class="file-name">{{ file.name }}</span>
+              <span class="file-size">{{ file.size | fileSize:fileSizeDecimals:fileSizeUnits }}</span>
+              <span class="file-type">{{ file.type }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- ⏰ TIMEAGOPIPE DEMO -->
+    <div class="demo-card">
+      <h3>⏰ TimeAgoPipe</h3>
+      <div class="demo-content">
+        <div class="time-examples">
+          @for (date of sampleData.dates; track date) {
+            <div class="time-example">
+              <span class="original-date">{{ date | date:'dd/MM/yyyy HH:mm' }}</span>
+              <span class="time-ago">{{ date | timeAgo }}</span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- 🖍️ SEARCHHIGHLIGHTPIPE DEMO -->
+    <div class="demo-card">
+      <h3>🖍️ SearchHighlightPipe</h3>
+      <div class="demo-content">
+        <div class="highlight-example">
+          <p [innerHTML]="selectedText | searchHighlight:highlightTerm:highlightClass:caseSensitive"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 📊 SORTBYPIPE DEMO -->
+    <div class="demo-card">
+      <h3>📊 SortByPipe</h3>
+      <div class="demo-content">
+        <p><strong>Proyectos ordenados por {{ sortField }} ({{ sortDirection }}):</strong></p>
+        <div class="sorted-list">
+          @for (project of filteredProjects; track project.id) {
+            <div class="sorted-item">
+              <span class="project-name">{{ project.name }}</span>
+              <span class="sort-value">
+                @switch (sortField) {
+                  @case ('budget') {
+                    {{ project.budget | currency:'PEN':'symbol':'1.0-0' }}
+                  }
+                  @case ('createdAt') {
+                    {{ project.createdAt | date:'dd/MM/yy' }}
+                  }
+                  @default {
+                    {{ project[sortField] }}
+                  }
+                }
+              </span>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- 📚 DOCUMENTACIÓN -->
+  <section class="documentation-section">
+    <h2>📚 Documentación de Pipes</h2>
+    
+    <div class="docs-grid">
+      @for (pipe of pipeDocumentation; track pipe.id) {
+        <div class="doc-card">
+          <h3>{{ pipe.name }}</h3>
+          <p>{{ pipe.description }}</p>
+          
+          <div class="syntax-section">
+            <h4>Sintaxis:</h4>
+            <code>{{ pipe.syntax }}</code>
+          </div>
+
+          <div class="performance-section">
+            <h4>Performance:</h4>
+            <span class="performance-badge" [class]="pipe.performance.isPure ? 'pure' : 'impure'">
+              {{ pipe.performance.isPure ? '🟢 Puro' : '🟡 Impuro' }}
+            </span>
+            <p>{{ pipe.performance.recommendation }}</p>
+          </div>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- ⚡ PERFORMANCE METRICS -->
+  @if (showPerformanceMetrics) {
+    <section class="performance-section">
+      <h2>⚡ Métricas de Performance</h2>
+      
+      @if (metrics$ | async; as metrics) {
+        <div class="metrics-grid">
+          @for (metric of metrics; track metric.pipeName) {
+            <div class="metric-card">
+              <h4>{{ metric.pipeName }}</h4>
+              <div class="metric-data">
+                <span>Tiempo: {{ formatExecutionTime(metric.executionTime) }}</span>
+                <span>Ejecuciones: {{ metric.executionCount }}</span>
+                <span>Promedio: {{ formatExecutionTime(metric.averageTime) }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+      
+      <div class="performance-actions">
+        <button type="button" (click)="runPerformanceBenchmark()" class="btn btn-primary">
+          🧪 Ejecutar Benchmark
+        </button>
+        <button type="button" (click)="clearPerformanceMetrics()" class="btn btn-secondary">
+          🧹 Limpiar Métricas
+        </button>
+      </div>
+    </section>
+  }
+
+</div>

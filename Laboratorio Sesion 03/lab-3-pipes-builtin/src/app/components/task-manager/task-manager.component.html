@@ -420,7 +420,7 @@
                         </small>
                       } @else {
                         <small class="overdue-days">
-                          ({{ Math.abs(getDaysUntilDue(task.dueDate)) }} días vencida)
+                          ({{ getAbsoluteDays(getDaysUntilDue(task.dueDate)) }} días vencida)
                         </small>
                       }
                     </div>
@@ -578,7 +578,7 @@
                     <button
                       type="button"
                       class="action-btn delete-btn"
-                      (click)="taskService.deleteTask(task.id).subscribe()"
+                      (click)="deleteTask(task.id)"
                       title="Eliminar tarea">
                       🗑️
                     </button>
@@ -698,7 +698,7 @@
                 <div class="column-header" [style.border-color]="status.color">
                   <h3>{{ status.label }}</h3>
                   <span class="task-count">
-                    {{ (tasks | filter:status.value:'status').length }}
+                    {{ getTasksByStatus(tasks, status.value).length }}
                   </span>
                 </div>
 
@@ -801,7 +801,7 @@
       <div class="stats-section">
         <h4>Por Región:</h4>
         <div class="stats-list">
-          @for (region of Object.keys(stats.byRegion); track region) {
+          @for (region of getRegionKeys(stats.byRegion); track region) {
             <div class="stat-item">
               <span class="stat-label">{{ region }}:</span>
               <span class="stat-value">{{ stats.byRegion[region] | number }}</span>
