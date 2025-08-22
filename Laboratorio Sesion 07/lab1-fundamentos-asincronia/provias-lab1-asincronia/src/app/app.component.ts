@@ -54,6 +54,7 @@ export class AppComponent implements OnInit {
   ngOnInit() {
     console.log('🔬 LAB 1: Fundamentos de Asincronía - Iniciado');
     console.log('👨‍🏫 Instructor: Ing. Jhonny Alexander Ramirez Chiroque');
+    console.log('🎯 Interface personalizada cargada - NO es el dashboard por defecto');
   }
   
   // Navegación entre pestañas
@@ -168,7 +169,7 @@ export class AppComponent implements OnInit {
   
   // Async/Await
   async testAsyncAwait(): Promise<void> {
-    console.log('🎭 Probando Async/Await');
+    console.log('🎭 Probando Async/Await - ¡Poesía en código!');
     this.loadingStates.asyncAwait = true;
     this.results.asyncAwait = 'Ejecutando con elegancia...';
     
@@ -236,12 +237,7 @@ export class AppComponent implements OnInit {
       this.results.promiseAllSettled = {
         message: `✅ Completado: ${successful} exitosas, ${failed} fallidas`,
         successful,
-        failed,
-        results: results.map((result, index) => ({
-          index: index + 1,
-          status: result.status,
-          data: result.status === 'fulfilled' ? 'Datos obtenidos' : result.reason?.message
-        }))
+        failed
       };
       this.loadingStates.promiseAllSettled = false;
       this.addMetric('Promise.allSettled', endTime - startTime);
@@ -322,5 +318,7 @@ export class AppComponent implements OnInit {
       { operation, time: Math.round(time) },
       ...this.performanceMetrics.slice(0, 9)
     ];
+    
+    console.log(`📊 Métrica: ${operation} - ${Math.round(time)}ms`);
   }
 }

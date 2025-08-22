@@ -3,7 +3,7 @@
   "version": 1,
   "newProjectRoot": "projects",
   "projects": {
-    "provias-security-forms": {
+    "provias-performance-forms": {
       "projectType": "application",
       "schematics": {
         "@schematics/angular:component": {
@@ -17,7 +17,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:application",
           "options": {
-            "outputPath": "dist/provias-security-forms",
+            "outputPath": "dist/provias-performance-forms",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [
@@ -64,10 +64,10 @@
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "provias-security-forms:build:production"
+              "buildTarget": "provias-performance-forms:build:production"
             },
             "development": {
-              "buildTarget": "provias-security-forms:build:development"
+              "buildTarget": "provias-performance-forms:build:development"
             }
           },
           "defaultConfiguration": "development"
@@ -98,8 +98,5 @@
         }
       }
     }
-  },
-  "cli": {
-    "analytics": false
   }
 }

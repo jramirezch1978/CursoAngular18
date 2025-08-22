@@ -1,56 +1,25 @@
 // 🔬 LAB 1: ESTILOS PARA FUNDAMENTOS DE ASINCRONÍA
-// Diseño profesional y educativo inspirado en PROVIAS
-
-// ====================================
-// VARIABLES Y COLORES
-// ====================================
 
 :root {
-  // Colores PROVIAS
   --provias-primary: #2c5530;
   --provias-secondary: #4a7c59;
-  --provias-accent: #7ba05b;
-  --provias-light: #a8d5ba;
-  
-  // Colores de estado
   --success-color: #28a745;
   --warning-color: #ffc107;
   --danger-color: #dc3545;
   --info-color: #17a2b8;
-  
-  // Colores de fondo
   --bg-primary: #ffffff;
   --bg-secondary: #f8f9fa;
-  --bg-accent: #e9ecef;
-  
-  // Texto
   --text-primary: #212529;
   --text-secondary: #6c757d;
-  --text-muted: #868e96;
-  
-  // Sombras
-  --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
   --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, 0.175);
-  
-  // Transiciones
-  --transition-fast: all 0.15s ease-in-out;
   --transition-normal: all 0.3s ease-in-out;
 }
-
-// ====================================
-// LAYOUT PRINCIPAL
-// ====================================
 
 .lab1-container {
   min-height: 100vh;
   background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
-
-// ====================================
-// HEADER
-// ====================================
 
 .lab-header {
   background: linear-gradient(135deg, var(--provias-primary) 0%, var(--provias-secondary) 100%);
@@ -64,17 +33,12 @@
     font-weight: 700;
     margin: 0 0 0.5rem 0;
     text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    
-    @media (max-width: 768px) {
-      font-size: 2rem;
-    }
   }
   
   .subtitle {
     font-size: 1.2rem;
     opacity: 0.9;
     margin: 0 0 0.25rem 0;
-    font-weight: 500;
   }
   
   .instructor {
@@ -85,10 +49,6 @@
   }
 }
 
-// ====================================
-// NAVEGACIÓN POR PESTAÑAS
-// ====================================
-
 .navigation-tabs {
   display: flex;
   justify-content: center;
@@ -96,46 +56,29 @@
   gap: 0.5rem;
   padding: 1.5rem 1rem;
   background: var(--bg-primary);
-  border-bottom: 1px solid var(--bg-accent);
-  box-shadow: var(--shadow-sm);
   
   .tab-button {
     background: var(--bg-secondary);
     border: 2px solid transparent;
     padding: 0.75rem 1.5rem;
     border-radius: 2rem;
-    font-size: 0.9rem;
     font-weight: 600;
     color: var(--text-secondary);
     cursor: pointer;
     transition: var(--transition-normal);
     
     &:hover {
-      background: var(--provias-light);
+      background: #a8d5ba;
       color: var(--provias-primary);
       transform: translateY(-2px);
-      box-shadow: var(--shadow-sm);
     }
     
     &.active {
       background: var(--provias-primary);
       color: white;
-      border-color: var(--provias-secondary);
-      box-shadow: var(--shadow-md);
-    }
-    
-    @media (max-width: 768px) {
-      padding: 0.5rem 1rem;
-      font-size: 0.8rem;
-      flex: 1;
-      min-width: 120px;
     }
   }
 }
-
-// ====================================
-// CONTENIDO PRINCIPAL
-// ====================================
 
 .lab-content {
   max-width: 1200px;
@@ -148,66 +91,45 @@
 }
 
 @keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
 }
-
-// ====================================
-// CAJAS DE TEORÍA
-// ====================================
 
 .theory-box {
   background: var(--bg-primary);
-  border: 1px solid var(--bg-accent);
   border-radius: 1rem;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   
   h2 {
     color: var(--provias-primary);
     font-size: 1.8rem;
     margin: 0 0 1rem 0;
-    font-weight: 700;
   }
   
   blockquote {
-    background: linear-gradient(135deg, var(--provias-light) 0%, rgba(168, 213, 186, 0.3) 100%);
+    background: linear-gradient(135deg, #a8d5ba 0%, rgba(168, 213, 186, 0.3) 100%);
     border-left: 4px solid var(--provias-primary);
     padding: 1.5rem;
     margin: 1.5rem 0;
     border-radius: 0 0.5rem 0.5rem 0;
     font-style: italic;
     font-size: 1.1rem;
-    line-height: 1.6;
     
     footer {
       margin-top: 1rem;
-      font-size: 0.9rem;
       color: var(--provias-primary);
       font-weight: 600;
       
-      &::before {
-        content: "— ";
-      }
+      &::before { content: "— "; }
     }
   }
 }
 
-// ====================================
-// LISTA DE OBJETIVOS
-// ====================================
-
 .objectives-list {
   list-style: none;
   padding: 0;
-  margin: 1.5rem 0;
   
   li {
     background: var(--bg-secondary);
@@ -215,27 +137,10 @@
     margin-bottom: 0.5rem;
     border-radius: 0.5rem;
     border-left: 4px solid var(--success-color);
-    font-size: 1rem;
-    transition: var(--transition-fast);
     
     &:hover {
       transform: translateX(5px);
-      box-shadow: var(--shadow-sm);
     }
-  }
-}
-
-// ====================================
-// CONCEPTOS CLAVE
-// ====================================
-
-.concept-box {
-  margin-top: 2rem;
-  
-  h3 {
-    color: var(--provias-secondary);
-    font-size: 1.4rem;
-    margin-bottom: 1rem;
   }
 }
 
@@ -243,93 +148,49 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1rem;
-  margin-top: 1rem;
 }
 
 .concept-card {
   background: var(--bg-primary);
   padding: 1.5rem;
   border-radius: 0.75rem;
-  border: 1px solid var(--bg-accent);
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--shadow-md);
   transition: var(--transition-normal);
   
   h4 {
     color: var(--provias-primary);
     margin: 0 0 0.75rem 0;
-    font-size: 1.1rem;
-    font-weight: 600;
-  }
-  
-  p {
-    color: var(--text-secondary);
-    margin: 0;
-    line-height: 1.5;
   }
   
   &:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-md);
   }
 }
-
-// ====================================
-// CONTENEDORES DE DEMOSTRACIÓN
-// ====================================
 
 .demo-container {
   background: var(--bg-primary);
   border-radius: 1rem;
   padding: 2rem;
   margin-bottom: 2rem;
-  box-shadow: var(--shadow-sm);
-  
-  h2, h3 {
-    color: var(--provias-primary);
-    margin-top: 0;
-  }
+  box-shadow: var(--shadow-md);
 }
 
-// ====================================
-// GRILLAS DE COMPARACIÓN
-// ====================================
-
-.comparison-grid {
+.comparison-grid, .patterns-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
 }
 
-.patterns-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
-}
-
-// ====================================
-// TARJETAS DE DEMOSTRACIÓN
-// ====================================
-
 .demo-card, .pattern-card {
   background: var(--bg-secondary);
-  border: 1px solid var(--bg-accent);
   border-radius: 0.75rem;
   padding: 1.5rem;
   transition: var(--transition-normal);
   
   h3 {
     color: var(--provias-primary);
-    font-size: 1.2rem;
     margin: 0 0 1rem 0;
-    font-weight: 600;
-  }
-  
-  p {
-    color: var(--text-secondary);
-    margin: 0 0 1rem 0;
-    line-height: 1.5;
   }
   
   &:hover {
@@ -338,15 +199,10 @@
   }
 }
 
-// ====================================
-// BOTONES DE DEMOSTRACIÓN
-// ====================================
-
 .demo-button {
   border: none;
   padding: 1rem 2rem;
   border-radius: 0.5rem;
-  font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition-normal);
@@ -356,7 +212,6 @@
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none !important;
   }
   
   &:not(:disabled):hover {
@@ -364,96 +219,54 @@
     box-shadow: var(--shadow-md);
   }
   
-  // Variantes de colores
   &.danger {
     background: var(--danger-color);
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #c82333;
-    }
   }
   
   &.success {
     background: var(--success-color);
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #218838;
-    }
   }
   
   &.warning {
     background: var(--warning-color);
     color: #212529;
-    
-    &:hover:not(:disabled) {
-      background: #e0a800;
-    }
   }
   
   &.primary {
     background: var(--provias-primary);
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: var(--provias-secondary);
-    }
   }
   
   &.elegant {
-    background: linear-gradient(135deg, var(--provias-secondary) 0%, var(--provias-accent) 100%);
+    background: linear-gradient(135deg, var(--provias-secondary) 0%, #7ba05b 100%);
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: linear-gradient(135deg, var(--provias-primary) 0%, var(--provias-secondary) 100%);
-    }
   }
   
   &.parallel {
     background: #6f42c1;
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #5a32a3;
-    }
   }
   
   &.resilient {
     background: #fd7e14;
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #e56600;
-    }
   }
   
   &.timeout {
     background: var(--info-color);
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #138496;
-    }
   }
   
   &.retry {
     background: #6c757d;
     color: white;
-    
-    &:hover:not(:disabled) {
-      background: #5a6268;
-    }
   }
 }
 
-// ====================================
-// CAJAS DE RESULTADOS
-// ====================================
-
 .result-box {
   background: var(--bg-primary);
-  border: 1px solid var(--bg-accent);
   border-radius: 0.5rem;
   padding: 1rem;
   margin-top: 1rem;
@@ -468,19 +281,13 @@
   pre {
     margin: 0;
     font-size: 0.9rem;
-    line-height: 1.4;
     color: var(--text-primary);
     white-space: pre-wrap;
-    word-wrap: break-word;
   }
 }
 
-// ====================================
-// EXPLICACIONES DE CÓDIGO
-// ====================================
-
 .code-explanation {
-  background: var(--bg-accent);
+  background: #e9ecef;
   border-radius: 0.5rem;
   padding: 1.5rem;
   margin-top: 1.5rem;
@@ -492,123 +299,13 @@
   
   ul {
     margin: 0;
-    padding-left: 1.5rem;
     
     li {
       margin-bottom: 0.5rem;
       color: var(--text-secondary);
-      line-height: 1.5;
     }
   }
 }
-
-// ====================================
-// VENTAJAS Y CARACTERÍSTICAS
-// ====================================
-
-.advantages-box {
-  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.05) 100%);
-  border: 1px solid rgba(40, 167, 69, 0.2);
-  border-radius: 0.75rem;
-  padding: 1.5rem;
-  margin-top: 1.5rem;
-  
-  h4 {
-    color: var(--success-color);
-    margin: 0 0 1rem 0;
-    font-size: 1.2rem;
-  }
-}
-
-.advantages-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 1rem;
-}
-
-.advantage-item {
-  background: var(--bg-primary);
-  padding: 1rem;
-  border-radius: 0.5rem;
-  border-left: 3px solid var(--success-color);
-  
-  strong {
-    color: var(--success-color);
-    display: block;
-    margin-bottom: 0.25rem;
-  }
-}
-
-// ====================================
-// TABLA DE COMPARACIÓN
-// ====================================
-
-.comparison-table {
-  margin-top: 2rem;
-  
-  h4 {
-    color: var(--provias-primary);
-    margin-bottom: 1rem;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    background: var(--bg-primary);
-    border-radius: 0.5rem;
-    overflow: hidden;
-    box-shadow: var(--shadow-sm);
-    
-    thead {
-      background: var(--provias-primary);
-      
-      th {
-        color: white;
-        padding: 1rem;
-        text-align: left;
-        font-weight: 600;
-        font-size: 0.9rem;
-      }
-    }
-    
-    tbody {
-      td {
-        padding: 0.75rem 1rem;
-        border-bottom: 1px solid var(--bg-accent);
-        font-size: 0.9rem;
-        
-        &:first-child {
-          font-weight: 600;
-          color: var(--text-primary);
-        }
-        
-        &.bad {
-          background: rgba(220, 53, 69, 0.1);
-          color: var(--danger-color);
-        }
-        
-        &.good {
-          background: rgba(40, 167, 69, 0.1);
-          color: var(--success-color);
-        }
-        
-        &.excellent {
-          background: rgba(44, 85, 48, 0.1);
-          color: var(--provias-primary);
-          font-weight: 600;
-        }
-      }
-      
-      tr:last-child td {
-        border-bottom: none;
-      }
-    }
-  }
-}
-
-// ====================================
-// PANEL DE MÉTRICAS
-// ====================================
 
 .metrics-panel {
   position: fixed;
@@ -616,18 +313,14 @@
   right: 2rem;
   width: 300px;
   background: var(--bg-primary);
-  border: 1px solid var(--bg-accent);
   border-radius: 0.75rem;
   padding: 1rem;
-  box-shadow: var(--shadow-lg);
+  box-shadow: var(--shadow-md);
   z-index: 1000;
   
   h3 {
     margin: 0 0 1rem 0;
-    font-size: 1.1rem;
     color: var(--provias-primary);
-    border-bottom: 1px solid var(--bg-accent);
-    padding-bottom: 0.5rem;
   }
   
   @media (max-width: 768px) {
@@ -638,33 +331,21 @@
 }
 
 .metrics-list {
-  max-height: 200px;
-  overflow-y: auto;
-  
   .metric-item {
     display: flex;
     justify-content: space-between;
-    align-items: center;
     padding: 0.5rem 0;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
     font-size: 0.85rem;
     
-    &:last-child {
-      border-bottom: none;
-    }
-    
     .operation {
-      font-weight: 500;
       color: var(--text-primary);
-      flex: 1;
     }
     
     .time {
       font-weight: 600;
-      font-family: 'Monaco', 'Menlo', monospace;
       padding: 0.25rem 0.5rem;
       border-radius: 0.25rem;
-      margin-left: 0.5rem;
+      font-family: monospace;
     }
     
     &.fast .time {
@@ -684,94 +365,26 @@
   }
 }
 
-// ====================================
-// MENSAJES DE ESTADO
-// ====================================
-
 .warning {
   color: var(--warning-color);
   font-weight: 600;
   
-  &::before {
-    content: "⚠️ ";
-  }
+  &::before { content: "⚠️ "; }
 }
 
 .success {
   color: var(--success-color);
   font-weight: 600;
   
-  &::before {
-    content: "✨ ";
-  }
+  &::before { content: "✨ "; }
 }
-
-// ====================================
-// RESPONSIVIDAD
-// ====================================
 
 @media (max-width: 768px) {
   .lab1-container {
-    .lab-content {
-      padding: 1rem;
-    }
-    
-    .demo-container {
-      padding: 1rem;
-    }
-    
-    .theory-box {
-      padding: 1.5rem;
-    }
-    
-    .comparison-grid,
-    .patterns-grid {
-      grid-template-columns: 1fr;
-    }
-    
-    .demo-button {
-      max-width: 100%;
-    }
+    .lab-content { padding: 1rem; }
+    .demo-container { padding: 1rem; }
+    .theory-box { padding: 1.5rem; }
+    .comparison-grid, .patterns-grid { grid-template-columns: 1fr; }
+    .demo-button { max-width: 100%; }
   }
-}
-
-@media (max-width: 480px) {
-  .lab-header h1 {
-    font-size: 1.5rem;
-  }
-  
-  .navigation-tabs {
-    .tab-button {
-      padding: 0.5rem 0.75rem;
-      font-size: 0.75rem;
-    }
-  }
-  
-  .concept-grid {
-    grid-template-columns: 1fr;
-  }
-  
-  .advantages-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-// ====================================
-// ANIMACIONES DE CARGA
-// ====================================
-
-@keyframes pulse {
-  0% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-  100% {
-    opacity: 1;
-  }
-}
-
-.demo-button:disabled {
-  animation: pulse 2s infinite;
 }
