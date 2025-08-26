@@ -1,0 +1,360 @@
+<div class="custom-directives-showcase">
+  <!-- Header -->
+  <header class="showcase-header">
+    <h1>🚀 Directivas Personalizadas Avanzadas</h1>
+    <p class="subtitle">Demostración de HostListener, HostBinding y Renderer2 en acción</p>
+  </header>
+
+  <!-- Sección de Tooltips -->
+  <section class="demo-section">
+    <h2>💬 Tooltips Inteligentes</h2>
+    <p>Hover sobre los elementos para ver tooltips personalizados</p>
+    
+    <div class="tooltip-demos">
+      <button 
+        class="demo-button primary"
+        appTooltip="Este es un tooltip básico que aparece arriba"
+        tooltipPosition="top"
+        [tooltipDelay]="300">
+        🔝 Tooltip Arriba
+      </button>
+      
+      <button 
+        class="demo-button secondary"
+        appTooltip="Tooltip con posición personalizada abajo"
+        tooltipPosition="bottom"
+        [tooltipDelay]="500">
+        🔻 Tooltip Abajo
+      </button>
+      
+      <button 
+        class="demo-button success"
+        appTooltip="Tooltip a la izquierda con información detallada"
+        tooltipPosition="left"
+        tooltipClass="tooltip-large">
+        ⬅️ Tooltip Izquierda
+      </button>
+      
+      <button 
+        class="demo-button warning"
+        appTooltip="Tooltip a la derecha con animación"
+        tooltipPosition="right"
+        [tooltipDelay]="200">
+        ➡️ Tooltip Derecha
+      </button>
+    </div>
+
+    <div class="feature-highlights">
+      <div 
+        class="feature-card"
+        appTooltip="🎯 HostListener detecta eventos de mouse automáticamente"
+        tooltipPosition="top">
+        <h4>🎧 HostListener</h4>
+        <p>Escucha eventos mouseenter/mouseleave automáticamente</p>
+      </div>
+      
+      <div 
+        class="feature-card"
+        appTooltip="🎨 Renderer2 crea elementos DOM de forma segura"
+        tooltipPosition="top">
+        <h4>🛡️ Renderer2</h4>
+        <p>Manipulación segura del DOM sin riesgos XSS</p>
+      </div>
+      
+      <div 
+        class="feature-card"
+        appTooltip="⚡ Posicionamiento dinámico inteligente"
+        tooltipPosition="top">
+        <h4>📍 Posicionamiento</h4>
+        <p>Calcula automáticamente la mejor posición</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Lazy Loading -->
+  <section class="demo-section">
+    <h2>🖼️ Lazy Loading de Imágenes</h2>
+    <p>Las imágenes se cargan automáticamente cuando entran en el viewport</p>
+    
+    <div class="lazy-load-grid">
+      @for (item of demoItems(); track item.id) {
+        <div class="project-card">
+          <div 
+            class="project-image"
+            [appLazyLoad]="item.image"
+            lazyLoadPlaceholder="https://via.placeholder.com/400x300?text=Cargando..."
+            lazyLoadError="https://via.placeholder.com/400x300?text=Error"
+            [lazyLoadThreshold]="0.2"
+            lazyLoadRootMargin="100px"
+            [appTooltip]="'Proyecto: ' + item.title + ' - Categoría: ' + item.category"
+            tooltipPosition="top">
+          </div>
+          
+          <div class="project-info">
+            <h4>{{ item.title }}</h4>
+            <p class="project-description">{{ item.description }}</p>
+            <div class="project-meta">
+              <span 
+                class="project-category"
+                [appTooltip]="'Categoría del proyecto'"
+                tooltipPosition="top">
+                🏷️ {{ item.category }}
+              </span>
+              <span 
+                class="project-rating"
+                [appTooltip]="'Calificación: ' + item.rating + '/5 estrellas'"
+                tooltipPosition="top">
+                {{ getRatingStars(item.rating) }} {{ item.rating }}
+              </span>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <div class="lazy-loading-info">
+      <div class="info-card">
+        <h4>📊 IntersectionObserver</h4>
+        <p>API moderna para detectar cuando elementos entran en viewport</p>
+      </div>
+      <div class="info-card">
+        <h4>🎭 HostBinding</h4>
+        <p>Clases CSS dinámicas para estados: loading, loaded, error</p>
+      </div>
+      <div class="info-card">
+        <h4>⚡ Performance</h4>
+        <p>Solo carga imágenes cuando son necesarias, mejorando velocidad</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Sección de Validación -->
+  <section class="demo-section">
+    <h2>✅ Validación Visual Avanzada</h2>
+    <p>Formulario con feedback visual inmediato y validación en tiempo real</p>
+    
+    <form class="validation-form" (ngSubmit)="submitForm()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="name">Nombre Completo *</label>
+          <input 
+            id="name"
+            type="text"
+            class="form-control"
+            [value]="contactForm().name"
+            (input)="updateForm('name', $any($event.target).value)"
+            placeholder="Ingrese su nombre completo"
+            appValidationFeedback
+            [appValidationFeedback]="validationState().name"
+            [validationMessage]="getValidationMessage('name')"
+            [showOnBlur]="true"
+            [showOnDirty]="true">
+        </div>
+        
+        <div class="form-group">
+          <label for="email">
+            Email *
+            @if (validationState().email === 'pending') {
+              <span class="validating">🔄 Validando...</span>
+            }
+          </label>
+          <input 
+            id="email"
+            type="email"
+            class="form-control"
+            [value]="contactForm().email"
+            (input)="updateForm('email', $any($event.target).value)"
+            placeholder="ejemplo@empresa.com"
+            appValidationFeedback
+            [appValidationFeedback]="validationState().email"
+            [validationMessage]="getValidationMessage('email')"
+            [showOnBlur]="true"
+            [showOnDirty]="true">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="phone">Teléfono</label>
+          <input 
+            id="phone"
+            type="tel"
+            class="form-control"
+            [value]="contactForm().phone"
+            (input)="updateForm('phone', $any($event.target).value)"
+            placeholder="+51 987 654 321"
+            appValidationFeedback
+            [appValidationFeedback]="validationState().phone"
+            [validationMessage]="getValidationMessage('phone')"
+            [showOnBlur]="true">
+        </div>
+        
+        <div class="form-group">
+          <label for="company">Empresa *</label>
+          <input 
+            id="company"
+            type="text"
+            class="form-control"
+            [value]="contactForm().company"
+            (input)="updateForm('company', $any($event.target).value)"
+            placeholder="Nombre de su empresa"
+            appValidationFeedback
+            [appValidationFeedback]="validationState().company"
+            [validationMessage]="getValidationMessage('company')"
+            [showOnBlur]="true"
+            [showOnDirty]="true">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="projectType">Tipo de Proyecto</label>
+          <select 
+            id="projectType"
+            class="form-control"
+            [value]="contactForm().projectType"
+            (change)="updateForm('projectType', $any($event.target).value)"
+            appTooltip="Seleccione el tipo de proyecto que más se ajuste a sus necesidades"
+            tooltipPosition="top">
+            <option value="">Seleccione...</option>
+            @for (type of projectTypes; track type) {
+              <option [value]="type">{{ type }}</option>
+            }
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="budget">Presupuesto Estimado</label>
+          <select 
+            id="budget"
+            class="form-control"
+            [value]="contactForm().budget"
+            (change)="updateForm('budget', $any($event.target).value)"
+            [appTooltip]="formatBudget(contactForm().budget)"
+            tooltipPosition="top">
+            <option value="">Seleccione rango...</option>
+            @for (range of budgetRanges; track range) {
+              <option [value]="range">{{ range }}</option>
+            }
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="message">Mensaje *</label>
+        <textarea 
+          id="message"
+          class="form-control"
+          rows="4"
+          [value]="contactForm().message"
+          (input)="updateForm('message', $any($event.target).value)"
+          placeholder="Describa su proyecto y requerimientos específicos..."
+          appValidationFeedback
+          [appValidationFeedback]="validationState().message"
+          [validationMessage]="getValidationMessage('message')"
+          [showOnBlur]="true"
+          [showOnDirty]="true">
+        </textarea>
+      </div>
+
+      <div class="form-actions">
+        <button 
+          type="button" 
+          class="btn btn-secondary"
+          (click)="resetForm()"
+          appTooltip="Limpiar todos los campos del formulario"
+          tooltipPosition="top">
+          🧹 Limpiar
+        </button>
+        
+        <button 
+          type="submit" 
+          class="btn btn-primary"
+          appTooltip="Enviar formulario de contacto"
+          tooltipPosition="top">
+          📨 Enviar Consulta
+        </button>
+      </div>
+    </form>
+
+    <div class="validation-features">
+      <div class="feature-item">
+        <h4>🎯 Validación en Tiempo Real</h4>
+        <p>Los campos se validan mientras el usuario escribe</p>
+      </div>
+      <div class="feature-item">
+        <h4>🔄 Validación Asíncrona</h4>
+        <p>El email se valida contra el servidor (simulado)</p>
+      </div>
+      <div class="feature-item">
+        <h4>💫 Animación de Error</h4>
+        <p>Los campos inválidos muestran animación de "shake"</p>
+      </div>
+      <div class="feature-item">
+        <h4>🎨 Estados Visuales</h4>
+        <p>Colores y bordes cambian según el estado de validación</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resumen de Implementación -->
+  <section class="implementation-summary">
+    <h2>🎯 Directivas Personalizadas Implementadas</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>TooltipDirective</h3>
+        <ul>
+          <li><code>@HostListener</code> para eventos mouse</li>
+          <li><code>@Input</code> para configuración</li>
+          <li><code>Renderer2</code> para creación segura</li>
+          <li>Posicionamiento dinámico inteligente</li>
+          <li>Cleanup automático en destroy</li>
+        </ul>
+      </div>
+      
+      <div class="summary-card">
+        <h3>LazyLoadDirective</h3>
+        <ul>
+          <li><code>@HostBinding</code> para clases CSS</li>
+          <li><code>IntersectionObserver</code> para viewport</li>
+          <li>Manejo de estados: loading, loaded, error</li>
+          <li>Placeholders personalizables</li>
+          <li>Optimización de performance</li>
+        </ul>
+      </div>
+      
+      <div class="summary-card">
+        <h3>ValidationFeedbackDirective</h3>
+        <ul>
+          <li><code>@HostBinding</code> con getters</li>
+          <li><code>@HostListener</code> para eventos form</li>
+          <li>Estados: valid, invalid, pending</li>
+          <li>Mensajes dinámicos con <code>Renderer2</code></li>
+          <li>Animaciones de feedback visual</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="key-concepts">
+      <h3>🔑 Conceptos Clave Aplicados</h3>
+      <div class="concepts-grid">
+        <div class="concept-item">
+          <h4>ElementRef + Renderer2</h4>
+          <p>Acceso seguro al DOM nativo sin manipulación directa</p>
+        </div>
+        <div class="concept-item">
+          <h4>HostListener</h4>
+          <p>Escucha eventos del elemento host de forma declarativa</p>
+        </div>
+        <div class="concept-item">
+          <h4>HostBinding</h4>
+          <p>Modifica propiedades del host reactivamente</p>
+        </div>
+        <div class="concept-item">
+          <h4>Lifecycle Hooks</h4>
+          <p>Gestión de recursos y cleanup en ngOnDestroy</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
