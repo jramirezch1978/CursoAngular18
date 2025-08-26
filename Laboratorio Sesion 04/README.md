@@ -1,53 +1,244 @@
-# 🚀 Laboratorio Sesión 04: Directivas Angular v18
+# 🎪 LAB 4: DRAG & DROP KANBAN CON HOSTBINDING Y RENDERER2
 
-## 📋 Información General
+## 🎯 Objetivo Principal
+Dominar **HostBinding, HostListener y Renderer2** creando un **sistema completo de Drag & Drop** con un tablero Kanban funcional, aplicando técnicas avanzadas de manipulación del DOM y interactividad de directivas personalizadas.
 
-**Curso:** Angular v18 - 30 horas académicas  
-**Modalidad:** 100% Online Live - Formato Laboratorio Intensivo  
-**Instructor:** Ing. Jhonny Alexander Ramirez Chiroque  
-**Institución:** PROVIAS DESCENTRALIZADO  
-**Sesión:** 4 - Directivas  
-**Fecha:** Jueves, 07 de Agosto 2025  
-**Duración Total:** 180 minutos (3 horas)  
+## 🏗️ ¿Qué Construiremos?
+Un **KanbanBoardComponent** profesional con funcionalidades avanzadas:
+- **🎯 Tablero Kanban** con 3 columnas (Por Hacer, En Progreso, Completado)
+- **🖱️ Drag & Drop** fluido entre columnas
+- **🎨 Directivas personalizadas** (DraggableDirective, DropZoneDirective)
+- **⚡ Animaciones** visuales durante el arrastre
+- **💾 Persistencia** de estado en localStorage
+- **🎭 Feedback visual** avanzado con Renderer2
 
-## 🎯 Objetivos del Laboratorio
+## ⏱️ Duración: 25 minutos
 
-Al completar este laboratorio, los participantes serán capaces de:
+## 🚀 Diferencias con Laboratorios Anteriores
 
-- ✅ Dominar las **directivas estructurales modernas** (@if, @for, @switch) de Angular v18
-- ✅ Implementar **directivas de atributo avanzadas** (NgClass, NgStyle, NgModel)
-- ✅ Crear **directivas personalizadas complejas** reutilizables
-- ✅ Utilizar **HostListener y HostBinding** para interactividad
-- ✅ Aplicar **Renderer2** para manipulación segura del DOM
-- ✅ Desarrollar un **sistema completo de Drag & Drop**
+| **Lab Anterior** | **LAB 4** |
+|------------------|-----------|
+| 📋 **LAB 1**: @if, @for, @switch | 🎪 **HostBinding y HostListener** |
+| 🎨 **LAB 2**: NgClass, NgStyle, NgModel | 🖱️ **Eventos de mouse avanzados** |
+| 🔧 **LAB 3**: Directivas básicas | 🎭 **Renderer2 para DOM manipulation** |
+| **Funcionalidad estática** | **Interactividad completa** |
 
-## 🛠️ Requisitos Previos
+## 🎯 Objetivos de Aprendizaje Específicos
 
-### Software Necesario
+Al completar este laboratorio, dominarás:
 
-| Herramienta | Versión Mínima | Verificación | Instalación |
-|-------------|----------------|--------------|-------------|
-| Node.js | v18.19.0 | `node --version` | [nodejs.org](https://nodejs.org) |
-| npm | v9.0.0 | `npm --version` | Incluido con Node.js |
-| Angular CLI | v18.x | `ng version` | `npm install -g @angular/cli@18` |
-| VS Code | Última | - | [code.visualstudio.com](https://code.visualstudio.com) |
-| Git | v2.x | `git --version` | [git-scm.com](https://git-scm.com) |
+- ✅ **HostListener** para capturar eventos de mouse/touch complejos
+- ✅ **HostBinding** para modificar propiedades del elemento host dinámicamente  
+- ✅ **Renderer2** para manipulación segura y cross-platform del DOM
+- ✅ **Drag & Drop API** nativa de HTML5 integrada con Angular
+- ✅ **Directivas reutilizables** que encapsulan comportamiento complejo
+- ✅ **Gestión de estado** durante operaciones de arrastre
+- ✅ **Animaciones CSS** coordinadas con eventos JavaScript
 
-### Extensiones de VS Code Recomendadas
+## 📋 Conceptos Clave del LAB 4
 
-1. **Angular Language Service** - IntelliSense avanzado para templates
-2. **Angular Snippets** - Snippets para directivas
-3. **Prettier - Code formatter** - Formateo automático
-4. **Error Lens** - Muestra errores inline
-5. **Angular DevTools** - Debugging de directivas
-6. **GitLens** - Control de versiones visual
+### 1. HostListener - Captura de Eventos Avanzada
+**HostListener** escucha eventos del elemento host con máximo control:
 
-## 🚀 Instalación y Configuración
+#### Eventos de Mouse para Drag & Drop
+```typescript
+@Directive({
+  selector: '[appDraggable]'
+})
+export class DraggableDirective {
+  @HostListener('dragstart', ['$event'])
+  onDragStart(event: DragEvent) {
+    // Configurar datos de transferencia
+    event.dataTransfer?.setData('text/plain', this.dragData);
+    
+    // Personalizar imagen de arrastre
+    const dragImage = this.createCustomDragImage();
+    event.dataTransfer?.setDragImage(dragImage, 10, 10);
+    
+    this.dragStart.emit(this.dragData);
+  }
+  
+  @HostListener('drag', ['$event'])
+  onDrag(event: DragEvent) {
+    // Actualizar posición durante el arrastre
+    this.updateDragPosition(event.clientX, event.clientY);
+  }
+  
+  @HostListener('dragend', ['$event'])
+  onDragEnd(event: DragEvent) {
+    // Limpiar estado después del drop
+    this.resetDragState();
+    this.dragEnd.emit();
+  }
+}
+```
 
-### 1. Clonar el Repositorio
+#### Mouse Events Especializados
+```typescript
+// Detección precisa de hover
+@HostListener('mouseenter')
+@HostListener('mouseleave')
+// Control de clicks
+@HostListener('click', ['$event'])
+@HostListener('contextmenu', ['$event']) // Click derecho
+// Eventos táctiles para móviles
+@HostListener('touchstart', ['$event'])
+@HostListener('touchmove', ['$event'])
+@HostListener('touchend', ['$event'])
+```
 
-```bash
-git clone <repository-url>
+### 2. HostBinding - Control Total del Elemento
+**HostBinding** modifica propiedades del host dinámicamente:
+
+#### Binding de Clases Dinámicas
+```typescript
+export class DraggableDirective {
+  @HostBinding('class.is-dragging')
+  get isDragging() {
+    return this.dragState === 'dragging';
+  }
+  
+  @HostBinding('class.drag-hover')
+  get isHovered() {
+    return this.isMouseOver;
+  }
+  
+  @HostBinding('class.drag-disabled')
+  get isDisabled() {
+    return !this.enabled;
+  }
+}
+```
+
+#### Binding de Estilos Avanzados
+```typescript
+// Opacidad durante arrastre
+@HostBinding('style.opacity')
+get dragOpacity() {
+  return this.isDragging ? '0.5' : '1';
+}
+
+// Transformaciones CSS
+@HostBinding('style.transform')
+get dragTransform() {
+  return this.isDragging ? 'scale(1.05) rotate(5deg)' : 'none';
+}
+
+// Cursor dinámico
+@HostBinding('style.cursor')
+get dragCursor() {
+  return this.enabled ? 'grab' : 'not-allowed';
+}
+
+// Propiedades HTML5 Drag
+@HostBinding('draggable')
+get draggableAttribute() {
+  return this.enabled;
+}
+```
+
+### 3. Renderer2 - Manipulación Segura del DOM
+**Renderer2** permite modificar el DOM de forma segura y cross-platform:
+
+#### Creación de Elementos Dinámicos
+```typescript
+export class DropZoneDirective {
+  constructor(
+    private el: ElementRef,
+    private renderer: Renderer2
+  ) {}
+
+  @HostListener('dragover', ['$event'])
+  onDragOver(event: DragEvent) {
+    event.preventDefault();
+    
+    // Crear indicador visual de drop
+    const dropIndicator = this.renderer.createElement('div');
+    this.renderer.addClass(dropIndicator, 'drop-indicator');
+    this.renderer.setStyle(dropIndicator, 'position', 'absolute');
+    this.renderer.setStyle(dropIndicator, 'background', 'rgba(34, 197, 94, 0.2)');
+    this.renderer.setStyle(dropIndicator, 'border', '2px dashed #22c55e');
+    
+    // Agregar al DOM
+    this.renderer.appendChild(this.el.nativeElement, dropIndicator);
+  }
+
+  @HostListener('drop', ['$event'])
+  onDrop(event: DragEvent) {
+    event.preventDefault();
+    
+    // Crear efecto visual de drop exitoso
+    const successEffect = this.renderer.createElement('div');
+    this.renderer.addClass(successEffect, 'drop-success');
+    this.renderer.setStyle(successEffect, 'animation', 'dropSuccess 0.6s ease-out');
+    
+    this.renderer.appendChild(this.el.nativeElement, successEffect);
+    
+    // Remover efecto después de la animación
+    setTimeout(() => {
+      this.renderer.removeChild(this.el.nativeElement, successEffect);
+    }, 600);
+  }
+}
+```
+
+#### Ventajas de Renderer2 vs Manipulación Directa
+```typescript
+// ❌ INCORRECTO - Manipulación directa (insegura)
+this.el.nativeElement.innerHTML = '<div>Contenido</div>';
+this.el.nativeElement.style.backgroundColor = 'red';
+
+// ✅ CORRECTO - Con Renderer2 (seguro)
+const div = this.renderer.createElement('div');
+const text = this.renderer.createText('Contenido');
+this.renderer.appendChild(div, text);
+this.renderer.setStyle(this.el.nativeElement, 'backgroundColor', 'red');
+this.renderer.appendChild(this.el.nativeElement, div);
+```
+
+### 4. Arquitectura del Sistema Drag & Drop
+El sistema funciona con **dos directivas principales**:
+
+#### DraggableDirective - Elementos Arrastrables
+```typescript
+@Directive({
+  selector: '[appDraggable]'
+})
+export class DraggableDirective {
+  @Input() dragData: any; // Datos a transferir
+  @Input() dragDisabled: boolean = false;
+  
+  @Output() dragStart = new EventEmitter<any>();
+  @Output() dragEnd = new EventEmitter<void>();
+  
+  // Estados visuales con HostBinding
+  @HostBinding('class.dragging') isDragging = false;
+  @HostBinding('style.opacity') get opacity() {
+    return this.isDragging ? '0.6' : '1';
+  }
+}
+```
+
+#### DropZoneDirective - Zonas de Drop
+```typescript
+@Directive({
+  selector: '[appDropZone]'
+})
+export class DropZoneDirective {
+  @Input() dropZoneId: string = '';
+  @Input() acceptedTypes: string[] = ['*'];
+  
+  @Output() itemDropped = new EventEmitter<any>();
+  
+  // Estados visuales
+  @HostBinding('class.drag-over') isDragOver = false;
+  @HostBinding('class.drop-valid') isValidDrop = false;
+}
+```
+
+## 🏗️ Implementación del Kanban Board
+
+### PASO 1: Crear las Directivas Base (8 minutos)
 cd laboratorio-sesion04
 ```
 
