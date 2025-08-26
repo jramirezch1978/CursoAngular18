@@ -1,11 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { KanbanBoardComponent } from './components/kanban-board/kanban-board.component';
+import { RouterOutlet, RouterModule } from '@angular/router';
+import { NavigationComponent } from './components/navigation/navigation.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, KanbanBoardComponent],
+  imports: [RouterOutlet, RouterModule, NavigationComponent],
   template: `
     <div class="app-container">
       <header class="app-header">
@@ -14,14 +14,14 @@ import { KanbanBoardComponent } from './components/kanban-board/kanban-board.com
             <span class="logo-icon">🏗️</span>
             <div class="logo-text">
               <h1>PROVIAS Nacional</h1>
-              <p>Laboratorio 04 - Drag & Drop con HostBinding y Renderer2</p>
+              <p>Laboratorio Completo - Directivas Angular 18</p>
             </div>
           </div>
         </div>
       </header>
       
       <main class="app-main">
-        <app-kanban-board></app-kanban-board>
+        <app-navigation></app-navigation>
       </main>
       
       <footer class="app-footer">
@@ -124,5 +124,5 @@ import { KanbanBoardComponent } from './components/kanban-board/kanban-board.com
   `]
 })
 export class AppComponent {
-  title = 'lab04-drag-drop-kanban';
+  title = 'laboratorio-jarch';
 }
