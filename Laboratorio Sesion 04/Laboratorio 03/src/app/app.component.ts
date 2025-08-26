@@ -1,11 +1,10 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
 import { CustomDirectivesShowcaseComponent } from './components/custom-directives-showcase/custom-directives-showcase.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, CustomDirectivesShowcaseComponent],
+  imports: [CustomDirectivesShowcaseComponent],
   template: `
     <div class="app-container">
       <header class="app-header">

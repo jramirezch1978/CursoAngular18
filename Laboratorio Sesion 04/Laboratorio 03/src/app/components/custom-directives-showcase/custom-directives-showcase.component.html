@@ -1,1 +1,279 @@
-<p>custom-directives-showcase works!</p>
+<div class="showcase-container">
+  <!-- Header -->
+  <div class="showcase-header">
+    <h2>🎯 Showcase de Directivas Personalizadas</h2>
+    <p>Demostración completa de todas las directivas implementadas en el Laboratorio 03</p>
+    
+    <!-- Control de Roles -->
+    <div class="role-selector">
+      <label>Rol actual: <strong>{{currentRole()}}</strong></label>
+      <div class="role-buttons">
+        <button 
+          class="btn btn-role" 
+          [class.active]="currentRole() === 'admin'"
+          (click)="changeRole('admin')"
+          appTooltip="Acceso completo a todas las funciones"
+          tooltipPosition="top">
+          👑 Admin
+        </button>
+        <button 
+          class="btn btn-role" 
+          [class.active]="currentRole() === 'user'"
+          (click)="changeRole('user')"
+          appTooltip="Acceso estándar de usuario"
+          tooltipPosition="top">
+          👤 Usuario
+        </button>
+        <button 
+          class="btn btn-role" 
+          [class.active]="currentRole() === 'guest'"
+          (click)="changeRole('guest')"
+          appTooltip="Acceso limitado de invitado"
+          tooltipPosition="top">
+          👥 Invitado
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="showcase-grid">
+    
+    <!-- 1. ValidationFeedbackDirective -->
+    <div class="showcase-section">
+      <h3>🔍 ValidationFeedbackDirective</h3>
+      <p>Directiva que proporciona feedback visual para validación de formularios</p>
+      
+      <div class="form-demo">
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input 
+            type="email" 
+            id="email"
+            class="form-control"
+            placeholder="Ingresa tu email"
+            [ngModel]="email()"
+            (ngModelChange)="email.set($any($event)); onEmailChange()"
+            [appValidationFeedback]="emailValidation()"
+            appTooltip="El email debe tener formato válido"
+            tooltipPosition="right">
+          <div class="validation-status">
+            Estado: <span [class]="'status-' + emailValidation()">{{emailValidation()}}</span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input 
+            type="password" 
+            id="password"
+            class="form-control"
+            placeholder="Mínimo 8 caracteres"
+            [ngModel]="password()"
+            (ngModelChange)="password.set($any($event)); onPasswordChange()"
+            [appValidationFeedback]="passwordValidation()"
+            appTooltip="La contraseña debe tener al menos 8 caracteres"
+            tooltipPosition="right">
+          <div class="validation-status">
+            Estado: <span [class]="'status-' + passwordValidation()">{{passwordValidation()}}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h4>✨ Características:</h4>
+        <ul>
+          <li>✅ Bordes de colores según estado (verde, rojo, amarillo)</li>
+          <li>✅ Backgrounds sutiles para mejor UX</li>
+          <li>✅ Efecto shake para estados inválidos</li>
+          <li>✅ Transiciones suaves</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 2. HasPermissionDirective -->
+    <div class="showcase-section">
+      <h3>🔐 HasPermissionDirective</h3>
+      <p>Directiva estructural que muestra/oculta contenido basado en permisos</p>
+      
+      <div class="permissions-demo">
+        <div class="permission-item">
+          <div *appHasPermission="'read'" class="permission-content success">
+            ✅ Tienes permiso de LECTURA
+          </div>
+          <div *appHasPermission="'read'; permissionMode: 'hide'" class="permission-content error">
+            ❌ No tienes permiso de lectura
+          </div>
+        </div>
+
+        <div class="permission-item">
+          <div *appHasPermission="'write'" class="permission-content success">
+            ✅ Tienes permiso de ESCRITURA
+          </div>
+          <div *appHasPermission="'write'; permissionMode: 'hide'" class="permission-content error">
+            ❌ No tienes permiso de escritura
+          </div>
+        </div>
+
+        <div class="permission-item">
+          <div *appHasPermission="'delete'" class="permission-content success">
+            ✅ Tienes permiso de ELIMINACIÓN
+          </div>
+          <div *appHasPermission="'delete'; permissionMode: 'hide'" class="permission-content error">
+            ❌ No tienes permiso de eliminación
+          </div>
+        </div>
+
+        <div class="permission-item">
+          <div *appHasPermission="'edit-users'" class="permission-content success">
+            ✅ Puedes EDITAR USUARIOS
+          </div>
+          <div *appHasPermission="'edit-users'; permissionMode: 'hide'" class="permission-content error">
+            ❌ No puedes editar usuarios
+          </div>
+        </div>
+
+        <div class="permission-item">
+          <div *appHasPermission="'view-reports'" class="permission-content success">
+            ✅ Puedes VER REPORTES
+          </div>
+          <div *appHasPermission="'view-reports'; permissionMode: 'hide'" class="permission-content error">
+            ❌ No puedes ver reportes
+          </div>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h4>✨ Características:</h4>
+        <ul>
+          <li>✅ Control granular de permisos</li>
+          <li>✅ Modo show/hide configurable</li>
+          <li>✅ Diferentes roles: Admin, Usuario, Invitado</li>
+          <li>✅ Persistencia en localStorage</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 3. TooltipDirective -->
+    <div class="showcase-section">
+      <h3>💬 TooltipDirective</h3>
+      <p>Directiva que agrega tooltips interactivos a cualquier elemento</p>
+      
+      <div class="tooltip-demo">
+        <div class="tooltip-buttons">
+          <button 
+            class="btn btn-primary"
+            appTooltip="¡Tooltip arriba!"
+            tooltipPosition="top">
+            Top
+          </button>
+          <button 
+            class="btn btn-secondary"
+            appTooltip="¡Tooltip abajo!"
+            tooltipPosition="bottom">
+            Bottom
+          </button>
+          <button 
+            class="btn btn-success"
+            appTooltip="¡Tooltip a la izquierda!"
+            tooltipPosition="left">
+            Left
+          </button>
+          <button 
+            class="btn btn-warning"
+            appTooltip="¡Tooltip a la derecha!"
+            tooltipPosition="right">
+            Right
+          </button>
+        </div>
+
+        <div class="tooltip-elements">
+          <p appTooltip="Los párrafos también pueden tener tooltips">
+            🖱️ Pasa el mouse por aquí
+          </p>
+          <span 
+            class="tooltip-badge"
+            appTooltip="Información adicional sobre este elemento importante"
+            tooltipPosition="bottom">
+            🏷️ Badge con tooltip
+          </span>
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h4>✨ Características:</h4>
+        <ul>
+          <li>✅ 4 posiciones: top, bottom, left, right</li>
+          <li>✅ Animaciones suaves de entrada/salida</li>
+          <li>✅ Posicionamiento inteligente</li>
+          <li>✅ Gestión segura del DOM con Renderer2</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- 4. LazyLoadDirective -->
+    <div class="showcase-section full-width" id="lazy-images">
+      <h3>🚀 LazyLoadDirective</h3>
+      <p>Directiva que implementa lazy loading de imágenes con IntersectionObserver</p>
+      
+      <div class="lazy-load-demo">
+        <div class="scroll-info">
+          <p>📜 Haz scroll hacia abajo para ver las imágenes cargándose dinámicamente</p>
+          <button class="btn btn-primary" (click)="scrollToImages()">
+            📍 Ver imágenes lazy-loaded
+          </button>
+        </div>
+
+        <div class="images-grid">
+          @for (url of imageUrls; track url) {
+            <div class="image-card">
+              <img 
+                [appLazyLoad]="url"
+                alt="Imagen lazy-loaded"
+                class="lazy-image">
+              <p class="image-caption">Imagen {{$index + 1}}</p>
+            </div>
+          }
+        </div>
+      </div>
+
+      <div class="feature-list">
+        <h4>✨ Características:</h4>
+        <ul>
+          <li>✅ IntersectionObserver para detectar visibilidad</li>
+          <li>✅ Placeholder automático mientras carga</li>
+          <li>✅ Carga 100px antes de entrar en viewport</li>
+          <li>✅ Manejo de errores de carga</li>
+          <li>✅ Gestión de memoria eficiente</li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Footer de información -->
+  <div class="showcase-footer">
+    <div class="tech-info">
+      <h4>🛠️ Tecnologías Utilizadas:</h4>
+      <div class="tech-tags">
+        <span class="tech-tag">Angular 18</span>
+        <span class="tech-tag">TypeScript</span>
+        <span class="tech-tag">Signals</span>
+        <span class="tech-tag">HostBinding</span>
+        <span class="tech-tag">HostListener</span>
+        <span class="tech-tag">Renderer2</span>
+        <span class="tech-tag">IntersectionObserver</span>
+        <span class="tech-tag">Directivas Personalizadas</span>
+      </div>
+    </div>
+    
+    <div class="instructions">
+      <h4>📋 Instrucciones:</h4>
+      <ol>
+        <li>🔄 Cambia entre roles para ver cómo funcionan los permisos</li>
+        <li>📝 Escribe en los campos para ver la validación en tiempo real</li>
+        <li>🖱️ Pasa el mouse por los elementos para ver los tooltips</li>
+        <li>📜 Haz scroll para observar el lazy loading de imágenes</li>
+      </ol>
+    </div>
+  </div>
+</div>

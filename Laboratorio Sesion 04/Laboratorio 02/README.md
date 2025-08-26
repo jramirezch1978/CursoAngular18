@@ -1,101 +1,204 @@
-# LAB 1: DIRECTIVAS ESTRUCTURALES MODERNAS
+# LAB 2: DIRECTIVAS DE ATRIBUTO AVANZADAS
 
-## 🎯 Objetivo
-Dominar la nueva sintaxis de control flow (@if, @for, @switch) con casos de uso reales en un sistema de gestión de proyectos de infraestructura.
+## 🎯 Objetivo Principal
+Dominar las **directivas de atributo** de Angular 18 (NgClass, NgStyle, NgModel) creando un **sistema completo de personalización de temas** que permite a los usuarios configurar la apariencia de la aplicación en tiempo real.
+
+## 🎨 ¿Qué Construiremos?
+Un **ThemeConfiguratorComponent** profesional que funciona como el panel de personalización de aplicaciones modernas, donde los usuarios pueden:
+- Cambiar temas completos (claro, oscuro, corporativo, creativo)
+- Personalizar colores individuales con selectores de color
+- Ajustar tipografía (fuente, tamaño, peso, espaciado)
+- Configurar espaciado y layout dinámicamente
+- Gestionar widgets personalizables
+- Ver cambios en **tiempo real** mientras editan
 
 ## ⏱️ Duración: 45 minutos
 
-## 📋 Conceptos Clave
+## 🚀 Diferencias Clave vs Laboratorio 01
 
-### 1. Nueva Sintaxis de Control Flow en Angular 18
-Angular 18 introduce una revolucionaria sintaxis de control flow que reemplaza las directivas tradicionales:
+| **Laboratorio 01** | **Laboratorio 02** |
+|-------------------|-------------------|
+| 📋 **Directivas Estructurales** | 🎨 **Directivas de Atributo** |
+| @if, @for, @switch | NgClass, NgStyle, NgModel |
+| Controla **qué** se muestra | Controla **cómo** se ve |
+| Dashboard de proyectos | Configurador de temas |
+| Lógica de presentación | Personalización visual |
 
-#### @if / @else if / @else
+## 📋 Conceptos Clave del LAB 2
+
+### 1. NgClass - Clases CSS Dinámicas
+**NgClass** permite aplicar clases CSS dinámicamente basándose en condiciones:
+
+#### Sintaxis con Objetos (Más Usado)
 ```typescript
-@if (loading()) {
-  <div class="spinner">Cargando...</div>
-} @else if (error(); as errorMessage) {
-  <div class="error">{{ errorMessage }}</div>
-} @else {
-  <div class="content">Contenido cargado</div>
-}
+// En el template
+<div [ngClass]="{
+  'theme-dark': isDarkMode(),
+  'theme-compact': isCompactLayout(),
+  'theme-animated': hasAnimations(),
+  'theme-rtl': isRTL()
+}">
+  Contenido con clases dinámicas
+</div>
+
+// En el componente
+readonly themeClasses = computed(() => ({
+  'theme-dark': this.isDarkMode(),
+  'theme-compact': this.currentLayout() === 'compact',
+  'has-sidebar': this.showSidebar(),
+  'high-contrast': this.highContrastMode()
+}));
 ```
 
-**Ventajas:**
-- ✅ Sintaxis más clara y legible
-- ✅ Mejor tree-shaking (elimina código no usado)
-- ✅ Integrado directamente en el compilador
-- ✅ No requiere imports adicionales
+**Casos de uso reales:**
+- ✅ Temas dinámicos (claro/oscuro/corporativo)
+- ✅ Estados de componentes (active, disabled, loading)
+- ✅ Responsive design (mobile, tablet, desktop)
+- ✅ Preferencias del usuario (compact, spacious)
 
-#### @for / @empty
+#### Sintaxis con Arrays y Strings
 ```typescript
-@for (project of projects(); track project.id) {
-  <div class="project-card">{{ project.name }}</div>
-} @empty {
-  <div class="no-data">No hay proyectos</div>
-}
+// Array de clases
+<div [ngClass]="['base-theme', currentTheme(), layoutClass()]">
+  Clases base + dinámicas
+</div>
+
+// String condicional
+<div [ngClass]="isActive() ? 'active highlighted' : 'inactive'">
+  Clases condicionales simples
+</div>
 ```
 
-**Características clave:**
-- **track function**: Optimiza el renderizado identificando elementos únicos
-- **variables locales**: $index, $even, $odd, $first, $last
-- **@empty**: Maneja automáticamente listas vacías
+### 2. NgStyle - Estilos CSS Dinámicos
+**NgStyle** permite aplicar estilos inline dinámicamente:
 
-#### @switch / @case / @default
 ```typescript
-@switch (project.status) {
-  @case (ProjectStatus.PLANNING) {
-    <span class="badge planning">📋 Planificación</span>
+// Estilos con objeto (MÁS USADO)
+<div [ngStyle]="{
+  'background-color': primaryColor(),
+  'color': textColor(),
+  'font-size.px': fontSize(),
+  'padding.rem': spacing() * 1.5,
+  'border-radius.px': borderRadius(),
+  '--primary-color': primaryColor() // CSS Variables!
+}">
+  Elemento con estilos dinámicos
+</div>
+
+// Computed styles
+readonly containerStyles = computed(() => ({
+  'background': this.computedColors().surface,
+  'color': this.computedColors().text,
+  'font-family': this.typography().fontFamily,
+  '--theme-primary': this.colors().primary,
+  '--theme-secondary': this.colors().secondary
+}));
+```
+
+**🔥 Ventaja de CSS Variables:**
+- Cambian todos los elementos que usen esa variable
+- Mejor performance que cambiar estilos individuales
+- Más mantenible y escalable
+
+### 3. NgModel - Two-Way Data Binding
+**NgModel** crea binding bidireccional entre el template y el componente:
+
+```typescript
+// En el template
+<input 
+  type="color" 
+  [(ngModel)]="primaryColor"
+  (ngModelChange)="onColorChange($event)">
+
+<input 
+  type="range" 
+  min="12" 
+  max="24" 
+  [(ngModel)]="fontSize">
+
+<select [(ngModel)]="selectedTheme">
+  @for (theme of availableThemes(); track theme.id) {
+    <option [value]="theme.id">{{ theme.name }}</option>
   }
-  @case (ProjectStatus.EXECUTION) {
-    <span class="badge execution">🚧 En Ejecución</span>
-  }
-  @default {
-    <span class="badge unknown">❓ Estado Desconocido</span>
-  }
+</select>
+
+// En el componente
+readonly primaryColor = signal('#667eea');
+readonly fontSize = signal(16);
+readonly selectedTheme = signal('light');
+
+onColorChange(color: string) {
+  this.primaryColor.set(color);
+  this.updateTheme(); // Actualiza tema en tiempo real
 }
 ```
 
-### 2. Signals y Reactividad
-Los **signals** son el nuevo sistema reactivo de Angular que trabaja perfectamente con el control flow:
+**💡 Poder del Two-Way Binding:**
+- Cambios instantáneos en la UI
+- Sincronización automática
+- Feedback inmediato al usuario
+
+### 4. Patrón de Configurador de Temas
+El **ThemeConfiguratorComponent** es el corazón de este laboratorio:
 
 ```typescript
-// Signal básico
-const loading = signal(false);
-const projects = signal<Project[]>([]);
+@Component({
+  selector: 'app-theme-configurator',
+  template: `
+    <!-- Tabs dinámicos con NgClass -->
+    <nav class="tabs">
+      @for (tab of tabs; track tab.id) {
+        <button 
+          [ngClass]="{
+            'tab-active': activeTab() === tab.id,
+            'tab-has-changes': hasChanges(tab.id)
+          }"
+          (click)="setActiveTab(tab.id)">
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
 
-// Computed signal
-const hasProjects = computed(() => this.projects().length > 0);
-const filteredProjects = computed(() => {
-  const projects = this.projects();
-  const filter = this.filter();
-  return projects.filter(p => p.status === filter);
-});
+    <!-- Preview en tiempo real con NgStyle -->
+    <div 
+      class="live-preview"
+      [ngStyle]="{
+        'background': computedColors().background,
+        'color': computedColors().text,
+        'font-family': typography().fontFamily,
+        '--primary': colors().primary,
+        '--secondary': colors().secondary
+      }">
+      Vista previa en vivo
+    </div>
+  `
+})
 ```
 
-### 3. Track Functions para Performance
-Las track functions son cruciales para el rendimiento con listas grandes:
+## 🏗️ Arquitectura del Sistema de Temas
 
-```typescript
-@for (project of projects(); track project.id) {
-  // Angular sabe que project.id identifica únicamente cada elemento
-  // Solo re-renderiza elementos que realmente cambiaron
-}
-```
+### 🎨 Características Implementadas
 
-**Sin track function:**
-- Angular recrea todos los elementos DOM cuando la lista cambia
-- Performance degradada con listas grandes
+#### 📂 6 Categorías de Personalización:
+1. **Presets** - Temas predefinidos (corporativo, creativo, minimalista)
+2. **Colores** - Paleta completa personalizable (12+ colores)
+3. **Tipografía** - Fuentes, tamaños, pesos, espaciado
+4. **Espaciado** - Escalas, border-radius, contenedores
+5. **Widgets** - Componentes arrastrables personalizables
+6. **Avanzado** - RTL, alto contraste, import/export
 
-**Con track function:**
-- Angular actualiza solo elementos modificados
-- Performance optimizada incluso con miles de elementos
+#### 🔄 Flujo de Personalización:
+1. **Usuario cambia setting** (color picker, slider, select)
+2. **NgModel actualiza signal** automáticamente
+3. **Computed signal recalcula** estilos/clases
+4. **NgClass/NgStyle aplican** cambios al DOM
+5. **Vista previa se actualiza** instantáneamente
 
 ## 🛠️ Implementación Paso a Paso
 
-### PASO 1: Crear Interfaces y Modelos (5 minutos)
+### PASO 1: Sistema de Interfaces (5 minutos)
 
-Crear archivo `src/app/interfaces/infrastructure.interface.ts`:
+Crear archivo `src/app/interfaces/theme.interface.ts`:
 
 ```typescript
 // Interfaces para el sistema de gestión de infraestructura de PROVIAS
