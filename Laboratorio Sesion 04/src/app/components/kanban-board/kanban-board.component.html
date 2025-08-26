@@ -1,0 +1,302 @@
+<div class="kanban-board">
+  <!-- Header -->
+  <header class="kanban-header">
+    <h1>📋 Tablero Kanban - Drag & Drop Avanzado</h1>
+    <p class="subtitle">Sistema completo con HostBinding y Renderer2</p>
+    
+    <!-- Estadísticas rápidas -->
+    <div class="quick-stats">
+      <span class="stat">
+        📊 {{ statistics().total }} tareas
+      </span>
+      <span class="stat critical">
+        🔴 {{ statistics().critical }} críticas
+      </span>
+      <span class="stat overdue">
+        ⚠️ {{ statistics().overdue }} vencidas
+      </span>
+    </div>
+  </header>
+
+  <!-- Controles -->
+  <div class="controls">
+    <button 
+      class="btn btn-primary"
+      (click)="showAddTaskModal.set(true)">
+      ➕ Nueva Tarea
+    </button>
+  </div>
+
+  <!-- Tablero Kanban -->
+  <div class="kanban-columns">
+    @for (column of columns(); track column.id) {
+      <div 
+        class="kanban-column"
+        appDropZone
+        [appDropZone]="true"
+        (itemDropped)="onDrop($event, column.id)"
+        [style.border-top]="'4px solid ' + column.color">
+        
+        <!-- Header de Columna -->
+        <div class="column-header" [style.background-color]="column.color">
+          <h3>{{ column.title }}</h3>
+          <div class="column-meta">
+            <span class="task-count">{{ column.tasks.length }}</span>
+            @if (column.limit) {
+              <span 
+                class="task-limit"
+                [class.limit-reached]="column.tasks.length >= column.limit">
+                / {{ column.limit }}
+              </span>
+            }
+          </div>
+        </div>
+
+        <!-- Tareas -->
+        <div class="column-tasks">
+          @for (task of column.tasks; track task.id) {
+            <div 
+              class="task-card"
+              [class]="getPriorityClass(task.priority)"
+              [class.overdue]="isOverdue(task.dueDate)"
+              appDraggable
+              [appDraggable]="true"
+              [dragData]="task"
+              (dragStart)="onDragStart(task, column.id)"
+              (dragEnd)="onDragEnd()">
+              
+              <!-- Task Header -->
+              <div class="task-header">
+                <div class="task-priority">
+                  {{ getPriorityIcon(task.priority) }}
+                </div>
+                <h4>{{ task.title }}</h4>
+                <div class="task-actions">
+                  <button 
+                    class="btn-icon"
+                    (click)="editTask(task)">
+                    ✏️
+                  </button>
+                  <button 
+                    class="btn-icon"
+                    (click)="deleteTask(task.id, column.id)">
+                    🗑️
+                  </button>
+                </div>
+              </div>
+
+              <!-- Task Content -->
+              @if (task.description) {
+                <p class="task-description">{{ task.description }}</p>
+              }
+
+              <!-- Task Tags -->
+              @if (task.tags.length > 0) {
+                <div class="task-tags">
+                  @for (tag of task.tags; track tag) {
+                    <span class="tag">{{ tag }}</span>
+                  }
+                </div>
+              }
+
+              <!-- Task Footer -->
+              <div class="task-footer">
+                <div class="task-assignee">
+                  @if (task.avatar) {
+                    <img 
+                      [src]="task.avatar"
+                      [alt]="task.assignee"
+                      class="assignee-avatar">
+                  } @else {
+                    <div class="assignee-initials">
+                      {{ task.assignee.split(' ').map(n => n[0]).join('') }}
+                    </div>
+                  }
+                </div>
+
+                <div class="task-meta">
+                  @if (task.attachments > 0) {
+                    <span class="meta-item">
+                      📎 {{ task.attachments }}
+                    </span>
+                  }
+                  @if (task.comments > 0) {
+                    <span class="meta-item">
+                      💬 {{ task.comments }}
+                    </span>
+                  }
+                </div>
+
+                <div class="task-due-date" [class.overdue]="isOverdue(task.dueDate)">
+                  @if (isOverdue(task.dueDate)) {
+                    <span>⚠️ Vencida</span>
+                  } @else {
+                    <span>📅 {{ getDaysUntilDue(task.dueDate) }}d</span>
+                  }
+                </div>
+              </div>
+            </div>
+          }
+
+          <!-- Empty State -->
+          @if (column.tasks.length === 0) {
+            <div class="empty-column">
+              <p>Sin tareas</p>
+              <small>Arrastra tareas aquí</small>
+            </div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Modal de Nueva Tarea -->
+  @if (showAddTaskModal()) {
+    <div class="modal-overlay" (click)="showAddTaskModal.set(false)">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h2>{{ editingTask() ? 'Editar' : 'Nueva' }} Tarea</h2>
+          <button class="btn-close" (click)="showAddTaskModal.set(false)">✕</button>
+        </div>
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Título *</label>
+            <input 
+              type="text"
+              class="form-control"
+              [value]="newTask().title"
+              (input)="newTask.update(t => ({...t, title: $any($event.target).value}))"
+              placeholder="Título de la tarea">
+          </div>
+          
+          <div class="form-group">
+            <label>Descripción</label>
+            <textarea 
+              class="form-control"
+              rows="3"
+              [value]="newTask().description"
+              (input)="newTask.update(t => ({...t, description: $any($event.target).value}))"
+              placeholder="Descripción detallada">
+            </textarea>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label>Asignado a *</label>
+              <select 
+                class="form-control"
+                [value]="newTask().assignee"
+                (change)="newTask.update(t => ({...t, assignee: $any($event.target).value}))">
+                <option value="">Seleccionar...</option>
+                @for (user of users; track user.id) {
+                  <option [value]="user.name">{{ user.name }}</option>
+                }
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label>Prioridad</label>
+              <select 
+                class="form-control"
+                [value]="newTask().priority"
+                (change)="newTask.update(t => ({...t, priority: $any($event.target).value}))">
+                <option value="low">🟢 Baja</option>
+                <option value="medium">🟡 Media</option>
+                <option value="high">🟠 Alta</option>
+                <option value="critical">🔴 Crítica</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="form-group">
+            <label>Columna</label>
+            <select 
+              class="form-control"
+              [value]="newTask().column"
+              (change)="newTask.update(t => ({...t, column: $any($event.target).value}))">
+              @for (column of columns(); track column.id) {
+                <option [value]="column.id">{{ column.title }}</option>
+              }
+            </select>
+          </div>
+          
+          <div class="form-group">
+            <label>Tags</label>
+            <div class="tags-selector">
+              @for (tag of availableTags; track tag) {
+                <button 
+                  type="button"
+                  class="tag-btn"
+                  [class.selected]="newTask().tags?.includes(tag)"
+                  (click)="toggleTag(tag)">
+                  {{ tag }}
+                </button>
+              }
+            </div>
+          </div>
+        </div>
+        
+        <div class="modal-footer">
+          <button 
+            class="btn btn-secondary"
+            (click)="resetNewTask(); showAddTaskModal.set(false)">
+            Cancelar
+          </button>
+          <button 
+            class="btn btn-primary"
+            [disabled]="taskValidation() !== 'valid'"
+            (click)="addTask()">
+            {{ editingTask() ? 'Actualizar' : 'Crear' }} Tarea
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Resumen de Implementación -->
+  <section class="implementation-summary">
+    <h2>🎯 Técnicas Avanzadas Implementadas</h2>
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>DraggableDirective</h3>
+        <ul>
+          <li><code>@HostBinding</code> para opacity, transform, cursor</li>
+          <li><code>@HostListener</code> para dragstart, dragend, drag</li>
+          <li><code>DataTransfer</code> para comunicación de datos</li>
+          <li><code>Renderer2</code> para preview personalizado</li>
+        </ul>
+      </div>
+      
+      <div class="summary-card">
+        <h3>DropZoneDirective</h3>
+        <ul>
+          <li><code>@HostBinding</code> para bordes y background dinámicos</li>
+          <li>Detección de drag over con contador</li>
+          <li>Efectos de drop con animación ripple</li>
+          <li>Validación de tipos aceptados</li>
+        </ul>
+      </div>
+      
+      <div class="summary-card">
+        <h3>Efectos Visuales</h3>
+        <ul>
+          <li>Preview de drag personalizado</li>
+          <li>Animaciones de hover y drop</li>
+          <li>Feedback visual inmediato</li>
+          <li>Estados CSS dinámicos</li>
+        </ul>
+      </div>
+      
+      <div class="summary-card">
+        <h3>Performance</h3>
+        <ul>
+          <li>Event throttling en drag move</li>
+          <li>Cleanup automático de elementos</li>
+          <li>Signals para reactividad optimizada</li>
+          <li>Track functions en @for loops</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+</div>

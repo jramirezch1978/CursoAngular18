@@ -1,170 +1,208 @@
 /* You can add global styles to this file, and also import other style files */
 
-// Estilos globales para directivas personalizadas
-
-// Tooltip
-.custom-tooltip {
-  position: fixed;
-  background: rgba(0, 0, 0, 0.9);
-  color: white;
-  padding: 8px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  white-space: nowrap;
-  z-index: 10000;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  max-width: 300px;
-
-  &.tooltip-visible {
-    opacity: 1;
-  }
-
-  &.tooltip-large {
-    max-width: 400px;
-    padding: 12px 16px;
-    font-size: 16px;
-  }
-
-  // Flechas para diferentes posiciones
-  &.tooltip-top::after {
-    content: '';
-    position: absolute;
-    top: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-top-color: rgba(0, 0, 0, 0.9);
-  }
-
-  &.tooltip-bottom::after {
-    content: '';
-    position: absolute;
-    bottom: 100%;
-    left: 50%;
-    transform: translateX(-50%);
-    border: 6px solid transparent;
-    border-bottom-color: rgba(0, 0, 0, 0.9);
-  }
-
-  &.tooltip-left::after {
-    content: '';
-    position: absolute;
-    left: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 6px solid transparent;
-    border-left-color: rgba(0, 0, 0, 0.9);
-  }
-
-  &.tooltip-right::after {
-    content: '';
-    position: absolute;
-    right: 100%;
-    top: 50%;
-    transform: translateY(-50%);
-    border: 6px solid transparent;
-    border-right-color: rgba(0, 0, 0, 0.9);
-  }
-}
-
-// Lazy Loading
-.lazy-loading {
-  filter: blur(5px);
-  transition: filter 0.3s ease;
-  background: linear-gradient(45deg, #f0f0f0, #e0e0e0);
-  background-size: 400% 400%;
-  animation: shimmer 1.5s ease-in-out infinite;
-}
-
-.lazy-loaded {
-  filter: blur(0);
-  animation: fadeIn 0.5s ease;
-}
-
-.lazy-error {
-  filter: grayscale(100%) brightness(0.7);
-  opacity: 0.6;
-}
-
-.fade-in {
-  animation: fadeIn 0.5s ease;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes shimmer {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
-
-// Validation Feedback
-.validation-valid {
-  border: 2px solid #28a745 !important;
-  box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.2);
-  background: rgba(40, 167, 69, 0.05);
-}
-
-.validation-invalid {
-  border: 2px solid #dc3545 !important;
-  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.2);
-  background: rgba(220, 53, 69, 0.05);
-}
-
-.validation-pending {
-  border: 2px solid #ffc107 !important;
-  box-shadow: 0 0 0 3px rgba(255, 193, 7, 0.2);
-  background: rgba(255, 193, 7, 0.05);
-}
-
-.validation-shake {
-  animation: shake 0.5s ease;
-}
-
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-.validation-message {
-  position: absolute;
-  bottom: -25px;
-  left: 0;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 4px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-  white-space: nowrap;
-  z-index: 1000;
-
-  &.validation-message-error {
-    background: #dc3545;
-    color: white;
-  }
-
-  &.validation-message-visible {
-    opacity: 1;
-  }
-}
-
-// Global styles
+// Reset y estilos base
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: #f8f9fa;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  line-height: 1.6;
+  color: #2c3e50;
+  background: #f8f9fa;
+}
+
+// Estilos globales para directivas de drag & drop
+
+// Draggable elements
+[appDraggable] {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    cursor: move;
+  }
+  
+  &.dragging {
+    opacity: 0.5;
+    transform: scale(1.05);
+    z-index: 1000;
+  }
+}
+
+// Drop zones
+[appDropZone] {
+  transition: all 0.3s ease;
+  position: relative;
+  
+  &.drag-over {
+    border: 2px dashed #667eea !important;
+    background-color: rgba(102, 126, 234, 0.1) !important;
+    transform: scale(1.02);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+  }
+  
+  &.can-drop {
+    border-color: #28a745 !important;
+  }
+  
+  &.drop-zone-highlight {
+    animation: pulse 1s infinite;
+  }
+}
+
+// Animaciones
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(0); }
+}
+
+// Drag preview personalizado
+.drag-preview {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  transform: rotate(2deg) scale(1.05);
+  opacity: 0.8;
+  pointer-events: none;
+  z-index: 10000;
+}
+
+// Drop effect ripple
+.drop-effect-ripple {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(102, 126, 234, 0.3);
+  pointer-events: none;
+  z-index: 1000;
+  animation: ripple 0.6s ease-out forwards;
+}
+
+@keyframes ripple {
+  from {
+    width: 40px;
+    height: 40px;
+    opacity: 0.3;
+  }
+  to {
+    width: 200px;
+    height: 200px;
+    opacity: 0;
+  }
+}
+
+// Utilidades de validación
+.validation-valid {
+  border-color: #28a745 !important;
+  box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+}
+
+.validation-invalid {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+}
+
+.validation-pending {
+  border-color: #ffc107 !important;
+  box-shadow: 0 0 0 0.2rem rgba(255, 193, 7, 0.25);
+}
+
+// Scrollbar personalizado
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+  
+  &:hover {
+    background: #a8a8a8;
+  }
+}
+
+// Responsive utilities
+@media (max-width: 768px) {
+  .hide-mobile {
+    display: none !important;
+  }
+}
+
+@media (min-width: 769px) {
+  .hide-desktop {
+    display: none !important;
+  }
+}
+
+// Print styles
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+}
+
+// Accessibility
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// Focus styles
+*:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+button:focus,
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .drag-over {
+    border-color: #000 !important;
+    background-color: #fff !important;
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
